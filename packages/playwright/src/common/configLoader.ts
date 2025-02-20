@@ -224,7 +224,10 @@ function validateConfig(file: string, config: Config) {
       throw errorWithFile(file, `config.reporter must be a string`);
     }
   }
-
+  if ('shardingMode' in config && config.shardingMode !== undefined) {
+    if (typeof config.shardingMode !== 'string' || !['partition', 'round-robin', 'duration-round-robin'].includes(config.shardingMode))
+      throw errorWithFile(file, `config.shardingMode must be one of "partition", "round-robin" or "duration-round-robin"`);
+  }
   if ('reportSlowTests' in config && config.reportSlowTests !== undefined && config.reportSlowTests !== null) {
     if (!config.reportSlowTests || typeof config.reportSlowTests !== 'object')
       throw errorWithFile(file, `config.reportSlowTests must be an object`);
@@ -366,9 +369,9 @@ export async function loadConfigFromFileRestartIfNeeded(configFile: string | und
   return await loadConfig(location, overrides, ignoreDeps);
 }
 
-export async function loadEmptyConfigForMergeReports() {
+export async function loadEmptyConfigForMergeReports(overrides?: ConfigCLIOverrides) {
   // Merge reports is "different" for no good reason. It should not pick up local config from the cwd.
-  return await loadConfig({ configDir: process.cwd() });
+  return await loadConfig({ configDir: process.cwd() }, overrides);
 }
 
 export function restartWithExperimentalTsEsm(configFile: string | undefined, force: boolean = false): boolean {
