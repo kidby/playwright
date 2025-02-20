@@ -45,6 +45,8 @@ type ReportData = {
 export async function createMergedReport(config: FullConfigInternal, dir: string, reporterDescriptions: ReporterDescription[], rootDirOverride: string | undefined) {
   const reporters = await createReporters(config, 'merge', false, reporterDescriptions);
   const multiplexer = new Multiplexer(reporters);
+  const lastRun = new LastRunReporter(config);
+  const multiplexer = new Multiplexer([...reporters, lastRun]);
   const stringPool = new StringInternPool();
 
   let printStatus: StatusCallback = () => {};
