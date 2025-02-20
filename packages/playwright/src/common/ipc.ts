@@ -19,7 +19,7 @@ import util from 'util';
 import { serializeCompilationCache } from '../transform/compilationCache';
 
 import type { ConfigLocation, FullConfigInternal } from './config';
-import type { ReporterDescription, TestInfoError, TestStatus } from '../../types/test';
+import type { PlaywrightTestConfig, ReporterDescription, TestInfoError, TestStatus } from '../../types/test';
 import type { MatcherResultProperty } from '../matchers/matcherHint';
 import type { SerializedCompilationCache  } from '../transform/compilationCache';
 
@@ -37,6 +37,8 @@ export type ConfigCLIOverrides = {
   reporter?: ReporterDescription[];
   additionalReporters?: ReporterDescription[];
   shard?: { current: number, total: number };
+  shardingMode?: PlaywrightTestConfig['shardingMode'];
+  lastRunFile?: string;
   timeout?: number;
   tsconfig?: string;
   ignoreSnapshots?: boolean;
