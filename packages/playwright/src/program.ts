@@ -36,7 +36,7 @@ import { serializeError } from './util';
 
 import type { TestError } from '../types/testReporter';
 import type { ConfigCLIOverrides } from './common/ipc';
-import type { TraceMode } from '../types/test';
+import type { TraceMode, ShardingMode } from '../types/test';
 import type { ReporterDescription } from '../types/test';
 import type { Command } from 'playwright-core/lib/utilsBundle';
 
@@ -149,6 +149,7 @@ function addMergeReportsCommand(program: Command) {
   });
   command.option('-c, --config <file>', `Configuration file. Can be used to specify additional configuration for the output report.`);
   command.option('--reporter <reporter>', `Reporter to use, comma-separated, can be ${builtInReporters.map(name => `"${name}"`).join(', ')} (default: "${defaultReporter}")`);
+  command.option('--last-run-file <file>', `Path to a json file where the last run information is written to (default: test-results/.last-run.json)`);
   command.addHelpText('afterAll', `
 Arguments [dir]:
   Directory containing blob reports.
@@ -266,7 +267,8 @@ async function listTestFiles(opts: { [key: string]: any }) {
 
 async function mergeReports(reportDir: string | undefined, opts: { [key: string]: any }) {
   const configFile = opts.config;
-  const config = configFile ? await loadConfigFromFileRestartIfNeeded(configFile) : await loadEmptyConfigForMergeReports();
+  const cliOverrides = overridesFromOptions(opts);
+  const config = configFile ? await loadConfigFromFileRestartIfNeeded(configFile, cliOverrides) : await loadEmptyConfigForMergeReports(cliOverrides);
   if (!config)
     return;
 
@@ -304,6 +306,8 @@ function overridesFromOptions(options: { [key: string]: any }): ConfigCLIOverrid
     retries: options.retries ? parseInt(options.retries, 10) : undefined,
     reporter: resolveReporterOption(options.reporter),
     shard: resolveShardOption(options.shard),
+    shardingMode: options.shardingMode ? resolveShardingModeOption(options.shardingMode) : undefined,
+    lastRunFile: options.lastRunFile ? path.resolve(process.cwd(), options.lastRunFile) : undefined,
     timeout: options.timeout ? parseInt(options.timeout, 10) : undefined,
     tsconfig: options.tsconfig ? path.resolve(process.cwd(), options.tsconfig) : undefined,
     ignoreSnapshots: options.ignoreSnapshots ? !!options.ignoreSnapshots : undefined,
@@ -341,6 +345,15 @@ function overridesFromOptions(options: { [key: string]: any }): ConfigCLIOverrid
     throw new Error(`--tsconfig "${options.tsconfig}" does not exist`);
 
   return overrides;
+}
+const shardingModes: ShardingMode[] = ['partition', 'round-robin', 'duration-round-robin'];
+
+function resolveShardingModeOption(shardingMode?: string): ShardingMode | undefined {
+  if (!shardingMode)
+    return undefined;
+  if (!shardingModes.includes(shardingMode as ShardingMode))
+    throw new Error(`Unsupported sharding mode "${shardingMode}", must be one of: ${shardingModes.map(mode => `"${mode}"`).join(', ')}`);
+  return shardingMode as ShardingMode;
 }
 
 function resolveReporterOption(reporter?: string): ReporterDescription[] | undefined {
@@ -403,6 +416,7 @@ const testOptions: [string, string][] = [
   ['--headed', `Run tests in headed browsers (default: headless)`],
   ['--ignore-snapshots', `Ignore screenshot and snapshot expectations`],
   ['--last-failed', `Only re-run the failures`],
+  ['--last-run-file <file>', `Path to a json file where the last run information is read from and written to (default: test-results/.last-run.json)`],
   ['--list', `Collect all the tests and report them, but do not run`],
   ['--max-failures <N>', `Stop after the first N failures`],
   ['--no-deps', 'Do not run project dependencies'],
@@ -415,6 +429,7 @@ const testOptions: [string, string][] = [
   ['--reporter <reporter>', `Reporter to use, comma-separated, can be ${builtInReporters.map(name => `"${name}"`).join(', ')} (default: "${defaultReporter}")`],
   ['--retries <retries>', `Maximum retry count for flaky tests, zero for no retries (default: no retries)`],
   ['--shard <shard>', `Shard tests and execute only the selected shard, specify in the form "current/all", 1-based, for example "3/5"`],
+  ['--sharding-mode <mode>', `Sharding algorithm to use; "partition", "round-robin" or "duration-round-robin". Defaults to "partition".`],
   ['--timeout <timeout>', `Specify test timeout threshold in milliseconds, zero for unlimited (default: ${defaultTimeout})`],
   ['--trace <mode>', `Force tracing mode, can be ${kTraceModes.map(mode => `"${mode}"`).join(', ')}`],
   ['--tsconfig <path>', `Path to a single tsconfig applicable to all imported files (default: look up tsconfig for each imported file separately)`],
