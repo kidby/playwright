@@ -32,6 +32,7 @@ import type { TestError } from '../../types/testReporter';
 import type { FullConfigInternal } from '../common/config';
 import type { JsonConfig, JsonEvent, JsonFullResult, JsonLocation, JsonProject, JsonSuite, JsonTestCase, JsonTestResultEnd, JsonTestStepEnd, JsonTestStepStart } from '../isomorphic/teleReceiver';
 import type * as blobV1 from './versions/blobV1';
+import { LastRunReporter } from '../runner/lastRun';
 
 type StatusCallback = (message: string) => void;
 
