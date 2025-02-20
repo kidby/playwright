@@ -1526,6 +1526,21 @@ interface TestConfig<TestArgs = {}, WorkerArgs = {}> {
   };
 
   /**
+   * Defines the algorithm to be used for sharding. Defaults to `'partition'`.
+   * - `'partition'` - divide the set of test groups by number of shards. e.g. first half goes to shard 1/2 and
+   *   seconds half to shard 2/2.
+   * - `'round-robin'` - spread test groups to shards in a round-robin way. e.g. loop over test groups and always
+   *   assign to the shard that has the lowest number of tests.
+   * - `'duration-round-robin'` - use duration info from `.last-run.json` to spread test groups to shards in a
+   *   round-robin way. e.g. loop over test groups and always assign to the shard that has the lowest duration of
+   *   tests. new tests which were not present in the last run will use an average duration time. When no
+   *   `.last-run.json` could be found the behavior is identical to `'round-robin'`.
+   *
+   * Learn more about [sharding](https://playwright.dev/docs/test-sharding) with Playwright Test.
+   */
+  shardingMode?: "partition"|"round-robin"|"duration-round-robin";
+  
+  /**
    * **NOTE** Use
    * [testConfig.snapshotPathTemplate](https://playwright.dev/docs/api/class-testconfig#test-config-snapshot-path-template)
    * to configure snapshot paths.
@@ -6268,6 +6283,7 @@ export interface PlaywrightWorkerOptions {
   video: VideoMode | /** deprecated */ 'retry-with-video' | { mode: VideoMode, size?: ViewportSize };
 }
 
+export type ShardingMode = Exclude<PlaywrightTestConfig['shardingMode'], undefined>;
 export type ScreenshotMode = 'off' | 'on' | 'only-on-failure' | 'on-first-failure';
 export type PageSnapshotMode = 'off' | 'on' | 'only-on-failure';
 export type TraceMode = 'off' | 'on' | 'retain-on-failure' | 'on-first-retry' | 'on-all-retries' | 'retain-on-first-failure';
