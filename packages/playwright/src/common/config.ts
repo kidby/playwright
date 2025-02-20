@@ -20,7 +20,7 @@ import path from 'path';
 
 import { getPackageJsonPath, mergeObjects } from '../util';
 
-import type { Config, Fixtures, Project, ReporterDescription } from '../../types/test';
+import type { Config, Fixtures, Project, ReporterDescription, ShardingMode } from '../../types/test';
 import type { TestRunnerPluginRegistration } from '../plugins';
 import type { Matcher } from '../util';
 import type { ConfigCLIOverrides } from './ipc';
@@ -61,6 +61,8 @@ export class FullConfigInternal {
   testIdMatcher?: Matcher;
   lastFailedTestIdMatcher?: Matcher;
   defineConfigWasUsed = false;
+  shardingMode: ShardingMode;
+  lastRunFile: string | undefined;
 
   globalSetups: string[] = [];
   globalTeardowns: string[] = [];
@@ -111,6 +113,10 @@ export class FullConfigInternal {
       workers: 0,
       webServer: null,
     };
+
+    this.shardingMode = takeFirst(configCLIOverrides.shardingMode, userConfig.shardingMode, 'partition');
+    this.lastRunFile = configCLIOverrides.lastRunFile;
+
     for (const key in userConfig) {
       if (key.startsWith('@'))
         (this.config as any)[key] = (userConfig as any)[key];
