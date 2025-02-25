@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
+import { LastRunReporter  } from './lastRun';
+
+import type { LastRunInfo } from './lastRun';
 import type { FullConfigInternal } from '../common/config';
 import type { Suite, TestCase } from '../common/test';
-import { LastRunReporter, type LastRunInfo } from './lastRun';
 
 export type TestGroup = {
   workerHash: string;
@@ -219,28 +221,34 @@ function filterForShardRoundRobin(
   testGroups: TestGroup[],
   lastRunInfo?: LastRunInfo,
 ): Set<TestGroup> {
+  const averageDuration = lastRunInfo
+    ? Object.values(lastRunInfo.testDurations || {}).reduce((a, b) => a + b, 1) /
+    Math.max(1, Object.values(lastRunInfo.testDurations || {}).length)
+    : 0;
+
+  const weight = (group: TestGroup) => {
+    if (!lastRunInfo)
+      return group.tests.length;
+    return group.tests.reduce((sum, test) => {
+      // Assert that testDurations is a Record with string keys.
+      const testDuration = ((lastRunInfo.testDurations as Record<string, number>)[test.id] ?? averageDuration);
+      return sum + Math.max(1, testDuration);
+    }, 0);
+  };
 
   const weights = new Array(shard.total).fill(0);
   const shardSet = new Array(shard.total).fill(0).map(() => new Set<TestGroup>());
-  const averageDuration = lastRunInfo ? Object.values(lastRunInfo?.testDurations || {}).reduce((a, b) => a + b, 1) / Math.max(1, Object.values(lastRunInfo?.testDurations || {}).length) : 0;
-  const weight = (group: TestGroup) => {
-    if (!lastRunInfo)
-      // If we don't have last run info, we just count the number of tests.
-      return group.tests.length;
-    // If we have last run info, we use the duration of the tests.
-    return group.tests.reduce((sum, test) => sum + Math.max(1, lastRunInfo.testDurations?.[test.id] || averageDuration), 0);
-  };
 
-  // We sort the test groups by group duration in descending order.
+  // Sort test groups by calculated weight in descending order.
   const sortedTestGroups = testGroups.slice().sort((a, b) => weight(b) - weight(a));
 
-  // Then we add each group to the shard with the smallest number of tests.
+  // Distribute groups in round-robin manner.
   for (const group of sortedTestGroups) {
-    const index = weights.reduce((minIndex, currentLength, currentIndex) => currentLength < weights[minIndex] ? currentIndex : minIndex, 0);
+    const index = weights.reduce((minIndex, currentLength, currentIndex) =>
+      currentLength < weights[minIndex] ? currentIndex : minIndex, 0);
     weights[index] += weight(group);
     shardSet[index].add(group);
   }
 
   return shardSet[shard.current - 1];
 }
-
