@@ -37,7 +37,6 @@ export class LastRunReporter implements ReporterV2 {
   constructor(config: FullConfigInternal) {
     this._config = config;
     if (config.lastRunFile) {
-      // specified via command line argument
       this._lastRunFile = config.lastRunFile;
     } else {
       const [project] = filterProjects(config.projects, config.cliProjectFilter);
@@ -52,6 +51,7 @@ export class LastRunReporter implements ReporterV2 {
     try {
       return JSON.parse(await fs.promises.readFile(this._lastRunFile, 'utf8'));
     } catch {
+      // File doesn't exist or is invalid JSON - silently return undefined
     }
   }
 
@@ -77,13 +77,21 @@ export class LastRunReporter implements ReporterV2 {
   async onEnd(result: FullResult) {
     if (!this._lastRunFile || this._config.cliListOnly)
       return;
+
     await fs.promises.mkdir(path.dirname(this._lastRunFile), { recursive: true });
-    const failedTests = this._suite?.allTests().filter(t => !t.ok()).map(t => t.id);
-        const testDurations = this._suite?.allTests().reduce((map, t) => {
+
+    const failedTests = this._suite?.allTests().filter(t => !t.ok()).map(t => t.id) || [];
+    const testDurations = this._suite?.allTests().reduce((map, t) => {
       map[t.id] = t.results.map(r => r.duration).reduce((a, b) => a + b, 0);
       return map;
-    }, {} as { [key: string]: number });
-    const lastRunReport = JSON.stringify({ status: result.status, failedTests, testDurations }, undefined, 2);
+    }, {} as { [key: string]: number }) || {};
+
+    const lastRunReport = JSON.stringify({
+      status: result.status,
+      failedTests,
+      testDurations
+    }, undefined, 2);
+
     await fs.promises.writeFile(this._lastRunFile, lastRunReport);
   }
 }

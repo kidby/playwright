@@ -139,17 +139,25 @@ export async function filterForShard(config: FullConfigInternal, testGroups: Tes
   //
   // Shards are still balanced by the number of tests, not files,
   // even in the case of non-paralleled files.
-  const mode = config.shardingMode;
-  const shard = config.config.shard!;
-  if (mode === 'round-robin')
+  const strategy = shardingStrategies[config.shardingMode];
+  // Pass config.config.shard to the strategies that expect shard object
+  // This matches how duration-round-robin is already using it
+  return strategy(config.config.shard!, testGroups, config);
+}
+
+const shardingStrategies = {
+  'partition': (shard: { total: number, current: number }, testGroups: TestGroup[]) => {
+    return filterForShardPartition(shard, testGroups);
+  },
+  'round-robin': (shard: { total: number, current: number }, testGroups: TestGroup[]) => {
     return filterForShardRoundRobin(shard, testGroups);
-  if (mode === 'duration-round-robin') {
+  },
+  'duration-round-robin': async (shard: { total: number, current: number }, testGroups: TestGroup[], config: FullConfigInternal): Promise<Set<TestGroup>> => {
     const lastRun = new LastRunReporter(config);
     const lastRunInfo = await lastRun.lastRunInfo();
     return filterForShardRoundRobin(shard, testGroups, lastRunInfo);
   }
-  return filterForShardPartition(shard, testGroups);
-}
+};
 
 /**
  * Shards tests by partitioning them into equal parts.
