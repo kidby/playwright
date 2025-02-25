@@ -11751,7 +11751,8 @@ export interface ElementHandle<T=Node> extends JSHandle<T> {
      * Specify locators that should be masked when the screenshot is taken. Masked elements will be overlaid with a pink
      * box `#FF00FF` (customized by
      * [`maskColor`](https://playwright.dev/docs/api/class-elementhandle#element-handle-screenshot-option-mask-color))
-     * that completely covers its bounding box.
+     * that completely covers its bounding box. The mask is also applied to invisible elements, see
+     * [Matching only visible elements](https://playwright.dev/docs/locators#matching-only-visible-elements) to disable that.
      */
     mask?: Array<Locator>;
 
@@ -14174,9 +14175,9 @@ export interface Locator {
    *
    * ```html
    * <select multiple>
-   *   <option value="red">Red</div>
-   *   <option value="green">Green</div>
-   *   <option value="blue">Blue</div>
+   *   <option value="red">Red</option>
+   *   <option value="green">Green</option>
+   *   <option value="blue">Blue</option>
    * </select>
    * ```
    *
@@ -14425,7 +14426,8 @@ export interface Locator {
   }): Promise<void>;
 
   /**
-   * Perform a tap gesture on the element matching the locator.
+   * Perform a tap gesture on the element matching the locator. For examples of emulating other gestures by manually
+   * dispatching touch events, see the [emulating legacy touch events](https://playwright.dev/docs/touch-events) page.
    *
    * **Details**
    *
@@ -14612,6 +14614,17 @@ export interface Locator {
      */
     trial?: boolean;
   }): Promise<void>;
+
+  /**
+   * Returns a locator that only matches [visible](https://playwright.dev/docs/actionability#visible) elements.
+   * @param options
+   */
+  visible(options?: {
+    /**
+     * Whether to match visible or invisible elements.
+     */
+    visible?: boolean;
+  }): Locator;
 
   /**
    * Returns when element specified by locator satisfies the
@@ -21309,6 +21322,9 @@ export interface Selectors {
 /**
  * The Touchscreen class operates in main-frame CSS pixels relative to the top-left corner of the viewport. Methods on
  * the touchscreen can only be used in browser contexts that have been initialized with `hasTouch` set to true.
+ *
+ * This class is limited to emulating tap gestures. For examples of other gestures simulated by manually dispatching
+ * touch events, see the [emulating legacy touch events](https://playwright.dev/docs/touch-events) page.
  */
 export interface Touchscreen {
   /**
@@ -22048,7 +22064,8 @@ export interface LocatorScreenshotOptions {
    * Specify locators that should be masked when the screenshot is taken. Masked elements will be overlaid with a pink
    * box `#FF00FF` (customized by
    * [`maskColor`](https://playwright.dev/docs/api/class-locator#locator-screenshot-option-mask-color)) that completely
-   * covers its bounding box.
+   * covers its bounding box. The mask is also applied to invisible elements, see
+   * [Matching only visible elements](https://playwright.dev/docs/locators#matching-only-visible-elements) to disable that.
    */
   mask?: Array<Locator>;
 
@@ -22772,7 +22789,8 @@ export interface PageScreenshotOptions {
    * Specify locators that should be masked when the screenshot is taken. Masked elements will be overlaid with a pink
    * box `#FF00FF` (customized by
    * [`maskColor`](https://playwright.dev/docs/api/class-page#page-screenshot-option-mask-color)) that completely covers
-   * its bounding box.
+   * its bounding box. The mask is also applied to invisible elements, see
+   * [Matching only visible elements](https://playwright.dev/docs/locators#matching-only-visible-elements) to disable that.
    */
   mask?: Array<Locator>;
 
