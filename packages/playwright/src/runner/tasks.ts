@@ -338,7 +338,7 @@ function createPhasesTask(): Task<TestRun> {
           testRun.phases.push(phase);
           for (const project of phaseProjects) {
             const projectSuite = projectToSuite.get(project)!;
-            const testGroups = createTestGroups(projectSuite, testRun.config.config.workers);
+            const testGroups = await createTestGroups(projectSuite, testRun.config.config.workers);
             phase.projects.push({ project, projectSuite, testGroups });
             testGroupsInPhase += testGroups.length;
           }

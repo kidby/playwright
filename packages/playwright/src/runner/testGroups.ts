@@ -224,87 +224,63 @@ class TestSharding {
     const uniqueFiles = new Set<string>();
     for (const t of allTests)
       uniqueFiles.add(t._requireFile);
-    if (this._workerPool?.hasWorkers()) {await Promise.all([...uniqueFiles].map(f => this._workerPool!.analyzeFile(f).catch(() => this._fileCache.getComplexity(f))));} else {
+    if (this._workerPool?.hasWorkers()) {
+      await Promise.all([...uniqueFiles].map(f => this._workerPool!.analyzeFile(f).catch(() => this._fileCache.getComplexity(f))));
+    } else {
       for (const f of uniqueFiles)
         this._fileCache.getComplexity(f);
     }
     this._populateSuiteMetrics(projectSuite);
 
+    // Group tests by worker hash in a deterministic order.
     const groupsByWorker = new MultiMap<string, TestCase>();
     for (const test of allTests)
       groupsByWorker.set(test._workerHash, test);
-
     const result: TestGroup[] = [];
-    // Fix: Correctly iterate over the MultiMap by worker hash
-    for (const workerHash of groupsByWorker.keys()) {
+
+    // Sort worker hashes to ensure a predictable order.
+    for (const workerHash of [...groupsByWorker.keys()].sort()) {
       const tests = groupsByWorker.get(workerHash);
-      const groupsByFile = new Map<string, {
-        general: TestGroup;
-        parallel: MultiMap<string, TestGroup>;
-        parallelWithHooks: TestGroup;
-      }>();
+      // Group by file. We will keep a "general" group (for tests not in parallel)
+      // and a map for parallel groups keyed by the test's parent title (or fallback to test id).
+      const groupsByFile = new Map<string, { general: TestGroup, parallel: Map<string, TestGroup> }>();
 
       for (const test of tests) {
         let entry = groupsByFile.get(test._requireFile);
         if (!entry) {
           entry = {
             general: this.createGroup(test),
-            parallel: new MultiMap<string, TestGroup>(),
-            parallelWithHooks: this.createGroup(test)
+            parallel: new Map<string, TestGroup>()
           };
           groupsByFile.set(test._requireFile, entry);
         }
-        let inParallel = false, outerSeq: Suite | undefined, hasHooks = false;
-        for (let cur: any = test.parent; cur; cur = cur.parent) {
-          if (cur._parallelMode === 'serial' || cur._parallelMode === 'default')
-            outerSeq = cur;
-          inParallel = inParallel || cur._parallelMode === 'parallel';
-          hasHooks = hasHooks || cur._hooks?.some((h: { type: string }) => h.type === 'beforeAll' || h.type === 'afterAll');
-        }
-        if (inParallel) {
-          if (hasHooks && !outerSeq) {entry.parallelWithHooks.tests.push(test);} else {
-            const key = outerSeq ? outerSeq.title : test.id;
-            // Fix: Get TestGroup array for this key and properly check for existence
-            const grpArr = entry.parallel.get(key);
-            // Fix: If there's no group for this key, create one and add it
-            if (grpArr.length === 0) {
-              const grp = this.createGroup(test);
-              entry.parallel.set(key, grp);
-              grp.tests.push(test);
-            } else {
-              // Use the existing group
-              grpArr[0].tests.push(test);
-            }
+        // Decide whether the test is in parallel mode.
+        if (test.parent && test.parent._parallelMode === 'parallel') {
+          // Use parent.title as key; fallback to test.id.
+          const key = test.parent.title || test.id;
+          let pg = entry.parallel.get(key);
+          if (!pg) {
+            pg = this.createGroup(test);
+            entry.parallel.set(key, pg);
           }
+          pg.tests.push(test);
         } else {
           entry.general.tests.push(test);
         }
       }
 
+      // Add groups into the result. Sort tests within each group to guarantee consistency.
       for (const entry of groupsByFile.values()) {
-        if (entry.general.tests.length)
+        if (entry.general.tests.length > 0) {
+          entry.general.tests.sort((a, b) => a.id.localeCompare(b.id));
           result.push(entry.general);
-
-        // Fix: Correctly iterate over parallel groups
-        for (const key of entry.parallel.keys()) {
-          const grpArr = entry.parallel.get(key);
-          if (grpArr.length > 0)
-            result.push(grpArr[0]);
-
         }
-
-        if (entry.parallelWithHooks.tests.length) {
-          const total = entry.parallelWithHooks.tests.length;
-          const groupSize = total <= expectedParallelism ? 1 : Math.ceil(total / expectedParallelism);
-          const sorted = entry.parallelWithHooks.tests.slice().sort((a, b) => a.parent!.title.localeCompare(b.parent!.title));
-          let current: TestGroup | undefined;
-          for (const t of sorted) {
-            if (!current || current.tests.length >= groupSize) {
-              current = this.createGroup(t);
-              result.push(current);
-            }
-            current.tests.push(t);
-          }
+        // Sort the parallel groups by the key (or first test id) for deterministic order.
+        for (const pg of Array.from(entry.parallel.values()).sort((a, b) =>
+          a.tests[0].id.localeCompare(b.tests[0].id)
+        )) {
+          pg.tests.sort((a, b) => a.id.localeCompare(b.id));
+          result.push(pg);
         }
       }
     }
@@ -321,10 +297,13 @@ class TestSharding {
       });
       return shards;
     }
-    const sorted = [...testGroups].sort((a, b) =>
-      this.getGroupWeight(b, runtimeData) - this.getGroupWeight(a, runtimeData)
-    );
+    // Sort groups first by descending weight and then by file name as a secondary criterion.
+    const sorted = [...testGroups].sort((a, b) => {
+      const diff = this.getGroupWeight(b, runtimeData) - this.getGroupWeight(a, runtimeData);
+      return diff !== 0 ? diff : a.requireFile.localeCompare(b.requireFile);
+    });
     for (const grp of sorted) {
+      // Assign each group to the shard with the smallest current weight.
       let idx = 0;
       for (let i = 1; i < shards.length; i++) {
         if (shards[i].weight < shards[idx].weight)

@@ -154,6 +154,43 @@ test('should not produce skipped tests for zero-sized shards', async ({ runInlin
   expect(result.outputLines).toEqual([]);
 });
 
+test('should produce deterministic ordering for test groups in sharding', async ({ runInlineTest }) => {
+  const tests = {
+    'b1.spec.ts': `
+      import { test } from '@playwright/test';
+      test('alpha', async () => {
+        console.log('\\n%%alpha-done');
+      });
+      test('beta', async () => {
+        console.log('\\n%%beta-done');
+      });
+    `,
+    'a1.spec.ts': `
+      import { test } from '@playwright/test';
+      test('gamma', async () => {
+        console.log('\\n%%gamma-done');
+      });
+    `,
+    'c1.spec.ts': `
+      import { test } from '@playwright/test';
+      test.describe.configure({ mode: 'parallel' });
+      test('delta', async () => {
+        console.log('\\n%%delta-done');
+      });
+      test('epsilon', async () => {
+        console.log('\\n%%epsilon-done');
+      });
+    `,
+  };
+  const result = await runInlineTest(tests, { shard: '1/2', workers: 1 });
+  expect(result.exitCode).toBe(0);
+  expect(result.outputLines).toEqual([
+    'gamma-done',
+    'alpha-done',
+    'delta-done'
+  ]);
+});
+
 test('should respect shard=1/2 in config', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     ...tests,
