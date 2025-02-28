@@ -182,11 +182,11 @@ export async function createRootSuite(testRun: TestRun, errors: TestError[], sho
     for (const projectSuite of rootSuite.suites) {
       // Split beforeAll-grouped tests into "config.shard.total" groups when needed.
       // Later on, we'll re-split them between workers by using "config.workers" instead.
-      testGroups.push(...createTestGroups(projectSuite, config.config.shard.total));
+      testGroups.push(...await createTestGroups(projectSuite, config.config.shard.total));
     }
 
     // Shard test groups.
-    const testGroupsInThisShard = filterForShard(config.config.shard, testGroups);
+    const testGroupsInThisShard = await filterForShard(config.config.shard, testGroups, config);
     const testsInThisShard = new Set<TestCase>();
     for (const group of testGroupsInThisShard) {
       for (const test of group.tests)
@@ -246,9 +246,7 @@ function filterProjectSuite(projectSuite: Suite, options: { cliFileFilters: Test
   filterTestsRemoveEmptySuites(result, (test: TestCase) => {
     if (options.cliTitleMatcher && !options.cliTitleMatcher(test._grepTitle()))
       return false;
-    if (options.additionalFileMatcher && !options.additionalFileMatcher(test.location.file))
-      return false;
-    return true;
+    return !(options.additionalFileMatcher && !options.additionalFileMatcher(test.location.file));
   });
   return result;
 }

@@ -60,6 +60,7 @@ export class FullConfigInternal {
   testIdMatcher?: Matcher;
   lastFailedTestIdMatcher?: Matcher;
   defineConfigWasUsed = false;
+  lastRunFile: string | undefined;
 
   globalSetups: string[] = [];
   globalTeardowns: string[] = [];
@@ -109,6 +110,9 @@ export class FullConfigInternal {
       workers: 0,
       webServer: null,
     };
+
+    this.lastRunFile = configCLIOverrides.lastRunFile;
+
     for (const key in userConfig) {
       if (key.startsWith('@'))
         (this.config as any)[key] = (userConfig as any)[key];
