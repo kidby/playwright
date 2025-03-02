@@ -283,10 +283,16 @@ export async function filterForShard(
   testGroups: TestGroup[],
   fullConfigInternal?: FullConfigInternal
 ): Promise<Set<TestGroup>> {
-  const isLastFailed = fullConfigInternal?.cliArgs?.includes('--last-failed');
-  if (isLastFailed || !fullConfigInternal || fullConfigInternal.config.testBalancing === 'count')
-    return simpleFilterForShard(shard, testGroups);
+  // Note that sharding works based on test groups.
+  // This means parallel files will be sharded by single tests,
+  // while non-parallel files will be sharded by the whole file.
 
+  const isLastFailed = fullConfigInternal?.cliArgs?.includes('--last-failed');
+  const isFullyParallel = fullConfigInternal?.cliArgs?.some(arg => arg === '--fully-parallel');
+
+  // Use simple counting for these special cases to maintain compatibility with existing tests
+  if (isLastFailed || isFullyParallel || !fullConfigInternal || fullConfigInternal.config.testBalancing !== 'weight')
+    return simpleFilterForShard(shard, testGroups);
 
   const testBalancer = new TestBalancer();
   return await testBalancer.balanceShards(shard, testGroups, fullConfigInternal);
