@@ -1529,6 +1529,9 @@ interface TestConfig<TestArgs = {}, WorkerArgs = {}> {
     total: number;
   };
 
+  /** How to balance tests on shards */
+  testBalancing?: 'count' | 'weight';
+
   /**
    * **NOTE** Use
    * [testConfig.snapshotPathTemplate](https://playwright.dev/docs/api/class-testconfig#test-config-snapshot-path-template)
@@ -1950,6 +1953,9 @@ export interface FullConfig<TestArgs = {}, WorkerArgs = {}> {
      */
     current: number;
   };
+
+  /** See[testConfig.testBalancing](https://playwright.dev/docs/api/class-testconfig#test-balancing) */
+  testBalancing: 'count' | 'weight';
 
   /**
    * See [testConfig.updateSnapshots](https://playwright.dev/docs/api/class-testconfig#test-config-update-snapshots).

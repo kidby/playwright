@@ -288,6 +288,15 @@ export async function normalizeAndSaveAttachment(outputPath: string, name: strin
   }
 }
 
+export function getFileSize(filePath: string): number {
+  try {
+    const stats = fs.statSync(filePath);
+    return stats.size;
+  } catch {
+    return 0;
+  }
+}
+
 export function fileIsModule(file: string): boolean {
   if (file.endsWith('.mjs') || file.endsWith('.mts'))
     return true;

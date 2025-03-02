@@ -16,24 +16,36 @@
 
 import path from 'path';
 
-import { InProcessLoaderHost, OutOfProcessLoaderHost } from './loaderHost';
-import { createFileFiltersFromArguments, createFileMatcherFromArguments, createTitleMatcher, errorWithFile, forceRegExp } from '../util';
-import { buildProjectsClosure, collectFilesForProject, filterProjects } from './projectUtils';
-import {  createTestGroups, filterForShard } from './testGroups';
-import { applyRepeatEachIndex, bindFileSuiteToProject, filterByFocusedLine, filterByTestIds, filterOnly, filterTestsRemoveEmptySuites } from '../common/suiteUtils';
-import { Suite } from '../common/test';
-import { dependenciesForTestFile } from '../transform/compilationCache';
-import { requireOrImport } from '../transform/transform';
-import { sourceMapSupport } from '../utilsBundle';
+import {InProcessLoaderHost, OutOfProcessLoaderHost} from './loaderHost';
+import type {Matcher, TestFileFilter} from '../util';
+import {
+  createFileFiltersFromArguments,
+  createFileMatcherFromArguments,
+  createTitleMatcher,
+  errorWithFile,
+  forceRegExp
+} from '../util';
+import {buildProjectsClosure, collectFilesForProject, filterProjects} from './projectUtils';
+import type {TestGroup} from './testGroups';
+import {createTestGroups, filterForShard} from './testGroups';
+import {
+  applyRepeatEachIndex,
+  bindFileSuiteToProject,
+  filterByFocusedLine,
+  filterByTestIds,
+  filterOnly,
+  filterTestsRemoveEmptySuites
+} from '../common/suiteUtils';
+import type {TestCase} from '../common/test';
+import {Suite} from '../common/test';
+import {dependenciesForTestFile} from '../transform/compilationCache';
+import {requireOrImport} from '../transform/transform';
+import type {RawSourceMap} from '../utilsBundle';
+import {sourceMapSupport} from '../utilsBundle';
 
-import type { TestRun } from './tasks';
-import type { TestGroup } from './testGroups';
-import type { FullConfig, Reporter, TestError } from '../../types/testReporter';
-import type { FullProjectInternal } from '../common/config';
-import type { FullConfigInternal } from '../common/config';
-import type { TestCase } from '../common/test';
-import type { Matcher, TestFileFilter } from '../util';
-import type { RawSourceMap } from '../utilsBundle';
+import type {TestRun} from './tasks';
+import type {FullConfig, Reporter, TestError} from '../../types/testReporter';
+import type {FullConfigInternal, FullProjectInternal} from '../common/config';
 
 
 export async function collectProjectsAndTestFiles(testRun: TestRun, doNotRunTestsOutsideProjectFilter: boolean) {
@@ -182,7 +194,7 @@ export async function createRootSuite(testRun: TestRun, errors: TestError[], sho
     for (const projectSuite of rootSuite.suites) {
       // Split beforeAll-grouped tests into "config.shard.total" groups when needed.
       // Later on, we'll re-split them between workers by using "config.workers" instead.
-      testGroups.push(...await createTestGroups(projectSuite, config.config.shard.total));
+      testGroups.push(...createTestGroups(projectSuite, config.config.shard.total));
     }
 
     // Shard test groups.

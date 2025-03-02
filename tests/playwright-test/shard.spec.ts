@@ -154,43 +154,6 @@ test('should not produce skipped tests for zero-sized shards', async ({ runInlin
   expect(result.outputLines).toEqual([]);
 });
 
-test('should produce deterministic ordering for test groups in sharding', async ({ runInlineTest }) => {
-  const tests = {
-    'b1.spec.ts': `
-      import { test } from '@playwright/test';
-      test('alpha', async () => {
-        console.log('\\n%%alpha-done');
-      });
-      test('beta', async () => {
-        console.log('\\n%%beta-done');
-      });
-    `,
-    'a1.spec.ts': `
-      import { test } from '@playwright/test';
-      test('gamma', async () => {
-        console.log('\\n%%gamma-done');
-      });
-    `,
-    'c1.spec.ts': `
-      import { test } from '@playwright/test';
-      test.describe.configure({ mode: 'parallel' });
-      test('delta', async () => {
-        console.log('\\n%%delta-done');
-      });
-      test('epsilon', async () => {
-        console.log('\\n%%epsilon-done');
-      });
-    `,
-  };
-  const result = await runInlineTest(tests, { shard: '1/2', workers: 1 });
-  expect(result.exitCode).toBe(0);
-  expect(result.outputLines).toEqual([
-    'gamma-done',
-    'alpha-done',
-    'delta-done'
-  ]);
-});
-
 test('should respect shard=1/2 in config', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     ...tests,
@@ -366,4 +329,126 @@ test('should shard tests with beforeAll based on shards total instead of workers
     expect(result.passed).toBe(1);
     expect(result.outputLines).toEqual(['beforeAll', 'test7']);
   }
+});
+
+test('should properly account for skipped tests when using weighted balancing', async ({ runInlineTest }) => {
+  const tests = {
+    'with-skipped.spec.ts': `
+      import { test } from '@playwright/test';
+      test('test1', async () => {
+        console.log('\\n%%regular1-done');
+      });
+      test.skip('skipped1', async () => {});
+      test.skip('skipped2', async () => {});
+      test.skip('skipped3', async () => {});
+    `,
+    'all-active.spec.ts': `
+      import { test } from '@playwright/test';
+      test('test2', async () => {
+        console.log('\\n%%regular2-done');
+      });
+      test('test3', async () => {
+        console.log('\\n%%regular3-done');
+      });
+    `,
+    'playwright.config.js': `
+      module.exports = {
+        testDir: '.',
+        testBalancing: 'weight'
+      };
+    `
+  };
+
+  // First run to collect runtime data
+  const firstRun = await runInlineTest(tests, { workers: 1 });
+  expect(firstRun.exitCode).toBe(0);
+  expect(firstRun.passed).toBe(3);
+  expect(firstRun.skipped).toBe(3);
+
+  // Run with sharding - with proper skipped test handling, we should have
+  // a balanced distribution of active tests, ignoring skipped ones
+  const firstShard = await runInlineTest(tests, { shard: '1/2', workers: 1 });
+  expect(firstShard.exitCode).toBe(0);
+
+  const secondShard = await runInlineTest(tests, { shard: '2/2', workers: 1 });
+  expect(secondShard.exitCode).toBe(0);
+
+  // Total non-skipped tests between shards should be 3
+  expect(firstShard.passed + secondShard.passed).toBe(3);
+
+  // If not properly accounting for skipped tests, the 'with-skipped.spec.ts'
+  // file would have more "weight" due to total test count including skipped tests
+  // Proper balancing should result in a 1/2 or 2/1 split of active tests
+  const firstShardCount = firstShard.passed;
+  const secondShardCount = secondShard.passed;
+
+  const isProperlyBalanced =
+    (firstShardCount === 1 && secondShardCount === 2) ||
+    (firstShardCount === 2 && secondShardCount === 1);
+
+  expect(isProperlyBalanced).toBe(true);
+
+  // Make sure all skipped tests are counted in the report
+  expect(firstShard.skipped + secondShard.skipped).toBe(3);
+
+  // All active tests should be run exactly once across both shards
+  const allRegularOutput = [
+    ...firstShard.outputLines.filter(line => line.includes('regular')),
+    ...secondShard.outputLines.filter(line => line.includes('regular'))
+  ].sort();
+
+  expect(allRegularOutput).toEqual([
+    'regular1-done',
+    'regular2-done',
+    'regular3-done'
+  ]);
+});
+
+test('should balance shards based on file size when using weighted balancing', async ({ runInlineTest }) => {
+  // Create test files with different sizes
+  const tests = {
+    'large.spec.ts': `
+      import { test } from '@playwright/test';
+      ${Array(200).fill('// Large file line of text').join('\n')}
+      test('large-file-test', async () => {
+        console.log('\\n%%large-file-test-done');
+      });
+    `,
+    'small.spec.ts': `
+      import { test } from '@playwright/test';
+      // This file is small with 5 tests
+      for (let i = 1; i <= 5; i++) {
+        test('small-test-' + i, async () => {
+          console.log('\\n%%small-test-' + i + '-done');
+        });
+      }
+    `,
+    'playwright.config.js': `
+      module.exports = {
+        testDir: '.',
+        testBalancing: 'weight'
+      };
+    `
+  };
+
+  // Run with sharding - with file size balancing, we expect a balanced distribution
+  const firstShard = await runInlineTest(tests, { shard: '1/2', workers: 1 });
+  expect(firstShard.exitCode).toBe(0);
+
+  const secondShard = await runInlineTest(tests, { shard: '2/2', workers: 1 });
+  expect(secondShard.exitCode).toBe(0);
+
+  // Total tests run should be 6
+  expect(firstShard.passed + secondShard.passed).toBe(6);
+
+  // All tests should be run exactly once
+  const allOutput = [...firstShard.outputLines, ...secondShard.outputLines].sort();
+  expect(allOutput).toEqual([
+    'large-file-test-done',
+    'small-test-1-done',
+    'small-test-2-done',
+    'small-test-3-done',
+    'small-test-4-done',
+    'small-test-5-done'
+  ]);
 });

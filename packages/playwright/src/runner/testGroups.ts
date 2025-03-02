@@ -14,33 +14,14 @@
  * limitations under the License.
  */
 
-import * as fs from 'fs';
-import { Worker, isMainThread, parentPort, workerData } from 'worker_threads';
-import { cpus } from 'os';
-
-import { calculateSha1, toPosixPath } from 'playwright-core/lib/utils';
-import { MultiMap } from 'playwright-core/lib/utils';
+import { calculateSha1 } from 'playwright-core/lib/utils';
 
 import { LastRunReporter } from './lastRun';
+import { getFileSize } from '../util';
 
 import type { Suite, TestCase } from '../common/test';
 import type { FullConfigInternal } from '../common/config';
 
-
-const MAX_WORKER_THREADS = Math.max(1, Math.min(cpus().length - 1, 4));
-const FILE_BATCH_SIZE = 20;
-
-const PATTERNS = {
-  assertion: /assert|expect|should/g,
-  async: /async|await|setTimeout|setInterval|Promise/g,
-  errorHandling: /try\s*{|catch\s*\(|finally\s*{/g,
-  network: /fetch\(|axios\.|http\./,
-  worker: /new Worker\(|child_process/
-};
-
-//
-// Types
-//
 export type TestGroup = {
   workerHash: string;
   requireFile: string;
@@ -49,384 +30,264 @@ export type TestGroup = {
   tests: TestCase[];
 };
 
-export type FileMetadata = { size: number; complexity: number };
+type Shard = {
+  weight: number;
+  groups: Set<TestGroup>;
+};
 
-type WorkerMessage =
-  | { type: 'analyzeFile'; filePath: string }
-  | { type: 'result'; filePath: string; metadata: FileMetadata };
-
-type Shard = { weight: number; groups: Set<TestGroup> };
-
-class FileCache {
-  private _sizes = new Map<string, number>();
-  private _complexities = new Map<string, number>();
-
-  getSize(filePath: string): number {
-    if (!this._sizes.has(filePath)) {
-      try {
-        const stats = fs.statSync(filePath);
-        this._sizes.set(filePath, stats.size);
-      } catch {
-        this._sizes.set(filePath, 0);
-      }
-    }
-    return this._sizes.get(filePath)!;
-  }
-
-  getComplexity(filePath: string, content?: string): number {
-    if (!this._complexities.has(filePath)) {
-      try {
-        if (!content && this.getSize(filePath) <= 1024 * 1024)
-          content = fs.readFileSync(filePath, 'utf8');
-        let complexity = 1.0;
-        if (content) {
-          const asserts = content.match(PATTERNS.assertion);
-          if (asserts)
-            complexity += Math.min(asserts.length / 100, 0.5);
-          const asyncs = content.match(PATTERNS.async);
-          if (asyncs)
-            complexity += Math.min(asyncs.length / 20, 0.3);
-          if (PATTERNS.network.test(content))
-            complexity += 0.2;
-        }
-        this._complexities.set(filePath, complexity);
-      } catch {
-        this._complexities.set(filePath, 1.0);
-      }
-    }
-    return this._complexities.get(filePath)!;
-  }
-
-  clear(): void {
-    this._sizes.clear();
-    this._complexities.clear();
-  }
+function getActiveTests(tests: TestCase[]): TestCase[] {
+  return tests.filter(test => !(test.expectedStatus === 'skipped'));
 }
 
-class WorkerPool {
-  private _workers: Worker[] = [];
-  private _pending = new Map<string, (metadata: FileMetadata) => void>();
+class TestBalancer {
+  private _fileSizeCache = new Map<string, number>();
+  private _weightCache = new Map<TestGroup, number>();
 
-  init(): void {
-    if (this._workers.length > 0 || !isMainThread)
-      return;
-    for (let i = 0; i < MAX_WORKER_THREADS; i++) {
-      const worker = new Worker(__filename, { workerData: { type: 'fileAnalyzer' } });
-      worker.on('message', (msg: WorkerMessage) => {
-        if (msg.type === 'result') {
-          this._pending.get(msg.filePath)?.(msg.metadata);
-          this._pending.delete(msg.filePath);
-        }
-      });
-      this._workers.push(worker);
+  private _getFileSize(filePath: string): number {
+    if (!this._fileSizeCache.has(filePath)) {
+      const size = getFileSize(filePath);
+      this._fileSizeCache.set(filePath, size);
     }
-  }
-
-  analyzeFile(filePath: string): Promise<FileMetadata> {
-    if (!this._workers.length)
-      this.init();
-    return new Promise(resolve => {
-      this._pending.set(filePath, resolve);
-      const index = this._pending.size % this._workers.length;
-      this._workers[index].postMessage({ type: 'analyzeFile', filePath });
-    });
-  }
-
-  hasWorkers(): boolean {
-    return this._workers.length > 0;
-  }
-
-  close(): void {
-    for (const worker of this._workers)
-      worker.terminate().catch(() => {});
-    this._workers = [];
-  }
-}
-
-class TestSharding {
-  private _fileCache = new FileCache();
-  private _suiteMetrics = new Map<Suite, { depth: number; hookCount: number }>();
-  private _groupWeightCache = new Map<TestGroup, number>();
-
-  constructor(private _workerPool?: WorkerPool) {}
-
-  private _populateSuiteMetrics(suite: Suite, depth = 0): { depth: number; hookCount: number } {
-    if (this._suiteMetrics.has(suite))
-      return this._suiteMetrics.get(suite)!;
-    const hooks = suite._hooks?.length || 0;
-    let maxDepth = depth, totalHooks = hooks;
-    for (const child of suite.suites) {
-      const m = this._populateSuiteMetrics(child, depth + 1);
-      maxDepth = Math.max(maxDepth, m.depth);
-      totalHooks += m.hookCount;
-    }
-    const metrics = { depth: maxDepth, hookCount: totalHooks };
-    this._suiteMetrics.set(suite, metrics);
-    return metrics;
-  }
-
-  private _getGroupHash(group: TestGroup): string {
-    return `${group.workerHash}-${toPosixPath(group.requireFile)}-${group.repeatEachIndex}-${group.projectId}`;
-  }
-
-  private _calculateStableHash(group: TestGroup): number {
-    const hash = calculateSha1(this._getGroupHash(group));
-    return parseInt(hash.substring(0, 8), 16) % 1000;
+    return this._fileSizeCache.get(filePath)!;
   }
 
   getGroupWeight(group: TestGroup, runtimeData?: { [testId: string]: number }): number {
-    if (this._groupWeightCache.has(group))
-      return this._groupWeightCache.get(group)!;
-    const tests = group.tests;
-    let weight: number;
-    const stableHash = this._calculateStableHash(group);
+    if (this._weightCache.has(group))
+      return this._weightCache.get(group)!;
+
+    const activeTests = getActiveTests(group.tests);
+
+    if (activeTests.length === 0) {
+      const minWeight = 0.1;
+      this._weightCache.set(group, minWeight);
+      return minWeight;
+    }
 
     if (runtimeData) {
-      let total = 0, count = 0;
-      for (const t of tests) {
-        const d = runtimeData[t.id];
-        if (d !== undefined) {
-          total += d;
+      let totalRuntime = 0;
+      let count = 0;
+      for (const test of activeTests) {
+        const duration = runtimeData[test.id];
+        if (duration !== undefined) {
+          totalRuntime += duration;
           count++;
         }
       }
       if (count > 0) {
-        const avg = total / count;
-        weight = total + (tests.length - count) * avg;
-        this._groupWeightCache.set(group, weight + stableHash * 0.00001);
+        const avgRuntime = totalRuntime / count;
+        const weight = totalRuntime + (activeTests.length - count) * avgRuntime;
+        this._weightCache.set(group, weight);
         return weight;
       }
     }
-    const testCount = tests.length;
-    const fileSize = this._fileCache.getSize(group.requireFile);
-    const sizeScore = fileSize > 0 ? Math.log(fileSize) * 5 : 0;
-    const complexity = this._fileCache.getComplexity(group.requireFile);
-    const { hookCount } = this._populateSuiteMetrics(tests[0].parent!);
-    weight = testCount * 100 + sizeScore + hookCount * 5;
-    weight *= complexity;
-    weight += stableHash * 0.001;
-    this._groupWeightCache.set(group, weight);
+
+    const fileSize = this._getFileSize(group.requireFile);
+    let weight = activeTests.length * 100;
+
+    if (fileSize > 0)
+      weight += Math.log(fileSize) * 5;
+
+    // Add a small hash factor for stability
+    const hashStr = calculateSha1(group.workerHash + group.requireFile);
+    const hashFactor = (parseInt(hashStr.substring(0, 8), 16) % 1000) / 10000;
+    weight += hashFactor;
+
+    this._weightCache.set(group, weight);
     return weight;
   }
 
-  createGroup(test: TestCase): TestGroup {
-    return {
-      workerHash: test._workerHash,
-      requireFile: test._requireFile,
-      repeatEachIndex: test.repeatEachIndex,
-      projectId: test._projectId,
-      tests: []
-    };
-  }
-
-  async createTestGroups(projectSuite: Suite, expectedParallelism: number): Promise<TestGroup[]> {
-    const allTests = [...projectSuite.allTests()];
-    const uniqueFiles = new Set<string>();
-    for (const t of allTests)
-      uniqueFiles.add(t._requireFile);
-    if (this._workerPool?.hasWorkers()) {
-      await Promise.all([...uniqueFiles].map(f => this._workerPool!.analyzeFile(f).catch(() => this._fileCache.getComplexity(f))));
-    } else {
-      for (const f of uniqueFiles)
-        this._fileCache.getComplexity(f);
-    }
-    this._populateSuiteMetrics(projectSuite);
-
-    // Group tests by worker hash in a deterministic order.
-    const groupsByWorker = new MultiMap<string, TestCase>();
-    for (const test of allTests)
-      groupsByWorker.set(test._workerHash, test);
-    const result: TestGroup[] = [];
-
-    // Sort worker hashes to ensure a predictable order.
-    for (const workerHash of [...groupsByWorker.keys()].sort()) {
-      const tests = groupsByWorker.get(workerHash);
-      // Group by file. We will keep a "general" group (for tests not in parallel)
-      // and a map for parallel groups keyed by the test's parent title (or fallback to test id).
-      const groupsByFile = new Map<string, { general: TestGroup, parallel: Map<string, TestGroup> }>();
-
-      for (const test of tests) {
-        let entry = groupsByFile.get(test._requireFile);
-        if (!entry) {
-          entry = {
-            general: this.createGroup(test),
-            parallel: new Map<string, TestGroup>()
-          };
-          groupsByFile.set(test._requireFile, entry);
-        }
-        // Decide whether the test is in parallel mode.
-        if (test.parent && test.parent._parallelMode === 'parallel') {
-          // Use parent.title as key; fallback to test.id.
-          const key = test.parent.title || test.id;
-          let pg = entry.parallel.get(key);
-          if (!pg) {
-            pg = this.createGroup(test);
-            entry.parallel.set(key, pg);
-          }
-          pg.tests.push(test);
-        } else {
-          entry.general.tests.push(test);
-        }
-      }
-
-      // Add groups into the result. Sort tests within each group to guarantee consistency.
-      for (const entry of groupsByFile.values()) {
-        if (entry.general.tests.length > 0) {
-          entry.general.tests.sort((a, b) => a.id.localeCompare(b.id));
-          result.push(entry.general);
-        }
-        // Sort the parallel groups by the key (or first test id) for deterministic order.
-        for (const pg of Array.from(entry.parallel.values()).sort((a, b) =>
-          a.tests[0].id.localeCompare(b.tests[0].id)
-        )) {
-          pg.tests.sort((a, b) => a.id.localeCompare(b.id));
-          result.push(pg);
-        }
-      }
-    }
-    return result;
-  }
-
-  createShards(testGroups: TestGroup[], numShards: number, runtimeData?: { [testId: string]: number }): Shard[] {
+  createShards(
+    testGroups: TestGroup[],
+    numShards: number,
+    runtimeData?: { [testId: string]: number }
+  ): Shard[] {
     const shards: Shard[] = Array.from({ length: numShards }, () => ({ weight: 0, groups: new Set<TestGroup>() }));
+
     if (testGroups.length <= numShards) {
-      testGroups.forEach((grp, i) => {
-        const w = this.getGroupWeight(grp, runtimeData);
-        shards[i].groups.add(grp);
-        shards[i].weight = w;
+      testGroups.forEach((group, i) => {
+        shards[i].groups.add(group);
+        shards[i].weight = this.getGroupWeight(group, runtimeData);
       });
       return shards;
     }
-    // Sort groups first by descending weight and then by file name as a secondary criterion.
-    const sorted = [...testGroups].sort((a, b) => {
-      const diff = this.getGroupWeight(b, runtimeData) - this.getGroupWeight(a, runtimeData);
-      return diff !== 0 ? diff : a.requireFile.localeCompare(b.requireFile);
-    });
-    for (const grp of sorted) {
-      // Assign each group to the shard with the smallest current weight.
-      let idx = 0;
-      for (let i = 1; i < shards.length; i++) {
-        if (shards[i].weight < shards[idx].weight)
-          idx = i;
-      }
-      const w = this.getGroupWeight(grp, runtimeData);
-      shards[idx].groups.add(grp);
-      shards[idx].weight += w;
+
+    const sortedGroups = [...testGroups].sort((a, b) =>
+      this.getGroupWeight(b, runtimeData) - this.getGroupWeight(a, runtimeData));
+
+    for (const group of sortedGroups) {
+      const lightestShard = shards.reduce((prev, curr) =>
+        (curr.weight < prev.weight ? curr : prev));
+      const weight = this.getGroupWeight(group, runtimeData);
+      lightestShard.groups.add(group);
+      lightestShard.weight += weight;
     }
-    this._refineShards(shards, runtimeData);
+
     return shards;
   }
 
-  private _refineShards(shards: Shard[], runtimeData?: { [testId: string]: number }): void {
-    if (shards.length <= 1)
-      return;
-    shards.sort((a, b) => b.weight - a.weight);
-    const pairs = Math.min(3, Math.floor(shards.length / 2));
-    for (let i = 0; i < pairs; i++) {
-      const heavy = shards[i], light = shards[shards.length - 1 - i];
-      const diff = heavy.weight - light.weight;
-      if (diff <= 0)
-        continue;
-      for (const grp of heavy.groups) {
-        const w = this.getGroupWeight(grp, runtimeData);
-        if (w < diff * 0.8) {
-          heavy.groups.delete(grp);
-          heavy.weight -= w;
-          light.groups.add(grp);
-          light.weight += w;
-          break;
-        }
-      }
-    }
-  }
+  async balanceShards(
+    shard: { total: number; current: number },
+    testGroups: TestGroup[],
+    fullConfigInternal: FullConfigInternal
+  ): Promise<Set<TestGroup>> {
+    this._weightCache.clear();
 
-  async filterForShard(shard: { total: number; current: number }, testGroups: TestGroup[], config: FullConfigInternal): Promise<Set<TestGroup>> {
-    this._groupWeightCache.clear();
-    const uniqueFiles = new Set<string>();
-    testGroups.forEach(grp => uniqueFiles.add(grp.requireFile));
-    await this.processFiles([...uniqueFiles]);
-    const lastRunReporter = new LastRunReporter(config);
-    const lastRun = await lastRunReporter.lastRunInfo();
-    const runtimeData = lastRun?.testDurations;
-    const shardsArr = this.createShards(testGroups, shard.total, runtimeData);
-    shardsArr.sort((a, b) => a.weight - b.weight);
-    return shardsArr[shard.current - 1].groups;
-  }
+    const lastRunReporter = new LastRunReporter(fullConfigInternal);
+    const lastRunInfo = await lastRunReporter.lastRunInfo();
+    const runtimeData = lastRunInfo?.testDurations;
 
-  async processFiles(files: string[]): Promise<void> {
-    if (files.length < FILE_BATCH_SIZE || !this._workerPool?.hasWorkers()) {
-      for (const f of files)
-        this._fileCache.getComplexity(f);
-      return;
-    }
-    const batchSize = 50;
-    for (let i = 0; i < files.length; i += batchSize) {
-      const batch = files.slice(i, i + batchSize);
-      await Promise.all(batch.map(async f => {
-        try {
-          await this._workerPool!.analyzeFile(f);
-        } catch {
-          this._fileCache.getComplexity(f);
-        }
-      }));
-    }
+    const shards = this.createShards(testGroups, shard.total, runtimeData);
+    shards.sort((a, b) => a.weight - b.weight);
+
+    return shards[shard.current - 1].groups;
   }
 
   clearCaches(): void {
-    this._fileCache.clear();
-    this._suiteMetrics.clear();
-    this._groupWeightCache.clear();
+    this._fileSizeCache.clear();
+    this._weightCache.clear();
   }
 }
 
-function setupWorker(): void {
-  if (isMainThread || !parentPort)
-    return;
-  parentPort.on('message', (msg: WorkerMessage) => {
-    if (msg.type === 'analyzeFile') {
-      const { filePath } = msg;
-      try {
-        const stats = fs.statSync(filePath);
-        const size = stats.size;
-        let complexity = 1.0;
-        if (size <= 1024 * 1024) {
-          const content = fs.readFileSync(filePath, 'utf8');
-          const asserts = content.match(/assert|expect|should/g);
-          if (asserts)
-            complexity += Math.min(asserts.length / 100, 0.5);
-          const asyncs = content.match(/async|await|setTimeout|setInterval|Promise/g);
-          if (asyncs)
-            complexity += Math.min(asyncs.length / 20, 0.3);
-          if (/fetch\(|axios\.|http\./.test(content))
-            complexity += 0.2;
+export function createTestGroups(projectSuite: Suite, expectedParallelism: number): TestGroup[] {
+  // This function groups tests that can be run together.
+  // Tests cannot be run together when:
+  // - They belong to different projects - requires different workers.
+  // - They have a different repeatEachIndex - requires different workers.
+  // - They have a different set of worker fixtures in the pool - requires different workers.
+  // - They have a different requireFile - reuses the worker, but runs each requireFile separately.
+  // - They belong to a parallel suite.
+
+  // Using the map "workerHash -> requireFile -> group" makes us preserve the natural order
+  // of worker hashes and require files for the simple cases.
+  const groups = new Map<string, Map<string, {
+    // Tests that must be run in order are in the same group.
+    general: TestGroup,
+
+    // There are 3 kinds of parallel tests:
+    // - Tests belonging to parallel suites, without beforeAll/afterAll hooks.
+    //   These can be run independently, they are put into their own group, key === test.
+    // - Tests belonging to parallel suites, with beforeAll/afterAll hooks.
+    //   These should share the worker as much as possible, put into single parallelWithHooks group.
+    //   We'll divide them into equally-sized groups later.
+    // - Tests belonging to serial suites inside parallel suites.
+    //   These should run as a serial group, each group is independent, key === serial suite.
+    parallel: Map<Suite | TestCase, TestGroup>,
+    parallelWithHooks: TestGroup,
+  }>>();
+
+  const createGroup = (test: TestCase): TestGroup => ({
+    workerHash: test._workerHash,
+    requireFile: test._requireFile,
+    repeatEachIndex: test.repeatEachIndex,
+    projectId: test._projectId,
+    tests: [],
+  });
+
+  for (const test of projectSuite.allTests()) {
+    if (!groups.has(test._workerHash))
+      groups.set(test._workerHash, new Map());
+    const byFile = groups.get(test._workerHash)!;
+
+    if (!byFile.has(test._requireFile)) {
+      byFile.set(test._requireFile, {
+        general: createGroup(test),
+        parallel: new Map(),
+        parallelWithHooks: createGroup(test),
+      });
+    }
+    const groupSet = byFile.get(test._requireFile)!;
+
+    let insideParallel = false;
+    let outerSequentialSuite: Suite | undefined;
+    let hasHooks = false;
+    for (let parent: Suite | undefined = test.parent; parent; parent = parent.parent) {
+      if (parent._parallelMode === 'serial' || parent._parallelMode === 'default')
+        outerSequentialSuite = parent;
+      insideParallel ||= parent._parallelMode === 'parallel';
+      hasHooks ||= parent._hooks.some(hook => hook.type === 'beforeAll' || hook.type === 'afterAll');
+    }
+
+    if (insideParallel) {
+      if (hasHooks && !outerSequentialSuite) {
+        groupSet.parallelWithHooks.tests.push(test);
+      } else {
+        const key = outerSequentialSuite || test;
+        if (!groupSet.parallel.has(key))
+          groupSet.parallel.set(key, createGroup(test));
+        groupSet.parallel.get(key)!.tests.push(test);
+      }
+    } else {
+      groupSet.general.tests.push(test);
+    }
+  }
+
+  const result: TestGroup[] = [];
+  for (const byFile of groups.values()) {
+    for (const groupSet of byFile.values()) {
+      // Tests without parallel mode should run serially as a single group.
+      if (groupSet.general.tests.length)
+        result.push(groupSet.general);
+
+      // Parallel test groups without beforeAll/afterAll can be run independently.
+      result.push(...groupSet.parallel.values());
+
+      // Tests with beforeAll/afterAll should try to share workers as much as possible.
+      const groupSize = Math.ceil(groupSet.parallelWithHooks.tests.length / expectedParallelism);
+      let currentGroup: TestGroup | undefined;
+      for (const test of groupSet.parallelWithHooks.tests) {
+        if (!currentGroup || currentGroup.tests.length >= groupSize) {
+          currentGroup = createGroup(test);
+          result.push(currentGroup);
         }
-        parentPort!.postMessage({ type: 'result', filePath, metadata: { size, complexity } });
-      } catch {
-        parentPort!.postMessage({ type: 'result', filePath, metadata: { size: 0, complexity: 1.0 } });
+        currentGroup.tests.push(test);
       }
     }
-  });
-}
-
-if (!isMainThread && workerData?.type === 'fileAnalyzer')
-  setupWorker();
-
-export async function createTestGroups(projectSuite: Suite, expectedParallelism: number): Promise<TestGroup[]> {
-  const wp = new WorkerPool();
-  if (isMainThread && [...projectSuite.allTests()].length > 1000)
-    wp.init();
-  const sharder = new TestSharding(wp);
-  const groups = await sharder.createTestGroups(projectSuite, expectedParallelism);
-  wp.close();
-  return groups;
-}
-
-export async function filterForShard(shard: { total: number; current: number }, testGroups: TestGroup[], config: FullConfigInternal): Promise<Set<TestGroup>> {
-  const wp = new WorkerPool();
-  const sharder = new TestSharding(wp);
-  try {
-    return await sharder.filterForShard(shard, testGroups, config);
-  } finally {
-    wp.close();
   }
+  return result;
+}
+
+function simpleFilterForShard(shard: { total: number; current: number }, testGroups: TestGroup[]): Set<TestGroup> {
+  let totalTests = 0;
+  for (const group of testGroups) {
+    const activeTestCount = getActiveTests(group.tests).length;
+    totalTests += activeTestCount;
+  }
+
+  // Handle edge case where all tests are skipped
+  if (totalTests === 0) {
+    const groupsPerShard = Math.ceil(testGroups.length / shard.total);
+    const start = (shard.current - 1) * groupsPerShard;
+    const end = Math.min(start + groupsPerShard, testGroups.length);
+    return new Set(testGroups.slice(start, end));
+  }
+
+  const baseSize = Math.floor(totalTests / shard.total);
+  const extra = totalTests - baseSize * shard.total;
+  const currentShardIndex = shard.current - 1;
+  const from = baseSize * currentShardIndex + Math.min(extra, currentShardIndex);
+  const to = from + baseSize + (currentShardIndex < extra ? 1 : 0);
+
+  let current = 0;
+  const selected = new Set<TestGroup>();
+  for (const group of testGroups) {
+    const activeTestCount = getActiveTests(group.tests).length;
+    if (current >= from && current < to)
+      selected.add(group);
+    current += activeTestCount;
+  }
+  return selected;
+}
+
+export async function filterForShard(
+  shard: { total: number; current: number },
+  testGroups: TestGroup[],
+  fullConfigInternal?: FullConfigInternal
+): Promise<Set<TestGroup>> {
+  const isLastFailed = fullConfigInternal?.cliArgs?.includes('--last-failed');
+  if (isLastFailed || !fullConfigInternal || fullConfigInternal.config.testBalancing === 'count')
+    return simpleFilterForShard(shard, testGroups);
+
+
+  const testBalancer = new TestBalancer();
+  return await testBalancer.balanceShards(shard, testGroups, fullConfigInternal);
 }

@@ -38,6 +38,7 @@ export type ConfigCLIOverrides = {
   additionalReporters?: ReporterDescription[];
   shard?: { current: number, total: number };
   lastRunFile?: string;
+  testBalancing?: 'count' | 'weight';
   timeout?: number;
   tsconfig?: string;
   ignoreSnapshots?: boolean;

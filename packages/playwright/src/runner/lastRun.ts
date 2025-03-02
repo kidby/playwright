@@ -23,12 +23,6 @@ import type { FullResult, Suite } from '../../types/testReporter';
 import type { FullConfigInternal } from '../common/config';
 import type { ReporterV2 } from '../reporters/reporterV2';
 
-export type LastRunInfo = {
-  status: FullResult['status'];
-  failedTests: string[];
-  testDurations?: { [testId: string]: number };
-};
-
 export class LastRunReporter implements ReporterV2 {
   private _config: FullConfigInternal;
   private _lastRunFile: string | undefined;
@@ -45,13 +39,12 @@ export class LastRunReporter implements ReporterV2 {
     }
   }
 
-  async lastRunInfo(): Promise<LastRunInfo | undefined> {
+  async lastRunInfo() {
     if (!this._lastRunFile)
       return;
     try {
       return JSON.parse(await fs.promises.readFile(this._lastRunFile, 'utf8'));
     } catch {
-      // File doesn't exist or is invalid JSON - silently return undefined
     }
   }
 
