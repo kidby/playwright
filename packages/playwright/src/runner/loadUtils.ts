@@ -16,8 +16,7 @@
 
 import path from 'path';
 
-import {InProcessLoaderHost, OutOfProcessLoaderHost} from './loaderHost';
-import type {Matcher, TestFileFilter} from '../util';
+import { InProcessLoaderHost, OutOfProcessLoaderHost } from './loaderHost';
 import {
   createFileFiltersFromArguments,
   createFileMatcherFromArguments,
@@ -25,9 +24,8 @@ import {
   errorWithFile,
   forceRegExp
 } from '../util';
-import {buildProjectsClosure, collectFilesForProject, filterProjects} from './projectUtils';
-import type {TestGroup} from './testGroups';
-import {createTestGroups, filterForShard} from './testGroups';
+import { buildProjectsClosure, collectFilesForProject, filterProjects } from './projectUtils';
+import { createTestGroups, filterForShard } from './testGroups';
 import {
   applyRepeatEachIndex,
   bindFileSuiteToProject,
@@ -36,16 +34,18 @@ import {
   filterOnly,
   filterTestsRemoveEmptySuites
 } from '../common/suiteUtils';
-import type {TestCase} from '../common/test';
-import {Suite} from '../common/test';
-import {dependenciesForTestFile} from '../transform/compilationCache';
-import {requireOrImport} from '../transform/transform';
-import type {RawSourceMap} from '../utilsBundle';
-import {sourceMapSupport} from '../utilsBundle';
+import { Suite } from '../common/test';
+import { dependenciesForTestFile } from '../transform/compilationCache';
+import { requireOrImport } from '../transform/transform';
+import { sourceMapSupport } from '../utilsBundle';
 
-import type {TestRun} from './tasks';
-import type {FullConfig, Reporter, TestError} from '../../types/testReporter';
-import type {FullConfigInternal, FullProjectInternal} from '../common/config';
+import type { RawSourceMap } from '../utilsBundle';
+import type { TestCase } from '../common/test';
+import type { TestGroup } from './testGroups';
+import type { Matcher, TestFileFilter } from '../util';
+import type { TestRun } from './tasks';
+import type { FullConfig, Reporter, TestError } from '../../types/testReporter';
+import type { FullConfigInternal, FullProjectInternal } from '../common/config';
 
 
 export async function collectProjectsAndTestFiles(testRun: TestRun, doNotRunTestsOutsideProjectFilter: boolean) {
@@ -66,12 +66,11 @@ export async function collectProjectsAndTestFiles(testRun: TestRun, doNotRunTest
   const filesToRunByProject = new Map<FullProjectInternal, string[]>();
   for (const [project, files] of allFilesForProject) {
     const matchedFiles = files.filter(file => {
-      const hasMatchingSources = sourceMapSources(file, sourceMapCache).some(source => {
+      return sourceMapSources(file, sourceMapCache).some(source => {
         if (cliFileMatcher && !cliFileMatcher(source))
           return false;
         return true;
       });
-      return hasMatchingSources;
     });
     const filteredFiles = matchedFiles.filter(Boolean) as string[];
     filesToRunByProject.set(project, filteredFiles);
@@ -353,6 +352,6 @@ function sourceMapSources(file: string, cache: Map<string, string[]>): string[] 
       sources = sourceMapData.sources.map(source => path.resolve(path.dirname(file), source));
   } finally {
     cache.set(file, sources);
-    return sources;
   }
+  return sources;
 }

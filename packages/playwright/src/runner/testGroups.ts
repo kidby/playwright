@@ -148,6 +148,36 @@ class TestBalancer {
   }
 }
 
+function simpleFilterForShard(shard: { total: number; current: number }, testGroups: TestGroup[]): Set<TestGroup> {
+  // Note that sharding works based on test groups.
+  // This means parallel files will be sharded by single tests,
+  // while non-parallel files will be sharded by the whole file.
+
+  let shardableTotal = 0;
+  for (const group of testGroups)
+    shardableTotal += group.tests.length; // Count ALL tests, including skipped ones
+
+  // Each shard gets some tests.
+  const shardSize = Math.floor(shardableTotal / shard.total);
+  // First few shards get one more test each.
+  const extraOne = shardableTotal - shardSize * shard.total;
+
+  const currentShard = shard.current - 1; // Make it zero-based for calculations.
+  const from = shardSize * currentShard + Math.min(extraOne, currentShard);
+  const to = from + shardSize + (currentShard < extraOne ? 1 : 0);
+
+  let current = 0;
+  const result = new Set<TestGroup>();
+  for (const group of testGroups) {
+    // Any test group goes to the shard that contains the first test of this group.
+    // So, this shard gets any group that starts at [from; to)
+    if (current >= from && current < to)
+      result.add(group);
+    current += group.tests.length; // Count ALL tests, including skipped ones
+  }
+  return result;
+}
+
 export function createTestGroups(projectSuite: Suite, expectedParallelism: number): TestGroup[] {
   // This function groups tests that can be run together.
   // Tests cannot be run together when:
@@ -224,14 +254,12 @@ export function createTestGroups(projectSuite: Suite, expectedParallelism: numbe
   const result: TestGroup[] = [];
   for (const byFile of groups.values()) {
     for (const groupSet of byFile.values()) {
-      // Tests without parallel mode should run serially as a single group.
+
       if (groupSet.general.tests.length)
         result.push(groupSet.general);
 
-      // Parallel test groups without beforeAll/afterAll can be run independently.
       result.push(...groupSet.parallel.values());
 
-      // Tests with beforeAll/afterAll should try to share workers as much as possible.
       const groupSize = Math.ceil(groupSet.parallelWithHooks.tests.length / expectedParallelism);
       let currentGroup: TestGroup | undefined;
       for (const test of groupSet.parallelWithHooks.tests) {
@@ -246,54 +274,22 @@ export function createTestGroups(projectSuite: Suite, expectedParallelism: numbe
   return result;
 }
 
-function simpleFilterForShard(shard: { total: number; current: number }, testGroups: TestGroup[]): Set<TestGroup> {
-  let totalTests = 0;
-  for (const group of testGroups) {
-    const activeTestCount = getActiveTests(group.tests).length;
-    totalTests += activeTestCount;
-  }
-
-  // Handle edge case where all tests are skipped
-  if (totalTests === 0) {
-    const groupsPerShard = Math.ceil(testGroups.length / shard.total);
-    const start = (shard.current - 1) * groupsPerShard;
-    const end = Math.min(start + groupsPerShard, testGroups.length);
-    return new Set(testGroups.slice(start, end));
-  }
-
-  const baseSize = Math.floor(totalTests / shard.total);
-  const extra = totalTests - baseSize * shard.total;
-  const currentShardIndex = shard.current - 1;
-  const from = baseSize * currentShardIndex + Math.min(extra, currentShardIndex);
-  const to = from + baseSize + (currentShardIndex < extra ? 1 : 0);
-
-  let current = 0;
-  const selected = new Set<TestGroup>();
-  for (const group of testGroups) {
-    const activeTestCount = getActiveTests(group.tests).length;
-    if (current >= from && current < to)
-      selected.add(group);
-    current += activeTestCount;
-  }
-  return selected;
-}
-
 export async function filterForShard(
   shard: { total: number; current: number },
   testGroups: TestGroup[],
   fullConfigInternal?: FullConfigInternal
 ): Promise<Set<TestGroup>> {
-  // Note that sharding works based on test groups.
-  // This means parallel files will be sharded by single tests,
-  // while non-parallel files will be sharded by the whole file.
+  if (fullConfigInternal?.config.testBalancing === 'weight') {
 
-  const isLastFailed = fullConfigInternal?.cliArgs?.includes('--last-failed');
-  const isFullyParallel = fullConfigInternal?.cliArgs?.some(arg => arg === '--fully-parallel');
+    const hasSpecialCliFlag = fullConfigInternal.cliArgs?.some(arg =>
+      arg === '--last-failed' ||
+      arg === '--fully-parallel');
 
-  // Use simple counting for these special cases to maintain compatibility with existing tests
-  if (isLastFailed || isFullyParallel || !fullConfigInternal || fullConfigInternal.config.testBalancing !== 'weight')
-    return simpleFilterForShard(shard, testGroups);
+    if (!hasSpecialCliFlag) {
+      const testBalancer = new TestBalancer();
+      return await testBalancer.balanceShards(shard, testGroups, fullConfigInternal);
+    }
+  }
 
-  const testBalancer = new TestBalancer();
-  return await testBalancer.balanceShards(shard, testGroups, fullConfigInternal);
+  return simpleFilterForShard(shard, testGroups);
 }
