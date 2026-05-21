@@ -163,6 +163,11 @@ export class AppiumClient {
     return res.value as WindowRect;
   }
 
+  async getPageSource(): Promise<string> {
+    const res = await this._send('GET', `/session/${this._requireSession()}/source`);
+    return typeof res.value === 'string' ? res.value : '';
+  }
+
   private _requireSession(): string {
     if (!this._sessionId)
       throw new Error('No active Appium session. Call createSession() first.');

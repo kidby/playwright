@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AppiumAUT>
+  <XCUIElementTypeApplication name="ExampleApp">
+    <XCUIElementTypeNavigationBar name="Home">
+      <XCUIElementTypeButton name="Back" label="Back"/>
+    </XCUIElementTypeNavigationBar>
+    <XCUIElementTypeOther>
+      <XCUIElementTypeStaticText value="Welcome"/>
+      <XCUIElementTypeTextField label="Email" value=""/>
+      <XCUIElementTypeSecureTextField label="Password"/>
+      <XCUIElementTypeButton name="Sign In" label="Sign In"/>
+      <XCUIElementTypeSwitch name="Remember me" value="0"/>
+    </XCUIElementTypeOther>
+  </XCUIElementTypeApplication>
+</AppiumAUT>

@@ -19,6 +19,11 @@ export type { AppiumCapabilities, ElementHandle, LocatorStrategy } from './appiu
 export { AppLocator } from './appLocator';
 export type { LocatorChainPart } from './appLocator';
 export { Device } from './device';
+export type { AndroidKey } from './device';
+export { listWebViewContexts, switchToWebViewContext, waitForWebViewContext } from './webview';
+export type { WebViewContextDescriptor, WebViewSelector } from './webview';
+export { convertPageSourceToSnapshot, parsePageSource } from './snapshot';
+export type { AccessibilityNode } from './snapshot';
 export { gestures } from './gestures';
 export type { GestureApi, SwipeDirection, SwipeOptions, TapOptions, LongPressOptions, DoubleTapOptions, ScrollToElementOptions, PullToRefreshOptions } from './gestures';
 export { androidCapabilities, iosCapabilities } from './capabilities';

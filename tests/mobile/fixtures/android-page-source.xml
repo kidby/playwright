@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hierarchy>
+  <android.widget.FrameLayout package="com.example">
+    <androidx.appcompat.widget.Toolbar resource-id="action_bar">
+      <android.widget.TextView text="Sign in"/>
+    </androidx.appcompat.widget.Toolbar>
+    <android.widget.LinearLayout>
+      <android.widget.EditText resource-id="email" content-desc="Email" text="" clickable="true" enabled="true"/>
+      <android.widget.EditText resource-id="password" content-desc="Password" text="" clickable="true" enabled="true"/>
+      <android.widget.Button resource-id="submit" text="Sign In" clickable="true" enabled="true"/>
+      <android.widget.CheckBox resource-id="remember" text="Remember me" clickable="true" enabled="true"/>
+    </android.widget.LinearLayout>
+  </android.widget.FrameLayout>
+</hierarchy>
