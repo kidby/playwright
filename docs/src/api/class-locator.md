@@ -1453,6 +1453,30 @@ Attribute name to get the value for.
 ### param: Locator.getByTestId.testId = %%-locator-get-by-test-id-test-id-%%
 * since: v1.27
 
+## method: Locator.getById
+* since: v1.61
+- returns: <[Locator]>
+
+%%-template-locator-get-by-id-%%
+
+### param: Locator.getById.id = %%-locator-get-by-id-id-%%
+* since: v1.61
+
+### option: Locator.getById.exact = %%-locator-get-by-id-option-exact-%%
+* since: v1.61
+
+## method: Locator.getByClassName
+* since: v1.61
+- returns: <[Locator]>
+
+%%-template-locator-get-by-class-name-%%
+
+### param: Locator.getByClassName.className = %%-locator-get-by-class-name-class-%%
+* since: v1.61
+
+### option: Locator.getByClassName.exact = %%-locator-get-by-class-name-option-exact-%%
+* since: v1.61
+
 ## method: Locator.getByText
 * since: v1.27
 - returns: <[Locator]>
@@ -1502,6 +1526,28 @@ await locator.highlight({ style: { color: 'red' } });
 - `style` <[string]>
 
 Additional inline CSS applied to the highlight overlay, e.g. `"outline: 2px dashed red"`.
+
+## async method: Locator.copy
+* since: v1.61
+
+Focuses the element and presses the platform-native copy shortcut (`Meta+C` on macOS, `Control+C` elsewhere). The element must be focusable; for text the browser copies the current selection.
+
+### option: Locator.copy.timeout = %%-input-timeout-%%
+* since: v1.61
+
+### option: Locator.copy.timeout = %%-input-timeout-js-%%
+* since: v1.61
+
+## async method: Locator.paste
+* since: v1.61
+
+Focuses the element and presses the platform-native paste shortcut (`Meta+V` on macOS, `Control+V` elsewhere).
+
+### option: Locator.paste.timeout = %%-input-timeout-%%
+* since: v1.61
+
+### option: Locator.paste.timeout = %%-input-timeout-js-%%
+* since: v1.61
 
 ## async method: Locator.hover
 * since: v1.14

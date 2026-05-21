@@ -93,6 +93,32 @@ await Expect(response).Not.ToBeOKAsync();
 
 The opposite of [`method: APIResponseAssertions.toBeOK`].
 
+## async method: APIResponseAssertions.toHaveResponseProperty
+* since: v1.61
+
+Reads the response body as JSON and asserts that a value exists at the given dotted path. When called with an `expected` argument, also asserts deep equality.
+
+**Usage**
+
+```js
+const response = await page.request.get('/api/users/1');
+await expect(response).toHaveResponseProperty('data.user.id');
+await expect(response).toHaveResponseProperty('data.user.id', 42);
+await expect(response).toHaveResponseProperty('items[0].name', 'first');
+```
+
+### param: APIResponseAssertions.toHaveResponseProperty.propertyPath
+* since: v1.61
+- `propertyPath` <[string]>
+
+Dotted path into the JSON body. Use `[N]` for array indices.
+
+### param: APIResponseAssertions.toHaveResponseProperty.expected
+* since: v1.61
+- `expected` ?<[any]>
+
+Optional value to deep-equal against the resolved property. Omit to only assert presence.
+
 ## async method: APIResponseAssertions.toBeOK
 * since: v1.18
 * langs:

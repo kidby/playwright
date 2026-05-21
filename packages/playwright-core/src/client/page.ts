@@ -641,6 +641,17 @@ export class Page extends ChannelOwner<channels.PageChannel> implements api.Page
     await this._channel.bringToFront();
   }
 
+  // Page-level clipboard shortcuts. Operate on whatever currently has focus
+  // in the page — no implicit focus. Use Locator.copy / Locator.paste when
+  // a specific element should receive the keystroke.
+  async copy(): Promise<void> {
+    await this.keyboard.press('ControlOrMeta+C');
+  }
+
+  async paste(): Promise<void> {
+    await this.keyboard.press('ControlOrMeta+V');
+  }
+
   async [Symbol.asyncDispose]() {
     await this.close();
   }
@@ -711,6 +722,14 @@ export class Page extends ChannelOwner<channels.PageChannel> implements api.Page
 
   getByTestId(testId: string | RegExp): Locator {
     return this.mainFrame().getByTestId(testId);
+  }
+
+  getById(id: string, options?: { exact?: boolean }): Locator {
+    return this.mainFrame().getById(id, options);
+  }
+
+  getByClassName(className: string, options?: { exact?: boolean }): Locator {
+    return this.mainFrame().getByClassName(className, options);
   }
 
   getByAltText(text: string | RegExp, options?: { exact?: boolean }): Locator {

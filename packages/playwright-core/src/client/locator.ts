@@ -15,7 +15,7 @@
  */
 
 import { asLocatorDescription, locatorCustomDescription } from '@isomorphic/locatorGenerators';
-import { getByAltTextSelector, getByLabelSelector, getByPlaceholderSelector, getByRoleSelector, getByTestIdSelector, getByTextSelector, getByTitleSelector } from '@isomorphic/locatorUtils';
+import { getByAltTextSelector, getByClassNameSelector, getByIdSelector, getByLabelSelector, getByPlaceholderSelector, getByRoleSelector, getByTestIdSelector, getByTextSelector, getByTitleSelector } from '@isomorphic/locatorUtils';
 import { escapeForTextSelector } from '@isomorphic/stringUtils';
 import { isString } from '@isomorphic/rtti';
 import { monotonicTime } from '@isomorphic/time';
@@ -177,6 +177,14 @@ export class Locator implements api.Locator {
     return this.locator(getByTestIdSelector(testIdAttributeName(), testId));
   }
 
+  getById(id: string, options?: { exact?: boolean }): Locator {
+    return this.locator(getByIdSelector(id, options));
+  }
+
+  getByClassName(className: string, options?: { exact?: boolean }): Locator {
+    return this.locator(getByClassNameSelector(className, options));
+  }
+
   getByAltText(text: string | RegExp, options?: { exact?: boolean }): Locator {
     return this.locator(getByAltTextSelector(text, options));
   }
@@ -255,6 +263,19 @@ export class Locator implements api.Locator {
 
   async focus(options?: TimeoutOptions): Promise<void> {
     return await this._frame.focus(this._selector, { strict: true, ...options });
+  }
+
+  // Focus the element and emit the platform-native clipboard shortcut.
+  // ControlOrMeta resolves to Meta on macOS and Control elsewhere — see
+  // resolveSmartModifierString in packages/playwright-core/src/server/input.ts.
+  async copy(options?: TimeoutOptions): Promise<void> {
+    await this.focus(options);
+    await this.press('ControlOrMeta+C', options);
+  }
+
+  async paste(options?: TimeoutOptions): Promise<void> {
+    await this.focus(options);
+    await this.press('ControlOrMeta+V', options);
   }
 
   async blur(options?: TimeoutOptions): Promise<void> {
@@ -426,6 +447,14 @@ export class FrameLocator implements api.FrameLocator {
 
   getByTestId(testId: string | RegExp): Locator {
     return this.locator(getByTestIdSelector(testIdAttributeName(), testId));
+  }
+
+  getById(id: string, options?: { exact?: boolean }): Locator {
+    return this.locator(getByIdSelector(id, options));
+  }
+
+  getByClassName(className: string, options?: { exact?: boolean }): Locator {
+    return this.locator(getByClassNameSelector(className, options));
   }
 
   getByAltText(text: string | RegExp, options?: { exact?: boolean }): Locator {

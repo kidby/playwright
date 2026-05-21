@@ -473,6 +473,235 @@ export async function toBeOK(
   return { message, pass };
 }
 
+export function toBeWithinRange(
+  this: ExpectMatcherStateInternal,
+  value: number,
+  min: number,
+  max: number,
+) {
+  const matcherName = 'toBeWithinRange';
+  const pass = typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max;
+  const message = () => formatMatcherMessage(this.utils, {
+    isNot: this.isNot,
+    promise: this.promise,
+    matcherName,
+    receiver: 'value',
+    expectation: `[${min}, ${max}]`,
+    log: [`Actual: ${value}`],
+  });
+  return { message, pass };
+}
+
+export async function toMatchJsonSchema(
+  this: ExpectMatcherStateInternal,
+  received: any,
+  schema: JsonSchema,
+) {
+  const matcherName = 'toMatchJsonSchema';
+  // Allow either a parsed object or an APIResponse / Response — auto-extract
+  // the JSON body in the response case so callers don't have to await first.
+  let data = received;
+  if (received && typeof received.json === 'function' && typeof received.ok === 'function')
+    data = await received.json();
+
+  const errors: string[] = [];
+  validateJsonSchema(data, schema, '$', errors);
+  const pass = errors.length === 0;
+  const message = () => formatMatcherMessage(this.utils, {
+    isNot: this.isNot,
+    promise: this.promise,
+    matcherName,
+    receiver: 'data',
+    expectation: '',
+    log: errors.length ? errors : [`Schema matched at all checked points.`],
+  });
+  return { message, pass };
+}
+
+export async function toHaveResponseProperty(
+  this: ExpectMatcherStateInternal,
+  response: APIResponseEx,
+  propertyPath: string,
+  expected?: any,
+) {
+  const matcherName = 'toHaveResponseProperty';
+  expectTypes(response, ['APIResponse'], matcherName);
+  let body: any;
+  try {
+    body = await response.json();
+  } catch (e) {
+    return {
+      pass: false,
+      message: () => formatMatcherMessage(this.utils, {
+        isNot: this.isNot,
+        promise: this.promise,
+        matcherName,
+        receiver: 'response',
+        expectation: propertyPath,
+        log: [`Response body is not valid JSON: ${(e as Error).message}`],
+      }),
+    };
+  }
+  const { found, value } = getByJsonPath(body, propertyPath);
+  let pass: boolean;
+  if (!found)
+    pass = false;
+  else if (expected === undefined)
+    pass = true;
+  else
+    pass = jsonDeepEqual(value, expected);
+
+  const message = () => formatMatcherMessage(this.utils, {
+    isNot: this.isNot,
+    promise: this.promise,
+    matcherName,
+    receiver: 'response',
+    expectation: expected === undefined ? propertyPath : `${propertyPath} = ${JSON.stringify(expected)}`,
+    log: found ? [`Actual: ${JSON.stringify(value)}`] : [`Path "${propertyPath}" not found in response body`],
+  });
+  return { message, pass };
+}
+
+// Minimal JSON Schema validator covering the subset most API tests need:
+// type, properties, required, additionalProperties, items, enum, const,
+// pattern, minLength/maxLength, minimum/maximum. Avoids pulling ajv as a
+// runtime dependency. For exotic schemas (oneOf/allOf/refs), users can
+// pre-validate with their own validator and assert on a boolean.
+export type JsonSchema = {
+  type?: 'string' | 'number' | 'integer' | 'boolean' | 'null' | 'object' | 'array';
+  properties?: Record<string, JsonSchema>;
+  required?: string[];
+  additionalProperties?: boolean | JsonSchema;
+  items?: JsonSchema;
+  enum?: any[];
+  const?: any;
+  pattern?: string;
+  minLength?: number;
+  maxLength?: number;
+  minimum?: number;
+  maximum?: number;
+  nullable?: boolean;
+};
+
+function jsonTypeOf(value: any): string {
+  if (value === null)
+    return 'null';
+  if (Array.isArray(value))
+    return 'array';
+  if (Number.isInteger(value))
+    return 'integer';
+  return typeof value;
+}
+
+function validateJsonSchema(value: any, schema: JsonSchema, path: string, errors: string[]): void {
+  if (schema.nullable && value === null)
+    return;
+  if (schema.type) {
+    const actual = jsonTypeOf(value);
+    const ok = schema.type === actual ||
+      (schema.type === 'number' && actual === 'integer');
+    if (!ok)
+      errors.push(`${path}: expected type ${schema.type}, got ${actual}`);
+  }
+  if (schema.const !== undefined && !jsonDeepEqual(value, schema.const))
+    errors.push(`${path}: expected const ${JSON.stringify(schema.const)}, got ${JSON.stringify(value)}`);
+  if (schema.enum && !schema.enum.some(v => jsonDeepEqual(value, v)))
+    errors.push(`${path}: value ${JSON.stringify(value)} not in enum`);
+  if (typeof value === 'string') {
+    if (schema.pattern && !new RegExp(schema.pattern).test(value))
+      errors.push(`${path}: string does not match pattern ${schema.pattern}`);
+    if (schema.minLength !== undefined && value.length < schema.minLength)
+      errors.push(`${path}: string length ${value.length} < minLength ${schema.minLength}`);
+    if (schema.maxLength !== undefined && value.length > schema.maxLength)
+      errors.push(`${path}: string length ${value.length} > maxLength ${schema.maxLength}`);
+  }
+  if (typeof value === 'number') {
+    if (schema.minimum !== undefined && value < schema.minimum)
+      errors.push(`${path}: ${value} < minimum ${schema.minimum}`);
+    if (schema.maximum !== undefined && value > schema.maximum)
+      errors.push(`${path}: ${value} > maximum ${schema.maximum}`);
+  }
+  if (schema.properties && value && typeof value === 'object' && !Array.isArray(value)) {
+    for (const key of Object.keys(schema.properties)) {
+      if (key in value)
+        validateJsonSchema(value[key], schema.properties[key], `${path}.${key}`, errors);
+    }
+    if (schema.additionalProperties === false) {
+      const allowed = new Set(Object.keys(schema.properties));
+      for (const key of Object.keys(value)) {
+        if (!allowed.has(key))
+          errors.push(`${path}: unexpected property "${key}"`);
+      }
+    } else if (typeof schema.additionalProperties === 'object' && schema.additionalProperties) {
+      const allowed = new Set(Object.keys(schema.properties));
+      for (const key of Object.keys(value)) {
+        if (!allowed.has(key))
+          validateJsonSchema(value[key], schema.additionalProperties, `${path}.${key}`, errors);
+      }
+    }
+  }
+  if (schema.required && value && typeof value === 'object' && !Array.isArray(value)) {
+    for (const key of schema.required) {
+      if (!(key in value))
+        errors.push(`${path}: missing required property "${key}"`);
+    }
+  }
+  if (schema.items && Array.isArray(value)) {
+    for (let i = 0; i < value.length; i++)
+      validateJsonSchema(value[i], schema.items, `${path}[${i}]`, errors);
+  }
+}
+
+function getByJsonPath(root: any, propertyPath: string): { found: boolean; value: any } {
+  // Tokenise `a.b[0].c` into ['a','b',0,'c']
+  const tokens: (string | number)[] = [];
+  const parts = propertyPath.split('.');
+  for (const part of parts) {
+    const match = part.match(/^([^[\]]*)((?:\[\d+\])*)$/);
+    if (!match)
+      return { found: false, value: undefined };
+    if (match[1])
+      tokens.push(match[1]);
+    const indexMatches = match[2].matchAll(/\[(\d+)\]/g);
+    for (const m of indexMatches)
+      tokens.push(parseInt(m[1], 10));
+  }
+  let cursor = root;
+  for (const tok of tokens) {
+    if (cursor === null || cursor === undefined)
+      return { found: false, value: undefined };
+    if (typeof tok === 'number') {
+      if (!Array.isArray(cursor) || tok >= cursor.length)
+        return { found: false, value: undefined };
+    } else {
+      if (typeof cursor !== 'object' || !(tok in cursor))
+        return { found: false, value: undefined };
+    }
+    cursor = cursor[tok as any];
+  }
+  return { found: true, value: cursor };
+}
+
+function jsonDeepEqual(a: any, b: any): boolean {
+  if (a === b)
+    return true;
+  if (a === null || b === null || typeof a !== typeof b)
+    return false;
+  if (Array.isArray(a)) {
+    if (!Array.isArray(b) || a.length !== b.length)
+      return false;
+    return a.every((v, i) => jsonDeepEqual(v, b[i]));
+  }
+  if (typeof a === 'object') {
+    const aKeys = Object.keys(a);
+    const bKeys = Object.keys(b);
+    if (aKeys.length !== bKeys.length)
+      return false;
+    return aKeys.every(k => k in b && jsonDeepEqual(a[k], b[k]));
+  }
+  return false;
+}
+
 export async function toPass(
   this: ExpectMatcherState,
   callback: () => any,

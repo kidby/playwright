@@ -2318,6 +2318,13 @@ export interface Page {
   context(): BrowserContext;
 
   /**
+   * Presses the platform-native copy shortcut (`Meta+C` on macOS, `Control+C` elsewhere) on the page's currently
+   * focused element. Use [locator.copy([options])](https://playwright.dev/docs/api/class-locator#locator-copy) to
+   * target a specific element first.
+   */
+  copy(): Promise<void>;
+
+  /**
    * **NOTE** Use locator-based [locator.dblclick([options])](https://playwright.dev/docs/api/class-locator#locator-dblclick)
    * instead. Read more about [locators](https://playwright.dev/docs/locators).
    *
@@ -2844,6 +2851,64 @@ export interface Page {
     /**
      * Whether to find an exact match: case-sensitive and whole-string. Default to false. Ignored when locating by a
      * regular expression. Note that exact match still trims whitespace.
+     */
+    exact?: boolean;
+  }): Locator;
+
+  /**
+   * Locate element by its `class` attribute. The default is a substring match against the full class string
+   * (`[class*="foo"]`), which is forgiving of compound class names; pass `exact: true` for a token match (equivalent to
+   * `.foo`).
+   *
+   * **Usage**
+   *
+   * Consider the following DOM structure.
+   *
+   * ```html
+   * <div class="card card--featured">A</div>
+   * <div class="card">B</div>
+   * ```
+   *
+   * ```js
+   * await expect(page.getByClassName('featured')).toHaveCount(1);          // substring
+   * await expect(page.getByClassName('card', { exact: true })).toHaveCount(2); // token
+   * ```
+   *
+   * @param className Class name to match. Substring of the class attribute by default.
+   * @param options
+   */
+  getByClassName(className: string, options?: {
+    /**
+     * Require a token match (equivalent to `.value`) instead of the default substring match.
+     */
+    exact?: boolean;
+  }): Locator;
+
+  /**
+   * Locate element by its `id` attribute. The default is a substring (case-sensitive) match, which is forgiving of
+   * generated id suffixes; pass `exact: true` for a full attribute match.
+   *
+   * **Usage**
+   *
+   * Consider the following DOM structure.
+   *
+   * ```html
+   * <button id="submit-btn-9a8f">Submit</button>
+   * ```
+   *
+   * You can locate the element by its id:
+   *
+   * ```js
+   * await page.getById('submit-btn').click();              // substring match
+   * await page.getById('submit-btn-9a8f', { exact: true }).click();
+   * ```
+   *
+   * @param id Substring (default) or full id to match.
+   * @param options
+   */
+  getById(id: string, options?: {
+    /**
+     * Require an exact `[id="value"]` match instead of the default substring match.
      */
     exact?: boolean;
   }): Locator;
@@ -3653,6 +3718,12 @@ export interface Page {
      */
     filter?: "all"|"since-navigation";
   }): Promise<Array<Error>>;
+
+  /**
+   * Presses the platform-native paste shortcut (`Meta+V` on macOS, `Control+V` elsewhere) on the page's currently
+   * focused element.
+   */
+  paste(): Promise<void>;
 
   /**
    * Pauses script execution. Playwright will stop executing the script and wait for the user to either press the
@@ -6703,6 +6774,64 @@ export interface Frame {
     /**
      * Whether to find an exact match: case-sensitive and whole-string. Default to false. Ignored when locating by a
      * regular expression. Note that exact match still trims whitespace.
+     */
+    exact?: boolean;
+  }): Locator;
+
+  /**
+   * Locate element by its `class` attribute. The default is a substring match against the full class string
+   * (`[class*="foo"]`), which is forgiving of compound class names; pass `exact: true` for a token match (equivalent to
+   * `.foo`).
+   *
+   * **Usage**
+   *
+   * Consider the following DOM structure.
+   *
+   * ```html
+   * <div class="card card--featured">A</div>
+   * <div class="card">B</div>
+   * ```
+   *
+   * ```js
+   * await expect(page.getByClassName('featured')).toHaveCount(1);          // substring
+   * await expect(page.getByClassName('card', { exact: true })).toHaveCount(2); // token
+   * ```
+   *
+   * @param className Class name to match. Substring of the class attribute by default.
+   * @param options
+   */
+  getByClassName(className: string, options?: {
+    /**
+     * Require a token match (equivalent to `.value`) instead of the default substring match.
+     */
+    exact?: boolean;
+  }): Locator;
+
+  /**
+   * Locate element by its `id` attribute. The default is a substring (case-sensitive) match, which is forgiving of
+   * generated id suffixes; pass `exact: true` for a full attribute match.
+   *
+   * **Usage**
+   *
+   * Consider the following DOM structure.
+   *
+   * ```html
+   * <button id="submit-btn-9a8f">Submit</button>
+   * ```
+   *
+   * You can locate the element by its id:
+   *
+   * ```js
+   * await page.getById('submit-btn').click();              // substring match
+   * await page.getById('submit-btn-9a8f', { exact: true }).click();
+   * ```
+   *
+   * @param id Substring (default) or full id to match.
+   * @param options
+   */
+  getById(id: string, options?: {
+    /**
+     * Require an exact `[id="value"]` match instead of the default substring match.
      */
     exact?: boolean;
   }): Locator;
@@ -13404,6 +13533,21 @@ export interface Locator {
   contentFrame(): FrameLocator;
 
   /**
+   * Focuses the element and presses the platform-native copy shortcut (`Meta+C` on macOS, `Control+C` elsewhere). The
+   * element must be focusable; for text the browser copies the current selection.
+   * @param options
+   */
+  copy(options?: {
+    /**
+     * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
+     * option in the config, or by using the
+     * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
+     * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+     */
+    timeout?: number;
+  }): Promise<void>;
+
+  /**
    * Returns the number of elements matching the locator.
    *
    * **NOTE** If you need to assert the number of elements on the page, prefer
@@ -13952,6 +14096,64 @@ export interface Locator {
     /**
      * Whether to find an exact match: case-sensitive and whole-string. Default to false. Ignored when locating by a
      * regular expression. Note that exact match still trims whitespace.
+     */
+    exact?: boolean;
+  }): Locator;
+
+  /**
+   * Locate element by its `class` attribute. The default is a substring match against the full class string
+   * (`[class*="foo"]`), which is forgiving of compound class names; pass `exact: true` for a token match (equivalent to
+   * `.foo`).
+   *
+   * **Usage**
+   *
+   * Consider the following DOM structure.
+   *
+   * ```html
+   * <div class="card card--featured">A</div>
+   * <div class="card">B</div>
+   * ```
+   *
+   * ```js
+   * await expect(page.getByClassName('featured')).toHaveCount(1);          // substring
+   * await expect(page.getByClassName('card', { exact: true })).toHaveCount(2); // token
+   * ```
+   *
+   * @param className Class name to match. Substring of the class attribute by default.
+   * @param options
+   */
+  getByClassName(className: string, options?: {
+    /**
+     * Require a token match (equivalent to `.value`) instead of the default substring match.
+     */
+    exact?: boolean;
+  }): Locator;
+
+  /**
+   * Locate element by its `id` attribute. The default is a substring (case-sensitive) match, which is forgiving of
+   * generated id suffixes; pass `exact: true` for a full attribute match.
+   *
+   * **Usage**
+   *
+   * Consider the following DOM structure.
+   *
+   * ```html
+   * <button id="submit-btn-9a8f">Submit</button>
+   * ```
+   *
+   * You can locate the element by its id:
+   *
+   * ```js
+   * await page.getById('submit-btn').click();              // substring match
+   * await page.getById('submit-btn-9a8f', { exact: true }).click();
+   * ```
+   *
+   * @param id Substring (default) or full id to match.
+   * @param options
+   */
+  getById(id: string, options?: {
+    /**
+     * Require an exact `[id="value"]` match instead of the default substring match.
      */
     exact?: boolean;
   }): Locator;
@@ -14660,6 +14862,20 @@ export interface Locator {
    * A page this locator belongs to.
    */
   page(): Page;
+
+  /**
+   * Focuses the element and presses the platform-native paste shortcut (`Meta+V` on macOS, `Control+V` elsewhere).
+   * @param options
+   */
+  paste(options?: {
+    /**
+     * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
+     * option in the config, or by using the
+     * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
+     * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+     */
+    timeout?: number;
+  }): Promise<void>;
 
   /**
    * Focuses the matching element and presses a combination of the keys.
@@ -19819,6 +20035,64 @@ export interface FrameLocator {
     /**
      * Whether to find an exact match: case-sensitive and whole-string. Default to false. Ignored when locating by a
      * regular expression. Note that exact match still trims whitespace.
+     */
+    exact?: boolean;
+  }): Locator;
+
+  /**
+   * Locate element by its `class` attribute. The default is a substring match against the full class string
+   * (`[class*="foo"]`), which is forgiving of compound class names; pass `exact: true` for a token match (equivalent to
+   * `.foo`).
+   *
+   * **Usage**
+   *
+   * Consider the following DOM structure.
+   *
+   * ```html
+   * <div class="card card--featured">A</div>
+   * <div class="card">B</div>
+   * ```
+   *
+   * ```js
+   * await expect(page.getByClassName('featured')).toHaveCount(1);          // substring
+   * await expect(page.getByClassName('card', { exact: true })).toHaveCount(2); // token
+   * ```
+   *
+   * @param className Class name to match. Substring of the class attribute by default.
+   * @param options
+   */
+  getByClassName(className: string, options?: {
+    /**
+     * Require a token match (equivalent to `.value`) instead of the default substring match.
+     */
+    exact?: boolean;
+  }): Locator;
+
+  /**
+   * Locate element by its `id` attribute. The default is a substring (case-sensitive) match, which is forgiving of
+   * generated id suffixes; pass `exact: true` for a full attribute match.
+   *
+   * **Usage**
+   *
+   * Consider the following DOM structure.
+   *
+   * ```html
+   * <button id="submit-btn-9a8f">Submit</button>
+   * ```
+   *
+   * You can locate the element by its id:
+   *
+   * ```js
+   * await page.getById('submit-btn').click();              // substring match
+   * await page.getById('submit-btn-9a8f', { exact: true }).click();
+   * ```
+   *
+   * @param id Substring (default) or full id to match.
+   * @param options
+   */
+  getById(id: string, options?: {
+    /**
+     * Require an exact `[id="value"]` match instead of the default substring match.
      */
     exact?: boolean;
   }): Locator;

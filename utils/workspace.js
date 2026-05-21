@@ -214,6 +214,11 @@ const workspace = new Workspace(ROOT_PATH, [
     path: path.join(ROOT_PATH, 'packages', 'playwright-ct-vue'),
     files: ['LICENSE'],
   }),
+  new PWPackage({
+    name: '@playwright/mobile',
+    path: path.join(ROOT_PATH, 'packages', 'playwright-mobile'),
+    files: LICENCE_FILES,
+  }),
 ]);
 
 if (require.main === module) {

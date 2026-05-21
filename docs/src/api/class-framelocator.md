@@ -153,6 +153,30 @@ in that iframe.
 ### param: FrameLocator.getByTestId.testId = %%-locator-get-by-test-id-test-id-%%
 * since: v1.27
 
+## method: FrameLocator.getById
+* since: v1.61
+- returns: <[Locator]>
+
+%%-template-locator-get-by-id-%%
+
+### param: FrameLocator.getById.id = %%-locator-get-by-id-id-%%
+* since: v1.61
+
+### option: FrameLocator.getById.exact = %%-locator-get-by-id-option-exact-%%
+* since: v1.61
+
+## method: FrameLocator.getByClassName
+* since: v1.61
+- returns: <[Locator]>
+
+%%-template-locator-get-by-class-name-%%
+
+### param: FrameLocator.getByClassName.className = %%-locator-get-by-class-name-class-%%
+* since: v1.61
+
+### option: FrameLocator.getByClassName.exact = %%-locator-get-by-class-name-option-exact-%%
+* since: v1.61
+
 ## method: FrameLocator.getByText
 * since: v1.27
 - returns: <[Locator]>

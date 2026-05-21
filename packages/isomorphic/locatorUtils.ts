@@ -66,6 +66,16 @@ export function getByTextSelector(text: string | RegExp, options?: { exact?: boo
   return 'internal:text=' + escapeForTextSelector(text, !!options?.exact);
 }
 
+export function getByIdSelector(id: string, options?: { exact?: boolean }): string {
+  const op = options?.exact ? '=' : '*=';
+  return `internal:attr=[id${op}${escapeForAttributeSelector(id, true)}]`;
+}
+
+export function getByClassNameSelector(className: string, options?: { exact?: boolean }): string {
+  const op = options?.exact ? '~=' : '*=';
+  return `internal:attr=[class${op}${escapeForAttributeSelector(className, true)}]`;
+}
+
 export function getByRoleSelector(role: string, options: ByRoleOptions = {}): string {
   const props: string[][] = [];
   if (options.checked !== undefined)

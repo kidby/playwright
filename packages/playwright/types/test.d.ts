@@ -8492,7 +8492,48 @@ interface GenericAssertions<R> {
    * @param expected Expected error message or error object.
    */
   toThrowError(error?: unknown): R;
+  /**
+   * Ensures that `min <= value <= max` for finite numbers.
+   *
+   * **Usage**
+   *
+   * ```js
+   * expect(response.status()).toBeWithinRange(200, 299);
+   * ```
+   *
+   * @param min Inclusive lower bound.
+   * @param max Inclusive upper bound.
+   */
+  toBeWithinRange(min: number, max: number): Promise<void>;
 
+  /**
+   * Validates the received value against a JSON Schema. Supports a focused subset of JSON Schema — `type`,
+   * `properties`, `required`, `additionalProperties`, `items`, `enum`, `const`, `pattern`, `minLength`/`maxLength`,
+   * `minimum`/`maximum`, `nullable`. For exotic schemas (oneOf, allOf, $ref) validate externally and assert on the
+   * result.
+   *
+   * If the received value has a `json()` method and an `ok()` method, it is treated as an
+   * [APIResponse](https://playwright.dev/docs/api/class-apiresponse) and the body is read via `await response.json()`
+   * before validation.
+   *
+   * **Usage**
+   *
+   * ```js
+   * const response = await page.request.get('/api/users/1');
+   * await expect(response).toMatchJsonSchema({
+   *   type: 'object',
+   *   required: ['id', 'name'],
+   *   properties: {
+   *     id: { type: 'integer', minimum: 1 },
+   *     name: { type: 'string', minLength: 1 },
+   *     email: { type: 'string', pattern: '^[^@]+@[^@]+$' },
+   *   },
+   * });
+   * ```
+   *
+   * @param schema The JSON Schema to validate against.
+   */
+  toMatchJsonSchema(schema: Object): Promise<void>;
 }
 
 type FunctionAssertions = {
@@ -8704,6 +8745,24 @@ interface APIResponseAssertions {
    *
    */
   toBeOK(): Promise<void>;
+
+  /**
+   * Reads the response body as JSON and asserts that a value exists at the given dotted path. When called with an
+   * `expected` argument, also asserts deep equality.
+   *
+   * **Usage**
+   *
+   * ```js
+   * const response = await page.request.get('/api/users/1');
+   * await expect(response).toHaveResponseProperty('data.user.id');
+   * await expect(response).toHaveResponseProperty('data.user.id', 42);
+   * await expect(response).toHaveResponseProperty('items[0].name', 'first');
+   * ```
+   *
+   * @param propertyPath Dotted path into the JSON body. Use `[N]` for array indices.
+   * @param expected Optional value to deep-equal against the resolved property. Omit to only assert presence.
+   */
+  toHaveResponseProperty(propertyPath: string, expected?: any): Promise<void>;
 
   /**
    * Makes the assertion check for the opposite condition.

@@ -32,7 +32,7 @@ jobs:
     - uses: actions/checkout@v6
     - uses: actions/setup-node@v6
       with:
-        node-version: 20
+        node-version: 24
     - run: npm ci
     - run: npm run build
     - run: npx playwright install --with-deps
@@ -72,7 +72,7 @@ jobs:
     - uses: actions/checkout@v6
     - uses: ./.github/actions/run-test
       with:
-        node-version: 20
+        node-version: 24
         browsers-to-install: chromium
         command: npm run test -- --project=chromium-*
         bot-name: "${{ matrix.clock }}-time-library-chromium-linux"
@@ -97,7 +97,7 @@ jobs:
     - uses: actions/checkout@v6
     - uses: ./.github/actions/run-test
       with:
-        node-version: 20
+        node-version: 24
         command: npm run ttest
         bot-name: "${{ matrix.clock }}-time-runner-chromium-linux"
         flakiness-client-id: ${{ secrets.AZURE_FLAKINESS_DASHBOARD_CLIENT_ID }}

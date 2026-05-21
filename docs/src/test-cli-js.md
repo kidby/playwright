@@ -291,6 +291,44 @@ npx playwright show-trace trace/
 | `-h, --host <host>` | Host to serve trace on |
 | `-p, --port <port>` | Port to serve trace on |
 
+## Running under Bun
+
+Playwright ships two CLI binaries:
+
+- `playwright` — Node-runtime CLI (shebang `#!/usr/bin/env node`). Used by default when invoked as `npx playwright` or `bun run playwright` (Bun honors the shebang and delegates to Node).
+- `playwright-bun` — Bun-runtime CLI (shebang `#!/usr/bin/env bun`). Runs the test suite under Bun's native runtime.
+
+Two consumer-side changes are needed to switch to Bun:
+
+1. **Install Playwright via `bun link`, not `bun add`.** Bun caches `file:` installs by path-spelling, which can produce two independent Playwright instances in `node_modules` (causing `Error: two different versions of @playwright/test`). `bun link` registers a single canonical symlink and side-steps the cache.
+
+   ```bash
+   # In the consumer project
+   bun link playwright @playwright/test playwright-core
+   ```
+
+2. **Use `playwright-bun` in the script** instead of `playwright`:
+
+   ```json title="package.json"
+   {
+     "scripts": {
+       "test": "bun run playwright-bun test"
+     }
+   }
+   ```
+
+That's the full setup — no `bunfig.toml` preload, no `--preload` flag.
+
+### Scope of Bun support
+
+The Bun runtime path strips dangling `import type {...}` statements (which Bun's CJS-require code path occasionally leaks as runtime imports — producing confusing `SyntaxError: export 'X' not found` errors for type-only names like `Page`). Beyond that, Playwright's custom Babel plugins (fixture-lift preprocessing, CSS-to-identity-obj-proxy, JSX) do **not** fire under Bun. Bun's native TS transpiler handles typical TS + JSX workloads, but component-testing users who depend on Playwright's Babel plugins should keep running under Node.
+
+`--preload` is also supported for arbitrary Bun scripts that aren't going through the `playwright-bun` bin:
+
+```bash
+bun --preload=node_modules/playwright/lib/transform/bunRuntime.js ./your-script.ts
+```
+
 ## Specialized Commands
 
 ### Merge Reports

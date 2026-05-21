@@ -97,16 +97,15 @@ async function loadUserConfig(location: ConfigLocation): Promise<Config> {
   let object = location.resolvedConfigFile ? await requireOrImport(location.resolvedConfigFile) : {};
   if (object && typeof object === 'object' && ('default' in object))
     object = object['default'];
+  if (object && typeof object === 'object')
+    object = { ...object };
   return object as Config;
 }
 
 export async function loadConfig(location: ConfigLocation, overrides?: ConfigCLIOverrides, ignoreProjectDependencies = false, metadata?: Config['metadata']): Promise<FullConfigInternal> {
-  // 0. Setup ESM loader if needed.
   if (!registerESMLoader()) {
-    // In Node.js < 18, complain if the config file is ESM. Historically, we would restart
-    // the process with --loader, but now we require newer Node.js.
     if (location.resolvedConfigFile && fileIsModule(location.resolvedConfigFile))
-      throw errorWithFile(location.resolvedConfigFile, `Playwright requires Node.js 18.19 or higher to load esm modules. Please update your version of Node.js.`);
+      throw errorWithFile(location.resolvedConfigFile, `Playwright requires Node.js 24 or higher. Please update your version of Node.js.`);
   }
 
   // 1. Setup tsconfig; configure ESM loader with tsconfig and compilation cache.

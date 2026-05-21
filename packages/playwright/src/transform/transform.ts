@@ -25,6 +25,7 @@ import sourceMapSupport from 'source-map-support';
 import { loadTsConfig } from './tsconfig-loader';
 import { libPath, packageJSON } from '../package';
 import { createFileMatcher, debugTest, fileIsModule, resolveImportSpecifierAfterMapping } from '../util';
+import { importUnderBun, isBun } from './bunRuntime';
 import { belongsToNodeModules, currentFileDepsCollector, getFromCompilationCache, installSourceMapSupport } from './compilationCache';
 import { addHook } from './pirates';
 
@@ -271,13 +272,17 @@ function calculateHash(content: string, filePath: string, isModule: boolean, plu
 
 export async function requireOrImport(file: string) {
   installTransformIfNeeded();
+
+  if (isBun())
+    return await importUnderBun(file).finally(nextTask);
+
   const isModule = fileIsModule(file);
   if (isModule) {
     const fileName = url.pathToFileURL(file);
     const esmImport = () => eval(`import(${JSON.stringify(fileName)})`);
 
-    // For ESM imports, issue a preflight to populate the compilation cache with the
-    // source maps. This allows inline test() calls to resolve wrapFunctionWithLocation.
+    // The .esm.preflight extension is a synthetic specifier handled by our
+    // node:module ESM loader to flush source maps before the real import.
     await eval(`import(${JSON.stringify(fileName + '.esm.preflight')})`)
         .catch((error: any) => debugTest('Failed to load preflight for ' + file + ', source maps may be missing for errors thrown during loading.', error))
         .finally(nextTask);
@@ -305,6 +310,9 @@ function installTransformIfNeeded() {
   if (transformInstalled)
     return;
   transformInstalled = true;
+
+  if (isBun())
+    return;
 
   installSourceMapSupport();
 

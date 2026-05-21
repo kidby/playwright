@@ -53,17 +53,16 @@ const test = base.extend<TestOptions>({
         const tlsSocket = req.socket as import('tls').TLSSocket;
         const parts: { key: string, value: any }[] = [];
         parts.push({ key: 'alpn-protocol', value: tlsSocket.alpnProtocol });
-        // @ts-expect-error https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/62336
         parts.push({ key: 'servername', value: tlsSocket.servername });
         const cert = tlsSocket.getPeerCertificate();
         if (tlsSocket.authorized) {
-          res.writeHead(200, { 'Content-Type': 'text/html' });
+          (res as http.ServerResponse).writeHead(200, { 'Content-Type': 'text/html' });
           parts.push({ key: 'message', value: `Hello ${cert.subject.CN}, your certificate was issued by ${cert.issuer.CN}!` });
         } else if (cert.subject) {
-          res.writeHead(403, { 'Content-Type': 'text/html' });
+          (res as http.ServerResponse).writeHead(403, { 'Content-Type': 'text/html' });
           parts.push({ key: 'message', value: `Sorry ${cert.subject.CN}, certificates from ${cert.issuer.CN} are not welcome here.` });
         } else {
-          res.writeHead(401, { 'Content-Type': 'text/html' });
+          (res as http.ServerResponse).writeHead(401, { 'Content-Type': 'text/html' });
           parts.push({ key: 'message', value: `Sorry, but you need to provide a client certificate to continue.` });
         }
         res.end(parts.map(({ key, value }) => `<div data-testid="${key}">${value}</div>`).join(''));

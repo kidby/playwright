@@ -1050,6 +1050,30 @@ Attribute name to get the value for.
 ### param: Frame.getByTestId.testId = %%-locator-get-by-test-id-test-id-%%
 * since: v1.27
 
+## method: Frame.getById
+* since: v1.61
+- returns: <[Locator]>
+
+%%-template-locator-get-by-id-%%
+
+### param: Frame.getById.id = %%-locator-get-by-id-id-%%
+* since: v1.61
+
+### option: Frame.getById.exact = %%-locator-get-by-id-option-exact-%%
+* since: v1.61
+
+## method: Frame.getByClassName
+* since: v1.61
+- returns: <[Locator]>
+
+%%-template-locator-get-by-class-name-%%
+
+### param: Frame.getByClassName.className = %%-locator-get-by-class-name-class-%%
+* since: v1.61
+
+### option: Frame.getByClassName.exact = %%-locator-get-by-class-name-option-exact-%%
+* since: v1.61
+
 ## method: Frame.getByText
 * since: v1.27
 - returns: <[Locator]>

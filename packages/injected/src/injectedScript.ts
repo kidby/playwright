@@ -234,6 +234,15 @@ export class InjectedScript {
     this._engines.set('internal:describe', this._createDescribeEngine());
     this._engines.set('aria-ref', this._createAriaRefEngine());
 
+    // Fork additions — getById / getByClassName engines. Grouped here to
+    // keep the upstream block above untouched on rebase.
+    this._engines.set('id-contains', this._createAttributeContainsEngine('id', true));
+    this._engines.set('id-contains:light', this._createAttributeContainsEngine('id', false));
+    this._engines.set('class', this._createAttributeTokenEngine('class', true));
+    this._engines.set('class:light', this._createAttributeTokenEngine('class', false));
+    this._engines.set('class-contains', this._createAttributeContainsEngine('class', true));
+    this._engines.set('class-contains:light', this._createAttributeContainsEngine('class', false));
+
     for (const { name, source } of options.customEngines)
       this._engines.set(name, this.eval(source));
 
@@ -402,8 +411,25 @@ export class InjectedScript {
   }
 
   private _createAttributeEngine(attribute: string, shadow: boolean): SelectorEngine {
+    return this._createAttributeOpEngine(attribute, '=', shadow);
+  }
+
+  // Matches when `attribute` contains the given substring, e.g. `[id*="foo"]`
+  // or `[class*="foo"]`. Used by getById / getByClassName (default fuzzy).
+  private _createAttributeContainsEngine(attribute: string, shadow: boolean): SelectorEngine {
+    return this._createAttributeOpEngine(attribute, '*=', shadow);
+  }
+
+  // Matches when `attribute` is a whitespace-separated list containing the
+  // given token, e.g. `[class~="foo"]` — equivalent to `.foo` for class.
+  // Used by getByClassName when { exact: true }.
+  private _createAttributeTokenEngine(attribute: string, shadow: boolean): SelectorEngine {
+    return this._createAttributeOpEngine(attribute, '~=', shadow);
+  }
+
+  private _createAttributeOpEngine(attribute: string, op: string, shadow: boolean): SelectorEngine {
     const toCSS = (selector: string): CSSComplexSelectorList => {
-      const css = `[${attribute}=${JSON.stringify(selector)}]`;
+      const css = `[${attribute}${op}${JSON.stringify(selector)}]`;
       return [{ simples: [{ selector: { css, functions: [] }, combinator: '' }] }];
     };
     return {

@@ -1480,6 +1480,63 @@ Locator is resolved to the element immediately before performing an action, so a
 
 [Learn more about locators](../locators.md).
 
+## template-locator-get-by-id
+
+Locate element by its `id` attribute. The default is a substring (case-sensitive) match, which is forgiving of generated id suffixes; pass `exact: true` for a full attribute match.
+
+**Usage**
+
+Consider the following DOM structure.
+
+```html
+<button id="submit-btn-9a8f">Submit</button>
+```
+
+You can locate the element by its id:
+
+```js
+await page.getById('submit-btn').click();              // substring match
+await page.getById('submit-btn-9a8f', { exact: true }).click();
+```
+
+## locator-get-by-id-id
+- `id` <[string]>
+
+Substring (default) or full id to match.
+
+## locator-get-by-id-option-exact
+- `exact` <[boolean]>
+
+Require an exact `[id="value"]` match instead of the default substring match.
+
+## template-locator-get-by-class-name
+
+Locate element by its `class` attribute. The default is a substring match against the full class string (`[class*="foo"]`), which is forgiving of compound class names; pass `exact: true` for a token match (equivalent to `.foo`).
+
+**Usage**
+
+Consider the following DOM structure.
+
+```html
+<div class="card card--featured">A</div>
+<div class="card">B</div>
+```
+
+```js
+await expect(page.getByClassName('featured')).toHaveCount(1);          // substring
+await expect(page.getByClassName('card', { exact: true })).toHaveCount(2); // token
+```
+
+## locator-get-by-class-name-class
+- `className` <[string]>
+
+Class name to match. Substring of the class attribute by default.
+
+## locator-get-by-class-name-option-exact
+- `exact` <[boolean]>
+
+Require a token match (equivalent to `.value`) instead of the default substring match.
+
 ## template-locator-get-by-test-id
 
 Locate element by the test id.

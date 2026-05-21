@@ -26,8 +26,6 @@ import { fileIsModule } from '../util';
 // When handled, it is resolved similarly to the reqular import, but loading it yields empty content.
 const esmPreflightExtension = '.esm.preflight';
 
-// Node < 18.6: defaultResolve takes 3 arguments.
-// Node >= 18.6: nextResolve from the chain takes 2 arguments.
 async function resolve(originalSpecifier: string, context: { parentURL?: string }, defaultResolve: Function) {
   let specifier = originalSpecifier.replace(esmPreflightExtension, '');
   if (context.parentURL && context.parentURL.startsWith('file://')) {
@@ -59,8 +57,6 @@ const kSupportedFormats = new Map([
   [undefined, undefined]
 ]);
 
-// Node < 18.6: defaultLoad takes 3 arguments.
-// Node >= 18.6: nextLoad from the chain takes 2 arguments.
 async function load(moduleUrl: string, context: { format?: string }, defaultLoad: Function) {
   // Bail out for wasm, json, etc.
   if (!kSupportedFormats.has(context.format))
@@ -87,8 +83,6 @@ async function load(moduleUrl: string, context: { format?: string }, defaultLoad
   if (transformed.serializedCache)
     transport?.post('pushToCompilationCache', { cache: transformed.serializedCache });
 
-  // Output format is required, so we determine it manually when unknown.
-  // shortCircuit is required by Node >= 18.6 to designate no more loaders should be called.
   return {
     format: kSupportedFormats.get(context.format) || (fileIsModule(originalFilename) ? 'module' : 'commonjs'),
     source: isPreflight ? `void 0;` : transformed.code,

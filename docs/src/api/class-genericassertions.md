@@ -171,6 +171,57 @@ The value to compare to.
 
 
 
+## async method: GenericAssertions.toBeWithinRange
+* since: v1.61
+
+Ensures that `min <= value <= max` for finite numbers.
+
+**Usage**
+
+```js
+expect(response.status()).toBeWithinRange(200, 299);
+```
+
+### param: GenericAssertions.toBeWithinRange.min
+* since: v1.61
+- `min` <[float]>
+
+Inclusive lower bound.
+
+### param: GenericAssertions.toBeWithinRange.max
+* since: v1.61
+- `max` <[float]>
+
+Inclusive upper bound.
+
+## async method: GenericAssertions.toMatchJsonSchema
+* since: v1.61
+
+Validates the received value against a JSON Schema. Supports a focused subset of JSON Schema — `type`, `properties`, `required`, `additionalProperties`, `items`, `enum`, `const`, `pattern`, `minLength`/`maxLength`, `minimum`/`maximum`, `nullable`. For exotic schemas (oneOf, allOf, $ref) validate externally and assert on the result.
+
+If the received value has a `json()` method and an `ok()` method, it is treated as an [APIResponse] and the body is read via `await response.json()` before validation.
+
+**Usage**
+
+```js
+const response = await page.request.get('/api/users/1');
+await expect(response).toMatchJsonSchema({
+  type: 'object',
+  required: ['id', 'name'],
+  properties: {
+    id: { type: 'integer', minimum: 1 },
+    name: { type: 'string', minLength: 1 },
+    email: { type: 'string', pattern: '^[^@]+@[^@]+$' },
+  },
+});
+```
+
+### param: GenericAssertions.toMatchJsonSchema.schema
+* since: v1.61
+- `schema` <[Object]>
+
+The JSON Schema to validate against.
+
 ## method: GenericAssertions.toBeInstanceOf
 * since: v1.9
 

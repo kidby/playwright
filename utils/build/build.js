@@ -664,6 +664,21 @@ steps.push(new CustomCallbackStep(assertCoreBundleHasNoNodeModules));
   }, [playwrightSrc]));
 }
 
+// playwright/lib/transform/bunRuntime.js — loaded by the `playwright-bun`
+// bin entry (cli-bun.js) before cli.js, or via `bun --preload=...`.
+// Standalone bundle: registers Bun.plugin in its top-level eval so all
+// subsequent imports run through the type-import-stripping transform.
+{
+  const playwrightSrc = filePath('packages/playwright/src');
+  steps.push(new EsbuildStep({
+    bundle: true,
+    entryPoints: [filePath('packages/playwright/src/transform/bunRuntime.ts')],
+    outfile: filePath('packages/playwright/lib/transform/bunRuntime.js'),
+    external: [],
+    plugins: [],
+  }, [playwrightSrc]));
+}
+
 // Build playwright entry points (per-file), excluding matchers/* and
 // common/* + transform/* — all of those are produced by bundle steps below.
 steps.push(new EsbuildStep({

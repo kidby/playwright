@@ -16,7 +16,7 @@
  */
 
 import { assert } from '@isomorphic/assert';
-import { getByAltTextSelector, getByLabelSelector, getByPlaceholderSelector, getByRoleSelector, getByTestIdSelector, getByTextSelector, getByTitleSelector } from '@isomorphic/locatorUtils';
+import { getByAltTextSelector, getByClassNameSelector, getByIdSelector, getByLabelSelector, getByPlaceholderSelector, getByRoleSelector, getByTestIdSelector, getByTextSelector, getByTitleSelector } from '@isomorphic/locatorUtils';
 import { urlMatches } from '@isomorphic/urlMatch';
 import { EventEmitter } from './eventEmitter';
 import { ChannelOwner } from './channelOwner';
@@ -349,6 +349,14 @@ export class Frame extends ChannelOwner<channels.FrameChannel> implements api.Fr
 
   getByTestId(testId: string | RegExp): Locator {
     return this.locator(getByTestIdSelector(testIdAttributeName(), testId));
+  }
+
+  getById(id: string, options?: { exact?: boolean }): Locator {
+    return this.locator(getByIdSelector(id, options));
+  }
+
+  getByClassName(className: string, options?: { exact?: boolean }): Locator {
+    return this.locator(getByClassNameSelector(className, options));
   }
 
   getByAltText(text: string | RegExp, options?: { exact?: boolean }): Locator {

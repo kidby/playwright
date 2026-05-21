@@ -39,16 +39,13 @@ jobs:
       matrix:
         browser: [chromium, firefox, webkit]
         os: [ubuntu-22.04]
-        node-version: [20]
+        node-version: [24]
         include:
           - os: ubuntu-22.04
             node-version: 22
             browser: chromium
-          - os: ubuntu-22.04
-            node-version: 24
-            browser: chromium
           - os: ubuntu-22.04-arm
-            node-version: 20
+            node-version: 24
             browser: chromium
     runs-on: ${{ matrix.os }}
     permissions:
@@ -97,23 +94,23 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        node-version: [20]
+        node-version: [24]
         shardIndex: [1, 2]
         shardTotal: [2]
         shardWeights: ['58:42']
         include:
           - os: windows-latest
-            node-version: 20
+            node-version: 24
             shardIndex: 1
             shardTotal: 3
             shardWeights: '44:33:23'
           - os: windows-latest
-            node-version: 20
+            node-version: 24
             shardIndex: 2
             shardTotal: 3
             shardWeights: '44:33:23'
           - os: windows-latest
-            node-version: 20
+            node-version: 24
             shardIndex: 3
             shardTotal: 3
             shardWeights: '44:33:23'
@@ -163,7 +160,7 @@ jobs:
     - uses: actions/checkout@v6
     - uses: actions/setup-node@v6
       with:
-        node-version: 20
+        node-version: 24
     - run: npm ci
       env:
         DEBUG: pw:install

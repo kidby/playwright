@@ -15,5 +15,14 @@
  * limitations under the License.
  */
 
+// Runtime detection happens at the very top, BEFORE any other module
+// loads, so Bun.plugin onLoad handlers registered inside bunRuntime can
+// intercept subsequent imports. Under Node this is a no-op — the module
+// exports nothing and `typeof Bun === 'undefined'`. The shebang above
+// makes Node the default; users who invoke this under Bun (e.g.
+// `bun ./node_modules/.bin/playwright test` or `bun --bun run playwright`)
+// get the Bun runtime path automatically with no separate bin name.
+require('./lib/transform/bunRuntime');
+
 const { program } = require('./lib/program');
 program.parse(process.argv);

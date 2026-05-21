@@ -223,9 +223,7 @@ class SocksProxyConnection {
       const responseBody = escapeHTML('Playwright client-certificate error: ' + error.message)
           .replaceAll('\n', ' <br>');
       if (browserDecrypted.alpnProtocol === 'h2') {
-        // This method is available only in Node.js 20+
         if ('performServerHandshake' in http2) {
-          // @ts-expect-error
           const session: http2.ServerHttp2Session = http2.performServerHandshake(browserDecrypted);
           session.on('error', error => {
             this._browserEncrypted.destroy(error);

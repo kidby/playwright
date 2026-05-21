@@ -240,10 +240,13 @@ export abstract class APIRequestContext extends SdkObject {
     return { ...response, fetchUid };
   }
 
-  private _parseSetCookieHeader(responseUrl: string, setCookie: string[] | undefined): channels.NetworkCookie[] {
+  private _parseSetCookieHeader(responseUrl: string, setCookie: string[] | undefined, baseUrl?: string): channels.NetworkCookie[] {
     if (!setCookie)
       return [];
-    const url = new URL(responseUrl);
+    // responseUrl can be a relative path (some servers return relative
+    // redirect URLs in their final Response). Pass baseUrl so new URL()
+    // can resolve relative forms against the originating request URL.
+    const url = new URL(responseUrl, baseUrl);
     // https://datatracker.ietf.org/doc/html/rfc6265#section-5.1.4
     const defaultPath = '/' + url.pathname.substr(1).split('/').slice(0, -1).join('/');
     const cookies: channels.NetworkCookie[] = [];
@@ -393,7 +396,7 @@ export abstract class APIRequestContext extends SdkObject {
         for (const [name, value] of Object.entries(response.headers))
           fetchLog(`  ${name}: ${value}`);
 
-        const cookies = this._parseSetCookieHeader(response.url || url.toString(), response.headers['set-cookie']) ;
+        const cookies = this._parseSetCookieHeader(response.url || url.toString(), response.headers['set-cookie'], url.toString());
         if (cookies.length) {
           try {
             await this.addCookies(cookies);
@@ -564,10 +567,10 @@ export abstract class APIRequestContext extends SdkObject {
                 const peerCertificate = socket.getPeerCertificate();
                 securityDetails = {
                   protocol: socket.getProtocol() ?? undefined,
-                  subjectName: peerCertificate.subject.CN,
+                  subjectName: firstString(peerCertificate.subject.CN),
                   validFrom: new Date(peerCertificate.valid_from).getTime() / 1000,
                   validTo: new Date(peerCertificate.valid_to).getTime() / 1000,
-                  issuer: peerCertificate.issuer.CN
+                  issuer: firstString(peerCertificate.issuer.CN),
                 };
               }
             }),
@@ -726,6 +729,10 @@ export class GlobalAPIRequestContext extends APIRequestContext {
       origins: (this._origins || []).map(origin => ({ ...origin, indexedDB: indexedDB ? origin.indexedDB : [] })),
     };
   }
+}
+
+function firstString(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
 }
 
 function toHeadersArray(rawHeaders: string[]): types.HeadersArray {

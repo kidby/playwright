@@ -20,9 +20,11 @@ import https from 'https';
 import net from 'net';
 import tls from 'tls';
 
+
 import { assert } from '@isomorphic/assert';
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { monotonicTime } from '@isomorphic/time';
+import type { Duplex } from 'stream';
 
 // Implementation(partial) of Happy Eyeballs 2 algorithm described in
 // https://www.rfc-editor.org/rfc/rfc8305
@@ -33,21 +35,25 @@ const connectionAttemptDelayMs = 300;
 const kDNSLookupAt = Symbol('kDNSLookupAt');
 const kTCPConnectionAt = Symbol('kTCPConnectionAt');
 
+type AgentConnectionCallback = ((err: Error | null, stream?: Duplex) => void) | undefined;
+
 class HttpHappyEyeballsAgent extends http.Agent {
-  createConnection(options: http.ClientRequestArgs, oncreate?: (err: Error | null, socket?: net.Socket) => void): net.Socket | undefined {
-    // There is no ambiguity in case of IP address.
+  override createConnection(options: http.ClientRequestArgs, oncreate?: (err: Error | null, stream: Duplex) => void): Duplex | null | undefined {
     if (net.isIP(clientRequestArgsToHostName(options)))
       return net.createConnection(options as net.NetConnectOpts);
-    createConnectionAsync(options, oncreate, /* useTLS */ false).catch(err => oncreate?.(err));
+    const cb = oncreate as AgentConnectionCallback;
+    createConnectionAsync(options, cb, false).catch(err => cb?.(err));
+    return undefined;
   }
 }
 
 class HttpsHappyEyeballsAgent extends https.Agent {
-  createConnection(options: http.ClientRequestArgs, oncreate?: (err: Error | null, socket?: net.Socket) => void): net.Socket | undefined {
-    // There is no ambiguity in case of IP address.
+  override createConnection(options: http.ClientRequestArgs, oncreate?: (err: Error | null, stream: Duplex) => void): Duplex | null | undefined {
     if (net.isIP(clientRequestArgsToHostName(options)))
       return tls.connect(options as tls.ConnectionOptions);
-    createConnectionAsync(options, oncreate, /* useTLS */ true).catch(err => oncreate?.(err));
+    const cb = oncreate as AgentConnectionCallback;
+    createConnectionAsync(options, cb, true).catch(err => cb?.(err));
+    return undefined;
   }
 }
 

@@ -281,7 +281,13 @@ export function toReporters(reporters: BuiltInReporter | ReporterDescription[] |
   return reporters;
 }
 
-export const builtInReporters = ['list', 'line', 'dot', 'json', 'junit', 'null', 'github', 'html', 'blob'] as const;
+export const builtInReporters = [
+  // Upstream microsoft/playwright reporters — keep order intact for minimal
+  // rebase churn.
+  'list', 'line', 'dot', 'json', 'junit', 'null', 'github', 'html', 'blob',
+  // Fork additions — alphabetical.
+  'ai', 'catalog', 'csv', 'intellum-social', 'jira', 'new-relic', 'slack', 'xray',
+] as const;
 export type BuiltInReporter = typeof builtInReporters[number];
 
 export type ContextReuseMode = 'none' | 'when-possible';

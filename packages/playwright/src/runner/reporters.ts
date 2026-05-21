@@ -29,6 +29,16 @@ import LineReporter from '../reporters/line';
 import ListReporter from '../reporters/list';
 import ListModeReporter from '../reporters/listModeReporter';
 import { wrapReporterAsV2 } from '../reporters/reporterV2';
+// Fork additions — grouped below the upstream imports to keep the rebase
+// diff small.
+import AIReporter from '../reporters/ai';
+import CatalogReporter from '../reporters/catalog';
+import CSVReporter from '../reporters/csv';
+import IntellumSocialReporter from '../reporters/intellumSocial';
+import JiraReporter from '../reporters/jira';
+import NewRelicReporter from '../reporters/newRelic';
+import SlackReporter from '../reporters/slack';
+import XrayReporter from '../reporters/xray';
 
 import type { ReporterDescription } from '../../types/test';
 import type { TestError } from '../../types/testReporter';
@@ -39,15 +49,25 @@ import type { TestRunOptions } from './tasks';
 
 export async function createReporters(config: FullConfigInternal, mode: 'list' | 'test' | 'merge', descriptions?: ReporterDescription[], runOptions?: TestRunOptions): Promise<ReporterV2[]> {
   const defaultReporters: { [key in commonConfig.BuiltInReporter]: new(arg: any) => ReporterV2 } = {
-    blob: BlobReporter,
-    dot: mode === 'list' ? ListModeReporter : DotReporter,
-    line: mode === 'list' ? ListModeReporter : LineReporter,
-    list: mode === 'list' ? ListModeReporter : ListReporter,
-    github: GitHubReporter,
-    json: JSONReporter,
-    junit: JUnitReporter,
-    null: EmptyReporter,
-    html: HtmlReporter,
+    'blob': BlobReporter,
+    'dot': mode === 'list' ? ListModeReporter : DotReporter,
+    'line': mode === 'list' ? ListModeReporter : LineReporter,
+    'list': mode === 'list' ? ListModeReporter : ListReporter,
+    'github': GitHubReporter,
+    'json': JSONReporter,
+    'junit': JUnitReporter,
+    'null': EmptyReporter,
+    'html': HtmlReporter,
+    // Fork additions — alphabetical, kept after the upstream block to
+    // minimise rebase churn against microsoft/playwright.
+    'ai': AIReporter,
+    'catalog': CatalogReporter,
+    'csv': CSVReporter,
+    'intellum-social': IntellumSocialReporter,
+    'jira': JiraReporter,
+    'new-relic': NewRelicReporter,
+    'slack': SlackReporter,
+    'xray': XrayReporter,
   };
   const reporters: ReporterV2[] = [];
   descriptions ??= config.config.reporter;

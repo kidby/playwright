@@ -715,6 +715,16 @@ Raw CSS content to be injected into frame.
 
 Brings page to front (activates tab).
 
+## async method: Page.copy
+* since: v1.61
+
+Presses the platform-native copy shortcut (`Meta+C` on macOS, `Control+C` elsewhere) on the page's currently focused element. Use [`method: Locator.copy`] to target a specific element first.
+
+## async method: Page.paste
+* since: v1.61
+
+Presses the platform-native paste shortcut (`Meta+V` on macOS, `Control+V` elsewhere) on the page's currently focused element.
+
 ## async method: Page.cancelPickLocator
 * since: v1.59
 
@@ -2290,6 +2300,30 @@ Attribute name to get the value for.
 
 ### param: Page.getByTestId.testId = %%-locator-get-by-test-id-test-id-%%
 * since: v1.27
+
+## method: Page.getById
+* since: v1.61
+- returns: <[Locator]>
+
+%%-template-locator-get-by-id-%%
+
+### param: Page.getById.id = %%-locator-get-by-id-id-%%
+* since: v1.61
+
+### option: Page.getById.exact = %%-locator-get-by-id-option-exact-%%
+* since: v1.61
+
+## method: Page.getByClassName
+* since: v1.61
+- returns: <[Locator]>
+
+%%-template-locator-get-by-class-name-%%
+
+### param: Page.getByClassName.className = %%-locator-get-by-class-name-class-%%
+* since: v1.61
+
+### option: Page.getByClassName.exact = %%-locator-get-by-class-name-option-exact-%%
+* since: v1.61
 
 ## method: Page.getByText
 * since: v1.27
