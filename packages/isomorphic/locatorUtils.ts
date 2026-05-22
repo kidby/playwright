@@ -30,7 +30,10 @@ export type ByRoleOptions = {
 };
 
 function getByAttributeTextSelector(attrName: string, text: string | RegExp, options?: { exact?: boolean }): string {
-  return `internal:attr=[${attrName}=${escapeForAttributeSelector(text, options?.exact || false)}]`;
+  // The attribute-selector parser only allows op `=` with regex values;
+  // string values use `*=` for substring and `=` for exact.
+  const op = text instanceof RegExp || options?.exact ? '=' : '*=';
+  return `internal:attr=[${attrName}${op}${escapeForAttributeSelector(text, false)}]`;
 }
 
 // Multiple test id attribute names can be joined with a comma. Attribute names cannot contain commas.
@@ -67,20 +70,13 @@ export function getByTextSelector(text: string | RegExp, options?: { exact?: boo
 }
 
 export function getByIdSelector(id: string, options?: { exact?: boolean }): string {
-  // The internal:attr matcher honors caseSensitive=true as strict equality,
-  // and caseSensitive=false as case-insensitive substring. That maps cleanly
-  // to exact-vs-fuzzy id matching.
-  return `internal:attr=[id=${escapeForAttributeSelector(id, !!options?.exact)}]`;
+  const op = options?.exact ? '=' : '*=';
+  return `internal:attr=[id${op}${escapeForAttributeSelector(id, false)}]`;
 }
 
 export function getByClassNameSelector(className: string, options?: { exact?: boolean }): string {
-  if (options?.exact) {
-    // Token match — match elements where className is one of the space-separated
-    // class tokens. CSS class shorthand `.foo` does this natively; escape special
-    // chars to keep arbitrary class names safe.
-    return `css=.${className.replace(/([!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~ ])/g, '\\$1')}`;
-  }
-  return `internal:attr=[class=${escapeForAttributeSelector(className, false)}]`;
+  const op = options?.exact ? '~=' : '*=';
+  return `internal:attr=[class${op}${escapeForAttributeSelector(className, false)}]`;
 }
 
 export function getByRoleSelector(role: string, options: ByRoleOptions = {}): string {

@@ -405,6 +405,9 @@ For each Bun-native API evaluated against the fork's code, here's why it was eit
 | `Bun.escapeHTML` | ⏭ Skip | No HTML generation in fork-added paths (the markdown briefings are markdown, not HTML). |
 | `Bun.sleep` | ⏭ Skip | Two `setTimeout(resolve, ms)` helpers in `device.ts` and `webview.ts`. Both are dual-runtime; conditional swap would cost more than the speedup. |
 | `Bun.spawn` | ⏭ Skip | Tests deliberately spawn Bun *from Node* to test the Node→Bun boundary; using `Bun.spawn` would defeat the purpose. |
+| `crypto.randomUUID` (Web standard, both runtimes) | ✅ Used | `createGuid` in `packages/utils/crypto.ts` swapped from `crypto.randomBytes(16).toString('hex')` to `crypto.randomUUID().replaceAll('-', '')`. ~30% faster under both Node and Bun; output shape preserved (32 lowercase hex chars). |
+| `Bun.fetch.preconnect` | ✅ Used | Warms TCP+TLS at reporter constructor time (`webhookBase`/`jira`/`xray`/`newRelic`) and at `APIRequestContext` constructor time for `request` fixtures with a `baseURL`. Bun-only; no-ops under Node. Shared helper in `packages/utils/bunPreconnect.ts`. |
+| `undici` direct migration in `playwright-core` | ⏭ Skip | `packages/playwright-core/src/server/fetch.ts` uses Node's legacy `http.request`/`https.request` with custom proxy agents, HappyEyeballs DNS, HAR timing, client certs. Migrating to undici's Dispatcher API is a ~500-LOC refactor of an upstream-hot file with significant rebase risk. Node 18+ already routes global `fetch()` through undici, which is what the reporters use — so the win is already realized where it's cheap. |
 
 ## Specialized Commands
 

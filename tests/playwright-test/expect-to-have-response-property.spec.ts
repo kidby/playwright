@@ -16,13 +16,14 @@
 
 import { test, expect } from './playwright-test-fixtures';
 
+const { isBun } = require(require.resolve('../../packages/playwright/lib/transform/bunRuntime')) as typeof import('../../packages/playwright/src/transform/bunRuntime');
+
 // The shared `server` fixture (Node http.createServer) doesn't reach the
 // inline-test child reliably under Bun — the child gets ECONNREFUSED even
 // after switching to 127.0.0.1 literals. Likely a binding-or-readiness mismatch
 // between Bun's http polyfill and the fixture's lifecycle. Skipping until the
 // upstream test infrastructure adds Bun-friendly handling.
-test.skip(typeof (globalThis as { Bun?: unknown }).Bun !== 'undefined',
-    'server fixture is not reachable from inline-test child under Bun');
+test.skip(isBun(), 'server fixture is not reachable from inline-test child under Bun');
 
 test('asserts dotted path presence and optional deep-equal of expected value', async ({ runInlineTest, server }) => {
   server.setRoute('/api/u', (req, res) => {

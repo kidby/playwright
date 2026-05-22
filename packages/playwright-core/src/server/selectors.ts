@@ -45,10 +45,6 @@ export class Selectors {
       'role', 'internal:attr', 'internal:label', 'internal:text',
       'internal:role', 'internal:testid', 'internal:describe',
       'aria-ref',
-      // Fork additions — engines registered in InjectedScript.
-      'id-contains', 'id-contains:light',
-      'class', 'class:light',
-      'class-contains', 'class-contains:light',
     ]);
     this._builtinEnginesInMainWorld = new Set([
       '_react', '_vue',
