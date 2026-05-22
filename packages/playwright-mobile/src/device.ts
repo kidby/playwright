@@ -18,13 +18,22 @@ import { AppiumClient   } from './appiumClient';
 import { AppLocator } from './appLocator';
 import { gestures  } from './gestures';
 import { convertPageSourceToSnapshot } from './snapshot';
-import { listWebViewContexts, switchToWebViewContext, waitForWebViewContext } from './webview';
+import { NATIVE_APP_CONTEXT, listWebViewContexts, switchToWebViewContext, waitForWebViewContext } from './webview';
 
 import type { AppiumCapabilities, LocatorStrategy } from './appiumClient';
-import type { GestureApi } from './gestures';
+import type { GestureApi, SwipeDirection } from './gestures';
 import type { WebViewContextDescriptor, WebViewSelector } from './webview';
 
 export type AndroidKey = 'BACK' | 'HOME' | 'ENTER' | 'TAB' | 'DELETE' | 'SEARCH';
+
+export type AlertAction = 'accept' | 'dismiss';
+
+export type HandleAlertOptions = {
+  action: AlertAction;
+  buttonName?: string;
+  retries?: number;
+  pollMs?: number;
+};
 
 const ANDROID_KEYCODES: Record<AndroidKey, number> = {
   BACK: 4,
@@ -35,10 +44,30 @@ const ANDROID_KEYCODES: Record<AndroidKey, number> = {
   SEARCH: 84,
 };
 
+const DEFAULT_ALERT_RETRIES = 10;
+const DEFAULT_ALERT_POLL_MS = 500;
+const DEFAULT_WAIT_TIMEOUT_MS = 20_000;
+const DEFAULT_WAIT_POLL_MS = 250;
+const DEFAULT_TAP_UNTIL_VISIBLE_MAX = 10;
+
+export type WaitOptions = {
+  timeoutMs?: number;
+  pollMs?: number;
+};
+
+export type TapUntilVisibleOptions = {
+  scrollTarget?: AppLocator;
+  maxTaps?: number;
+  direction?: SwipeDirection;
+  timeoutMs?: number;
+  pollMs?: number;
+};
+
 export class Device {
   readonly client: AppiumClient;
   readonly gestures: GestureApi;
   readonly app: AppLocator;
+  defaultActionTimeoutMs = DEFAULT_WAIT_TIMEOUT_MS;
 
   private constructor(client: AppiumClient) {
     this.client = client;
@@ -74,7 +103,7 @@ export class Device {
   }
 
   async switchToContext(name: string | undefined) {
-    await this.client.setContext(name ?? 'NATIVE_APP');
+    await this.client.setContext(name ?? NATIVE_APP_CONTEXT);
   }
 
   async contexts(): Promise<string[]> {
@@ -113,6 +142,22 @@ export class Device {
       await this.client.executeScript('mobile: hideKeyboard', []);
     } catch {
       // Keyboard may not be visible — swallow.
+    }
+  }
+
+  async handleAlert(opts: HandleAlertOptions): Promise<void> {
+    const retries = opts.retries ?? DEFAULT_ALERT_RETRIES;
+    const pollMs = opts.pollMs ?? DEFAULT_ALERT_POLL_MS;
+    const args = [{ action: opts.action, buttonLabel: opts.buttonName }];
+    for (let i = 0; i <= retries; i++) {
+      try {
+        await this.client.executeScript('mobile: alert', args);
+        return;
+      } catch {
+        if (i === retries)
+          return;
+        await sleep(pollMs);
+      }
     }
   }
 
@@ -161,7 +206,65 @@ export class Device {
     return convertPageSourceToSnapshot(source, platform);
   }
 
+  async setValue(locator: AppLocator, value: string, opts: { clearBefore?: boolean } = {}): Promise<void> {
+    const handle = await locator.resolve();
+    await this.client.click(handle);
+    if (opts.clearBefore !== false) {
+      try {
+        await this.client.clear(handle);
+      } catch {
+        if (this.isAndroid)
+          await this.client.executeScript('mobile: longClickGesture', [{ elementId: handle.ELEMENT }]).catch(() => undefined);
+      }
+    }
+    await this.client.sendKeys(handle, value);
+  }
+
+  async waitForVisible(target: AppLocator, opts: WaitOptions = {}): Promise<void> {
+    const timeout = opts.timeoutMs ?? this.defaultActionTimeoutMs;
+    const poll = opts.pollMs ?? DEFAULT_WAIT_POLL_MS;
+    const deadline = Date.now() + timeout;
+    while (Date.now() < deadline) {
+      if (await target.isDisplayed())
+        return;
+      await sleep(poll);
+    }
+    throw new Error(`waitForVisible: target not visible within ${timeout}ms (chain: ${describeChain(target)})`);
+  }
+
+  async tapUntilVisible(target: AppLocator, opts: TapUntilVisibleOptions = {}): Promise<void> {
+    const maxTaps = opts.maxTaps ?? DEFAULT_TAP_UNTIL_VISIBLE_MAX;
+    const poll = opts.pollMs ?? DEFAULT_WAIT_POLL_MS;
+    const direction: SwipeDirection = opts.direction ?? 'up';
+    const deadline = opts.timeoutMs !== undefined ? Date.now() + opts.timeoutMs : undefined;
+    for (let i = 0; i < maxTaps; i++) {
+      if (await target.isDisplayed())
+        return;
+      if (deadline !== undefined && Date.now() >= deadline)
+        break;
+      if (opts.scrollTarget)
+        await this.gestures.swipe({ target: opts.scrollTarget, direction });
+      else
+        await this.gestures.swipe({ direction });
+      await sleep(poll);
+    }
+    if (await target.isDisplayed())
+      return;
+    const reason = deadline !== undefined && Date.now() >= deadline
+      ? `timeoutMs=${opts.timeoutMs}`
+      : `maxTaps=${maxTaps}`;
+    throw new Error(`tapUntilVisible: target not visible (${reason}, chain: ${describeChain(target)})`);
+  }
+
   async findElementRaw(using: LocatorStrategy, value: string) {
     return await this.client.findElement(using, value);
   }
+}
+
+function describeChain(loc: AppLocator): string {
+  return loc.chain().map(p => `${p.using}=${p.value}`).join(' >> ');
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }

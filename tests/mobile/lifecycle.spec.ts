@@ -48,7 +48,7 @@ test('shell on Android sends mobile: shell with command + args', async () => {
 
 test('shell throws on iOS', async () => {
   const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
-  const error = await device.shell('ls').catch(e => e as Error);
+  const error: Error = await device.shell('ls').then(() => new Error('expected failure'), e => e as Error);
   expect(error.message).toContain('Android-only');
   await device.stop();
 });

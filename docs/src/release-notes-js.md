@@ -6,6 +6,40 @@ toc_max_heading_level: 2
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
+## Intellum fork — mobile parity
+
+The fork's `@playwright/experimental-mobile` package gains Tier-1 + Tier-2 parity with production mobile-test frameworks built on WebdriverIO + Appium. All additions are brand-neutral and route through Appium 2 `mobile:` extension commands; no new runtime dependencies.
+
+### Webview context management
+
+- `device.webViewContexts()`, `device.waitForWebViewContext(sel)`, `device.switchToWebViewContext(sel)` with `string | RegExp` matching for `title` / `url`, plus `packageOrBundleId`, `attached`, `visible`, `empty` filtering. Android multi-page webviews surface each `WEBVIEW_pkg/pageId` as its own descriptor.
+
+### Keyboard + key events
+
+- `device.pressBack()`, `pressEnter()`, `pressDelete()`, `pressTab()` (Android keycodes 4, 66, 112, 61), plus `pressAndroidKey('HOME' | 'SEARCH')` and `hideKeyboard()` (silent on no-keyboard).
+
+### Page source + AI-ready accessibility snapshot
+
+- `device.pageSource()` returns raw Appium XML.
+- `device.snapshot()` returns a YAML accessibility tree with native classes mapped to semantic ARIA-like roles. Interactable nodes carry ref labels (`[ref=m1]`) for LLM-driven test repair.
+- Pure helpers: `convertPageSourceToSnapshot(xml, platform)` and `parsePageSource(xml, platform)`.
+
+### Device lifecycle + ADB shell
+
+- `device.shell(command, args?)` (Android), `device.activateApp(id)`, `device.terminateApp(id)`.
+- `device.pushFile(path, content)`, `device.pullFile(path)`, `device.filesCount(dir, grep?)`.
+
+### Forms, alerts, polling
+
+- `device.setValue(locator, value, { clearBefore? })` — click → clear → sendKeys with Android `mobile: longClickGesture` fallback when `/clear` errors.
+- `device.handleAlert({ action, buttonName?, retries?, pollMs? })` — retry loop with silent-on-exhaust.
+- `device.waitForVisible(target, opts?)` honoring `device.defaultActionTimeoutMs`.
+- `device.tapUntilVisible(target, { scrollTarget?, maxTaps?, direction?, timeoutMs?, pollMs? })` — caps on whichever of `maxTaps` or `timeoutMs` fires first.
+
+### CI-aware timeouts
+
+- `mobileTest` exposes `defaultActionTimeoutMs` as an option fixture, defaulting to 30s under `CI` and 20s locally. Wired automatically into `device.waitForVisible`.
+
 ## Version 1.60
 
 ### 🌐 HAR recording on Tracing

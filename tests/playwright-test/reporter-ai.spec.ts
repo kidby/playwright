@@ -91,6 +91,32 @@ test('ai reporter inline prompt is prepended', async ({ runInlineTest }, testInf
   expect(briefing).toMatch(/# Failure:.*\bbad\b/);
 });
 
+test('ai reporter inlines mobile-snapshot attachment as a YAML code block', async ({ runInlineTest }, testInfo) => {
+  const result = await runInlineTest({
+    'playwright.config.ts': `
+      module.exports = { reporter: [['ai', { outputDir: 'ai-out' }]] };
+    `,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
+      test('mobile failure with snapshot', async ({}, testInfo) => {
+        await testInfo.attach('mobile-snapshot', {
+          body: '- button "Sign in" [ref=m1]\\n- text "Welcome"',
+          contentType: 'application/x-yaml',
+        });
+        expect(1).toBe(2);
+      });
+    `,
+  });
+  expect(result.exitCode).toBe(1);
+  const aiDir = path.join(testInfo.outputPath(), 'ai-out');
+  const files = fs.readdirSync(aiDir).filter(f => f.endsWith('.md') && f !== 'index.md');
+  const briefing = fs.readFileSync(path.join(aiDir, files[0]), 'utf-8');
+  expect(briefing).toContain('## Mobile UI snapshot');
+  expect(briefing).toContain('```yaml');
+  expect(briefing).toContain('- button "Sign in" [ref=m1]');
+  expect(briefing).toContain('- text "Welcome"');
+});
+
 test('ai reporter writes empty index when all pass', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `

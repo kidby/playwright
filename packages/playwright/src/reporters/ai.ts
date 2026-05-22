@@ -34,6 +34,9 @@ export type AIReporterOptions = {
 
 const STREAM_CAP = 4000;
 const FAILURE_ID_CAP = 200;
+const MOBILE_SNAPSHOT_CAP = 8000;
+const MOBILE_SNAPSHOT_NAME = 'mobile-snapshot';
+const MOBILE_SNAPSHOT_CONTENT_TYPE = 'application/x-yaml';
 
 class AIReporter implements ReporterV2 {
   private _config!: FullConfig;
@@ -93,6 +96,7 @@ class AIReporter implements ReporterV2 {
   private _briefFailure(test: TestCase, result: TestResult): FailureBriefing {
     const titlePath = test.titlePath().slice(1);
     const errors = result.errors?.length ? result.errors : (result.error ? [result.error] : []);
+    const attachments = result.attachments || [];
     return {
       id: sanitiseId(titlePath.join('--') || test.id),
       title: test.title,
@@ -109,11 +113,12 @@ class AIReporter implements ReporterV2 {
       sourceFrame: errors[0]?.snippet,
       stdout: result.stdout.map(c => typeof c === 'string' ? c : c.toString()).join(''),
       stderr: result.stderr.map(c => typeof c === 'string' ? c : c.toString()).join(''),
-      attachments: (result.attachments || []).map(a => ({
+      attachments: attachments.map(a => ({
         name: a.name,
         contentType: a.contentType,
         path: a.path ? path.relative(this._config.rootDir, a.path) : undefined,
       })),
+      mobileSnapshot: readMobileSnapshot(attachments),
       ci: this._ci,
     };
   }
@@ -136,8 +141,29 @@ type FailureBriefing = {
   stdout: string;
   stderr: string;
   attachments: { name: string; contentType: string; path?: string }[];
+  mobileSnapshot?: string;
   ci: CIMetadata;
 };
+
+type Attachment = { name: string; contentType: string; body?: Buffer; path?: string };
+
+function readMobileSnapshot(attachments: Attachment[]): string | undefined {
+  const a = attachments.find(att =>
+    att.name === MOBILE_SNAPSHOT_NAME || att.contentType === MOBILE_SNAPSHOT_CONTENT_TYPE,
+  );
+  if (!a)
+    return undefined;
+  let text: string | undefined;
+  if (a.body)
+    text = a.body.toString('utf-8');
+  else if (a.path)
+    try { text = fs.readFileSync(a.path, 'utf-8'); } catch { return undefined; }
+  if (!text)
+    return undefined;
+  return text.length > MOBILE_SNAPSHOT_CAP
+    ? text.slice(0, MOBILE_SNAPSHOT_CAP) + '\n# … truncated\n'
+    : text;
+}
 
 function resolvePrompt(prompt: string | undefined, configDir: string): string | undefined {
   if (!prompt)
@@ -209,6 +235,10 @@ function renderBriefing(f: FailureBriefing, prompt?: string): string {
       out.line('**stderr:**').code(trimTo(f.stderr, STREAM_CAP));
     out.blank();
   }
+
+  if (f.mobileSnapshot)
+    out.h2('Mobile UI snapshot').line('```yaml').line(f.mobileSnapshot).line('```').blank();
+
 
   if (f.attachments.length) {
     out.h2('Artifacts');

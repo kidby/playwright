@@ -63,7 +63,7 @@ test('pressAndroidKey HOME and SEARCH use 3 and 84', async () => {
 
 test('pressBack throws on iOS', async () => {
   const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
-  const error = await device.pressBack().catch(e => e as Error);
+  const error: Error = await device.pressBack().then(() => new Error('expected failure'), e => e as Error);
   expect(error.message).toContain('Android-only');
   await device.stop();
 });

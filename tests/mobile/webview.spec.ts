@@ -94,7 +94,7 @@ test('waitForWebViewContext throws after timeout when nothing matches', async ()
       return { body: { value: [{ id: 'NATIVE_APP' }] } };
   });
   const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
-  const error = await device.waitForWebViewContext({ title: /Never/, pollMs: 25, timeoutMs: 100 }).catch(e => e as Error);
+  const error: Error = await device.waitForWebViewContext({ title: /Never/, pollMs: 25, timeoutMs: 100 }).then(() => new Error('expected failure'), e => e as Error);
   expect(error.message).toContain('no context matched');
   expect(error.message).toContain('Never');
   await device.stop();
@@ -131,8 +131,8 @@ test('attached=false or visible=false pages are skipped', async () => {
     }
   });
   const device = await Device.start(mock.url, androidCapabilities({ appPackage: 'com.app' }));
-  const error = await device.waitForWebViewContext({ title: 'Background', pollMs: 25, timeoutMs: 100 }).catch(e => e as Error);
-  expect(error).toBeInstanceOf(Error);
+  const error: Error = await device.waitForWebViewContext({ title: 'Background', pollMs: 25, timeoutMs: 100 }).then(() => new Error('expected failure'), e => e as Error);
+  expect(error.message).toContain('no context matched');
   const ok = await device.waitForWebViewContext({ title: 'Foreground', pollMs: 25, timeoutMs: 500 });
   expect(ok.id).toBe('WEBVIEW_com.app/p2');
   await device.stop();

@@ -24,8 +24,12 @@ import type { TestFixture } from 'playwright/test';
 export type MobileFixtures = {
   appiumServerUrl: string;
   capabilities: AppiumCapabilities;
+  defaultActionTimeoutMs: number;
   device: Device;
 };
+
+const DEFAULT_ACTION_TIMEOUT_LOCAL_MS = 20_000;
+const DEFAULT_ACTION_TIMEOUT_CI_MS = 30_000;
 
 const requireCapabilitiesFixture: TestFixture<AppiumCapabilities, MobileFixtures> = async () => {
   throw new Error(
@@ -33,14 +37,40 @@ const requireCapabilitiesFixture: TestFixture<AppiumCapabilities, MobileFixtures
   );
 };
 
+export type AttachableTestInfo = {
+  status?: string;
+  attach(name: string, opts: { body: Buffer | string; contentType: string }): Promise<void>;
+};
+
+export async function captureFailureArtifacts(device: Device, testInfo: AttachableTestInfo): Promise<void> {
+  try {
+    const yaml = await device.snapshot();
+    if (yaml)
+      await testInfo.attach('mobile-snapshot', { body: yaml, contentType: 'application/x-yaml' });
+  } catch {
+    // Snapshot capture is best-effort — never block the test teardown.
+  }
+  try {
+    const png = await device.screenshot();
+    if (png?.length)
+      await testInfo.attach('mobile-screenshot', { body: png, contentType: 'image/png' });
+  } catch {
+    // Same — best-effort.
+  }
+}
+
 export const mobileTest = base.extend<MobileFixtures>({
   appiumServerUrl: [process.env.APPIUM_URL || 'http://127.0.0.1:4723', { option: true }],
   capabilities: [requireCapabilitiesFixture, { option: true }],
-  device: async ({ appiumServerUrl, capabilities }, use) => {
+  defaultActionTimeoutMs: [process.env.CI ? DEFAULT_ACTION_TIMEOUT_CI_MS : DEFAULT_ACTION_TIMEOUT_LOCAL_MS, { option: true }],
+  device: async ({ appiumServerUrl, capabilities, defaultActionTimeoutMs }, use, testInfo) => {
     const device = await Device.start(appiumServerUrl, capabilities);
+    device.defaultActionTimeoutMs = defaultActionTimeoutMs;
     try {
       await use(device);
     } finally {
+      if (testInfo.status !== 'passed' && testInfo.status !== 'skipped')
+        await captureFailureArtifacts(device, testInfo);
       await device.stop().catch(() => undefined);
     }
   },

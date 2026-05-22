@@ -19,6 +19,8 @@ import type { AppiumClient } from './appiumClient';
 const DEFAULT_TIMEOUT_MS = 120_000;
 const DEFAULT_POLL_MS = 500;
 
+export const NATIVE_APP_CONTEXT = 'NATIVE_APP';
+
 export type WebViewContextDescriptor = {
   id: string;
   title?: string;
@@ -26,6 +28,7 @@ export type WebViewContextDescriptor = {
   packageOrBundleId?: string;
   attached?: boolean;
   visible?: boolean;
+  empty?: boolean;
 };
 
 export type WebViewSelector = {
@@ -53,7 +56,6 @@ type AndroidPage = {
 };
 
 type AndroidContext = {
-  proc?: string;
   webviewName?: string;
   info?: { packageName?: string };
   pages?: AndroidPage[];
@@ -91,7 +93,7 @@ export async function switchToWebViewContext(client: AppiumClient, sel: WebViewS
 }
 
 function matches(c: WebViewContextDescriptor, sel: WebViewSelector): boolean {
-  if (c.id === 'NATIVE_APP')
+  if (c.id === NATIVE_APP_CONTEXT)
     return false;
   if (sel.packageOrBundleId && c.packageOrBundleId !== sel.packageOrBundleId)
     return false;
@@ -99,7 +101,7 @@ function matches(c: WebViewContextDescriptor, sel: WebViewSelector): boolean {
     return false;
   if (sel.url !== undefined && !textMatches(c.url, sel.url))
     return false;
-  if (c.attached === false || c.visible === false || (c as { empty?: boolean }).empty === true)
+  if (c.attached === false || c.visible === false || c.empty === true)
     return false;
   return true;
 }
@@ -164,6 +166,7 @@ function normalizeAndroidContexts(raw: unknown): WebViewContextDescriptor[] {
         packageOrBundleId: pkg,
         attached: page.attached,
         visible: page.visible,
+        empty: page.empty,
       });
     }
   }

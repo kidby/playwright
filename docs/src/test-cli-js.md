@@ -364,3 +364,38 @@ Clear all Playwright caches.
 ```bash
 npx playwright clear-cache
 ```
+
+## Mobile testing (Appium)
+
+`@playwright/experimental-mobile` adds an Appium-driven mobile test runner alongside the browser-test stack. It speaks W3C WebDriver classic to an Appium 2 server and exposes a Playwright-shaped `mobileTest` fixture that works for both iOS (XCUITest) and Android (UiAutomator2).
+
+```ts title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+import { androidCapabilities } from '@playwright/experimental-mobile';
+
+export default defineConfig({
+  projects: [
+    {
+      name: 'android-smoke',
+      testMatch: '**/*.mobile.spec.ts',
+      use: {
+        appiumServerUrl: 'http://127.0.0.1:4723',
+        capabilities: androidCapabilities({ app: 'apks/dev.apk', appPackage: 'com.example.dev' }),
+      },
+    },
+  ],
+});
+```
+
+```ts title="login.mobile.spec.ts"
+import { mobileTest as test, expect } from '@playwright/experimental-mobile';
+
+test('login then dashboard', async ({ device }) => {
+  await device.app.byAccessibilityId('email').fill('user@example.com');
+  await device.app.byAccessibilityId('signin').click();
+  await device.waitForVisible(device.app.byAccessibilityId('dashboard'));
+});
+```
+
+This package is independent of Playwright's native `_android` API, which drives Chrome-on-Android via ADB + CDP. Use `_android` for Chrome content automation, `@playwright/experimental-mobile` for native app testing across either platform. See `packages/playwright-mobile/README.md` for the full API.
+
