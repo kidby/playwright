@@ -22,6 +22,7 @@ import * as zlib from 'zlib';
 
 import { createGuid } from '@utils/crypto';
 import { httpHappyEyeballsAgent, httpsHappyEyeballsAgent, timingForSocket } from '@utils/happyEyeballs';
+import { preconnect as bunPreconnect } from '@utils/bunPreconnect';
 import { assert } from '@isomorphic/assert';
 import { constructURLBasedOnBaseURL } from '@isomorphic/urlMatch';
 import { eventsHelper } from '@utils/eventsHelper';
@@ -636,6 +637,7 @@ export class BrowserContextAPIRequestContext extends APIRequestContext {
     super(context);
     this._context = context;
     context.once(BrowserContext.Events.Close, () => this._disposeImpl());
+    bunPreconnect(context._options.baseURL);
   }
 
   override tracing() {
@@ -700,6 +702,7 @@ export class GlobalAPIRequestContext extends APIRequestContext {
       proxy: options.proxy,
     };
     this._tracing = new Tracing(this, options.tracesDir);
+    bunPreconnect(options.baseURL);
   }
 
   override tracing() {

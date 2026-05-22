@@ -15,18 +15,25 @@
  */
 
 import fs from 'fs';
-import url from 'url';
+import { createRequire } from 'module';
+import path from 'path';
 
 type BunPluginLoader = 'js' | 'jsx' | 'ts' | 'tsx';
 type BunOnLoadResult = { contents: string; loader?: BunPluginLoader } | undefined;
+type BunOnResolveResult = { path: string; namespace?: string } | undefined;
 type BunPluginBuilder = {
   onLoad(
     filter: { filter: RegExp; namespace?: string },
     callback: (args: { path: string }) => BunOnLoadResult,
   ): void;
+  onResolve(
+    filter: { filter: RegExp; namespace?: string },
+    callback: (args: { path: string; importer: string }) => BunOnResolveResult,
+  ): void;
 };
 type BunGlobal = {
   plugin(plugin: { name: string; setup: (build: BunPluginBuilder) => void }): void;
+  pathToFileURL(path: string): URL;
 };
 declare const Bun: BunGlobal | undefined;
 
@@ -43,6 +50,7 @@ export function installBunRuntime(): void {
   Bun!.plugin({
     name: 'playwright-bun-runtime',
     setup(build) {
+      build.onResolve({ filter: /^playwright(-core)?\/lib\// }, args => resolvePackageLib(args.path, args.importer));
       build.onLoad({ filter: /\.tsx?$/ }, args => {
         let source: string;
         try {
@@ -50,10 +58,36 @@ export function installBunRuntime(): void {
         } catch {
           return undefined;
         }
-        return { contents: stripTypeImports(source), loader: 'ts' };
+        const loader: BunPluginLoader = args.path.endsWith('.tsx') ? 'tsx' : 'ts';
+        return { contents: stripTypeImports(source), loader };
       });
     },
   });
+}
+
+const packageRootCache = new Map<string, string | null>();
+
+function resolvePackageLib(specifier: string, importer: string): BunOnResolveResult {
+  const match = specifier.match(/^(playwright(?:-core)?)\/(lib\/.+?)(?:\.js)?$/);
+  if (!match)
+    return undefined;
+  const [, pkgName, libPath] = match;
+  let pkgRoot = packageRootCache.get(pkgName);
+  if (pkgRoot === undefined) {
+    try {
+      const req = createRequire(importer || __filename);
+      pkgRoot = path.dirname(req.resolve(`${pkgName}/package.json`));
+    } catch {
+      pkgRoot = null;
+    }
+    packageRootCache.set(pkgName, pkgRoot);
+  }
+  if (!pkgRoot)
+    return undefined;
+  const resolved = path.join(pkgRoot, `${libPath}.js`);
+  if (!fs.existsSync(resolved))
+    return undefined;
+  return { path: resolved };
 }
 
 export function stripTypeImports(source: string): string {
@@ -73,7 +107,7 @@ export function stripTypeImports(source: string): string {
 }
 
 export async function importUnderBun(file: string): Promise<unknown> {
-  const fileUrl = url.pathToFileURL(file).toString();
+  const fileUrl = Bun!.pathToFileURL(file).toString();
   return await eval(`import(${JSON.stringify(fileUrl)})`);
 }
 

@@ -19,6 +19,7 @@ import path from 'path';
 
 import { detectCI  } from './ciAdapter';
 import { resolveOutputFile  } from './base';
+import { writeFileAtomic } from './runtimeIO';
 import type { CIMetadata } from './ciAdapter';
 import type { CommonReporterOptions } from './base';
 
@@ -77,15 +78,14 @@ class AIReporter implements ReporterV2 {
       failures.push(this._briefFailure(test, result));
     }
     try {
-      fs.mkdirSync(this._outputDir, { recursive: true });
       if (this._options.markdown !== false) {
         for (const f of failures)
-          fs.writeFileSync(path.join(this._outputDir, `${f.id}.md`), renderBriefing(f, this._resolvedPrompt), 'utf-8');
-        fs.writeFileSync(path.join(this._outputDir, 'index.md'), renderIndex(failures, this._ci), 'utf-8');
+          await writeFileAtomic(path.join(this._outputDir, `${f.id}.md`), renderBriefing(f, this._resolvedPrompt));
+        await writeFileAtomic(path.join(this._outputDir, 'index.md'), renderIndex(failures, this._ci));
       }
       if (this._options.jsonl !== false) {
         const jsonl = failures.map(f => JSON.stringify(f)).join('\n') + (failures.length ? '\n' : '');
-        fs.writeFileSync(path.join(this._outputDir, 'failures.jsonl'), jsonl, 'utf-8');
+        await writeFileAtomic(path.join(this._outputDir, 'failures.jsonl'), jsonl);
       }
     } catch (e) {
       // eslint-disable-next-line no-restricted-properties

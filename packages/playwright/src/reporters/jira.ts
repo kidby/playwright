@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+import { preconnect } from '@utils/bunPreconnect';
 import { detectCI  } from './ciAdapter';
+
 import type { CIMetadata } from './ciAdapter';
 
 import type { ReporterV2 } from './reporterV2';
@@ -56,6 +58,7 @@ class JiraReporter implements ReporterV2 {
   constructor(options: JiraReporterOptions = {}) {
     this._options = options;
     this._ci = detectCI();
+    preconnect(options.baseUrl);
   }
 
   version(): 'v2' { return 'v2'; }

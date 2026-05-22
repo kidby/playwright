@@ -99,11 +99,12 @@ test('stripTypeImports: default + named with per-specifier marker is left untouc
   expect(stripTypeImports(src)).toBe(src);
 });
 
-test('isBun(): returns false under Node test runner', () => {
-  expect(isBun()).toBe(false);
+test('isBun() reports the current runtime accurately', () => {
+  // Detects whichever runtime is hosting the test runner: Node or Bun.
+  expect(isBun()).toBe(typeof (globalThis as { Bun?: unknown }).Bun !== 'undefined');
 });
 
-itBun('isBun(): returns true under Bun', () => {
+itBun('isBun(): returns true when invoked from a spawned Bun process', () => {
   const result = runUnderBun(`
     const { isBun } = require(${JSON.stringify(bunRuntimeJs)});
     if (!isBun()) { process.stderr.write('isBun() returned false under Bun'); process.exit(1); }
@@ -126,6 +127,22 @@ itBun('Bun.plugin onLoad strips type imports end-to-end', async ({}, testInfo) =
   expect(result.stderr).toBe('');
   expect(result.status).toBe(0);
   expect(result.stdout).toBe('42');
+});
+
+itBun('Bun.plugin onLoad handles .tsx with JSX correctly', async ({}, testInfo) => {
+  fs.mkdirSync(testInfo.outputDir, { recursive: true });
+  const fixture = path.join(testInfo.outputDir, 'fixture.tsx');
+  fs.writeFileSync(fixture, `import type { Missing } from './does-not-exist';\nconst el = <div className="x">hi</div>;\nexport const x = el ? 1 : 0;\n`);
+  const result = runUnderBun(`
+    require(${JSON.stringify(bunRuntimeJs)});
+    (async () => {
+      const m = await import(${JSON.stringify(fixture)});
+      process.stdout.write(String(m.x));
+    })();
+  `);
+  expect(result.stderr).toBe('');
+  expect(result.status).toBe(0);
+  expect(result.stdout).toBe('1');
 });
 
 // Idempotency of installBunRuntime() is not externally observable: Bun.plugin is a non-writable,

@@ -67,13 +67,20 @@ export function getByTextSelector(text: string | RegExp, options?: { exact?: boo
 }
 
 export function getByIdSelector(id: string, options?: { exact?: boolean }): string {
-  const op = options?.exact ? '=' : '*=';
-  return `internal:attr=[id${op}${escapeForAttributeSelector(id, true)}]`;
+  // The internal:attr matcher honors caseSensitive=true as strict equality,
+  // and caseSensitive=false as case-insensitive substring. That maps cleanly
+  // to exact-vs-fuzzy id matching.
+  return `internal:attr=[id=${escapeForAttributeSelector(id, !!options?.exact)}]`;
 }
 
 export function getByClassNameSelector(className: string, options?: { exact?: boolean }): string {
-  const op = options?.exact ? '~=' : '*=';
-  return `internal:attr=[class${op}${escapeForAttributeSelector(className, true)}]`;
+  if (options?.exact) {
+    // Token match — match elements where className is one of the space-separated
+    // class tokens. CSS class shorthand `.foo` does this natively; escape special
+    // chars to keep arbitrary class names safe.
+    return `css=.${className.replace(/([!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~ ])/g, '\\$1')}`;
+  }
+  return `internal:attr=[class=${escapeForAttributeSelector(className, false)}]`;
 }
 
 export function getByRoleSelector(role: string, options: ByRoleOptions = {}): string {

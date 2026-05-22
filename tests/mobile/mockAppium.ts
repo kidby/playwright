@@ -52,7 +52,7 @@ export async function startMockAppium(): Promise<MockAppium> {
   const server = http.createServer(async (req, res) => {
     const chunks: Buffer[] = [];
     for await (const chunk of req)
-      chunks.push(chunk as Buffer);
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
     const raw = Buffer.concat(chunks).toString('utf-8');
     let body: any = undefined;
     if (raw) {

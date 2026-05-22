@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+import { preconnect } from '@utils/bunPreconnect';
 import { detectCI  } from './ciAdapter';
+
 import type { CIMetadata } from './ciAdapter';
 
 import type { ReporterV2 } from './reporterV2';
@@ -61,6 +63,9 @@ export abstract class WebhookReporterBase implements ReporterV2 {
   constructor(options: WebhookReporterOptions = {}) {
     this._options = options;
     this._ci = detectCI();
+    // Warm TLS for the outbound webhook so the actual fire (typically at end-of-run)
+    // doesn't pay the handshake cost. No-op under Node; safe to call anytime.
+    preconnect(options.webhookUrl);
   }
 
   abstract reporterName(): string;

@@ -293,41 +293,118 @@ npx playwright show-trace trace/
 
 ## Running under Bun
 
-Playwright ships two CLI binaries:
+Playwright's CLI auto-detects Bun. The single `playwright` bin works under either runtime — `node ./node_modules/playwright/cli.js test` and `bun ./node_modules/playwright/cli.js test` both run the suite. There is no separate Bun-only bin to install.
 
-- `playwright` — Node-runtime CLI (shebang `#!/usr/bin/env node`). Used by default when invoked as `npx playwright` or `bun run playwright` (Bun honors the shebang and delegates to Node).
-- `playwright-bun` — Bun-runtime CLI (shebang `#!/usr/bin/env bun`). Runs the test suite under Bun's native runtime.
+### Consumer setup
 
-Two consumer-side changes are needed to switch to Bun:
+In a Bun-based project:
 
-1. **Install Playwright via `bun link`, not `bun add`.** Bun caches `file:` installs by path-spelling, which can produce two independent Playwright instances in `node_modules` (causing `Error: two different versions of @playwright/test`). `bun link` registers a single canonical symlink and side-steps the cache.
+```bash
+# Install Playwright via bun link, not bun add. Bun caches file: installs by
+# path-spelling, which can produce two independent Playwright instances in
+# node_modules (causing "Error: two different versions of @playwright/test").
+# `bun link` registers a single canonical symlink and side-steps the cache.
+bun link playwright @playwright/test playwright-core
+```
 
-   ```bash
-   # In the consumer project
-   bun link playwright @playwright/test playwright-core
-   ```
+```json title="package.json"
+{
+  "scripts": {
+    "test": "bun ./node_modules/playwright/cli.js test"
+  }
+}
+```
 
-2. **Use `playwright-bun` in the script** instead of `playwright`:
+No `bunfig.toml` preload, no `--preload` flag, no separate bin.
 
-   ```json title="package.json"
-   {
-     "scripts": {
-       "test": "bun run playwright-bun test"
-     }
-   }
-   ```
+### How the Bun shim works
 
-That's the full setup — no `bunfig.toml` preload, no `--preload` flag.
+`packages/playwright/lib/transform/bunRuntime.js` is required at the top of `cli.js`. Under Node it's a no-op (gated by `typeof Bun === 'undefined'`). Under Bun it registers a single `Bun.plugin` with two hooks:
+
+1. **`onResolve`** intercepts `playwright/lib/*` and `playwright-core/lib/*` specifiers and forces them to the actual `lib/*.js` files in `node_modules`. Bun honors `tsconfig.json` `compilerOptions.paths` at runtime, and the workspace's tsconfig deliberately maps these paths to `src/*.ts` for TypeScript authoring convenience — without this onResolve override, Bun would load `src/bootstrap.ts` (a TS file the plugin marks as an async module via the onLoad hook) instead of `lib/bootstrap.js`, and `require()` of an async module fails. The hook routes Playwright's lib paths around tsconfig paths so the workspace stays Bun-runnable.
+2. **`onLoad`** reads each `.ts` / `.tsx` source via `fs.readFileSync` (**synchronous** — making this async causes Bun to mark every plugin-processed file as an async module, which breaks all the CJS `require()` calls in the runner). Strips dangling `import type { … }` statements that Bun's CJS-require path occasionally leaks as runtime imports — producing confusing `SyntaxError: export 'X' not found` for type-only names like `Page`. Returns the source with the correct loader: `loader: 'tsx'` for `.tsx` files (handles JSX), `loader: 'ts'` otherwise.
+
+`importUnderBun` in the same module uses `Bun.pathToFileURL` to construct the URL passed to dynamic `import()` — faster than `url.pathToFileURL` and removes the `url` module dep from the Bun-only path.
 
 ### Scope of Bun support
 
-The Bun runtime path strips dangling `import type {...}` statements (which Bun's CJS-require code path occasionally leaks as runtime imports — producing confusing `SyntaxError: export 'X' not found` errors for type-only names like `Page`). Beyond that, Playwright's custom Babel plugins (fixture-lift preprocessing, CSS-to-identity-obj-proxy, JSX) do **not** fire under Bun. Bun's native TS transpiler handles typical TS + JSX workloads, but component-testing users who depend on Playwright's Babel plugins should keep running under Node.
+- ✅ TypeScript spec files including `import type` forms.
+- ✅ JSX in `.tsx` files (loader picks `tsx`).
+- ✅ Mixed CJS / ESM consumer setups.
+- ✅ **The fork's own in-monorepo test suite** runs under Bun. The `onResolve` hook routes tsconfig path mappings around the source-vs-lib trap (54/54 upstream `loader.spec.ts` tests pass under Bun).
+- ❌ Playwright's custom Babel plugins (fixture-lift preprocessing, CSS-to-identity-obj-proxy, component-test JSX). Bun's native TS transpiler handles typical TS+JSX, but component-testing users who depend on Playwright's Babel plugins should keep running under Node.
 
-`--preload` is also supported for arbitrary Bun scripts that aren't going through the `playwright-bun` bin:
+### Bun-flavored npm scripts
 
-```bash
-bun --preload=node_modules/playwright/lib/transform/bunRuntime.js ./your-script.ts
-```
+The repo ships dual-runtime variants for the two most-used test scripts:
+
+| Node script | Bun script | Purpose |
+|---|---|---|
+| `npm run ttest <grep>` | `npm run ttest:bun <grep>` | Playwright-test runner tests under the Bun runtime. Outer process is Bun; child processes spawned by `runInlineTest` inherit Bun via `process.execPath`. |
+| `npm run ctest <grep>` | `npm run ctest:bun <grep>` | Chromium-only library/page tests under Bun. Browser launch dominates wall-clock, so the runtime delta is small here — use the Bun variant mainly for compatibility verification, not speed. |
+
+Under both `:bun` scripts, all spawned children (workers, inline-test sub-runners, fixtures) inherit the Bun runtime automatically via `child_process.fork`'s `process.execPath` inheritance — no separate flag needed.
+
+### Known Bun-only test gaps
+
+- **`expect-to-have-response-property.spec.ts`** is `test.skip`-gated under Bun. The shared `server` fixture (Node `http.createServer`) is not reachable from inline-test child processes when the parent runs under Bun — child gets `ECONNREFUSED` whether targeting `localhost` or `127.0.0.1`. Likely a binding-or-readiness mismatch between Bun's `http` polyfill and the fixture's lifecycle. Spec passes 1/1 under Node.
+
+### Performance
+
+Micro-benchmark of the specific Node→Bun swaps the fork makes, 1000 iterations on a ~4 KB TypeScript file:
+
+| Operation | Node (ms total) | Bun (ms total) | Speedup |
+|---|---|---|---|
+| `fs.readFileSync` ↔ `Bun.file().text()` | 53.9 | 43.1 | 1.25× |
+| `fs.writeFileSync` ↔ `Bun.write()` | 98.1 | 70.6 | 1.39× |
+| `url.pathToFileURL` ↔ `Bun.pathToFileURL` | 3.1 | 0.9 | 3.60× |
+
+Run via `node utils/bench-bun.mjs` (requires Bun on PATH). Set `BENCH_ITERATIONS=5000 BENCH_FILE_KB=64` for larger samples.
+
+Real-world: against one-automation's `@unit` suite (4 tests in `tests/platform/config/`):
+
+| Runtime | Wall-clock | Pass count |
+|---|---|---|
+| Node | 6.80s | 4/4 |
+| Bun | 3.38s | 4/4 |
+
+Bun is ~2× faster for the runner cold-start + transpile path. Identical pass/fail outcomes.
+
+The fork's own in-tree suites under both runtimes:
+
+| Suite | Tests | Node | Bun |
+|---|---|---|---|
+| `bun-runtime` | 13 (12 active under Bun; 1 inverted by design) | 13/13 — 0.8s | 12/13 — 0.8s |
+| `reporter-ai` | 5 | 5/5 — 6.7s | 5/5 — 4.6s |
+| 9 fork reporters (ai/catalog/csv/jira/new-relic/slack/xray/intellum-social/ci-adapter) | 25 | 25/25 — ~13s | 25/25 — 5.5s |
+| Upstream `loader.spec.ts` | 54 | 54/54 — 41.9s | 54/54 — 42.7s |
+
+The runner under Bun runs Playwright's most loader-heavy upstream spec (54 tests of the runner's own ESM/CJS loader plumbing) at parity wall-clock with Node, and fork-added reporters at ~2× faster.
+
+### Bun API audit
+
+For each Bun-native API evaluated against the fork's code, here's why it was either used or skipped:
+
+| Bun feature | Verdict | Reason |
+|---|---|---|
+| `Bun.pathToFileURL` | ✅ Used | Drop-in for `url.pathToFileURL` in `bunRuntime.ts`'s Bun-only `importUnderBun()`. 3.6× faster. |
+| `Bun.write` | ✅ Used | Conditional helper in `runtimeIO.ts` used by `ai.ts` + `csv.ts` reporter file writes. 1.4× faster. |
+| `Bun.file().text()` | ❌ Reverted | Making the plugin onLoad async causes Bun to mark every plugin-processed file as an async module, which breaks `require()` on the runner. Sync `fs.readFileSync` is correct. |
+| `Bun.fetch` | ✅ Free | All reporter outbound HTTP and the mobile package's Appium client already use the Web-standard `fetch()`. Bun replaces it natively at runtime — zero code change. |
+| `Bun.serve` | ⏭ Skip | Test fixtures use `http.createServer` which runs in <2ms; no measurable win. Would force dual-implementation since unit tests run under Node. |
+| `bun:sqlite` | ⏭ Skip | No current hot path. Could power a future failure-history index in the AI reporter — that's a feature add, not a Bun improvement. |
+| `Bun.WebView` | ⏭ Skip | Bun.WebView is itself a Playwright-style browser automator. Heavy overlap with Playwright. Replacing Playwright's CDP transport with Bun.WebView is core-scale upstream work with massive rebase risk. |
+| Bun `Worker` | ⏭ Skip | Playwright's runner already uses `child_process.fork`. Replacing it = upstream core rewrite. Fork-added code has no parallelism-bound hot paths large enough to justify worker overhead. |
+| `Bun.semver` | ⏭ Skip | No version-comparison code in fork-added paths. |
+| `Bun.Glob` | ⏭ Skip | No file-scan code in fork-added paths. |
+| `Bun.hash` / `Bun.CryptoHasher` | ⏭ Skip | Only crypto usage in fork-touched code is `crypto.randomBytes` in upstream `mcp/test/browserBackend.ts` (not fork-added). |
+| `Bun.Image` | ⏭ Skip | The mobile package's `device.screenshot()` passes PNG bytes through unmodified. No transformations in the pipeline. |
+| `HTMLRewriter` | ⏭ Skip | No HTML transformation in fork-added paths. |
+| `Bun.YAML.parse` | ⏭ Skip | The fork *emits* YAML (mobile snapshot, AI briefing) but never parses it. |
+| `Bun.JSONL` | ⏭ Skip | `ai.ts` writes `failures.jsonl` line by line as strings (`JSON.stringify` per failure). Nothing reads it in fork code; a downstream consumer of the jsonl could use `Bun.JSONL.parse` but that's not our scope. |
+| `Bun.escapeHTML` | ⏭ Skip | No HTML generation in fork-added paths (the markdown briefings are markdown, not HTML). |
+| `Bun.sleep` | ⏭ Skip | Two `setTimeout(resolve, ms)` helpers in `device.ts` and `webview.ts`. Both are dual-runtime; conditional swap would cost more than the speedup. |
+| `Bun.spawn` | ⏭ Skip | Tests deliberately spawn Bun *from Node* to test the Node→Bun boundary; using `Bun.spawn` would defeat the purpose. |
 
 ## Specialized Commands
 

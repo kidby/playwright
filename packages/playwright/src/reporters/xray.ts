@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { preconnect } from '@utils/bunPreconnect';
+
 import type { ReporterV2 } from './reporterV2';
 import type { FullConfig, FullResult, Suite, TestCase, TestResult } from '../../types/testReporter';
 
@@ -42,6 +44,7 @@ class XrayReporter implements ReporterV2 {
   constructor(options: XrayReporterOptions = {}) {
     this._options = options;
     this._keyRegex = new RegExp(options.testKeyPattern || DEFAULT_TEST_KEY_PATTERN);
+    preconnect(options.baseUrl);
   }
 
   version(): 'v2' { return 'v2'; }

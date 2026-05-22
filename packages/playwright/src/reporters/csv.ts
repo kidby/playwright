@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import fs from 'fs';
 import path from 'path';
 
 import { stripAnsiEscapes } from '@isomorphic/stringUtils';
 import { resolveOutputFile  } from './base';
+import { writeFileAtomic } from './runtimeIO';
 import type { CommonReporterOptions } from './base';
 
 import type { ReporterV2 } from './reporterV2';
@@ -83,8 +83,7 @@ class CSVReporter implements ReporterV2 {
       return;
     }
     try {
-      fs.mkdirSync(path.dirname(this._resolvedOutputFile), { recursive: true });
-      fs.writeFileSync(this._resolvedOutputFile, output, 'utf-8');
+      await writeFileAtomic(this._resolvedOutputFile, output);
     } catch (e) {
       // eslint-disable-next-line no-restricted-properties
       process.stderr.write(`[csv] failed to write ${this._resolvedOutputFile}: ${(e as Error).message}\n`);

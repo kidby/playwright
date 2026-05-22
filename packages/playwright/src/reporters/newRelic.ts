@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+import { preconnect } from '@utils/bunPreconnect';
 import { detectCI  } from './ciAdapter';
+
 import type { CIMetadata } from './ciAdapter';
 
 import type { ReporterV2 } from './reporterV2';
@@ -47,6 +49,15 @@ class NewRelicReporter implements ReporterV2 {
   constructor(options: NewRelicReporterOptions = {}) {
     this._options = options;
     this._ci = detectCI();
+    preconnect(this._endpoint());
+  }
+
+  private _endpoint(): string | undefined {
+    if (this._options.endpoint)
+      return this._options.endpoint;
+    if (!this._options.accountId)
+      return undefined;
+    return INSIGHTS_ENDPOINT[this._options.region || 'US'](this._options.accountId);
   }
 
   version(): 'v2' { return 'v2'; }

@@ -19,7 +19,7 @@ import crypto from 'crypto';
 import { assert } from '@isomorphic/assert';
 
 export function createGuid(): string {
-  return crypto.randomBytes(16).toString('hex');
+  return crypto.randomUUID().replaceAll('-', '');
 }
 
 export function calculateSha1(buffer: Buffer | string): string {

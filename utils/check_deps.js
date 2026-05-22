@@ -275,7 +275,8 @@ async function innerCheckDeps(root) {
       return true;
     if (!packageJSON)
       return false;
-    const match = importName.match(/(@[\w-]+\/)?([^/]+)/);
+    const normalized = importName.startsWith('node:') ? importName.slice(5) : importName;
+    const match = normalized.match(/(@[\w-]+\/)?([^/]+)/);
     const dependency = match[1] ? match[1] + match[2] : match[2];
     if (builtins.has(dependency))
       return true;

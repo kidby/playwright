@@ -25,6 +25,8 @@
     "stest": "playwright test --config=tests/stress/playwright.config.ts",
     "biditest": "playwright test --config=tests/bidi/playwright.config.ts",
     "ttest": "node ./tests/playwright-test/stable-test-runner/node_modules/@playwright/test/cli test --config=tests/playwright-test/playwright.config.ts",
+    "ttest:bun": "bun ./tests/playwright-test/stable-test-runner/node_modules/playwright/cli.js test --config=tests/playwright-test/playwright.config.ts",
+    "ctest:bun": "bun ./node_modules/playwright/cli.js test --config=tests/library/playwright.config.ts --project=chromium-*",
     "ct": "playwright test tests/components/test-all.spec.js --reporter=list",
     "test": "playwright test --config=tests/library/playwright.config.ts",
     "test-mcp": "playwright test --config=tests/mcp/playwright.config.ts",

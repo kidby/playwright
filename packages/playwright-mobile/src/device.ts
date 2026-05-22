@@ -88,7 +88,7 @@ export class Device {
   }
 
   get platform(): 'iOS' | 'Android' | undefined {
-    return this.client.capabilities?.platformName as 'iOS' | 'Android' | undefined;
+    return this.client.capabilities?.platformName;
   }
 
   get isAndroid() { return this.platform === 'Android'; }
