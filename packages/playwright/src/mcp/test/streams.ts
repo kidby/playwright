@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Writable } from 'node:stream';
+import { Writable } from 'stream';
 
 import { stripAnsiEscapes } from '../../util';
 

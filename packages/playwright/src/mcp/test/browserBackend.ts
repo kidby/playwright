@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import crypto from 'node:crypto';
+import crypto from 'crypto';
+
 import { stripAnsiEscapes } from '@isomorphic/stringUtils';
 
 import type { tools } from 'playwright-core/lib/coreBundle';
 import type * as playwright from '../../../index';
 import type { TestInfoImpl } from '../../worker/testInfo';
-import type { Browser } from '../../../../playwright-core/src/client/browser';
 
 export type BrowserMCPRequest = {
   initialize?: { clientInfo: tools.ClientInfo },
@@ -122,7 +122,7 @@ export async function runDaemonForContext(testInfo: TestInfoImpl, context: playw
     return false;
 
   const sessionName = `tw-${crypto.randomBytes(3).toString('hex')}`;
-  await (context.browser() as Browser)!.bind(sessionName, { workspaceDir: testInfo.project.testDir });
+  await context.browser()!.bind(sessionName, { workspaceDir: testInfo.project.testDir });
 
   /* eslint-disable-next-line no-console */
   console.log([

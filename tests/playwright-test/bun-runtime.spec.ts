@@ -101,7 +101,7 @@ test('stripTypeImports: default + named with per-specifier marker is left untouc
 
 test('isBun() reports the current runtime accurately', () => {
   // Detects whichever runtime is hosting the test runner: Node or Bun.
-  expect(isBun()).toBe(typeof (globalThis as { Bun?: unknown }).Bun !== 'undefined');
+  expect(isBun()).toBe(!!process.versions.bun);
 });
 
 itBun('isBun(): returns true when invoked from a spawned Bun process', () => {

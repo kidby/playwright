@@ -16,7 +16,8 @@
 
 import { test, expect } from './playwright-test-fixtures';
 
-const { isBun } = require(require.resolve('../../packages/playwright/lib/transform/bunRuntime')) as typeof import('../../packages/playwright/src/transform/bunRuntime');
+const bunRuntimeJs = require.resolve('../../packages/playwright/lib/transform/bunRuntime');
+const { isBun } = require(bunRuntimeJs) as typeof import('../../packages/playwright/src/transform/bunRuntime');
 
 // The shared `server` fixture (Node http.createServer) doesn't reach the
 // inline-test child reliably under Bun — the child gets ECONNREFUSED even

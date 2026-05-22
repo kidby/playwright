@@ -70,11 +70,12 @@ export function getByTextSelector(text: string | RegExp, options?: { exact?: boo
 }
 
 export function getByIdSelector(id: string, options?: { exact?: boolean }): string {
-  const op = options?.exact ? '=' : '*=';
-  return `internal:attr=[id${op}${escapeForAttributeSelector(id, false)}]`;
+  return getByAttributeTextSelector('id', id, options);
 }
 
 export function getByClassNameSelector(className: string, options?: { exact?: boolean }): string {
+  // Token match (`~=`) for exact so `getByClassName('foo', { exact: true })`
+  // matches `class="foo bar"` — equivalent to CSS `.foo`. Fuzzy stays substring.
   const op = options?.exact ? '~=' : '*=';
   return `internal:attr=[class${op}${escapeForAttributeSelector(className, false)}]`;
 }

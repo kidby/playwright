@@ -38,7 +38,7 @@ type BunGlobal = {
 declare const Bun: BunGlobal | undefined;
 
 export function isBun(): boolean {
-  return typeof Bun !== 'undefined';
+  return !!process.versions.bun;
 }
 
 let installed = false;

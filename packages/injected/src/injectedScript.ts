@@ -1754,7 +1754,7 @@ function createAttributeMatcher(part: AttributeSelectorPart): (s: string) => boo
     case '$=': return s => norm(s).endsWith(target);
     case '~=': return s => norm(s).split(/\s+/).includes(target);
     case '|=': return s => norm(s) === target || norm(s).startsWith(target + '-');
-    default:   return s => norm(s) === target;
+    default: return s => norm(s) === target;
   }
 }
 

@@ -15,7 +15,6 @@
  */
 
 type BunFetchModule = { preconnect(url: string): void };
-declare const Bun: unknown;
 
 // Cap dedup memory in long-running processes. Clear-on-overflow is fine —
 // re-preconnecting a known origin is a cheap no-op for Bun's socket pool.
@@ -23,7 +22,7 @@ const MAX_TRACKED_ORIGINS = 256;
 const seenUrls = new Set<string>();
 
 export function preconnect(url: string | undefined): void {
-  if (!url || typeof Bun === 'undefined')
+  if (!url || !process.versions.bun)
     return;
   if (!/^https?:\/\//i.test(url))
     return;
