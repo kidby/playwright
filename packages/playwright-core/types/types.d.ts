@@ -15631,6 +15631,32 @@ export interface BrowserType<Unused = {}> {
    */
   connectOverCDP(options: ConnectOverCDPOptions & { wsEndpoint?: string }): Promise<Browser>;
   /**
+   * This method attaches Playwright to an existing browser instance using the Chrome DevTools Protocol.
+   *
+   * The default browser context is accessible via
+   * [browser.contexts()](https://playwright.dev/docs/api/class-browser#browser-contexts).
+   *
+   * **NOTE** Connecting over the Chrome DevTools Protocol is only supported for Chromium-based browsers.
+   *
+   * **NOTE** This connection is significantly lower fidelity than the Playwright protocol connection via
+   * [browserType.connect(endpoint[, options])](https://playwright.dev/docs/api/class-browsertype#browser-type-connect).
+   * If you are experiencing issues or attempting to use advanced functionality, you probably want to use
+   * [browserType.connect(endpoint[, options])](https://playwright.dev/docs/api/class-browsertype#browser-type-connect).
+   *
+   * **Usage**
+   *
+   * ```js
+   * const browser = await playwright.chromium.connectOverCDP('http://localhost:9222');
+   * const defaultContext = browser.contexts()[0];
+   * const page = defaultContext.pages()[0];
+   * ```
+   *
+   * @param endpointURL A CDP websocket endpoint or http url to connect to. For example `http://localhost:9222/` or
+   * `ws://127.0.0.1:9222/devtools/browser/387adf4c-243f-4051-a181-46798f4a46f4`.
+   * @param options
+   */
+  connectOverCDP(transport: ConnectionTransport): Promise<Browser>;
+  /**
    * This method attaches Playwright to an existing browser instance created via `BrowserType.launchServer` in Node.js.
    *
    * **NOTE** The major and minor version of the Playwright instance that connects needs to match the version of
@@ -16408,6 +16434,13 @@ export interface BrowserType<Unused = {}> {
    * Returns browser name. For example: `'chromium'`, `'webkit'` or `'firefox'`.
    */
   name(): string;
+}
+
+export interface ConnectionTransport {
+  send(message: object): void;
+  close(): void;
+  onmessage?: (message: object) => void;
+  onclose?: (reason?: string) => void;
 }
 
 /**
@@ -22515,6 +22548,35 @@ export interface WebStorage {
  * - Ensure that `nodeCliInspect`
  *   ([FuseV1Options.EnableNodeCliInspectArguments](https://www.electronjs.org/docs/latest/tutorial/fuses#nodecliinspect))
  *   fuse is **not** set to `false`.
+ *
+ * **Mocking native dialogs:**
+ *
+ * Playwright does not intercept the native Electron [dialog](https://www.electronjs.org/docs/latest/api/dialog) API
+ * (`dialog.showOpenDialog`, `dialog.showSaveDialog`, `dialog.showMessageBox`, etc.) because those calls happen in the
+ * Electron main process and go straight to OS APIs. Use
+ * [electronApplication.evaluate(pageFunction[, arg])](https://playwright.dev/docs/api/class-electronapplication#electron-application-evaluate)
+ * to replace the relevant methods in the main process so tests run deterministically without any OS-level UI:
+ *
+ * ```js
+ * // Stub the open dialog to always return a fixed path.
+ * await electronApp.evaluate(({ dialog }, filePaths) => {
+ *   dialog.showOpenDialog = () => Promise.resolve({ canceled: false, filePaths });
+ * }, ['/path/to/file.txt']);
+ *
+ * // Stub the save dialog.
+ * await electronApp.evaluate(({ dialog }, filePath) => {
+ *   dialog.showSaveDialog = () => Promise.resolve({ canceled: false, filePath });
+ * }, '/path/to/saved.txt');
+ *
+ * // Stub showMessageBox to click the first button.
+ * await electronApp.evaluate(({ dialog }) => {
+ *   dialog.showMessageBox = () => Promise.resolve({ response: 0, checkboxChecked: false });
+ * });
+ * ```
+ *
+ * The replacement persists until the application is closed. Synchronous variants (`showOpenDialogSync`,
+ * `showSaveDialogSync`, `showMessageBoxSync`) can be stubbed the same way — just return the value directly instead of
+ * a `Promise`.
  */
 export interface Electron {
   /**
@@ -25041,6 +25103,26 @@ type Devices = {
   "iPhone 15 Pro landscape": DeviceDescriptor;
   "iPhone 15 Pro Max": DeviceDescriptor;
   "iPhone 15 Pro Max landscape": DeviceDescriptor;
+  "iPhone 16": DeviceDescriptor;
+  "iPhone 16 landscape": DeviceDescriptor;
+  "iPhone 16 Plus": DeviceDescriptor;
+  "iPhone 16 Plus landscape": DeviceDescriptor;
+  "iPhone 16 Pro": DeviceDescriptor;
+  "iPhone 16 Pro landscape": DeviceDescriptor;
+  "iPhone 16 Pro Max": DeviceDescriptor;
+  "iPhone 16 Pro Max landscape": DeviceDescriptor;
+  "iPhone 16e": DeviceDescriptor;
+  "iPhone 16e landscape": DeviceDescriptor;
+  "iPhone 17": DeviceDescriptor;
+  "iPhone 17 landscape": DeviceDescriptor;
+  "iPhone Air": DeviceDescriptor;
+  "iPhone Air landscape": DeviceDescriptor;
+  "iPhone 17 Pro": DeviceDescriptor;
+  "iPhone 17 Pro landscape": DeviceDescriptor;
+  "iPhone 17 Pro Max": DeviceDescriptor;
+  "iPhone 17 Pro Max landscape": DeviceDescriptor;
+  "iPhone 17e": DeviceDescriptor;
+  "iPhone 17e landscape": DeviceDescriptor;
   "Kindle Fire HDX": DeviceDescriptor;
   "Kindle Fire HDX landscape": DeviceDescriptor;
   "LG Optimus L70": DeviceDescriptor;
