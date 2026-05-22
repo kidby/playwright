@@ -1,7 +1,7 @@
 [*]
 @isomorphic/**
 @utils/**
-node_modules/colors/safe
+node_modules/picocolors
 
 [expectLibrary.ts]
 node_modules/@jest/expect-utils

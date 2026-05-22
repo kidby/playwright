@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import colors from 'colors/safe';
+import colors from 'picocolors';
 import { test, expect } from './playwright-test-fixtures';
 
 for (const useIntermediateMergeReport of [false, true] as const) {

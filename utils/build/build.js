@@ -621,6 +621,13 @@ steps.push(new EsbuildStep({
   }, dynamicImportToRequirePlugin],
 }, [playwrightCoreSrc]));
 
+// Small zero-dep utilities that @utils source files import directly
+// (cross-package layering forbids routing them through utilsBundle).
+// Bundling them into coreBundle is intentional and safe.
+const CORE_BUNDLE_ALLOWED_NODE_MODULES = [
+  'node_modules/picocolors/',
+];
+
 function assertCoreBundleHasNoNodeModules() {
   const bundlePath = filePath('packages/playwright-core/lib/coreBundle.js');
   const contents = fs.readFileSync(bundlePath, 'utf8');
@@ -628,8 +635,11 @@ function assertCoreBundleHasNoNodeModules() {
   const offenders = [];
   for (let i = 0; i < lines.length; i++) {
     const idx = lines[i].indexOf('node_modules/');
-    if (idx !== -1)
-      offenders.push(`  ${bundlePath}:${i + 1}: ${lines[i].slice(Math.max(0, idx - 10), idx + 80)}`);
+    if (idx === -1)
+      continue;
+    if (CORE_BUNDLE_ALLOWED_NODE_MODULES.some(allowed => lines[i].includes(allowed)))
+      continue;
+    offenders.push(`  ${bundlePath}:${i + 1}: ${lines[i].slice(Math.max(0, idx - 10), idx + 80)}`);
   }
   if (offenders.length) {
     console.error(`\n==== coreBundle.js contains 'node_modules/' references (${offenders.length} lines) ====`);

@@ -17,7 +17,8 @@
 import path from 'path';
 import { Writable } from 'stream';
 
-import realColors from 'colors/safe';
+import pc from 'picocolors';
+
 import { noColors } from '@isomorphic/colors';
 import { msToString } from '@isomorphic/formatUtils';
 import { parseErrorStack } from '@isomorphic/stackTrace';
@@ -26,9 +27,11 @@ import { fitToWidth } from '@utils/stringWidth';
 
 import { resolveReporterOutputPath, stripAnsiEscapes } from '../util';
 
+import type { Colors } from '@isomorphic/colors';
 import type { ReporterV2 } from './reporterV2';
 import type { FullConfig, FullResult, Location, Suite, TestCase, TestError, TestResult, TestStep } from '../../types/testReporter';
-import type { Colors } from '@isomorphic/colors';
+
+const realColors: Colors = { ...pc, enabled: pc.isColorSupported, grey: pc.gray };
 
 export type TestResultOutput = { chunk: string | Buffer, type: 'stdout' | 'stderr' };
 export const kOutputSymbol = Symbol('output');

@@ -4,7 +4,7 @@
 ../common/
 ../isomorphic/**
 ../util.ts
-node_modules/colors/safe
+node_modules/picocolors
 node_modules/get-east-asian-width
 node_modules/mime
 node_modules/open

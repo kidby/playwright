@@ -16,7 +16,7 @@
  */
 
 import jpegjs from 'jpeg-js';
-import colors from 'colors/safe';
+import colors from 'picocolors';
 import * as diff from 'diff';
 import { PNG } from 'pngjs';
 import { padImageToSize } from '@isomorphic/imageUtils';

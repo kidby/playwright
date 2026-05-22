@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import colors from 'colors/safe';
+import colors from 'picocolors';
 import { asLocatorDescription } from '@isomorphic/locatorGenerators';
 import { isTextualMimeType } from '@isomorphic/mimeType';
 import { isRegExp } from '@isomorphic/rtti';

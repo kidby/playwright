@@ -144,7 +144,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
     test('should render stdout', async ({ runInlineTest }) => {
       const result = await runInlineTest({
         'a.test.ts': `
-          import colors from 'colors/safe';
+          import colors from 'picocolors';
           import { test, expect } from '@playwright/test';
           test('one', async ({}) => {
             console.log(colors.yellow('Hello world'));
@@ -174,7 +174,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
           };
         `,
         'a.test.ts': `
-          import colors from 'colors/safe';
+          import colors from 'picocolors';
           import { test, expect } from '@playwright/test';
           test('one', async ({}) => {
             console.log(colors.yellow('Hello world'));

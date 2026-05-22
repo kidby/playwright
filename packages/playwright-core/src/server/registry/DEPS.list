@@ -4,5 +4,5 @@
 ../../package.ts
 ../utils.ts
 ../userAgent.ts
-node_modules/colors/safe
+node_modules/picocolors
 node_modules/progress

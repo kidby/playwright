@@ -19,7 +19,7 @@ import readline from 'readline';
 import { EventEmitter } from 'events';
 
 import { remote } from 'playwright-core/lib/coreBundle';
-import colors from 'colors/safe';
+import colors from 'picocolors';
 import enquirer from 'enquirer';
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { createGuid } from '@utils/crypto';

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import colorsLibrary from 'colors/safe';
+import colorsLibrary from 'picocolors';
 export const colors = colorsLibrary;
 
 import debugLibrary from 'debug';

@@ -8,7 +8,7 @@
 ../util.ts
 ../isomorphic/
 node_modules/chokidar
-node_modules/colors/safe
+node_modules/picocolors
 node_modules/debug
 node_modules/diff
 node_modules/enquirer

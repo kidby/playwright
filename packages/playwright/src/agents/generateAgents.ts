@@ -17,7 +17,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import colors from 'colors/safe';
+import colors from 'picocolors';
 import yaml from 'yaml';
 import { tomlArray, tomlBasicString, tomlMultilineBasicString } from '@isomorphic/stringUtils';
 import { mkdirIfNeeded } from '@utils/fileUtils';

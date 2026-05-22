@@ -16,7 +16,7 @@
 import net from 'net';
 import path from 'path';
 
-import colors from 'colors/safe';
+import colors from 'picocolors';
 import debug from 'debug';
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { monotonicTime } from '@isomorphic/time';

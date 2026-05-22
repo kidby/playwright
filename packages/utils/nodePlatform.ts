@@ -21,7 +21,7 @@ import * as util from 'util';
 import { Readable, Writable, pipeline } from 'stream';
 import { EventEmitter } from 'events';
 
-import colors from 'colors/safe';
+import colors from 'picocolors';
 import { debugLogger } from './debugLogger';
 import { currentZone, emptyZone } from './zones';
 import { debugMode, isUnderTest } from './debug';

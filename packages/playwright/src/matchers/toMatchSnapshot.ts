@@ -17,7 +17,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import colors from 'colors/safe';
+import colors from 'picocolors';
 import { getMimeTypeForPath } from '@isomorphic/mimeType';
 import { isString } from '@isomorphic/stringUtils';
 import { compareBuffersOrStrings, getComparator } from '@utils/comparators';

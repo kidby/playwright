@@ -2,7 +2,7 @@
 @isomorphic/**
 @utils/**
 ../mcp/test/
-node_modules/colors/safe
+node_modules/picocolors
 node_modules/yaml
 
 [generateAgents.ts]
