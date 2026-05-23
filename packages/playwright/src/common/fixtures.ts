@@ -16,9 +16,9 @@
 
 import crypto from 'crypto';
 
-import { filterStackFile, formatLocation } from '../util';
+import { filterStackFile, formatLocation } from '../util.js';
 
-import type { FixturesWithLocation } from './config';
+import type { FixturesWithLocation } from './config.js';
 import type { Fixtures } from '../../types/test';
 import type { Location } from '../../types/testReporter';
 

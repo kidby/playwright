@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { Dispatcher } from './dispatcher';
-import { SdkObject } from '../instrumentation';
+import { Dispatcher } from './dispatcher.js';
+import { SdkObject } from '../instrumentation.js';
 
-import type { LocalUtilsDispatcher } from './localUtilsDispatcher';
+import type { LocalUtilsDispatcher } from './localUtilsDispatcher.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 

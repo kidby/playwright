@@ -19,7 +19,7 @@ import net from 'net';
 
 import debug from 'debug';
 import { assert } from '@isomorphic/assert';
-import type { Backend, DeviceBackend, SocketBackend } from './android';
+import type { Backend, DeviceBackend, SocketBackend } from './android.js';
 import type * as channels from '@protocol/channels';
 
 

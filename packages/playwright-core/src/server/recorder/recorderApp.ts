@@ -19,23 +19,23 @@ import path from 'path';
 
 import mime from 'mime';
 import { isUnderTest } from '@utils/debug';
-import { libPath } from '../../package';
-import { syncLocalStorageWithSettings } from '../launchApp';
-import { launchApp } from '../launchApp';
-import { nullProgress, ProgressController } from '../progress';
-import { ThrottledFile } from './throttledFile';
-import { languageSet } from '../codegen/languages';
-import { collapseActions, shouldMergeAction } from './recorderUtils';
-import { generateCode } from '../codegen/language';
-import { Recorder, RecorderEvent } from '../recorder';
-import { BrowserContext } from '../browserContext';
+import { libPath } from '../../package.js';
+import { syncLocalStorageWithSettings } from '../launchApp.js';
+import { launchApp } from '../launchApp.js';
+import { nullProgress, ProgressController } from '../progress.js';
+import { ThrottledFile } from './throttledFile.js';
+import { languageSet } from '../codegen/languages.js';
+import { collapseActions, shouldMergeAction } from './recorderUtils.js';
+import { generateCode } from '../codegen/language.js';
+import { Recorder, RecorderEvent } from '../recorder.js';
+import { BrowserContext } from '../browserContext.js';
 
-import type { Page } from '../page';
+import type { Page } from '../page.js';
 import type * as actions from '@recorder/actions';
 import type { CallLog, ElementInfo, Mode, RecorderBackend, RecorderFrontend, Source } from '@recorder/recorderTypes';
-import type { Language, LanguageGeneratorOptions } from '../codegen/types';
+import type { Language, LanguageGeneratorOptions } from '../codegen/types.js';
 import type * as channels from '@protocol/channels';
-import type { Progress } from '../progress';
+import type { Progress } from '../progress.js';
 import type { AriaTemplateNode } from '@isomorphic/ariaSnapshot';
 
 export type RecorderAppParams = channels.BrowserContextEnableRecorderParams & {
@@ -205,7 +205,7 @@ export class RecorderApp {
     const sdkLanguage = inspectedContext._browser.sdkLanguage();
     const isChromium = inspectedContext._browser.options.browserType === 'chromium';
     const headed = !!inspectedContext._browser.options.headful;
-    const { createPlaywright } = require('../playwright') as typeof import('../playwright');
+    const { createPlaywright } = require('../playwright') as typeof import('../playwright.js');
     const recorderPlaywright = createPlaywright({ sdkLanguage: 'javascript', isInternalPlaywright: true });
     const { context: appContext, page } = await launchApp(recorderPlaywright.chromium, {
       sdkLanguage,

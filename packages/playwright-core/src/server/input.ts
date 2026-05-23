@@ -15,12 +15,12 @@
  */
 
 import { assert } from '@isomorphic/assert';
-import * as keyboardLayout from './usKeyboardLayout';
-import { NonRecoverableDOMError } from './dom';
+import * as keyboardLayout from './usKeyboardLayout.js';
+import { NonRecoverableDOMError } from './dom.js';
 
-import type { Progress } from './progress';
-import type { Page } from './page';
-import type * as types from './types';
+import type { Progress } from './progress.js';
+import type { Page } from './page.js';
+import type * as types from './types.js';
 
 export const keypadLocation = keyboardLayout.keypadLocation;
 

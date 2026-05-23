@@ -24,17 +24,17 @@ import { constructURLBasedOnBaseURL, isURLPattern } from '@isomorphic/urlMatch';
 import { serializeExpectedTextValues } from '@isomorphic/expectUtils';
 import { monotonicTime } from '@isomorphic/index';
 
-import { expectTypes, formatMatcherMessage, MatcherResult } from './matcherHint';
-import { toBeTruthy } from './toBeTruthy';
-import { toEqual } from './toEqual';
-import { toHaveURLWithPredicate } from './toHaveURL';
-import { toMatchText } from './toMatchText';
-import { toHaveScreenshotStepTitle } from './toMatchSnapshot';
-import { expectConfig } from './expect';
+import { expectTypes, formatMatcherMessage, MatcherResult } from './matcherHint.js';
+import { toBeTruthy } from './toBeTruthy.js';
+import { toEqual } from './toEqual.js';
+import { toHaveURLWithPredicate } from './toHaveURL.js';
+import { toMatchText } from './toMatchText.js';
+import { toHaveScreenshotStepTitle } from './toMatchSnapshot.js';
+import { expectConfig } from './expect.js';
 
 import type { ExpectMatcherState } from '../../types/test';
-import type { ExpectTestInfo } from './expect';
-import type { InternalMatcherUtils } from './matcherHint';
+import type { ExpectTestInfo } from './expect.js';
+import type { InternalMatcherUtils } from './matcherHint.js';
 import type { APIResponse, Locator, Frame, Page } from 'playwright-core';
 import type { ExpectResult } from 'playwright-core/lib/client/frame';
 import type { FrameExpectParams } from 'playwright-core/lib/client/types';

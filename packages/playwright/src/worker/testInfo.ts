@@ -25,16 +25,16 @@ import { createGuid } from '@utils/crypto';
 import { sanitizeForFilePath, trimLongString } from '@utils/fileUtils';
 import { currentZone } from '@utils/zones';
 
-import { TimeoutManager, TimeoutManagerError } from './timeoutManager';
-import { addSuffixToFilePath, filteredStackTrace, getContainedPath, normalizeAndSaveAttachment, sanitizeFilePathBeforeExtension, windowsFilesystemFriendlyLength } from '../util';
-import { TestTracing } from './testTracing';
-import { testInfoError } from './util';
-import { ipc, transform } from '../common';
+import { TimeoutManager, TimeoutManagerError } from './timeoutManager.js';
+import { addSuffixToFilePath, filteredStackTrace, getContainedPath, normalizeAndSaveAttachment, sanitizeFilePathBeforeExtension, windowsFilesystemFriendlyLength } from '../util.js';
+import { TestTracing } from './testTracing.js';
+import { testInfoError } from './util.js';
+import { ipc, transform } from '../common/index.js';
 
-import type { RunnableDescription } from './timeoutManager';
+import type { RunnableDescription } from './timeoutManager.js';
 import type { FullProject, TestInfo, TestInfoError, TestStatus, TestStepInfo, TestAnnotation } from '../../types/test';
 import type { FullConfig, Location } from '../../types/testReporter';
-import type { config as commonConfig, FullConfigInternal, test as testNs } from '../common';
+import type { config as commonConfig, FullConfigInternal, test as testNs } from '../common/index.js';
 import type { StackFrame } from '@protocol/channels';
 
 export type TestStepCategory = 'expect' | 'fixture' | 'hook' | 'pw:api' | 'test.step' | 'test.attach';

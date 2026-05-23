@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-import { Android } from './android/android';
-import { AdbBackend } from './android/backendAdb';
-import { BidiChromium } from './bidi/bidiChromium';
-import { BidiFirefox } from './bidi/bidiFirefox';
-import { Chromium } from './chromium/chromium';
-import { DebugController } from './debugController';
-import { Electron } from './electron/electron';
-import { Firefox } from './firefox/firefox';
-import { SdkObject, createRootSdkObject } from './instrumentation';
-import { WebKit } from './webkit/webkit';
+import { Android } from './android/android.js';
+import { AdbBackend } from './android/backendAdb.js';
+import { BidiChromium } from './bidi/bidiChromium.js';
+import { BidiFirefox } from './bidi/bidiFirefox.js';
+import { Chromium } from './chromium/chromium.js';
+import { DebugController } from './debugController.js';
+import { Electron } from './electron/electron.js';
+import { Firefox } from './firefox/firefox.js';
+import { SdkObject, createRootSdkObject } from './instrumentation.js';
+import { WebKit } from './webkit/webkit.js';
 
-import type { BrowserType } from './browserType';
+import type { BrowserType } from './browserType.js';
 import type { Language } from '@isomorphic/locatorGenerators';
-import type { Browser } from './browser';
-import type { Page } from './page';
+import type { Browser } from './browser.js';
+import type { Page } from './page.js';
 
 type PlaywrightOptions = {
   sdkLanguage: Language;

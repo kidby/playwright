@@ -13,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const minimumMajorNodeVersion = 18;
-const currentNodeVersion = process.versions.node;
-const semver = currentNodeVersion.split('.');
-const [major] = [+semver[0]];
 
-if (major < minimumMajorNodeVersion) {
-  console.error(
-      'You are running Node.js ' +
-      currentNodeVersion +
-      '.\n' +
-      `Playwright requires Node.js ${minimumMajorNodeVersion} or higher. \n` +
-      'Please update your version of Node.js.'
-  );
-  process.exit(1);
-}
+import playwright from './index.js';
 
-module.exports = require('./lib/coreBundle').inprocess.playwright;
+export const chromium = playwright.chromium;
+export const firefox = playwright.firefox;
+export const webkit = playwright.webkit;
+export const selectors = playwright.selectors;
+export const devices = playwright.devices;
+export const errors = playwright.errors;
+export const request = playwright.request;
+export const _electron = playwright._electron;
+export const _android = playwright._android;
+export default playwright;

@@ -19,12 +19,12 @@ import EventEmitter from 'events';
 import * as zod from 'zod';
 import { tools } from 'playwright-core/lib/coreBundle';
 
-import { TestContext } from './testContext';
+import { TestContext } from './testContext.js';
 import * as testTools from './testTools.js';
 import * as generatorTools from './generatorTools.js';
 import * as plannerTools from './plannerTools.js';
 
-import type { TestTool } from './testTool';
+import type { TestTool } from './testTool.js';
 
 const typesWithIntent = ['action', 'assertion', 'input'];
 

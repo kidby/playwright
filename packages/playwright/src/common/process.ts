@@ -20,9 +20,9 @@ import { ManualPromise } from '@isomorphic/manualPromise';
 import { setTimeOrigin } from '@isomorphic/time';
 import { startProfiling, stopProfiling } from '@utils/profiler';
 
-import { serializeError } from '../util';
+import { serializeError } from '../util.js';
 
-import type { EnvProducedPayload, ProcessInitParams, TestInfoErrorPayload } from './ipc';
+import type { EnvProducedPayload, ProcessInitParams, TestInfoErrorPayload } from './ipc.js';
 
 export type ProtocolRequest = {
   id: number;

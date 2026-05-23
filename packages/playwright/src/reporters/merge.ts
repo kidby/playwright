@@ -20,18 +20,18 @@ import path from 'path';
 import { isPathInside } from '@utils/fileUtils';
 import { ZipFile } from '@utils/zipFile';
 
-import {  currentBlobReportVersion } from './blob';
-import { Multiplexer } from './multiplexer';
-import { JsonStringInternalizer, StringInternPool } from '../isomorphic/stringInternPool';
-import { asFullConfig, asFullResult, TeleReporterReceiver } from '../isomorphic/teleReceiver';
-import { createReporters } from '../runner/reporters';
-import { relativeFilePath } from '../util';
+import {  currentBlobReportVersion } from './blob.js';
+import { Multiplexer } from './multiplexer.js';
+import { JsonStringInternalizer, StringInternPool } from '../isomorphic/stringInternPool.js';
+import { asFullConfig, asFullResult, TeleReporterReceiver } from '../isomorphic/teleReceiver.js';
+import { createReporters } from '../runner/reporters.js';
+import { relativeFilePath } from '../util.js';
 
 import type { ReporterDescription, TestAnnotation } from '../../types/test';
 import type { TestError } from '../../types/testReporter';
-import type { FullConfigInternal } from '../common';
-import type { BlobReportMetadata, JsonAttachment, JsonConfig, JsonEvent, JsonFullResult, JsonLocation, JsonOnConfigureEvent, JsonOnEndEvent, JsonOnProjectEvent, JsonProject, JsonSuite, JsonTestCase } from '../isomorphic/teleReceiver';
-import type * as blobV1 from './versions/blobV1';
+import type { FullConfigInternal } from '../common/index.js';
+import type { BlobReportMetadata, JsonAttachment, JsonConfig, JsonEvent, JsonFullResult, JsonLocation, JsonOnConfigureEvent, JsonOnEndEvent, JsonOnProjectEvent, JsonProject, JsonSuite, JsonTestCase } from '../isomorphic/teleReceiver.js';
+import type * as blobV1 from './versions/blobV1.js';
 
 type StatusCallback = (message: string) => void;
 

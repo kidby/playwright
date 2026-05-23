@@ -15,20 +15,20 @@
  */
 
 import { LongStandingScope } from '@isomorphic/manualPromise';
-import { ChannelOwner } from './channelOwner';
-import { ConsoleMessage } from './consoleMessage';
-import { isTargetClosedError, TargetClosedError } from './errors';
-import { Events } from './events';
-import { JSHandle, assertMaxArguments, parseResult, serializeArgument } from './jsHandle';
-import { TimeoutSettings } from './timeoutSettings';
-import { Waiter } from './waiter';
+import { ChannelOwner } from './channelOwner.js';
+import { ConsoleMessage } from './consoleMessage.js';
+import { isTargetClosedError, TargetClosedError } from './errors.js';
+import { Events } from './events.js';
+import { JSHandle, assertMaxArguments, parseResult, serializeArgument } from './jsHandle.js';
+import { TimeoutSettings } from './timeoutSettings.js';
+import { Waiter } from './waiter.js';
 
-import type { BrowserContext } from './browserContext';
-import type { Page } from './page';
+import type { BrowserContext } from './browserContext.js';
+import type { Page } from './page.js';
 import type * as structs from '../../types/structs';
 import type * as api from '../../types/types';
 import type * as channels from '@protocol/channels';
-import type { WaitForEventOptions } from './types';
+import type { WaitForEventOptions } from './types.js';
 
 
 export class Worker extends ChannelOwner<channels.WorkerChannel> implements api.Worker {

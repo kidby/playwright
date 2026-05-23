@@ -15,7 +15,7 @@
  */
 
 import * as z from 'zod';
-import { defineTool } from './tool';
+import { defineTool } from './tool.js';
 
 const wait = defineTool({
   capability: 'core',

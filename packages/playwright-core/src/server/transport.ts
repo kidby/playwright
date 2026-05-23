@@ -19,8 +19,8 @@ import ws from 'ws';
 import { httpHappyEyeballsAgent, httpsHappyEyeballsAgent } from '@utils/happyEyeballs';
 import { makeWaitForNextTask } from '@utils/task';
 import type { WebSocket } from 'ws';
-import type { Progress } from './progress';
-import type { HeadersArray } from './types';
+import type { Progress } from './progress.js';
+import type { HeadersArray } from './types.js';
 import type { ClientRequest, IncomingMessage } from 'http';
 
 export const perMessageDeflate = {
@@ -125,6 +125,7 @@ export class WebSocketTransport implements ConnectionTransport {
       }
       return transport;
     } catch (error) {
+      // oxlint-disable-next-line progress/await-must-use-progress -- catch-block cleanup; operation is failing and the close must complete before rethrow
       await transport.closeAndWait();
       throw error;
     }

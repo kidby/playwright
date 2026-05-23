@@ -17,7 +17,7 @@
 
 import { assert } from '@isomorphic/assert';
 
-import type { BidiSession } from './bidiConnection';
+import type { BidiSession } from './bidiConnection.js';
 import type * as channels from '@protocol/channels';
 
 const PagePaperFormats: { [key: string]: { width: number, height: number }} = {

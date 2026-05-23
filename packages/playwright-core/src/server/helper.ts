@@ -18,8 +18,8 @@
 import { debugLogger } from '@utils/debugLogger';
 import { eventsHelper } from '@utils/eventsHelper';
 
-import type { Progress } from './progress';
-import type * as types from './types';
+import type { Progress } from './progress.js';
+import type * as types from './types.js';
 import type { RegisteredListener } from '@utils/eventsHelper';
 import type { EventEmitter } from 'events';
 

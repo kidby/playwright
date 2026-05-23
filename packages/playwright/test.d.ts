@@ -14,5 +14,5 @@
  * limitations under the License.
  */
 
-export * from './types/test';
-export { default } from './types/test';
+export * from './types/test.js';
+export { default } from './types/test.js';

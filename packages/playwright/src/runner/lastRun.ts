@@ -18,8 +18,8 @@ import fs from 'fs';
 import path from 'path';
 
 import type { FullResult, Suite } from '../../types/testReporter';
-import type { config as commonConfig } from '../common';
-import type { ReporterV2 } from '../reporters/reporterV2';
+import type { config as commonConfig } from '../common/index.js';
+import type { ReporterV2 } from '../reporters/reporterV2.js';
 
 type LastRunInfo = {
   status: FullResult['status'];

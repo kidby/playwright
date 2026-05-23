@@ -29,17 +29,17 @@ import { canAccessFile, existsAsync, removeFolders } from '@utils/fileUtils';
 import { calculateSha1 } from '@utils/crypto';
 import { getAsBooleanFromENV, getFromENV, getPackageManagerExecCommand } from '@utils/env';
 import { lock } from '@utils/third_party/lockfile';
-import { fetchData } from '../utils';
-import { getEmbedderName } from '../userAgent';
-import { installDependenciesLinux, installDependenciesWindows, validateDependenciesLinux, validateDependenciesWindows } from './dependencies';
-import { dockerVersion, readDockerVersionSync, transformCommandsForRoot } from './dependencies';
-import { downloadBrowserWithProgressBar, logPolitely } from './browserFetcher';
-import { packageRoot, binPath } from '../../package';
+import { fetchData } from '../utils.js';
+import { getEmbedderName } from '../userAgent.js';
+import { installDependenciesLinux, installDependenciesWindows, validateDependenciesLinux, validateDependenciesWindows } from './dependencies.js';
+import { dockerVersion, readDockerVersionSync, transformCommandsForRoot } from './dependencies.js';
+import { downloadBrowserWithProgressBar, logPolitely } from './browserFetcher.js';
+import { packageRoot, binPath } from '../../package.js';
 
-import type { DependencyGroup } from './dependencies';
+import type { DependencyGroup } from './dependencies.js';
 import type { HostPlatform } from '@utils/hostPlatform';
 
-export { writeDockerVersion } from './dependencies';
+export { writeDockerVersion } from './dependencies.js';
 
 const PACKAGE_PATH = packageRoot;
 const BIN_PATH = binPath;
@@ -1543,4 +1543,4 @@ function lowercaseAllKeys(json: any): any {
 
 export const registry = new Registry(require(path.join(packageRoot, 'browsers.json')));
 
-export { runOopDownloadBrowserMain } from './oopDownloadBrowserMain';
+export { runOopDownloadBrowserMain } from './oopDownloadBrowserMain.js';

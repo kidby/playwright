@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { BrowserContextDispatcher } from './browserContextDispatcher';
-import { BrowserDispatcher } from './browserDispatcher';
-import { WorkerDispatcher } from './pageDispatcher';
-import { Dispatcher } from './dispatcher';
+import { BrowserContextDispatcher } from './browserContextDispatcher.js';
+import { BrowserDispatcher } from './browserDispatcher.js';
+import { WorkerDispatcher } from './pageDispatcher.js';
+import { Dispatcher } from './dispatcher.js';
 
-import type { BrowserType } from '../browserType';
-import type { RootDispatcher } from './dispatcher';
+import type { BrowserType } from '../browserType.js';
+import type { RootDispatcher } from './dispatcher.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 

@@ -17,13 +17,13 @@
 import { EventEmitter } from 'events';
 import { Disposable } from '@isomorphic/disposable';
 import { eventsHelper } from '@utils/eventsHelper';
-import { connectToBrowserAcrossVersions } from '../utils/connect';
-import { serverRegistry } from '../../serverRegistry';
-import { SessionProviderEvent } from './sessionProvider';
+import { connectToBrowserAcrossVersions } from '../utils/connect.js';
+import { serverRegistry } from '../../serverRegistry.js';
+import { SessionProviderEvent } from './sessionProvider.js';
 
 import type * as api from '../../../types/types';
-import type { BrowserDescriptor } from '../../serverRegistry';
-import type { ContextEntry, SessionProvider, SessionProviderEventMap } from './sessionProvider';
+import type { BrowserDescriptor } from '../../serverRegistry.js';
+import type { ContextEntry, SessionProvider, SessionProviderEventMap } from './sessionProvider.js';
 
 type BrowserTrackerCallbacks = {
   onTabsChanged: () => void;

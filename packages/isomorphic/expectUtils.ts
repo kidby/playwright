@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { isRegExp, isString } from './rtti';
+import { isRegExp, isString } from './rtti.js';
 import type { ExpectedTextValue } from '@protocol/channels';
 
 export function serializeExpectedTextValues(items: (string | RegExp)[], options: { matchSubstring?: boolean, normalizeWhiteSpace?: boolean, ignoreCase?: boolean } = {}): ExpectedTextValue[] {

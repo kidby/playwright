@@ -17,10 +17,10 @@
 import * as z from 'zod';
 import { escapeWithQuotes } from '@isomorphic/stringUtils';
 
-import { defineTabTool } from './tool';
-import { optionalElementSchema } from './snapshot';
+import { defineTabTool } from './tool.js';
+import { optionalElementSchema } from './snapshot.js';
 
-import type { Tab } from './tab';
+import type { Tab } from './tab.js';
 
 const evaluateSchema = optionalElementSchema.extend({
   function: z.string().describe('() => { /* code */ } or (element) => { /* code */ } when element is provided'),

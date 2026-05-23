@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { evaluationScript } from './clientHelper';
-import { setTestIdAttribute } from './locator';
+import { evaluationScript } from './clientHelper.js';
+import { setTestIdAttribute } from './locator.js';
 
-import type { SelectorEngine } from './types';
+import type { SelectorEngine } from './types.js';
 import type * as api from '../../types/types';
 import type * as channels from '@protocol/channels';
-import type { BrowserContext } from './browserContext';
+import type { BrowserContext } from './browserContext.js';
 import type { Platform } from '@isomorphic/platform';
 
 export class Selectors implements api.Selectors {

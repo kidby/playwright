@@ -18,19 +18,19 @@
 import { eventsHelper } from '@utils/eventsHelper';
 import { assert } from '@isomorphic/assert';
 import { headersArrayToObject, headersObjectToArray } from '@isomorphic/headers';
-import { helper } from '../helper';
-import * as network from '../network';
-import { isProtocolError, isSessionClosedError } from '../protocolError';
+import { helper } from '../helper.js';
+import * as network from '../network.js';
+import { isProtocolError, isSessionClosedError } from '../protocolError.js';
 
-import type { CRSession } from './crConnection';
+import type { CRSession } from './crConnection.js';
 import type { Protocol } from './protocol';
 import type { RegisteredListener } from '@utils/eventsHelper';
-import type * as contexts from '../browserContext';
-import type * as frames from '../frames';
-import type { Page } from '../page';
-import type * as types from '../types';
-import type { CRPage } from './crPage';
-import type { CRServiceWorker } from './crServiceWorker';
+import type * as contexts from '../browserContext.js';
+import type * as frames from '../frames.js';
+import type { Page } from '../page.js';
+import type * as types from '../types.js';
+import type { CRPage } from './crPage.js';
+import type { CRServiceWorker } from './crServiceWorker.js';
 
 
 type SessionInfo = {

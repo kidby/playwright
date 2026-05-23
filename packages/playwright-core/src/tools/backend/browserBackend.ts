@@ -15,14 +15,14 @@
  */
 
 import debug from 'debug';
-import { Context } from './context';
-import { Response } from './response';
-import { SessionLog } from './sessionLog';
-import type { ContextConfig } from './context';
-import type * as playwright from '../../..';
-import type { Tool } from './tool';
-import type * as mcpServer from '../utils/mcp/server';
-import type { ClientInfo, ServerBackend } from '../utils/mcp/server';
+import { Context } from './context.js';
+import { Response } from './response.js';
+import { SessionLog } from './sessionLog.js';
+import type { ContextConfig } from './context.js';
+import type * as playwright from '../../../index.js';
+import type { Tool } from './tool.js';
+import type * as mcpServer from '../utils/mcp/server.js';
+import type { ClientInfo, ServerBackend } from '../utils/mcp/server.js';
 
 export class BrowserBackend implements ServerBackend {
   private _tools: Tool[];

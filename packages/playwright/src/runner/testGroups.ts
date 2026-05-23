@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { test } from '../common';
+import type { test } from '../common/index.js';
 
 export type TestGroup = {
   workerHash: string;

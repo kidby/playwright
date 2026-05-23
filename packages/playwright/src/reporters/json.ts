@@ -20,10 +20,10 @@ import path from 'path';
 import { MultiMap } from '@isomorphic/multimap';
 import { toPosixPath } from '@utils/fileUtils';
 
-import { formatError, nonTerminalScreen, prepareErrorStack, resolveOutputFile, CommonReporterOptions } from './base';
-import { config } from '../common';
+import { formatError, nonTerminalScreen, prepareErrorStack, resolveOutputFile, CommonReporterOptions } from './base.js';
+import { config } from '../common/index.js';
 
-import type { ReporterV2 } from './reporterV2';
+import type { ReporterV2 } from './reporterV2.js';
 import type { JsonReporterOptions } from '../../types/test';
 import type { FullConfig, FullResult, JSONReport, JSONReportError, JSONReportSpec, JSONReportSuite, JSONReportTest, JSONReportTestResult, JSONReportTestStep, Location, Suite, TestCase, TestError, TestResult, TestStep } from '../../types/testReporter';
 

@@ -17,7 +17,7 @@
 import { createGuid } from '@utils/crypto';
 import { debugLogger } from '@utils/debugLogger';
 import { escapeHTML } from '@isomorphic/stringUtils';
-import { Page } from './page';
+import { Page } from './page.js';
 
 export class Overlay {
   private readonly _page: Page;

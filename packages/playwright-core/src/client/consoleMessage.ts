@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { JSHandle } from './jsHandle';
+import { JSHandle } from './jsHandle.js';
 
 import type * as api from '../../types/types';
 import type { Platform } from '@isomorphic/platform';
 import type * as channels from '@protocol/channels';
-import type { Page } from './page';
-import type { Worker } from './worker';
+import type { Page } from './page.js';
+import type { Worker } from './worker.js';
 
 export class ConsoleMessage implements api.ConsoleMessage {
 

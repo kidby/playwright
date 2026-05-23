@@ -16,8 +16,8 @@
 
 import * as z from 'zod';
 import { formatObject } from '@isomorphic/stringUtils';
-import { defineTabTool } from './tool';
-import { elementSchema } from './snapshot';
+import { defineTabTool } from './tool.js';
+import { elementSchema } from './snapshot.js';
 
 export const uploadFile = defineTabTool({
   capability: 'core',

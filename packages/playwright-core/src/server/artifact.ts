@@ -18,8 +18,8 @@ import fs from 'fs';
 
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { assert } from '@isomorphic/assert';
-import { TargetClosedError } from './errors';
-import { SdkObject } from './instrumentation';
+import { TargetClosedError } from './errors.js';
+import { SdkObject } from './instrumentation.js';
 
 import type { Progress } from '@protocol/progress';
 

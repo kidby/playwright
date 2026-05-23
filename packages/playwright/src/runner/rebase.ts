@@ -21,11 +21,11 @@ import colors from 'picocolors';
 import * as diff from 'diff';
 import { MultiMap } from '@isomorphic/multimap';
 
-import { config as commonConfig, FullConfigInternal } from '../common';
-import * as babel from '../transform/babelBundle';
+import { config as commonConfig, FullConfigInternal } from '../common/index.js';
+import * as babel from '../transform/babelBundle.js';
 
-import type { InternalReporter } from '../reporters/internalReporter';
-import type { T } from '../transform/babelBundle';
+import type { InternalReporter } from '../reporters/internalReporter.js';
+import type { T } from '../transform/babelBundle.js';
 const t: typeof T = babel.types;
 
 type Location = {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { ReporterV2 } from './reporterV2';
+import type { ReporterV2 } from './reporterV2.js';
 
 class EmptyReporter implements ReporterV2 {
   version(): 'v2' {

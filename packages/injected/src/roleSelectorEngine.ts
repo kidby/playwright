@@ -17,11 +17,11 @@
 import { parseAttributeSelector } from '@isomorphic/selectorParser';
 import { normalizeWhiteSpace } from '@isomorphic/stringUtils';
 
-import { beginAriaCaches, endAriaCaches, getAriaChecked, getAriaDisabled, getAriaExpanded, getAriaLevel, getAriaPressed, getAriaRole, getAriaSelected, getElementAccessibleDescription, getElementAccessibleName, isElementHiddenForAria, kAriaCheckedRoles, kAriaExpandedRoles, kAriaLevelRoles, kAriaPressedRoles, kAriaSelectedRoles } from './roleUtils';
-import { matchesAttributePart } from './selectorUtils';
+import { beginAriaCaches, endAriaCaches, getAriaChecked, getAriaDisabled, getAriaExpanded, getAriaLevel, getAriaPressed, getAriaRole, getAriaSelected, getElementAccessibleDescription, getElementAccessibleName, isElementHiddenForAria, kAriaCheckedRoles, kAriaExpandedRoles, kAriaLevelRoles, kAriaPressedRoles, kAriaSelectedRoles } from './roleUtils.js';
+import { matchesAttributePart } from './selectorUtils.js';
 
 import type { AttributeSelectorOperator, AttributeSelectorPart } from '@isomorphic/selectorParser';
-import type { SelectorEngine, SelectorRoot } from './selectorEngine';
+import type { SelectorEngine, SelectorRoot } from './selectorEngine.js';
 
 type RoleEngineOptions = {
   role: string;

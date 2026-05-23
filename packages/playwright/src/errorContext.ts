@@ -20,7 +20,7 @@ import path from 'path';
 import { parseErrorStack } from '@isomorphic/stackTrace';
 import { stripAnsiEscapes } from '@isomorphic/stringUtils';
 
-import { relativeFilePath } from './util';
+import { relativeFilePath } from './util.js';
 
 import type { TestInfoError } from '../types/test';
 

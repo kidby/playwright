@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-import { traceOpen } from './traceOpen';
-import { closeTrace } from './traceUtils';
-import { traceActions } from './traceActions';
-import { traceAction } from './traceActions';
-import { traceRequests } from './traceRequests';
-import { traceRequest } from './traceRequests';
-import { traceConsole } from './traceConsole';
-import { traceErrors } from './traceErrors';
-import { traceSnapshot } from './traceSnapshot';
-import { traceScreenshot } from './traceScreenshot';
-import { traceAttachments } from './traceAttachments';
-import { traceAttachment } from './traceAttachments';
-import { installSkill } from './installSkill';
+import { traceOpen } from './traceOpen.js';
+import { closeTrace } from './traceUtils.js';
+import { traceActions } from './traceActions.js';
+import { traceAction } from './traceActions.js';
+import { traceRequests } from './traceRequests.js';
+import { traceRequest } from './traceRequests.js';
+import { traceConsole } from './traceConsole.js';
+import { traceErrors } from './traceErrors.js';
+import { traceSnapshot } from './traceSnapshot.js';
+import { traceScreenshot } from './traceScreenshot.js';
+import { traceAttachments } from './traceAttachments.js';
+import { traceAttachment } from './traceAttachments.js';
+import { installSkill } from './installSkill.js';
 
 import type { Command } from 'commander';
 

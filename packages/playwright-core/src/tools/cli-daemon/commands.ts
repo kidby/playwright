@@ -15,9 +15,9 @@
  */
 
 import * as z from 'zod';
-import { declareCommand } from './command';
+import { declareCommand } from './command.js';
 
-import type { AnyCommandSchema } from './command';
+import type { AnyCommandSchema } from './command.js';
 
 const elementTargetDescription = 'Exact target element reference from the page snapshot, or a unique element selector';
 

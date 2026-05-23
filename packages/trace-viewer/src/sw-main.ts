@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-import './sw/main';
+import './sw/main.js';

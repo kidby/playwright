@@ -15,8 +15,8 @@
  */
 
 import type { URLSearchParams } from 'url';
-import type { SnapshotRenderer } from './snapshotRenderer';
-import type { SnapshotStorage } from './snapshotStorage';
+import type { SnapshotRenderer } from './snapshotRenderer.js';
+import type { SnapshotStorage } from './snapshotStorage.js';
 import type { ResourceSnapshot } from '@trace/snapshot';
 
 export class SnapshotServer {

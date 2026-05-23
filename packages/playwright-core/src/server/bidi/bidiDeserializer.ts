@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as bidi from './third_party/bidiProtocol';
-import { parseUnserializableValue } from '../javascript';
+import * as bidi from './third_party/bidiProtocol.js';
+import { parseUnserializableValue } from '../javascript.js';
 
 export function deserializeBidiValue(result: bidi.Script.RemoteValue, internalIdMap = new Map<bidi.Script.InternalId, any>()): any {
   switch (result.type) {

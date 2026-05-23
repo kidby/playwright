@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import type { BrowserContext } from './browserContext';
-import type { LocalUtils } from './localUtils';
-import type { Route } from './network';
-import type { Page } from './page';
+import type { BrowserContext } from './browserContext.js';
+import type { LocalUtils } from './localUtils.js';
+import type { Route } from './network.js';
+import type { Page } from './page.js';
 import type { URLMatch } from '@isomorphic/urlMatch';
 
 type HarNotFoundAction = 'abort' | 'fallback';

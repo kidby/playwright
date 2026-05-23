@@ -18,17 +18,17 @@ import os from 'os';
 
 import { wrapInASCIIBox } from '@utils/ascii';
 import { RecentLogsCollector } from '@utils/debugLogger';
-import { BrowserType, kNoXServerRunningError } from '../browserType';
-import { BidiBrowser } from './bidiBrowser';
-import { kBrowserCloseMessageId } from './bidiConnection';
-import { chromiumSwitches } from '../chromium/chromiumSwitches';
-import { profileInUseError, waitForReadyState } from '../chromium/chromium';
-import { shouldProxyLoopback } from '../chromium/crBrowser';
+import { BrowserType, kNoXServerRunningError } from '../browserType.js';
+import { BidiBrowser } from './bidiBrowser.js';
+import { kBrowserCloseMessageId } from './bidiConnection.js';
+import { chromiumSwitches } from '../chromium/chromiumSwitches.js';
+import { profileInUseError, waitForReadyState } from '../chromium/chromium.js';
+import { shouldProxyLoopback } from '../chromium/crBrowser.js';
 
-import type { BrowserOptions } from '../browser';
-import type { SdkObject } from '../instrumentation';
-import type { ConnectionTransport } from '../transport';
-import type * as types from '../types';
+import type { BrowserOptions } from '../browser.js';
+import type { SdkObject } from '../instrumentation.js';
+import type { ConnectionTransport } from '../transport.js';
+import type * as types from '../types.js';
 
 
 export class BidiChromium extends BrowserType {

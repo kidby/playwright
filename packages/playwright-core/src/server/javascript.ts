@@ -17,10 +17,10 @@
 import { serializeAsCallArgument } from '@isomorphic/utilityScriptSerializers';
 import { LongStandingScope } from '@isomorphic/manualPromise';
 import { isUnderTest } from '@utils/debug';
-import { SdkObject } from './instrumentation';
-import * as rawUtilityScriptSource from '../generated/utilityScriptSource';
+import { SdkObject } from './instrumentation.js';
+import * as rawUtilityScriptSource from '../generated/utilityScriptSource.js';
 
-import type * as dom from './dom';
+import type * as dom from './dom.js';
 import type { Progress } from '@protocol/progress';
 import type { UtilityScript } from '@injected/utilityScript';
 

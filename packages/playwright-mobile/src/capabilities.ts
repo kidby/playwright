@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { AppiumCapabilities } from './appiumClient';
+import type { AppiumCapabilities } from './appiumClient.js';
 
 const DEFAULT_NEW_COMMAND_TIMEOUT_SEC = 240;
 

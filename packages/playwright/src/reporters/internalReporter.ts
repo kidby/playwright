@@ -18,13 +18,13 @@ import fs from 'fs';
 
 import { monotonicTime } from '@isomorphic/time';
 
-import { internalScreen, prepareErrorStack, relativeFilePath } from './base';
-import { Multiplexer } from './multiplexer';
-import { test as testNs } from '../common';
-import * as babel from '../transform/babelBundle';
-import { wrapReporterAsV2 } from './reporterV2';
+import { internalScreen, prepareErrorStack, relativeFilePath } from './base.js';
+import { Multiplexer } from './multiplexer.js';
+import { test as testNs } from '../common/index.js';
+import * as babel from '../transform/babelBundle.js';
+import { wrapReporterAsV2 } from './reporterV2.js';
 
-import type { AnyReporter, ReporterV2 } from './reporterV2';
+import type { AnyReporter, ReporterV2 } from './reporterV2.js';
 import type { FullConfig, FullResult, TestCase, TestError, TestResult, TestStep, WorkerInfo } from '../../types/testReporter';
 
 

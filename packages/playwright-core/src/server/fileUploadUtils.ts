@@ -19,10 +19,10 @@ import path from 'path';
 
 import mime from 'mime';
 import { assert } from '@isomorphic/assert';
-import type { WritableStreamDispatcher } from './dispatchers/writableStreamDispatcher';
-import type { InputFilesItems } from './dom';
-import type { Frame } from './frames';
-import type * as types from './types';
+import type { WritableStreamDispatcher } from './dispatchers/writableStreamDispatcher.js';
+import type { InputFilesItems } from './dom.js';
+import type { Frame } from './frames.js';
+import type * as types from './types.js';
 import type * as channels from '@protocol/channels';
 
 // Keep in sync with the client.

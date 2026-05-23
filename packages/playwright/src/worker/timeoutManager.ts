@@ -18,7 +18,7 @@ import colors from 'picocolors';
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { monotonicTime } from '@isomorphic/time';
 
-import { debugTest, formatLocation } from '../util';
+import { debugTest, formatLocation } from '../util.js';
 
 import type { Location } from '../../types/testReporter';
 

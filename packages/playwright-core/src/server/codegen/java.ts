@@ -16,13 +16,13 @@
 
 import { asLocator } from '@isomorphic/locatorGenerators';
 import { escapeWithQuotes } from '@isomorphic/stringUtils';
-import { toClickOptionsForSourceCode, toKeyboardModifiers, toSignalMap } from './language';
-import { deviceDescriptors } from '../deviceDescriptors';
-import { JavaScriptFormatter } from './javascript';
+import { toClickOptionsForSourceCode, toKeyboardModifiers, toSignalMap } from './language.js';
+import { deviceDescriptors } from '../deviceDescriptors.js';
+import { JavaScriptFormatter } from './javascript.js';
 
-import type { BrowserContextOptions } from '../../..';
-import type * as types from '../types';
-import type { Language, LanguageGenerator, LanguageGeneratorOptions } from './types';
+import type { BrowserContextOptions } from '../../../index.js';
+import type * as types from '../types.js';
+import type { Language, LanguageGenerator, LanguageGeneratorOptions } from './types.js';
 import type * as actions from '@recorder/actions';
 
 type JavaLanguageMode = 'library' | 'junit';

@@ -25,12 +25,12 @@ import colors from 'picocolors';
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { debugLogger } from '@utils/debugLogger';
 import { existsAsync, removeFolders } from '@utils/fileUtils';
-import { getUserAgent } from '../userAgent';
-import { libPath } from '../../package';
+import { getUserAgent } from '../userAgent.js';
+import { libPath } from '../../package.js';
 
 import { browserDirectoryToMarkerFilePath } from '.';
 
-import type { DownloadParams } from './oopDownloadBrowserMain';
+import type { DownloadParams } from './oopDownloadBrowserMain.js';
 
 export async function downloadBrowserWithProgressBar(title: string, browserDirectory: string, executablePath: string | undefined, downloadURLs: string[], downloadFileName: string, downloadSocketTimeout: number, force: boolean) {
   if (await existsAsync(browserDirectoryToMarkerFilePath(browserDirectory))) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { isString } from './stringUtils';
+import { isString } from './stringUtils.js';
 
 export function isHttpUrl(url: string, base?: string): boolean {
   try {

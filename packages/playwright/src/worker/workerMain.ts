@@ -19,17 +19,17 @@ import { ManualPromise } from '@isomorphic/manualPromise';
 import { removeFolders } from '@utils/fileUtils';
 import { gracefullyCloseAll } from '@utils/processLauncher';
 
-import { configLoader, fixtures, ipc, poolBuilder, ProcessRunner, suiteUtils, testLoader } from '../common';
-import * as globals from '../globals';
-import { setExpectConfig } from '../matchers/expect';
-import { debugTest, filteredStackTrace, relativeFilePath } from '../util';
-import { FixtureRunner } from './fixtureRunner';
-import { TestSkipError, TestInfoImpl, emtpyTestInfoCallbacks } from './testInfo';
-import { testInfoError } from './util';
+import { configLoader, fixtures, ipc, poolBuilder, ProcessRunner, suiteUtils, testLoader } from '../common/index.js';
+import * as globals from '../globals.js';
+import { setExpectConfig } from '../matchers/expect.js';
+import { debugTest, filteredStackTrace, relativeFilePath } from '../util.js';
+import { FixtureRunner } from './fixtureRunner.js';
+import { TestSkipError, TestInfoImpl, emtpyTestInfoCallbacks } from './testInfo.js';
+import { testInfoError } from './util.js';
 
-import type { TimeSlot } from './timeoutManager';
+import type { TimeSlot } from './timeoutManager.js';
 import type { Location } from '../../types/testReporter';
-import type { config as commonConfig, FullConfigInternal, test as testNs } from '../common';
+import type { config as commonConfig, FullConfigInternal, test as testNs } from '../common/index.js';
 import type { TestAnnotation, TestInfoError } from '../../types/test';
 
 export class WorkerMain extends ProcessRunner {

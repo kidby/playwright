@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { blendWithWhite, colorDeltaE94, rgb2gray } from './colorUtils';
-import { ImageChannel } from './imageChannel';
-import { FastStats, ssim } from './stats';
+import { blendWithWhite, colorDeltaE94, rgb2gray } from './colorUtils.js';
+import { ImageChannel } from './imageChannel.js';
+import { FastStats, ssim } from './stats.js';
 
 const SSIM_WINDOW_RADIUS = 15;
 const VARIANCE_WINDOW_RADIUS = 1;

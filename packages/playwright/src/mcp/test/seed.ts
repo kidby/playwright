@@ -19,9 +19,9 @@ import path from 'path';
 
 import { mkdirIfNeeded } from '@utils/fileUtils';
 
-import { projectUtils } from '../../runner';
+import { projectUtils } from '../../runner/index.js';
 
-import type { config, FullConfigInternal } from '../../common';
+import type { config, FullConfigInternal } from '../../common/index.js';
 
 export function seedProject(fullConfig: FullConfigInternal, projectName?: string) {
   if (!projectName)

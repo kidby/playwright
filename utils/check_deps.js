@@ -82,7 +82,12 @@ async function innerCheckDeps(root) {
   });
   const sourceFiles = program.getSourceFiles();
   const errors = [];
-  sourceFiles.filter(x => !x.fileName.includes(path.sep + 'node_modules' + path.sep) && !x.fileName.includes(path.sep + 'bundles' + path.sep)).map(x => visit(x, x.fileName, x.getFullText()));
+  // Only visit files inside our src tree. TS may pull in workspace lib files
+  // via symlinked node_modules when following `playwright/lib/*` imports — we
+  // don't want to validate compiled outputs against DEPS.list (those are the
+  // build's job to produce correctly).
+  const isInSrcOfThisPackage = (file) => file.startsWith(src + path.sep);
+  sourceFiles.filter(x => !x.fileName.includes(path.sep + 'node_modules' + path.sep) && !x.fileName.includes(path.sep + 'bundles' + path.sep) && !x.fileName.includes(path.sep + 'lib' + path.sep) && isInSrcOfThisPackage(x.fileName)).map(x => visit(x, x.fileName, x.getFullText()));
 
   if (errors.length) {
     for (const error of errors)
@@ -156,13 +161,44 @@ async function innerCheckDeps(root) {
       if (mergedDeps.includes('***'))
         return;
       if (importPath) {
+        // Normalize lib paths back to src — in a workspace, `playwright/lib/X`
+        // imports resolve via the symlinked node_modules to the actual lib
+        // output. check-deps wants to validate against the src tree (where
+        // DEPS.list lives).
+        const libToSrc = importPath.match(/^(.+\/packages\/[^/]+)\/lib\/(.+)$/);
+        if (libToSrc) {
+          const srcCandidate = `${libToSrc[1]}/src/${libToSrc[2]}`;
+          if (fs.existsSync(srcCandidate))
+            importPath = srcCandidate;
+          else if (srcCandidate.endsWith('.js')) {
+            const base = srcCandidate.slice(0, -3);
+            if (fs.existsSync(base + '.ts')) importPath = base + '.ts';
+            else if (fs.existsSync(base + '.tsx')) importPath = base + '.tsx';
+            else if (fs.existsSync(base + '.d.ts')) importPath = base + '.d.ts';
+            else if (fs.existsSync(base) && fs.statSync(base).isDirectory()) {
+              if (fs.existsSync(path.join(base, 'index.ts'))) importPath = path.join(base, 'index.ts');
+              else if (fs.existsSync(path.join(base, 'index.tsx'))) importPath = path.join(base, 'index.tsx');
+            }
+          }
+        }
         if (!fs.existsSync(importPath)) {
-          if (fs.existsSync(importPath + '.ts'))
-            importPath = importPath + '.ts';
-          else if (fs.existsSync(importPath + '.tsx'))
-            importPath = importPath + '.tsx';
-          else if (fs.existsSync(importPath + '.d.ts'))
-            importPath = importPath + '.d.ts';
+          // ESM imports include `.js` extensions in source (Node ESM requires
+          // them at runtime; TypeScript resolves them back to .ts at compile
+          // time). Strip a trailing `.js` before falling back to .ts/.tsx.
+          const baseImportPath = importPath.endsWith('.js') ? importPath.slice(0, -3) : importPath;
+          if (fs.existsSync(baseImportPath + '.ts'))
+            importPath = baseImportPath + '.ts';
+          else if (fs.existsSync(baseImportPath + '.tsx'))
+            importPath = baseImportPath + '.tsx';
+          else if (fs.existsSync(baseImportPath + '.d.ts'))
+            importPath = baseImportPath + '.d.ts';
+          else if (fs.existsSync(baseImportPath) && fs.statSync(baseImportPath).isDirectory()) {
+            // `./common/index.js` form — resolve via index.ts
+            if (fs.existsSync(path.join(baseImportPath, 'index.ts')))
+              importPath = path.join(baseImportPath, 'index.ts');
+            else if (fs.existsSync(path.join(baseImportPath, 'index.tsx')))
+              importPath = path.join(baseImportPath, 'index.tsx');
+          }
         }
 
         if (!allowImport(fileName, importPath, mergedDeps))

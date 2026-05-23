@@ -15,10 +15,10 @@
  */
 
 import * as z from 'zod';
-import { defineTool } from './tool';
+import { defineTool } from './tool.js';
 
-import type * as playwright from '../../..';
-import type { RouteEntry } from './context';
+import type * as playwright from '../../../index.js';
+import type { RouteEntry } from './context.js';
 
 const route = defineTool({
   capability: 'network',

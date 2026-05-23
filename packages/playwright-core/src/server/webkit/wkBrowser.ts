@@ -16,20 +16,20 @@
  */
 
 import { assert } from '@isomorphic/assert';
-import { Browser } from '../browser';
-import { BrowserContext, verifyGeolocation } from '../browserContext';
-import * as network from '../network';
-import { WKConnection, WKSession, kPageProxyMessageReceived } from './wkConnection';
-import { WKPage } from './wkPage';
-import { translatePathToWSL } from './webkit';
+import { Browser } from '../browser.js';
+import { BrowserContext, verifyGeolocation } from '../browserContext.js';
+import * as network from '../network.js';
+import { WKConnection, WKSession, kPageProxyMessageReceived } from './wkConnection.js';
+import { WKPage } from './wkPage.js';
+import { translatePathToWSL } from './webkit.js';
 
-import type { BrowserOptions } from '../browser';
-import type { SdkObject } from '../instrumentation';
-import type { InitScript, Page } from '../page';
-import type { ConnectionTransport } from '../transport';
-import type * as types from '../types';
+import type { BrowserOptions } from '../browser.js';
+import type { SdkObject } from '../instrumentation.js';
+import type { InitScript, Page } from '../page.js';
+import type { ConnectionTransport } from '../transport.js';
+import type * as types from '../types.js';
 import type { Protocol } from './protocol';
-import type { PageProxyMessageReceivedPayload } from './wkConnection';
+import type { PageProxyMessageReceivedPayload } from './wkConnection.js';
 import type * as channels from '@protocol/channels';
 
 const BROWSER_VERSION = '26.4';

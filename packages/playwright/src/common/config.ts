@@ -18,12 +18,12 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
-import { packageJSON } from '../package';
-import { getPackageJsonPath, mergeObjects, takeFirst } from '../util';
+import { packageJSON } from '../package.js';
+import { getPackageJsonPath, mergeObjects, takeFirst } from '../util.js';
 
 import type { Config, Fixtures, Metadata, Project, ReporterDescription } from '../../types/test';
-import type { TestRunnerPluginRegistration } from '../plugins';
-import type { ConfigCLIOverrides } from './ipc';
+import type { TestRunnerPluginRegistration } from '../plugins/index.js';
+import type { ConfigCLIOverrides } from './ipc.js';
 import type { Location } from '../../types/testReporter';
 import type { FullConfig, FullProject } from '../../types/testReporter';
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import type { ClientInfo } from '../../playwright-core/src/tools/cli-client/registry';
-import type { BrowserDescriptor } from '../../playwright-core/src/serverRegistry';
+import type { ClientInfo } from '../../playwright-core/src/tools/cli-client/registry.js';
+import type { BrowserDescriptor } from '../../playwright-core/src/serverRegistry.js';
 
 export type SessionStatus = BrowserDescriptor;
 

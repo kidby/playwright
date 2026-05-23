@@ -17,9 +17,9 @@
 
 import { eventsHelper } from '@utils/eventsHelper';
 import { assert } from '@isomorphic/assert';
-import { raceUncancellableOperationWithCleanup } from '../progress';
+import { raceUncancellableOperationWithCleanup } from '../progress.js';
 
-import type { CRSession } from './crConnection';
+import type { CRSession } from './crConnection.js';
 import type { Protocol } from './protocol';
 import type { RegisteredListener } from '@utils/eventsHelper';
 import type * as channels from '@protocol/channels';

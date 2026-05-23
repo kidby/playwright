@@ -19,7 +19,7 @@ import net from 'net';
 import os from 'os';
 import path from 'path';
 
-import { isPlaywrightExtensionInstalled } from '../utils/extension';
+import { isPlaywrightExtensionInstalled } from '../utils/extension.js';
 
 export type ChannelSession = {
   channel: string;

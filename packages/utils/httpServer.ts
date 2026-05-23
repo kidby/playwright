@@ -20,9 +20,9 @@ import path from 'path';
 import mime from 'mime';
 import { WebSocketServer as wsServer } from 'ws';
 import { assert } from '@isomorphic/assert';
-import { createGuid } from './crypto';
-import { isPathInside } from './fileUtils';
-import { createHttpServer, startHttpServer } from './network';
+import { createGuid } from './crypto.js';
+import { isPathInside } from './fileUtils.js';
+import { createHttpServer, startHttpServer } from './network.js';
 
 import type http from 'http';
 

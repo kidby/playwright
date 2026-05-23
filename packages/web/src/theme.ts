@@ -16,7 +16,7 @@
 
 import React from 'react';
 
-import { settings } from './uiUtils';
+import { settings } from './uiUtils.js';
 
 declare global {
   interface Document {

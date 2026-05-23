@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { ChannelOwner } from './channelOwner';
-import { Stream } from './stream';
-import { mkdirIfNeeded } from './fileUtils';
+import { ChannelOwner } from './channelOwner.js';
+import { Stream } from './stream.js';
+import { mkdirIfNeeded } from './fileUtils.js';
 
 import type * as channels from '@protocol/channels';
 import type { Readable } from 'stream';

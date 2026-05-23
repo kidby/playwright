@@ -15,7 +15,7 @@
  */
 
 import * as z from 'zod';
-import { defineTabTool } from './tool';
+import { defineTabTool } from './tool.js';
 
 export const handleDialog = defineTabTool({
   capability: 'core',

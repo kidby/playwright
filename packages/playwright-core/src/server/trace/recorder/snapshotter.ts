@@ -19,17 +19,17 @@ import { monotonicTime } from '@isomorphic/time';
 import { calculateSha1, createGuid } from '@utils/crypto';
 import { debugLogger } from '@utils/debugLogger';
 import { eventsHelper } from '@utils/eventsHelper';
-import { frameSnapshotStreamer } from './snapshotterInjected';
-import { BrowserContext } from '../../browserContext';
-import { Page } from '../../page';
-import { nullProgress } from '../../progress';
+import { frameSnapshotStreamer } from './snapshotterInjected.js';
+import { BrowserContext } from '../../browserContext.js';
+import { Page } from '../../page.js';
+import { nullProgress } from '../../progress.js';
 
-import type { SnapshotData } from './snapshotterInjected';
+import type { SnapshotData } from './snapshotterInjected.js';
 import type { RegisteredListener } from '@utils/eventsHelper';
-import type { Frame } from '../../frames';
-import type { InitScript } from '../../page';
+import type { Frame } from '../../frames.js';
+import type { InitScript } from '../../page.js';
 import type { FrameSnapshot } from '@trace/snapshot';
-import type { Progress } from '../../progress';
+import type { Progress } from '../../progress.js';
 
 export type SnapshotterBlob = {
   buffer: Buffer,

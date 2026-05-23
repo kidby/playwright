@@ -16,7 +16,7 @@
 
 import { preconnect } from '@utils/bunPreconnect';
 
-import type { ReporterV2 } from './reporterV2';
+import type { ReporterV2 } from './reporterV2.js';
 import type { FullConfig, FullResult, Suite, TestCase, TestResult } from '../../types/testReporter';
 
 const DEFAULT_TEST_KEY_PATTERN = '\\[([A-Z]+-\\d+)\\]';

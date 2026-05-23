@@ -15,13 +15,13 @@
  */
 
 import { eventsHelper } from '@utils/eventsHelper';
-import { BrowserContextDispatcher } from './browserContextDispatcher';
-import { Dispatcher } from './dispatcher';
-import { AndroidDevice } from '../android/android';
-import { SdkObject } from '../instrumentation';
+import { BrowserContextDispatcher } from './browserContextDispatcher.js';
+import { Dispatcher } from './dispatcher.js';
+import { AndroidDevice } from '../android/android.js';
+import { SdkObject } from '../instrumentation.js';
 
-import type { RootDispatcher } from './dispatcher';
-import type { Android, SocketBackend } from '../android/android';
+import type { RootDispatcher } from './dispatcher.js';
+import type { Android, SocketBackend } from '../android/android.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 

@@ -25,7 +25,7 @@ export function debugLog(...args: unknown[]): void {
 import {
   ProtocolCommand, ProtocolHandler, ProtocolV1Handler, ProtocolV2Handler,
   RelayContext, resolveChromeMember,
-} from './protocolHandlers';
+} from './protocolHandlers.js';
 
 type ProtocolResponse = {
   id?: number;

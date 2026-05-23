@@ -19,7 +19,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { libPath } from '../../package';
+import { libPath } from '../../package.js';
 
 export async function installSkill() {
   const cwd = process.cwd();

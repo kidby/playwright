@@ -21,11 +21,11 @@ import path from 'path';
 import { escapeTemplateString, isString } from '@isomorphic/stringUtils';
 import { existsAsync } from '@utils/fileUtils';
 
-import { expectTypes, formatMatcherMessage, printReceivedStringContainExpectedSubstring } from './matcherHint';
-import { expectConfig } from './expect';
+import { expectTypes, formatMatcherMessage, printReceivedStringContainExpectedSubstring } from './matcherHint.js';
+import { expectConfig } from './expect.js';
 
-import type { MatcherResult } from './matcherHint';
-import type { ExpectMatcherStateInternal, FrameEx, LocatorEx } from './matchers';
+import type { MatcherResult } from './matcherHint.js';
+import type { ExpectMatcherStateInternal, FrameEx, LocatorEx } from './matchers.js';
 import type { MatcherReceived } from '@injected/ariaSnapshot';
 import type { Page } from 'playwright-core';
 

@@ -25,14 +25,14 @@ import { ManualPromise, signalToPromise } from '@isomorphic/manualPromise';
 import { escapeRegExp } from '@isomorphic/stringUtils';
 import { toPosixPath } from '@utils/fileUtils';
 
-import { base, ListReporter, testRunner } from '../../runner';
-import { StringWriteStream } from './streams';
-import { fileExistsAsync } from '../../util';
-import { ensureSeedFile, seedProject } from './seed';
-import { configLoader } from '../../common';
+import { base, ListReporter, testRunner } from '../../runner/index.js';
+import { StringWriteStream } from './streams.js';
+import { fileExistsAsync } from '../../util.js';
+import { ensureSeedFile, seedProject } from './seed.js';
+import { configLoader } from '../../common/index.js';
 
-import type { ConfigLocation } from '../../common';
-import type { BrowserMCPRequest, BrowserMCPResponse } from './browserBackend';
+import type { ConfigLocation } from '../../common/index.js';
+import type { BrowserMCPRequest, BrowserMCPResponse } from './browserBackend.js';
 
 export type SeedFile = {
   file: string;

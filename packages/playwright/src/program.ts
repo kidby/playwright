@@ -21,12 +21,12 @@ import 'playwright-core/lib/bootstrap';
 import { libCli, tools } from 'playwright-core/lib/coreBundle';
 import { program } from 'commander';
 import { gracefullyProcessExitDoNotHang } from '@utils/processLauncher';
-import { builtInReporters, config, configLoader } from './common';
-import { runTests, clearCache, runTestServerAction } from './cli/testActions';
-import { showReport, mergeReports } from './cli/reportActions';
-import { TestServerBackend, testServerBackendTools } from './mcp/test/testBackend';
-import { ClaudeGenerator, CodexGenerator, OpencodeGenerator, VSCodeGenerator, CopilotGenerator } from './agents/generateAgents';
-import { packageJSON } from './package';
+import { builtInReporters, config, configLoader } from './common/index.js';
+import { runTests, clearCache, runTestServerAction } from './cli/testActions.js';
+import { showReport, mergeReports } from './cli/reportActions.js';
+import { TestServerBackend, testServerBackendTools } from './mcp/test/testBackend.js';
+import { ClaudeGenerator, CodexGenerator, OpencodeGenerator, VSCodeGenerator, CopilotGenerator } from './agents/generateAgents.js';
+import { packageJSON } from './package.js';
 
 export { program };
 

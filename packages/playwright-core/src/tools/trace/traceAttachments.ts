@@ -16,7 +16,7 @@
 
 /* eslint-disable no-console */
 
-import { loadTrace, saveOutputFile } from './traceUtils';
+import { loadTrace, saveOutputFile } from './traceUtils.js';
 
 export async function traceAttachments() {
   const trace = await loadTrace();

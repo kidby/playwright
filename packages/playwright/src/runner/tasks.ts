@@ -23,24 +23,24 @@ import { ManualPromise } from '@isomorphic/manualPromise';
 import { monotonicTime } from '@isomorphic/time';
 import { removeFolders } from '@utils/fileUtils';
 
-import { Dispatcher  } from './dispatcher';
-import { collectProjectsAndTestFiles, createRootSuite, loadFileSuites, loadGlobalHook, loadTestList } from './loadUtils';
-import { buildDependentProjects, buildProjectsClosure, buildTeardownToSetupsMap, filterProjects } from './projectUtils';
-import { applySuggestedRebaselines, clearSuggestedRebaselines } from './rebase';
-import { TaskRunner } from './taskRunner';
-import { detectChangedTestFiles } from './vcs';
-import { cc, config as commonConfig, FullConfigInternal, suiteUtils, test as testNs } from '../common';
-import { createTestGroups } from '../runner/testGroups';
-import { createTitleMatcher, forceRegExp, removeDirAndLogToConsole } from '../util';
+import { Dispatcher  } from './dispatcher.js';
+import { collectProjectsAndTestFiles, createRootSuite, loadFileSuites, loadGlobalHook, loadTestList } from './loadUtils.js';
+import { buildDependentProjects, buildProjectsClosure, buildTeardownToSetupsMap, filterProjects } from './projectUtils.js';
+import { applySuggestedRebaselines, clearSuggestedRebaselines } from './rebase.js';
+import { TaskRunner } from './taskRunner.js';
+import { detectChangedTestFiles } from './vcs.js';
+import { cc, config as commonConfig, FullConfigInternal, suiteUtils, test as testNs } from '../common/index.js';
+import { createTestGroups } from '../runner/testGroups.js';
+import { createTitleMatcher, forceRegExp, removeDirAndLogToConsole } from '../util.js';
 
-import type { TestGroup } from '../runner/testGroups';
-import type { EnvByProjectId } from './dispatcher';
-import type { TestRunnerPluginRegistration } from '../plugins';
-import type { Task } from './taskRunner';
+import type { TestGroup } from '../runner/testGroups.js';
+import type { EnvByProjectId } from './dispatcher.js';
+import type { TestRunnerPluginRegistration } from '../plugins/index.js';
+import type { Task } from './taskRunner.js';
 import type { ReporterDescription } from '../../types/test';
 import type { FullResult, TestError } from '../../types/testReporter';
-import type { Matcher, TestCaseFilter } from '../util';
-import type { InternalReporter } from '../reporters/internalReporter';
+import type { Matcher, TestCaseFilter } from '../util.js';
+import type { InternalReporter } from '../reporters/internalReporter.js';
 
 const readDirAsync = promisify(fs.readdir);
 

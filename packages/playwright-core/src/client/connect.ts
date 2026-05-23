@@ -16,13 +16,13 @@
 
 import { monotonicTime } from '@isomorphic/time';
 import { raceAgainstDeadline } from '@isomorphic/timeoutRunner';
-import { Browser } from './browser';
-import { ChannelOwner } from './channelOwner';
-import { Connection } from './connection';
-import { Events } from './events';
+import { Browser } from './browser.js';
+import { ChannelOwner } from './channelOwner.js';
+import { Connection } from './connection.js';
+import { Events } from './events.js';
 
-import type { Playwright } from './playwright';
-import type { ConnectOptions, HeadersArray } from './types';
+import type { Playwright } from './playwright.js';
+import type { ConnectOptions, HeadersArray } from './types.js';
 import type * as channels from '@protocol/channels';
 
 export async function connectToBrowser(playwright: Playwright, params: ConnectOptions): Promise<Browser> {

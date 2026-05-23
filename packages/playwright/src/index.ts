@@ -26,24 +26,24 @@ import { createGuid } from '@utils/crypto';
 import { debugMode } from '@utils/debug';
 import { setBoxedStackPrefixes } from '@utils/nodePlatform';
 import { currentZone } from '@utils/zones';
-import { buildErrorContext } from './errorContext';
-import { config, testType } from './common';
-import * as globals from './globals';
-import { packageRoot } from './package';
-import { createCustomMessageHandler, runDaemonForContext } from './mcp/test/browserBackend';
+import { buildErrorContext } from './errorContext.js';
+import { config, testType } from './common/index.js';
+import * as globals from './globals.js';
+import { packageRoot } from './package.js';
+import { createCustomMessageHandler, runDaemonForContext } from './mcp/test/browserBackend.js';
 
 import type { Fixtures, PlaywrightTestArgs, PlaywrightTestOptions, PlaywrightWorkerArgs, PlaywrightWorkerOptions, ScreenshotMode, TestInfo, TestType, VideoMode } from '../types/test';
-import type { TestInfoImpl, TestStepInternal } from './worker/testInfo';
-import type { ClientInstrumentationListener } from '../../playwright-core/src/client/clientInstrumentation';
-import type { Playwright as PlaywrightImpl } from '../../playwright-core/src/client/playwright';
-import type { Browser as BrowserImpl } from '../../playwright-core/src/client/browser';
-import type { BrowserContext as BrowserContextImpl } from '../../playwright-core/src/client/browserContext';
-import type { APIRequestContext as APIRequestContextImpl, NewContextOptions as APIRequestContextOptions } from '../../playwright-core/src/client/fetch';
-import type { ChannelOwner } from '../../playwright-core/src/client/channelOwner';
-import type { Page as PageImpl } from '../../playwright-core/src/client/page';
+import type { TestInfoImpl, TestStepInternal } from './worker/testInfo.js';
+import type { ClientInstrumentationListener } from '../../playwright-core/src/client/clientInstrumentation.js';
+import type { Playwright as PlaywrightImpl } from '../../playwright-core/src/client/playwright.js';
+import type { Browser as BrowserImpl } from '../../playwright-core/src/client/browser.js';
+import type { BrowserContext as BrowserContextImpl } from '../../playwright-core/src/client/browserContext.js';
+import type { APIRequestContext as APIRequestContextImpl, NewContextOptions as APIRequestContextOptions } from '../../playwright-core/src/client/fetch.js';
+import type { ChannelOwner } from '../../playwright-core/src/client/channelOwner.js';
+import type { Page as PageImpl } from '../../playwright-core/src/client/page.js';
 import type { BrowserContext, BrowserContextOptions, LaunchOptions, Page, Tracing } from 'playwright-core';
 
-export { expect } from './matchers/expect';
+export { expect } from './matchers/expect.js';
 export const _baseTest: TestType<{}, {}> = testType.rootTestType.test;
 
 setBoxedStackPrefixes([packageRoot]);
@@ -885,5 +885,5 @@ function tracing() {
 
 export const test = _utilityTest.extend<TestFixtures, WorkerFixtures>(playwrightFixtures);
 
-export { defineConfig, mergeTests } from './common';
-export { mergeExpects } from './matchers/expect';
+export { defineConfig, mergeTests } from './common/index.js';
+export { mergeExpects } from './matchers/expect.js';

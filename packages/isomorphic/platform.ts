@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { webColors } from './colors';
+import { webColors } from './colors.js';
 
 import type * as fs from 'fs';
 import type * as path from 'path';

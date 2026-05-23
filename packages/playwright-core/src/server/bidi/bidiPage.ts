@@ -16,25 +16,25 @@
 
 import { debugLogger } from '@utils/debugLogger';
 import { eventsHelper } from '@utils/eventsHelper';
-import * as dialog from '../dialog';
-import * as dom from '../dom';
-import * as js from '../javascript';
-import { BidiBrowserContext, getScreenOrientation } from './bidiBrowser';
-import { Page, Worker } from '../page';
-import { BidiExecutionContext, createHandle } from './bidiExecutionContext';
-import { RawKeyboardImpl, RawMouseImpl, RawTouchscreenImpl } from './bidiInput';
-import { BidiNetworkManager } from './bidiNetworkManager';
-import { BidiPDF } from './bidiPdf';
-import * as bidi from './third_party/bidiProtocol';
-import { nullProgress } from '../progress';
+import * as dialog from '../dialog.js';
+import * as dom from '../dom.js';
+import * as js from '../javascript.js';
+import { BidiBrowserContext, getScreenOrientation } from './bidiBrowser.js';
+import { Page, Worker } from '../page.js';
+import { BidiExecutionContext, createHandle } from './bidiExecutionContext.js';
+import { RawKeyboardImpl, RawMouseImpl, RawTouchscreenImpl } from './bidiInput.js';
+import { BidiNetworkManager } from './bidiNetworkManager.js';
+import { BidiPDF } from './bidiPdf.js';
+import * as bidi from './third_party/bidiProtocol.js';
+import { nullProgress } from '../progress.js';
 
-import * as network from '../network';
+import * as network from '../network.js';
 import type { RegisteredListener } from '@utils/eventsHelper';
-import type * as frames from '../frames';
-import type { InitScript, PageDelegate } from '../page';
-import type { Progress } from '../progress';
-import type * as types from '../types';
-import type { BidiSession } from './bidiConnection';
+import type * as frames from '../frames.js';
+import type { InitScript, PageDelegate } from '../page.js';
+import type { Progress } from '../progress.js';
+import type * as types from '../types.js';
+import type { BidiSession } from './bidiConnection.js';
 import type * as channels from '@protocol/channels';
 
 const UTILITY_WORLD_NAME = '__playwright_utility_world__';

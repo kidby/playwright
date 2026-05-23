@@ -20,7 +20,7 @@ import path from 'path';
 import * as z from 'zod';
 import { resolveWithinRoot } from '@utils/fileUtils';
 
-import { defineTestTool } from './testTool';
+import { defineTestTool } from './testTool.js';
 
 export const setupPage = defineTestTool({
   schema: {

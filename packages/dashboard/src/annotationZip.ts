@@ -18,7 +18,7 @@
 import * as zipImport from '@zip.js/zip.js/lib/zip-no-worker-deflate.js';
 
 import type * as zip from '@zip.js/zip.js';
-import type { SubmittedAnnotationFrame } from './dashboardChannel';
+import type { SubmittedAnnotationFrame } from './dashboardChannel.js';
 
 const zipjs = zipImport as typeof zip;
 

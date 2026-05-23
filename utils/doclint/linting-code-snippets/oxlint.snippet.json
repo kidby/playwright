@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react"],
+  "categories": {
+    "correctness": "off",
+    "suspicious": "off",
+    "perf": "off",
+    "pedantic": "off",
+    "style": "off",
+    "nursery": "off",
+    "restriction": "off"
+  },
+  "rules": {
+    "no-undef": "error",
+    "no-debugger": "error",
+    "no-dupe-keys": "error",
+    "no-duplicate-case": "error",
+    "no-unreachable": "error",
+    "no-unsafe-negation": "error",
+    "valid-typeof": "error",
+    "no-empty-character-class": "error",
+    "react/react-in-jsx-scope": "off"
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2022": true
+  }
+}

@@ -16,7 +16,7 @@
 
 import os from 'os';
 
-import { getLinuxDistributionInfoSync } from './linuxUtils';
+import { getLinuxDistributionInfoSync } from './linuxUtils.js';
 
 export type HostPlatform = 'win64' |
                            'mac10.13' |

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { Recorder } from './recorder';
+import { Recorder } from './recorder.js';
 
-import type { InjectedScript } from '../injectedScript';
-import type { RecorderDelegate } from './recorder';
+import type { InjectedScript } from '../injectedScript.js';
+import type { RecorderDelegate } from './recorder.js';
 import type * as actions from '@recorder/actions';
 import type { ElementInfo, Mode, OverlayState, UIState } from '@recorder/recorderTypes';
 

@@ -17,10 +17,10 @@
 import fs from 'fs';
 import path from 'path';
 
-import { outputFile  } from './context';
-import { parseResponse } from './response';
+import { outputFile  } from './context.js';
+import { parseResponse } from './response.js';
 
-import type { ContextConfig } from './context';
+import type { ContextConfig } from './context.js';
 
 export class SessionLog {
   private _folder: string;

@@ -19,11 +19,11 @@ import path from 'path';
 import { calculateSha1 } from '@utils/crypto';
 import { toPosixPath } from '@utils/fileUtils';
 
-import { createFileMatcher, forceRegExp, parseLocationArg } from '../util';
+import { createFileMatcher, forceRegExp, parseLocationArg } from '../util.js';
 
-import type { FullProjectInternal } from './config';
-import type { Suite, TestCase } from './test';
-import type { Matcher, TestCaseFilter } from '../util';
+import type { FullProjectInternal } from './config.js';
+import type { Suite, TestCase } from './test.js';
+import type { Matcher, TestCaseFilter } from '../util.js';
 
 export function filterTestsRemoveEmptySuites(suite: Suite, filter: TestCaseFilter): boolean {
   const filteredSuites = suite.suites.filter(child => filterTestsRemoveEmptySuites(child, filter));

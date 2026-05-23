@@ -18,9 +18,9 @@ import EventEmitter from 'events';
 import net from 'net';
 
 import { assert } from '@isomorphic/assert';
-import { createGuid } from './crypto';
-import { debugLogger } from './debugLogger';
-import { createSocket } from './happyEyeballs';
+import { createGuid } from './crypto.js';
+import { debugLogger } from './debugLogger.js';
+import { createSocket } from './happyEyeballs.js';
 
 import type { AddressInfo } from 'net';
 

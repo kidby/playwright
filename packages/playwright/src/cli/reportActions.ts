@@ -18,8 +18,8 @@ import fs from 'fs';
 import path from 'path';
 
 import { gracefullyProcessExitDoNotHang } from '@utils/processLauncher';
-import { builtInReporters, config as commonConfig, configLoader } from '../common';
-import { html, merge } from '../runner';
+import { builtInReporters, config as commonConfig, configLoader } from '../common/index.js';
+import { html, merge } from '../runner/index.js';
 
 import type { ReporterDescription } from '../../types/test';
 

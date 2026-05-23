@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { resolveSmartModifierString } from '../input';
-import { getBidiKeyValue } from './third_party/bidiKeyboard';
-import * as bidi from './third_party/bidiProtocol';
+import { resolveSmartModifierString } from '../input.js';
+import { getBidiKeyValue } from './third_party/bidiKeyboard.js';
+import * as bidi from './third_party/bidiProtocol.js';
 
-import type * as input from '../input';
-import type * as types from '../types';
-import type { BidiSession } from './bidiConnection';
-import type { Progress } from '../progress';
+import type * as input from '../input.js';
+import type * as types from '../types.js';
+import type { BidiSession } from './bidiConnection.js';
+import type { Progress } from '../progress.js';
 
 export class RawKeyboardImpl implements input.RawKeyboard {
   private _session: BidiSession;

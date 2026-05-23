@@ -19,8 +19,8 @@ import path from 'path';
 import { noColors } from '@isomorphic/colors';
 import { msToString } from '@isomorphic/formatUtils';
 
-import { TerminalReporter, formatResultFailure, formatRetry } from './base';
-import { stripAnsiEscapes } from '../util';
+import { TerminalReporter, formatResultFailure, formatRetry } from './base.js';
+import { stripAnsiEscapes } from '../util.js';
 
 import type { FullResult, TestCase, TestError, TestResult } from '../../types/testReporter';
 

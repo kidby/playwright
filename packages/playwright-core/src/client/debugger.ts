@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { ChannelOwner } from './channelOwner';
-import { Events } from './events';
+import { ChannelOwner } from './channelOwner.js';
+import { Events } from './events.js';
 
 import type * as api from '../../types/types';
 import type * as channels from '@protocol/channels';

@@ -17,7 +17,7 @@
 import childProcess from 'child_process';
 import path from 'path';
 
-import { cc } from '../common';
+import { cc } from '../common/index.js';
 
 export async function detectChangedTestFiles(baseCommit: string, configDir: string): Promise<Set<string>> {
   function gitFileList(args: string[]) {

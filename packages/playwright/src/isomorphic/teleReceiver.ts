@@ -16,7 +16,7 @@
 
 import type { Metadata, TestAnnotation } from '../../types/test';
 import type * as reporterTypes from '../../types/testReporter';
-import type { ReporterV2 } from '../reporters/reporterV2';
+import type { ReporterV2 } from '../reporters/reporterV2.js';
 
 export type StringIntern = (s: string) => string;
 export type JsonLocation = reporterTypes.Location;

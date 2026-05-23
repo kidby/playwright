@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-export { Browser } from './browser';
-export { BrowserContext } from './browserContext';
-export { findRepeatedSubsequencesForTest } from './callLog';
-export { deviceDescriptors } from './deviceDescriptors';
-export { DispatcherConnection, RootDispatcher, setMaxDispatchersForTest } from './dispatchers/dispatcher';
-export { RequestDispatcher, ResponseDispatcher } from './dispatchers/networkDispatchers';
-export { PlaywrightDispatcher } from './dispatchers/playwrightDispatcher';
-export { Request, Response } from './network';
-export { Page } from './page';
-export { createPlaywright } from './playwright';
-export { nullProgress } from './progress';
-export { WebSocketTransport } from './transport';
-export { installRootRedirect, openTraceInBrowser, openTraceViewerApp, startTraceViewerServer, runTraceViewerApp } from './trace/viewer/traceViewer';
+export { Browser } from './browser.js';
+export { BrowserContext } from './browserContext.js';
+export { findRepeatedSubsequencesForTest } from './callLog.js';
+export { deviceDescriptors } from './deviceDescriptors.js';
+export { DispatcherConnection, RootDispatcher, setMaxDispatchersForTest } from './dispatchers/dispatcher.js';
+export { RequestDispatcher, ResponseDispatcher } from './dispatchers/networkDispatchers.js';
+export { PlaywrightDispatcher } from './dispatchers/playwrightDispatcher.js';
+export { Request, Response } from './network.js';
+export { Page } from './page.js';
+export { createPlaywright } from './playwright.js';
+export { nullProgress } from './progress.js';
+export { WebSocketTransport } from './transport.js';
+export { installRootRedirect, openTraceInBrowser, openTraceViewerApp, startTraceViewerServer, runTraceViewerApp } from './trace/viewer/traceViewer.js';
 
-export type { DispatcherScope } from './dispatchers/dispatcher';
-export type { Frame } from './frames';
-export type { Playwright } from './playwright';
-export type { TraceViewerRedirectOptions, TraceViewerServerOptions } from './trace/viewer/traceViewer';
+export type { DispatcherScope } from './dispatchers/dispatcher.js';
+export type { Frame } from './frames.js';
+export type { Playwright } from './playwright.js';
+export type { TraceViewerRedirectOptions, TraceViewerServerOptions } from './trace/viewer/traceViewer.js';

@@ -18,25 +18,25 @@ import fs from 'fs';
 
 import { makeSocketPath } from '@utils/fileUtils';
 import { createGuid } from '@utils/crypto';
-import { BrowserContext, validateBrowserContextOptions } from './browserContext';
-import { Download } from './download';
-import { SdkObject } from './instrumentation';
-import { Page } from './page';
-import { ClientCertificatesProxy } from './socksClientCertificatesInterceptor';
-import { PlaywrightPipeServer } from '../remote/playwrightPipeServer';
-import { PlaywrightWebSocketServer } from '../remote/playwrightWebSocketServer';
-import { BrowserInfo, serverRegistry } from '../serverRegistry';
-import { nullProgress } from './progress';
-import { TargetClosedError } from './errors';
+import { BrowserContext, validateBrowserContextOptions } from './browserContext.js';
+import { Download } from './download.js';
+import { SdkObject } from './instrumentation.js';
+import { Page } from './page.js';
+import { ClientCertificatesProxy } from './socksClientCertificatesInterceptor.js';
+import { PlaywrightPipeServer } from '../remote/playwrightPipeServer.js';
+import { PlaywrightWebSocketServer } from '../remote/playwrightWebSocketServer.js';
+import { BrowserInfo, serverRegistry } from '../serverRegistry.js';
+import { nullProgress } from './progress.js';
+import { TargetClosedError } from './errors.js';
 
-import type * as types from './types';
-import type { ProxySettings } from './types';
+import type * as types from './types.js';
+import type { ProxySettings } from './types.js';
 import type { RecentLogsCollector } from '@utils/debugLogger';
 import type * as channels from '@protocol/channels';
 import type { ChildProcess } from 'child_process';
 import type { Language } from '@isomorphic/locatorGenerators';
-import type { Progress } from './progress';
-import type * as playwright from '../..';
+import type { Progress } from './progress.js';
+import type * as playwright from '../../index.js';
 
 export interface BrowserProcess {
   onclose?: ((exitCode: number | null, signal: string | null) => void);

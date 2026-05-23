@@ -24,19 +24,19 @@ import { isUnderTest } from '@utils/debug';
 import { HttpServer } from '@utils/httpServer';
 import { gracefullyProcessExitDoNotHang } from '@utils/processLauncher';
 
-import { configLoader, ipc } from '../common';
-import ListReporter from '../reporters/list';
-import { SigIntWatcher } from './sigIntWatcher';
-import { TestRunner, TestRunnerEvent } from './testRunner';
-import UIModeReporter from './uiModeReporter';
-import { loadReporter } from './loadUtils';
-import { wrapReporterAsV2 } from '../reporters/reporterV2';
+import { configLoader, ipc } from '../common/index.js';
+import ListReporter from '../reporters/list.js';
+import { SigIntWatcher } from './sigIntWatcher.js';
+import { TestRunner, TestRunnerEvent } from './testRunner.js';
+import UIModeReporter from './uiModeReporter.js';
+import { loadReporter } from './loadUtils.js';
+import { wrapReporterAsV2 } from '../reporters/reporterV2.js';
 
 import type { Transport } from '@utils/httpServer';
 import type * as reporterTypes from '../../types/testReporter';
-import type { ConfigLocation } from '../common';
-import type { ReportEntry, TestServerInterface, TestServerInterfaceEventEmitters } from '../isomorphic/testServerInterface';
-import type { ReporterV2 } from '../reporters/reporterV2';
+import type { ConfigLocation } from '../common/index.js';
+import type { ReportEntry, TestServerInterface, TestServerInterfaceEventEmitters } from '../isomorphic/testServerInterface.js';
+import type { ReporterV2 } from '../reporters/reporterV2.js';
 
 type TraceViewerRedirectOptions = coreServer.TraceViewerRedirectOptions;
 type TraceViewerServerOptions = coreServer.TraceViewerServerOptions;

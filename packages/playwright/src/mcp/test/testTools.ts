@@ -15,8 +15,8 @@
  */
 
 import * as z from 'zod';
-import { ListModeReporter } from '../../runner';
-import { defineTestTool } from './testTool';
+import { ListModeReporter } from '../../runner/index.js';
+import { defineTestTool } from './testTool.js';
 
 export const listTests = defineTestTool({
   schema: {

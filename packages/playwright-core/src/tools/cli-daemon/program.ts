@@ -22,13 +22,13 @@ import path from 'path';
 
 import { getAsBooleanFromENV, guessClientName } from '@utils/env';
 import { gracefullyProcessExitDoNotHang } from '@utils/processLauncher';
-import { libPath } from '../../package';
-import { startCliDaemonServer } from './daemon';
-import { setupExitWatchdog } from '../mcp/watchdog';
-import { createBrowserWithInfo } from '../mcp/browserFactory';
-import * as configUtils from '../mcp/config';
-import { createClientInfo } from '../cli-client/registry';
-import { registry as browserRegistry } from '../../server/registry/index';
+import { libPath } from '../../package.js';
+import { startCliDaemonServer } from './daemon.js';
+import { setupExitWatchdog } from '../mcp/watchdog.js';
+import { createBrowserWithInfo } from '../mcp/browserFactory.js';
+import * as configUtils from '../mcp/config.js';
+import { createClientInfo } from '../cli-client/registry.js';
+import { registry as browserRegistry } from '../../server/registry/index.js';
 import type { Command } from 'commander';
 
 export function decorateProgram(program: Command) {

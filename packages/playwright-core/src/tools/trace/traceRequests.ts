@@ -18,7 +18,7 @@
 
 import path from 'path';
 import { msToString } from '@isomorphic/formatUtils';
-import { loadTrace } from './traceUtils';
+import { loadTrace } from './traceUtils.js';
 
 export async function traceRequests(options: { grep?: string, method?: string, status?: string, failed?: boolean }) {
   const trace = await loadTrace();

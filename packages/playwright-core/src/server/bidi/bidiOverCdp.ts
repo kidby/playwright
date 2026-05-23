@@ -19,7 +19,7 @@ import * as bidiCdpConnection from 'chromium-bidi/lib/cjs/cdp/CdpConnection';
 
 import { debugLogger } from '@utils/debugLogger';
 
-import type { ConnectionTransport, ProtocolRequest, ProtocolResponse } from '../transport';
+import type { ConnectionTransport, ProtocolRequest, ProtocolResponse } from '../transport.js';
 import type { ChromiumBidi } from 'chromium-bidi/lib/cjs/protocol/protocol';
 import type * as bidiTransport from 'chromium-bidi/lib/cjs/utils/transport';
 

@@ -16,7 +16,7 @@
 
 import * as css from '@isomorphic/cssTokenizer';
 
-import { beginDOMCaches, closestCrossShadow, elementSafeTagName, enclosingShadowRootOrDocument, endDOMCaches, getElementComputedStyle, isElementStyleVisibilityVisible, isVisibleTextNode, parentElementOrShadowHost } from './domUtils';
+import { beginDOMCaches, closestCrossShadow, elementSafeTagName, enclosingShadowRootOrDocument, endDOMCaches, getElementComputedStyle, isElementStyleVisibilityVisible, isVisibleTextNode, parentElementOrShadowHost } from './domUtils.js';
 
 import type { AriaRole } from '@isomorphic/ariaSnapshot';
 

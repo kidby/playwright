@@ -16,11 +16,11 @@
 
 import crypto from 'crypto';
 
-import * as rawWebAuthnSource from '../generated/webAuthnSource';
-import { nullProgress } from './progress';
+import * as rawWebAuthnSource from '../generated/webAuthnSource.js';
+import { nullProgress } from './progress.js';
 
-import type { BrowserContext } from './browserContext';
-import type { InitScript } from './page';
+import type { BrowserContext } from './browserContext.js';
+import type { InitScript } from './page.js';
 import type { Progress } from '@protocol/progress';
 
 const kBindingName = '__pwWebAuthnBinding';

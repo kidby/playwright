@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { ImageChannel } from './imageChannel';
+import type { ImageChannel } from './imageChannel.js';
 
 export interface Stats {
   c1: ImageChannel;

@@ -20,11 +20,11 @@ import os from 'os';
 
 import dotenv from 'dotenv';
 import { isSystemDirectory } from '@utils/fileUtils';
-import { playwright } from '../../inprocess';
-import { configFromIniFile } from './configIni';
+import { playwright } from '../../inprocess.js';
+import { configFromIniFile } from './configIni.js';
 
-import type * as playwrightTypes from '../../..';
-import type { Config, ToolCapability } from './config.d';
+import type * as playwrightTypes from '../../../index.js';
+import type { Config, ToolCapability } from './config.d.js';
 
 async function fileExistsAsync(resolved: string) {
   try { return (await fs.promises.stat(resolved)).isFile(); } catch { return false; }

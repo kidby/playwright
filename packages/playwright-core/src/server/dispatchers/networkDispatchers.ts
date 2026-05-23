@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import { WebSocket } from '../network';
-import { Dispatcher } from './dispatcher';
-import { FrameDispatcher } from './frameDispatcher';
-import { WorkerDispatcher } from './pageDispatcher';
-import { TracingDispatcher } from './tracingDispatcher';
-import { Request } from '../network';
+import { WebSocket } from '../network.js';
+import { Dispatcher } from './dispatcher.js';
+import { FrameDispatcher } from './frameDispatcher.js';
+import { WorkerDispatcher } from './pageDispatcher.js';
+import { TracingDispatcher } from './tracingDispatcher.js';
+import { Request } from '../network.js';
 
-import type { APIRequestContext } from '../fetch';
-import type { Response, Route } from '../network';
-import type { BrowserContextDispatcher } from './browserContextDispatcher';
-import type { RootDispatcher } from './dispatcher';
-import type { PageDispatcher } from './pageDispatcher';
+import type { APIRequestContext } from '../fetch.js';
+import type { Response, Route } from '../network.js';
+import type { BrowserContextDispatcher } from './browserContextDispatcher.js';
+import type { RootDispatcher } from './dispatcher.js';
+import type { PageDispatcher } from './pageDispatcher.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 

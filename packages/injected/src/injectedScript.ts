@@ -20,30 +20,30 @@ import { splitTestIdAttributeNames } from '@isomorphic/locatorUtils';
 import { parseAttributeSelector, parseSelector, stringifySelector, visitAllSelectorParts } from '@isomorphic/selectorParser';
 import { cacheNormalizedWhitespaces, normalizeWhiteSpace, trimStringWithEllipsis } from '@isomorphic/stringUtils';
 
-import { generateAriaTree, getAllElementsMatchingExpectAriaTemplate, matchesExpectAriaTemplate, renderAriaTree, findNewElement } from './ariaSnapshot';
-import { beginDOMCaches, enclosingShadowRootOrDocument, endDOMCaches, isElementVisible, isInsideScope, parentElementOrShadowHost, setGlobalOptions } from './domUtils';
-import { Highlight } from './highlight';
-import { kLayoutSelectorNames, layoutSelectorScore } from './layoutSelectorUtils';
-import { createRoleEngine } from './roleSelectorEngine';
-import { beginAriaCaches, endAriaCaches, getAriaDisabled, getAriaRole, getCheckedAllowMixed, getCheckedWithoutMixed, getElementAccessibleDescription, getElementAccessibleErrorMessage, getElementAccessibleName, getReadonly } from './roleUtils';
-import { SelectorEvaluatorImpl, sortInDOMOrder } from './selectorEvaluator';
-import { generateSelector } from './selectorGenerator';
-import { elementMatchesText, elementText, getElementLabels } from './selectorUtils';
-import { XPathEngine } from './xpathSelectorEngine';
-import { ConsoleAPI } from './consoleApi';
-import { UtilityScript } from './utilityScript';
+import { generateAriaTree, getAllElementsMatchingExpectAriaTemplate, matchesExpectAriaTemplate, renderAriaTree, findNewElement } from './ariaSnapshot.js';
+import { beginDOMCaches, enclosingShadowRootOrDocument, endDOMCaches, isElementVisible, isInsideScope, parentElementOrShadowHost, setGlobalOptions } from './domUtils.js';
+import { Highlight } from './highlight.js';
+import { kLayoutSelectorNames, layoutSelectorScore } from './layoutSelectorUtils.js';
+import { createRoleEngine } from './roleSelectorEngine.js';
+import { beginAriaCaches, endAriaCaches, getAriaDisabled, getAriaRole, getCheckedAllowMixed, getCheckedWithoutMixed, getElementAccessibleDescription, getElementAccessibleErrorMessage, getElementAccessibleName, getReadonly } from './roleUtils.js';
+import { SelectorEvaluatorImpl, sortInDOMOrder } from './selectorEvaluator.js';
+import { generateSelector } from './selectorGenerator.js';
+import { elementMatchesText, elementText, getElementLabels } from './selectorUtils.js';
+import { XPathEngine } from './xpathSelectorEngine.js';
+import { ConsoleAPI } from './consoleApi.js';
+import { UtilityScript } from './utilityScript.js';
 
 import type { AriaTemplateNode } from '@isomorphic/ariaSnapshot';
 import type { CSSComplexSelectorList } from '@isomorphic/cssParser';
 import type { Language } from '@isomorphic/locatorGenerators';
 import type { AttributeSelectorPart, NestedSelectorBody, ParsedSelector, ParsedSelectorPart } from '@isomorphic/selectorParser';
 import type * as channels from '@protocol/channels';
-import type { AriaSnapshot, AriaTreeOptions } from './ariaSnapshot';
-import type { LayoutSelectorName } from './layoutSelectorUtils';
-import type { SelectorEngine, SelectorRoot } from './selectorEngine';
-import type { GenerateSelectorOptions } from './selectorGenerator';
-import type { ElementText, TextMatcher } from './selectorUtils';
-import type { Builtins } from './utilityScript';
+import type { AriaSnapshot, AriaTreeOptions } from './ariaSnapshot.js';
+import type { LayoutSelectorName } from './layoutSelectorUtils.js';
+import type { SelectorEngine, SelectorRoot } from './selectorEngine.js';
+import type { GenerateSelectorOptions } from './selectorGenerator.js';
+import type { ElementText, TextMatcher } from './selectorUtils.js';
+import type { Builtins } from './utilityScript.js';
 
 
 export type FrameExpectParams = Omit<channels.FrameExpectParams, 'expectedValue' | 'timeout'> & {

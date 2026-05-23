@@ -21,16 +21,16 @@ import { wrapInASCIIBox } from '@utils/ascii';
 import { SocksProxy } from '@utils/socksProxy';
 import { debugLogger } from '@utils/debugLogger';
 import { isUnderTest } from '@utils/debug';
-import { getPlaywrightVersion } from '../server/userAgent';
-import { PlaywrightConnection, PlaywrightInitializeResult } from './playwrightConnection';
-import { WebSocketServerTransport } from './serverTransport';
-import { createPlaywright } from '../server/playwright';
-import { Browser } from '../server/browser';
-import { nullProgress, ProgressController } from '../server/progress';
+import { getPlaywrightVersion } from '../server/userAgent.js';
+import { PlaywrightConnection, PlaywrightInitializeResult } from './playwrightConnection.js';
+import { WebSocketServerTransport } from './serverTransport.js';
+import { createPlaywright } from '../server/playwright.js';
+import { Browser } from '../server/browser.js';
+import { nullProgress, ProgressController } from '../server/progress.js';
 
-import type { AndroidDevice } from '../server/android/android';
-import type { Playwright } from '../server/playwright';
-import type { LaunchOptions as LaunchOptionsWithoutTimeout } from '../server/types';
+import type { AndroidDevice } from '../server/android/android.js';
+import type { Playwright } from '../server/playwright.js';
+import type { LaunchOptions as LaunchOptionsWithoutTimeout } from '../server/types.js';
 
 type LaunchOptionsWithTimeout = LaunchOptionsWithoutTimeout & { timeout: number };
 

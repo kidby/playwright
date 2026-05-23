@@ -10,12 +10,10 @@
   "engines": {
     "node": ">=24"
   },
-  "main": "index.js",
+  "type": "module",
   "exports": {
     ".": {
       "types": "./index.d.ts",
-      "import": "./index.mjs",
-      "require": "./index.js",
       "default": "./index.js"
     },
     "./package.json": "./package.json",
@@ -27,8 +25,6 @@
     "./lib/isomorphic": "./lib/isomorphic/index.js",
     "./lib/transform/babelBundle": "./lib/transform/babelBundle.js",
     "./jsx-runtime": {
-      "import": "./jsx-runtime.mjs",
-      "require": "./jsx-runtime.js",
       "default": "./jsx-runtime.js"
     },
     "./lib/util": "./lib/util.js",
@@ -40,8 +36,6 @@
     },
     "./test": {
       "types": "./test.d.ts",
-      "import": "./test.mjs",
-      "require": "./test.js",
       "default": "./test.js"
     }
   },

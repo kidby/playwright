@@ -20,15 +20,15 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 import debug from 'debug';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { startMcpHttpServer } from './http';
-import { toMcpTool } from './tool';
+import { startMcpHttpServer } from './http.js';
+import { toMcpTool } from './tool.js';
 
 import type { CallToolResult, CallToolRequest, Root } from '@modelcontextprotocol/sdk/types.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 export type { Server } from '@modelcontextprotocol/sdk/server/index.js';
 export type { Tool, CallToolResult, CallToolRequest, Root } from '@modelcontextprotocol/sdk/types.js';
 import type { Server as ServerType } from '@modelcontextprotocol/sdk/server/index.js';
-import type { ToolSchema } from './tool';
+import type { ToolSchema } from './tool.js';
 
 const serverDebug = debug('pw:mcp:server');
 const serverDebugResponse = debug('pw:mcp:server:response');

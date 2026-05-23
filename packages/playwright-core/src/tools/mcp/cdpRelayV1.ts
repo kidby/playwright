@@ -19,8 +19,8 @@
  * attachment and forwards CDP events/commands through a thin wrapper.
  */
 
-import type { ExtensionProtocolHandler, SendCommand, SendToCDPClient } from './cdpRelayHandler';
-import type { ExtensionEventsV1 } from './protocol';
+import type { ExtensionProtocolHandler, SendCommand, SendToCDPClient } from './cdpRelayHandler.js';
+import type { ExtensionEventsV1 } from './protocol.js';
 
 export class ExtensionProtocolV1 implements ExtensionProtocolHandler {
   private _sendCommand: SendCommand;

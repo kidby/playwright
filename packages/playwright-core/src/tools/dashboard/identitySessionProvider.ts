@@ -17,12 +17,12 @@
 import { EventEmitter } from 'events';
 import { Disposable } from '@isomorphic/disposable';
 import { eventsHelper } from '@utils/eventsHelper';
-import { packageJSON, packageRoot } from '../../package';
-import { SessionProviderEvent } from './sessionProvider';
+import { packageJSON, packageRoot } from '../../package.js';
+import { SessionProviderEvent } from './sessionProvider.js';
 
 import type * as api from '../../../types/types';
-import type { BrowserDescriptor, BrowserInfo } from '../../serverRegistry';
-import type { ContextEntry, SessionProvider, SessionProviderEventMap } from './sessionProvider';
+import type { BrowserDescriptor, BrowserInfo } from '../../serverRegistry.js';
+import type { ContextEntry, SessionProvider, SessionProviderEventMap } from './sessionProvider.js';
 
 export class IdentitySessionProvider extends EventEmitter<SessionProviderEventMap> implements SessionProvider {
   private _context: api.BrowserContext;

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { ImportRegistry } from './importRegistry';
-import { transformObject, unwrapObject } from './serializers';
+import { ImportRegistry } from './importRegistry.js';
+import { transformObject, unwrapObject } from './serializers.js';
 
 window.__pwRegistry = new ImportRegistry();
 window.__pwUnwrapObject = unwrapObject;

@@ -15,7 +15,7 @@
  */
 
 import { app } from 'electron';
-import { chromiumSwitches } from '../chromium/chromiumSwitches';
+import { chromiumSwitches } from '../chromium/chromiumSwitches.js';
 
 // Always pass user arguments first, see https://github.com/microsoft/playwright/issues/16614 and
 // https://github.com/microsoft/playwright/issues/29198.

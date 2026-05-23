@@ -16,20 +16,20 @@
 
 import { deserializeURLMatch, urlMatches } from '@isomorphic/urlMatch';
 import { eventsHelper } from '@utils/eventsHelper';
-import { Page } from '../page';
-import { Dispatcher } from './dispatcher';
-import { PageDispatcher } from './pageDispatcher';
-import * as rawWebSocketMockSource from '../../generated/webSocketMockSource';
-import { SdkObject } from '../instrumentation';
+import { Page } from '../page.js';
+import { Dispatcher } from './dispatcher.js';
+import { PageDispatcher } from './pageDispatcher.js';
+import * as rawWebSocketMockSource from '../../generated/webSocketMockSource.js';
+import { SdkObject } from '../instrumentation.js';
 
-import type { BrowserContextDispatcher } from './browserContextDispatcher';
-import type { BrowserContext } from '../browserContext';
-import type { DispatcherConnection } from './dispatcher';
-import type { Frame } from '../frames';
+import type { BrowserContextDispatcher } from './browserContextDispatcher.js';
+import type { BrowserContext } from '../browserContext.js';
+import type { DispatcherConnection } from './dispatcher.js';
+import type { Frame } from '../frames.js';
 import type * as ws from '@injected/webSocketMock';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
-import type { InitScript, PageBinding } from '../page';
+import type { InitScript, PageBinding } from '../page.js';
 
 export class WebSocketRouteDispatcher extends Dispatcher<SdkObject, channels.WebSocketRouteChannel, PageDispatcher | BrowserContextDispatcher> implements channels.WebSocketRouteChannel {
   _type_WebSocketRoute = true;

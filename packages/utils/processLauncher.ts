@@ -19,8 +19,8 @@ import * as childProcess from 'child_process';
 import fs from 'fs';
 import * as readline from 'readline';
 
-import { removeFolders } from './fileUtils';
-import { isUnderTest } from './debug';
+import { removeFolders } from './fileUtils.js';
+import { isUnderTest } from './debug.js';
 
 export type LaunchProcessOptions = {
   command: string,

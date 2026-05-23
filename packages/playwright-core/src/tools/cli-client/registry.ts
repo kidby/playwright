@@ -19,9 +19,9 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
-import { packageRoot, packageJSON } from '../../package';
+import { packageRoot, packageJSON } from '../../package.js';
 
-import type * as playwright from '../../..';
+import type * as playwright from '../../../index.js';
 
 export type ClientInfo = {
   version: string;

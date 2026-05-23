@@ -17,7 +17,7 @@
 import type { EventEmitter } from 'events';
 
 import type * as api from '../../../types/types';
-import type { BrowserDescriptor } from '../../serverRegistry';
+import type { BrowserDescriptor } from '../../serverRegistry.js';
 
 export type ContextEntry = {
   browser: api.Browser;

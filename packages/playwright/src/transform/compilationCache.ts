@@ -22,8 +22,8 @@ import sourceMapSupport from 'source-map-support';
 import { calculateSha1 } from '@utils/crypto';
 import { isUnderTest } from '@utils/debug';
 
-import { isWorkerProcess } from '../globals';
-import { packageRoot } from '../package';
+import { isWorkerProcess } from '../globals.js';
+import { packageRoot } from '../package.js';
 
 export type MemoryCache = {
   codePath: string;

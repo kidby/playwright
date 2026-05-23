@@ -16,15 +16,15 @@
  */
 
 import { isString } from '@isomorphic/stringUtils';
-import * as input from '../input';
-import { macEditingCommands } from '../macEditingCommands';
-import { toButtonsMask, toModifiersMask } from './crProtocolHelper';
+import * as input from '../input.js';
+import { macEditingCommands } from '../macEditingCommands.js';
+import { toButtonsMask, toModifiersMask } from './crProtocolHelper.js';
 
-import type * as types from '../types';
-import type { CRSession } from './crConnection';
-import type { DragManager } from './crDragDrop';
-import type { CRPage } from './crPage';
-import type { Progress } from '../progress';
+import type * as types from '../types.js';
+import type { CRSession } from './crConnection.js';
+import type { DragManager } from './crDragDrop.js';
+import type { CRPage } from './crPage.js';
+import type { Progress } from '../progress.js';
 
 
 export class RawKeyboardImpl implements input.RawKeyboard {

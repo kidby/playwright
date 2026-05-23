@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-import { tools } from '../coreBundle';
+import { tools } from '../coreBundle.js';
 
 tools.openDashboardApp();

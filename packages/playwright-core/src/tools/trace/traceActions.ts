@@ -19,7 +19,7 @@
 import { buildActionTree } from '@isomorphic/trace/traceModel';
 import { asLocatorDescription } from '@isomorphic/locatorGenerators';
 import { msToString } from '@isomorphic/formatUtils';
-import { loadTrace, formatTimestamp, actionTitle } from './traceUtils';
+import { loadTrace, formatTimestamp, actionTitle } from './traceUtils.js';
 
 import type { ActionTraceEventInContext } from '@isomorphic/trace/traceModel';
 import type { Language } from '@isomorphic/locatorGenerators';

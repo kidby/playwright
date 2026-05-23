@@ -16,23 +16,23 @@
 
 import { SocksProxy } from '@utils/socksProxy';
 import { eventsHelper  } from '@utils/eventsHelper';
-import { GlobalAPIRequestContext } from '../fetch';
-import { AndroidDispatcher } from './androidDispatcher';
-import { AndroidDeviceDispatcher } from './androidDispatcher';
-import { BrowserDispatcher } from './browserDispatcher';
-import { BrowserTypeDispatcher } from './browserTypeDispatcher';
-import { Dispatcher } from './dispatcher';
-import { ElectronDispatcher } from './electronDispatcher';
-import { LocalUtilsDispatcher } from './localUtilsDispatcher';
-import { APIRequestContextDispatcher } from './networkDispatchers';
-import { SdkObject } from '../instrumentation';
+import { GlobalAPIRequestContext } from '../fetch.js';
+import { AndroidDispatcher } from './androidDispatcher.js';
+import { AndroidDeviceDispatcher } from './androidDispatcher.js';
+import { BrowserDispatcher } from './browserDispatcher.js';
+import { BrowserTypeDispatcher } from './browserTypeDispatcher.js';
+import { Dispatcher } from './dispatcher.js';
+import { ElectronDispatcher } from './electronDispatcher.js';
+import { LocalUtilsDispatcher } from './localUtilsDispatcher.js';
+import { APIRequestContextDispatcher } from './networkDispatchers.js';
+import { SdkObject } from '../instrumentation.js';
 
-import type { RootDispatcher } from './dispatcher';
+import type { RootDispatcher } from './dispatcher.js';
 import type { SocksSocketClosedPayload, SocksSocketDataPayload, SocksSocketRequestedPayload } from '@utils/socksProxy';
 import type { RegisteredListener } from '@utils/eventsHelper';
-import type { AndroidDevice } from '../android/android';
-import type { Browser } from '../browser';
-import type { Playwright } from '../playwright';
+import type { AndroidDevice } from '../android/android.js';
+import type { Browser } from '../browser.js';
+import type { Playwright } from '../playwright.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 

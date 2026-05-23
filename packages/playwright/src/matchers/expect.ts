@@ -46,8 +46,8 @@ import {
   createExpectedPromiseMessage,
   createExpectedToResolveMessage,
   createExpectedToRejectMessage,
-} from './expectLibrary';
-import { ExpectError } from './matcherHint';
+} from './expectLibrary.js';
+import { ExpectError } from './matcherHint.js';
 import {
   computeMatcherTitleSuffix,
   deadlineForMatcher,
@@ -83,13 +83,13 @@ import {
   toHaveValue,
   toHaveValues,
   toPass
-} from './matchers';
-import { toMatchAriaSnapshot } from './toMatchAriaSnapshot';
-import { toHaveScreenshot, toMatchSnapshot } from './toMatchSnapshot';
+} from './matchers.js';
+import { toMatchAriaSnapshot } from './toMatchAriaSnapshot.js';
+import { toHaveScreenshot, toMatchSnapshot } from './toMatchSnapshot.js';
 
-import type { MatcherContext, MatchersObject, RawMatcherFn } from './expectLibrary';
-import type { MatcherAttachment, MatcherResult } from './matcherHint';
-import type { ExpectMatcherStateInternal } from './matchers';
+import type { MatcherContext, MatchersObject, RawMatcherFn } from './expectLibrary.js';
+import type { MatcherAttachment, MatcherResult } from './matcherHint.js';
+import type { ExpectMatcherStateInternal } from './matchers.js';
 import type { Expect } from '../../types/test';
 import type { StackFrame } from '@protocol/channels';
 

@@ -23,7 +23,7 @@ import { HttpsProxyAgent } from 'https-proxy-agent';
 import { SocksProxyAgent } from 'socks-proxy-agent';
 import { getProxyForUrl } from 'proxy-from-env';
 import { ManualPromise } from '@isomorphic/manualPromise';
-import { httpHappyEyeballsAgent, httpsHappyEyeballsAgent } from './happyEyeballs';
+import { httpHappyEyeballsAgent, httpsHappyEyeballsAgent } from './happyEyeballs.js';
 
 import type net from 'net';
 

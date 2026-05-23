@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { isLocalHostname, kMaxCookieExpiresDateInSeconds } from './network';
+import { isLocalHostname, kMaxCookieExpiresDateInSeconds } from './network.js';
 
 import type * as channels from '@protocol/channels';
 

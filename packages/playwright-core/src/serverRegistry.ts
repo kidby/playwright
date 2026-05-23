@@ -21,7 +21,7 @@ import path from 'path';
 import os from 'os';
 import chokidar from 'chokidar';
 
-import { packageJSON, packageRoot } from './package';
+import { packageJSON, packageRoot } from './package.js';
 
 // Only client depenencies with backward compatibility guarantees should be imported here.
 import type { LaunchOptions } from '../types/types';

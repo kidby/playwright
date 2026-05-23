@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { makeWaitForNextTask } from './task';
+import { makeWaitForNextTask } from './task.js';
 
 interface WritableStream {
   write(data: Buffer): void;

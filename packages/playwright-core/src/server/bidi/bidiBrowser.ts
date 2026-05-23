@@ -15,22 +15,22 @@
  */
 
 import { eventsHelper } from '@utils/eventsHelper';
-import { Browser } from '../browser';
-import { BrowserContext, verifyGeolocation } from '../browserContext';
-import * as network from '../network';
-import { BidiConnection } from './bidiConnection';
-import { bidiBytesValueToString } from './bidiNetworkManager';
-import { BidiPage, kPlaywrightBindingChannel } from './bidiPage';
-import { PageBinding } from '../page';
-import * as bidi from './third_party/bidiProtocol';
+import { Browser } from '../browser.js';
+import { BrowserContext, verifyGeolocation } from '../browserContext.js';
+import * as network from '../network.js';
+import { BidiConnection } from './bidiConnection.js';
+import { bidiBytesValueToString } from './bidiNetworkManager.js';
+import { BidiPage, kPlaywrightBindingChannel } from './bidiPage.js';
+import { PageBinding } from '../page.js';
+import * as bidi from './third_party/bidiProtocol.js';
 
 import type { RegisteredListener } from '@utils/eventsHelper';
-import type { BrowserOptions } from '../browser';
-import type { SdkObject } from '../instrumentation';
-import type { InitScript, Page } from '../page';
-import type { ConnectionTransport } from '../transport';
-import type * as types from '../types';
-import type { BidiSession } from './bidiConnection';
+import type { BrowserOptions } from '../browser.js';
+import type { SdkObject } from '../instrumentation.js';
+import type { InitScript, Page } from '../page.js';
+import type { ConnectionTransport } from '../transport.js';
+import type * as types from '../types.js';
+import type { BidiSession } from './bidiConnection.js';
 import type * as channels from '@protocol/channels';
 
 

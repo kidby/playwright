@@ -36,11 +36,11 @@ import { extractZip } from '@utils/third_party/extractZip';
 // `import('vite')`) is DCE'd in release builds.
 declare const __PW_HMR__: boolean;
 
-import { CommonReporterOptions, formatError, formatResultFailure, internalScreen } from './base';
-import * as babel from '../transform/babelBundle';
-import { resolveReporterOutputPath, stripAnsiEscapes } from '../util';
+import { CommonReporterOptions, formatError, formatResultFailure, internalScreen } from './base.js';
+import * as babel from '../transform/babelBundle.js';
+import { resolveReporterOutputPath, stripAnsiEscapes } from '../util.js';
 
-import type { ReportConfigureParams, ReportEndParams, ReporterV2 } from './reporterV2';
+import type { ReportConfigureParams, ReportEndParams, ReporterV2 } from './reporterV2.js';
 import type { HtmlReporterOptions as HtmlReporterConfigOptions, Metadata, TestAnnotation } from '../../types/test';
 import type * as api from '../../types/testReporter';
 import type { HTMLReport, HTMLReportOptions, Location, Stats, TestAttachment, TestCase, TestCaseSummary, TestFile, TestFileSummary, TestResult, TestStep } from '@html-reporter/types';

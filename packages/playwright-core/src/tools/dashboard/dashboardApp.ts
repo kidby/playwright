@@ -23,17 +23,17 @@ import { HttpServer } from '@utils/httpServer';
 import { makeSocketPath } from '@utils/fileUtils';
 import { gracefullyProcessExitDoNotHang } from '@utils/processLauncher';
 import { ManualPromise } from '@isomorphic/manualPromise';
-import { libPath } from '../../package';
-import { playwright } from '../../inprocess';
-import { findChromiumChannelBestEffort, registryDirectory } from '../../server/registry/index';
-import { minimist } from '../cli-client/minimist';
-import { DashboardConnection } from './dashboardController';
-import { RegistrySessionProvider } from './registrySessionProvider';
-import { IdentitySessionProvider } from './identitySessionProvider';
+import { libPath } from '../../package.js';
+import { playwright } from '../../inprocess.js';
+import { findChromiumChannelBestEffort, registryDirectory } from '../../server/registry/index.js';
+import { minimist } from '../cli-client/minimist.js';
+import { DashboardConnection } from './dashboardController.js';
+import { RegistrySessionProvider } from './registrySessionProvider.js';
+import { IdentitySessionProvider } from './identitySessionProvider.js';
 
-import type * as api from '../../..';
-import type { AnnotateResult } from './dashboardController';
-import type { SessionProvider } from './sessionProvider';
+import type * as api from '../../../index.js';
+import type { AnnotateResult } from './dashboardController.js';
+import type { SessionProvider } from './sessionProvider.js';
 
 // HMR: build-time flag — `true` in watch builds, `false` in release. esbuild
 // replaces the identifier via `define`, so the static branch pays zero runtime
@@ -55,8 +55,8 @@ async function startDashboardServer(provider: SessionProvider, options: Dashboar
   let connectionLanded = new ManualPromise<void>();
 
   httpServer.createWebSocket(() => {
+    // oxlint-disable-next-line prefer-const -- self-referential closure: ctor callback captures `connection`
     let connection: DashboardConnection;
-    // eslint-disable-next-line prefer-const
     connection = new DashboardConnection(provider, () => {
       connections.delete(connection);
       if (connections.size === 0)

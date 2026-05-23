@@ -14,12 +14,12 @@
  * limitations under the License.
 */
 import { assert } from '@isomorphic/assert';
-import { toModifiersMask } from './crProtocolHelper';
+import { toModifiersMask } from './crProtocolHelper.js';
 
-import type { CRPage } from './crPage';
-import type * as types from '../types';
+import type { CRPage } from './crPage.js';
+import type * as types from '../types.js';
 import type { Protocol } from './protocol';
-import type { Progress } from '../progress';
+import type { Progress } from '../progress.js';
 
 
 declare global {

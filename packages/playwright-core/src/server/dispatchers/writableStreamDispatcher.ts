@@ -16,10 +16,10 @@
 
 import fs from 'fs';
 
-import { Dispatcher } from './dispatcher';
-import { SdkObject } from '../instrumentation';
+import { Dispatcher } from './dispatcher.js';
+import { SdkObject } from '../instrumentation.js';
 
-import type { BrowserContextDispatcher } from './browserContextDispatcher';
+import type { BrowserContextDispatcher } from './browserContextDispatcher.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 

@@ -25,9 +25,9 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { urlHostFromAddress } from '@utils/httpServer';
 import { createHttpServer, startHttpServer } from '@utils/network';
 
-import * as mcpServer from './server';
+import * as mcpServer from './server.js';
 
-import type { ServerBackendFactory } from './server';
+import type { ServerBackendFactory } from './server.js';
 import type { SSEServerTransport as SSEServerTransportType } from '@modelcontextprotocol/sdk/server/sse.js';
 import type { StreamableHTTPServerTransport as StreamableHTTPServerTransportType } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { CSharpLanguageGenerator } from './csharp';
-import { JavaLanguageGenerator } from './java';
-import { JavaScriptLanguageGenerator } from './javascript';
-import { JsonlLanguageGenerator } from './jsonl';
-import { PythonLanguageGenerator } from './python';
+import { CSharpLanguageGenerator } from './csharp.js';
+import { JavaLanguageGenerator } from './java.js';
+import { JavaScriptLanguageGenerator } from './javascript.js';
+import { JsonlLanguageGenerator } from './jsonl.js';
+import { PythonLanguageGenerator } from './python.js';
 
 export function languageSet() {
   // Note: generators are ordered in the order of preference for each language.

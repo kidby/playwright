@@ -18,10 +18,10 @@ import { eventsHelper } from '@utils/eventsHelper';
 import { assert } from '@isomorphic/assert';
 
 import type { Protocol } from './protocol';
-import type { WKSession } from './wkConnection';
-import type { WKPage } from './wkPage';
+import type { WKSession } from './wkConnection.js';
+import type { WKPage } from './wkPage.js';
 import type { RegisteredListener } from '@utils/eventsHelper';
-import type * as network from '../network';
+import type * as network from '../network.js';
 
 export class WKProvisionalPage {
   readonly _session: WKSession;

@@ -15,16 +15,16 @@
  */
 
 import { eventsHelper } from '@utils/eventsHelper';
-import { parseRawCookie } from '../cookieStore';
-import * as network from '../network';
-import * as bidi from './third_party/bidiProtocol';
+import { parseRawCookie } from '../cookieStore.js';
+import * as network from '../network.js';
+import * as bidi from './third_party/bidiProtocol.js';
 
 import type { RegisteredListener } from '@utils/eventsHelper';
-import type * as frames from '../frames';
-import type { Page } from '../page';
-import type * as types from '../types';
-import type { BidiSession } from './bidiConnection';
-import type { BidiPage } from './bidiPage';
+import type * as frames from '../frames.js';
+import type { Page } from '../page.js';
+import type * as types from '../types.js';
+import type { BidiSession } from './bidiConnection.js';
+import type { BidiPage } from './bidiPage.js';
 
 const REQUEST_BODY_HEADERS = new Set(['content-encoding', 'content-language', 'content-location', 'content-type']);
 

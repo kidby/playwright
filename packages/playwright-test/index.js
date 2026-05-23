@@ -14,4 +14,5 @@
  * limitations under the License.
  */
 
-module.exports = require('playwright/test');
+export * from 'playwright/test';
+export { default } from 'playwright/test';

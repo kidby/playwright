@@ -22,11 +22,11 @@ import yaml from 'yaml';
 import { tomlArray, tomlBasicString, tomlMultilineBasicString } from '@isomorphic/stringUtils';
 import { mkdirIfNeeded } from '@utils/fileUtils';
 
-import { defaultSeedFile, findSeedFile, seedFileContent, seedProject } from '../mcp/test/seed';
-import { parseAgentSpec } from './agentParser';
+import { defaultSeedFile, findSeedFile, seedFileContent, seedProject } from '../mcp/test/seed.js';
+import { parseAgentSpec } from './agentParser.js';
 
-import type { AgentSpec } from './agentParser';
-import type { FullConfigInternal } from '../common';
+import type { AgentSpec } from './agentParser.js';
+import type { FullConfigInternal } from '../common/index.js';
 
 /* eslint-disable no-console */
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getFromENV, getAsBooleanFromENV } from './env';
+import { getFromENV, getAsBooleanFromENV } from './env.js';
 
 const _debugMode = getFromENV('PWDEBUG') || '';
 

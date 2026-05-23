@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import { AppiumClient   } from './appiumClient';
-import { AppLocator } from './appLocator';
-import { gestures  } from './gestures';
-import { convertPageSourceToSnapshot } from './snapshot';
-import { NATIVE_APP_CONTEXT, listWebViewContexts, switchToWebViewContext, waitForWebViewContext } from './webview';
+import { AppiumClient   } from './appiumClient.js';
+import { AppLocator } from './appLocator.js';
+import { gestures  } from './gestures.js';
+import { convertPageSourceToSnapshot } from './snapshot.js';
+import { NATIVE_APP_CONTEXT, listWebViewContexts, switchToWebViewContext, waitForWebViewContext } from './webview.js';
 
-import type { AppiumCapabilities, LocatorStrategy } from './appiumClient';
-import type { GestureApi, SwipeDirection } from './gestures';
-import type { WebViewContextDescriptor, WebViewSelector } from './webview';
+import type { AppiumCapabilities, LocatorStrategy } from './appiumClient.js';
+import type { GestureApi, SwipeDirection } from './gestures.js';
+import type { WebViewContextDescriptor, WebViewSelector } from './webview.js';
 
 export type AndroidKey = 'BACK' | 'HOME' | 'ENTER' | 'TAB' | 'DELETE' | 'SEARCH';
 

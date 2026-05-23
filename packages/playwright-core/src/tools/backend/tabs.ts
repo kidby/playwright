@@ -15,8 +15,8 @@
  */
 
 import * as z from 'zod';
-import { defineTool } from './tool';
-import { renderTabsMarkdown } from './response';
+import { defineTool } from './tool.js';
+import { renderTabsMarkdown } from './response.js';
 
 const browserTabs = defineTool({
   capability: 'core-tabs',

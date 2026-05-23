@@ -281,9 +281,31 @@ class EsbuildStep extends Step {
     options = {
       sourcemap: withSourceMaps ? 'linked' : false,
       platform: 'node',
-      format: 'cjs',
+      format: 'esm',
       ...options,
     };
+    // ESM bundles often pull in CJS deps that use `require(...)`, `__dirname`,
+    // and `__filename` internally (debug → require('tty'), open →
+    // path.join(__dirname, "xdg-open"), etc.). esbuild leaves those as-is in
+    // ESM mode, so we inject CJS-compat shims at the top of every bundled
+    // output. The injected `require` is also used by
+    // `dynamicImportToRequirePlugin`'s alias rewrites and
+    // `_rewriteVendoredImports`.
+    if (options.bundle && options.format === 'esm') {
+      const cjsCompat = [
+        `import { createRequire as __pwCreateRequire } from 'module';`,
+        `import { dirname as __pwDirname } from 'path';`,
+        `import { fileURLToPath as __pwFileURLToPath } from 'url';`,
+        `const require = __pwCreateRequire(import.meta.url);`,
+        `const __filename = __pwFileURLToPath(import.meta.url);`,
+        `const __dirname = __pwDirname(__filename);`,
+      ].join('\n') + '\n';
+      const existing = options.banner?.js ? options.banner.js + '\n' : '';
+      options.banner = {
+        ...options.banner,
+        js: cjsCompat + existing,
+      };
+    }
     this._watchPaths = watchPaths;
     if (options.bundle) {
       // For bundled outputs we always want a metafile so we can emit a
@@ -527,6 +549,7 @@ const dynamicImportToRequirePlugin = {
             (_, names) => `const {${names}} = require('playwright-core/lib/coreBundle').utils;`
         );
       }
+      // `require` is provided by the bundle-level banner (createRequire shim).
       return { contents, loader: 'ts' };
     });
   }
@@ -617,7 +640,7 @@ steps.push(new EsbuildStep({
   plugins: [{
     name: 'externalize-utilsBundle',
     setup: build => build.onResolve({ filter: /utilsBundle/ },
-        () => ({ path: './utilsBundle', external: true })),
+        () => ({ path: './utilsBundle.js', external: true })),
   }, dynamicImportToRequirePlugin],
 }, [playwrightCoreSrc]));
 
@@ -667,8 +690,8 @@ steps.push(new CustomCallbackStep(assertCoreBundleHasNoNodeModules));
     external: [
       'playwright-core',
       'playwright-core/*',
-      '../package',
-      '../globals',
+      '../package.js',
+      '../globals.js',
     ],
     plugins: [],
   }, [playwrightSrc]));
@@ -710,7 +733,20 @@ steps.push(new EsbuildStep({
   entryPoints: [filePath('packages/playwright/src/transform/babelBundle.ts')],
   outfile: filePath('packages/playwright/lib/transform/babelBundle.js'),
   external: [
-    '../package',
+    '../package.js',
+  ],
+  plugins: [dynamicImportToRequirePlugin],
+}, [filePath('packages/playwright/src')]));
+
+// playwright/lib/transform/oxcBundle.js — fast oxc-transform path used for
+// the common case (no user babel plugins). oxc-transform's native binding is
+// loaded via require, so we keep it external to avoid bundling the .node file.
+steps.push(new EsbuildStep({
+  bundle: true,
+  entryPoints: [filePath('packages/playwright/src/transform/oxcBundle.ts')],
+  outfile: filePath('packages/playwright/lib/transform/oxcBundle.js'),
+  external: [
+    'oxc-transform',
   ],
   plugins: [dynamicImportToRequirePlugin],
 }, [filePath('packages/playwright/src')]));
@@ -723,9 +759,9 @@ steps.push(new EsbuildStep({
   external: [
     'playwright-core',
     'playwright-core/*',
-    '../globals',
-    '../package',
-    '../babelBundle',
+    '../globals.js',
+    '../package.js',
+    '../babelBundle.js',
   ],
   plugins: [dynamicImportToRequirePlugin],
 }, [filePath('packages/playwright/src')]));
@@ -739,10 +775,10 @@ steps.push(new EsbuildStep({
     'playwright-core',
     'playwright-core/*',
     'playwright',
-    '../globals',
-    '../package',
-    '../utils',
-    '../matchers/expect',
+    '../globals.js',
+    '../package.js',
+    '../utils.js',
+    '../matchers/expect.js',
     '../transform/esmLoader.js',
   ],
   plugins: [dynamicImportToRequirePlugin],
@@ -756,15 +792,15 @@ steps.push(new EsbuildStep({
   external: [
     'playwright-core',
     'playwright-core/*',
-    '../common',
-    '../globals',
-    '../package',
-    '../util',
-    '../matchers/expect',
+    '../common.js',
+    '../globals.js',
+    '../package.js',
+    '../util.js',
+    '../matchers/expect.js',
     '../loader/loaderProcessEntry.js',
     '../worker/workerProcessEntry.js',
-    '../transform/babelBundle',
-    '../transform/esmLoader',
+    '../transform/babelBundle.js',
+    '../transform/esmLoader.js',
   ],
   // HMR: same flag as coreBundle; enables the html-reporter Vite dev server
   // in watch builds (reporters/html.ts lives in this bundle).
@@ -794,11 +830,11 @@ steps.push(new EsbuildStep({
   external: [
     'playwright-core',
     'playwright-core/*',
-    '../common',
-    '../globals',
-    '../package',
-    '../util',
-    '../transform/esmLoader',
+    '../common.js',
+    '../globals.js',
+    '../package.js',
+    '../util.js',
+    '../transform/esmLoader.js',
   ],
   plugins: [dynamicImportToRequirePlugin],
 }, [filePath('packages/playwright/src')]));
@@ -813,12 +849,12 @@ steps.push(new EsbuildStep({
   external: [
     'playwright-core',
     'playwright-core/*',
-    '../common',
-    '../globals',
-    '../package',
-    '../utils',
-    '../matchers/expect',
-    '../transform/esmLoader',
+    '../common.js',
+    '../globals.js',
+    '../package.js',
+    '../utils.js',
+    '../matchers/expect.js',
+    '../transform/esmLoader.js',
   ],
   plugins: [dynamicImportToRequirePlugin],
 }, [filePath('packages/playwright/src')]));

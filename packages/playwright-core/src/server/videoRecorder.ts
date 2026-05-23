@@ -23,13 +23,13 @@ import { createGuid } from '@utils/crypto';
 import { debugLogger } from '@utils/debugLogger';
 import { mkdirIfNeeded } from '@utils/fileUtils';
 import { monotonicTime } from '@isomorphic/time';
-import { Artifact } from './artifact';
-import { registry } from './registry';
+import { Artifact } from './artifact.js';
+import { registry } from './registry/index.js';
 
-import type * as types from './types';
+import type * as types from './types.js';
 import type { ChildProcess } from 'child_process';
-import type { Screencast, ScreencastClient } from './screencast';
-import type { Page } from './page';
+import type { Screencast, ScreencastClient } from './screencast.js';
+import type { Page } from './page.js';
 
 const fps = 25;
 

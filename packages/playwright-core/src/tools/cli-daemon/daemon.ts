@@ -22,18 +22,18 @@ import { decorateServer } from '@utils/network';
 import { makeSocketPath } from '@utils/fileUtils';
 import { gracefullyProcessExitDoNotHang } from '@utils/processLauncher';
 
-import { BrowserBackend } from '../backend/browserBackend';
-import { browserTools } from '../backend/tools';
-import { parseCommand } from './command';
-import { commands } from './commands';
+import { BrowserBackend } from '../backend/browserBackend.js';
+import { browserTools } from '../backend/tools.js';
+import { parseCommand } from './command.js';
+import { commands } from './commands.js';
 
-import { SocketConnection } from '../utils/socketConnection';
-import type * as playwright from '../../..';
-import type { SessionConfig, ClientInfo } from '../cli-client/registry';
-import type { CallToolRequest, CallToolResult } from '../backend/tool';
-import type { ContextConfig } from '../backend/context';
-import type { BrowserInfo } from '../../serverRegistry';
-import type { ClientInfo as McpClientInfo } from '../utils/mcp/server';
+import { SocketConnection } from '../utils/socketConnection.js';
+import type * as playwright from '../../../index.js';
+import type { SessionConfig, ClientInfo } from '../cli-client/registry.js';
+import type { CallToolRequest, CallToolResult } from '../backend/tool.js';
+import type { ContextConfig } from '../backend/context.js';
+import type { BrowserInfo } from '../../serverRegistry.js';
+import type { ClientInfo as McpClientInfo } from '../utils/mcp/server.js';
 
 async function socketExists(socketPath: string): Promise<boolean> {
   try {

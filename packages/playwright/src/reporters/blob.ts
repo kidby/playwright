@@ -25,12 +25,12 @@ import { calculateSha1, createGuid } from '@utils/crypto';
 import { removeFolders, sanitizeForFilePath } from '@utils/fileUtils';
 import { getUserAgent } from 'playwright-core/lib/coreBundle';
 
-import { resolveOutputFile, CommonReporterOptions } from './base';
-import { TeleReporterEmitter } from './teleEmitter';
+import { resolveOutputFile, CommonReporterOptions } from './base.js';
+import { TeleReporterEmitter } from './teleEmitter.js';
 
 import type { BlobReporterOptions } from '../../types/test';
 import type { FullConfig, FullResult, TestCase, TestResult } from '../../types/testReporter';
-import type { BlobReportMetadata, JsonAttachment, JsonEvent } from '../isomorphic/teleReceiver';
+import type { BlobReportMetadata, JsonAttachment, JsonEvent } from '../isomorphic/teleReceiver.js';
 import type { EventEmitter } from 'events';
 
 export const currentBlobReportVersion = 2;

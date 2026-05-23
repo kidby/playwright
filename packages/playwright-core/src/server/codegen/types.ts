@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { BrowserContextOptions, LaunchOptions } from '../../..';
+import type { BrowserContextOptions, LaunchOptions } from '../../../index.js';
 import type * as actions from '@recorder/actions';
 import type { Language } from '@isomorphic/locatorGenerators';
 export type { Language };

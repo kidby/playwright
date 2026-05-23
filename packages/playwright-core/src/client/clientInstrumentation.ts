@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import type { BrowserContext } from './browserContext';
-import type { APIRequestContext, NewContextOptions } from './fetch';
+import type { BrowserContext } from './browserContext.js';
+import type { APIRequestContext, NewContextOptions } from './fetch.js';
 import type { StackFrame } from '@protocol/channels';
-import type { Page } from './page';
-import type { BrowserContextOptions } from './types';
+import type { Page } from './page.js';
+import type { BrowserContextOptions } from './types.js';
 
 // Instrumentation can mutate the data, for example change apiName or stepId.
 export interface ApiCallData {

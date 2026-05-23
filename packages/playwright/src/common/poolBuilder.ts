@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { FixturePool } from './fixtures';
-import { formatLocation } from '../util';
+import { FixturePool } from './fixtures.js';
+import { formatLocation } from '../util.js';
 
-import type { FullProjectInternal } from './config';
-import type { LoadError } from './fixtures';
-import type { Suite, TestCase } from './test';
-import type { TestTypeImpl } from './testType';
+import type { FullProjectInternal } from './config.js';
+import type { LoadError } from './fixtures.js';
+import type { Suite, TestCase } from './test.js';
+import type { TestTypeImpl } from './testType.js';
 import type { TestError } from '../../types/testReporter';
 
 export class PoolBuilder {

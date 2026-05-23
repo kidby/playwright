@@ -19,7 +19,7 @@ import { ManualPromise } from '@isomorphic/manualPromise';
 import { httpRequest } from '@utils/network';
 
 import type { HTTPRequestParams } from '@utils/network';
-import type { Progress } from './progress';
+import type { Progress } from './progress.js';
 
 export async function fetchData(progress: Progress | undefined, params: HTTPRequestParams, onError?: (params: HTTPRequestParams, response: http.IncomingMessage) => Promise<Error>): Promise<string> {
   const promise = new ManualPromise<string>();

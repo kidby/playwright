@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import { buildAnnotatedImage, saveAnnotationAsDownload } from './annotationImage';
-import { buildAnnotationZip } from './annotationZip';
+import { buildAnnotatedImage, saveAnnotationAsDownload } from './annotationImage.js';
+import { buildAnnotationZip } from './annotationZip.js';
 
-import type { Annotation } from './annotations';
-import type { DashboardChannel, DashboardChannelEvents, MouseButton, SessionStatus, SubmittedAnnotationFrame, Tab } from './dashboardChannel';
-import type { ClientInfo } from '../../playwright-core/src/tools/cli-client/registry';
-import type { BrowserDescriptor } from '../../playwright-core/src/serverRegistry';
+import type { Annotation } from './annotations.js';
+import type { DashboardChannel, DashboardChannelEvents, MouseButton, SessionStatus, SubmittedAnnotationFrame, Tab } from './dashboardChannel.js';
+import type { ClientInfo } from '../../playwright-core/src/tools/cli-client/registry.js';
+import type { BrowserDescriptor } from '../../playwright-core/src/serverRegistry.js';
 
-export type { SessionStatus } from './dashboardChannel';
+export type { SessionStatus } from './dashboardChannel.js';
 
 export type Mode = 'readonly' | 'interactive' | 'annotate';
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as yauzl from './third_party/yauzl';
-import type { Entry, ZipFile as UnzipFile } from './third_party/yauzl';
+import * as yauzl from './third_party/yauzl/index.js';
+import type { Entry, ZipFile as UnzipFile } from './third_party/yauzl/index.js';
 
 export class ZipFile {
   private _fileName: string;

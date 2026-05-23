@@ -17,13 +17,13 @@
 
 import { MultiMap } from '@isomorphic/multimap';
 import { assert } from '@isomorphic/assert';
-import { helper } from './helper';
+import { helper } from './helper.js';
 
-import type * as dom from './dom';
-import type { Frame } from './frames';
-import type { Page } from './page';
-import type { Progress } from './progress';
-import type * as types from './types';
+import type * as dom from './dom.js';
+import type { Frame } from './frames.js';
+import type { Page } from './page.js';
+import type { Progress } from './progress.js';
+import type * as types from './types.js';
 import type { Rect } from '@isomorphic/types';
 import type { ParsedSelector } from '@isomorphic/selectorParser';
 

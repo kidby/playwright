@@ -26,8 +26,8 @@ import { launchProcess } from '@utils/processLauncher';
 
 import type { TestRunnerPlugin, TestRunnerPluginRegistration } from '.';
 import type { FullConfig } from '../../types/testReporter';
-import type { FullConfigInternal } from '../common';
-import type { ReporterV2 } from '../reporters/reporterV2';
+import type { FullConfigInternal } from '../common/index.js';
+import type { ReporterV2 } from '../reporters/reporterV2.js';
 
 export type WebServerPluginOptions = {
   command: string;

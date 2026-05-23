@@ -18,11 +18,11 @@ import { spawn } from 'child_process';
 
 import * as z from 'zod';
 
-import { libPath } from '../../package';
-import { defineTabTool, defineTool } from './tool';
-import { elementSchema, optionalElementSchema } from './snapshot';
+import { libPath } from '../../package.js';
+import { defineTabTool, defineTool } from './tool.js';
+import { elementSchema, optionalElementSchema } from './snapshot.js';
 
-import type { AnnotateResult } from '../dashboard/dashboardController';
+import type { AnnotateResult } from '../dashboard/dashboardController.js';
 
 const resume = defineTool({
   capability: 'devtools',

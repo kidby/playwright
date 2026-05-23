@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import type { ElementHandle } from './elementHandle';
-import type { Page } from './page';
-import type { FilePayload, TimeoutOptions } from './types';
+import type { ElementHandle } from './elementHandle.js';
+import type { Page } from './page.js';
+import type { FilePayload, TimeoutOptions } from './types.js';
 import type * as api from '../../types/types';
 import type * as channels from '@protocol/channels';
 

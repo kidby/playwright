@@ -18,12 +18,12 @@
 import { assert } from '@isomorphic/assert';
 import { rewriteErrorMessage } from '@isomorphic/stackTrace';
 import { parseEvaluationResultValue } from '@isomorphic/utilityScriptSerializers';
-import { getExceptionMessage, releaseObject } from './crProtocolHelper';
-import * as js from '../javascript';
-import * as dom from '../dom';
-import { isSessionClosedError } from '../protocolError';
+import { getExceptionMessage, releaseObject } from './crProtocolHelper.js';
+import * as js from '../javascript.js';
+import * as dom from '../dom.js';
+import { isSessionClosedError } from '../protocolError.js';
 
-import type { CRSession } from './crConnection';
+import type { CRSession } from './crConnection.js';
 import type { Protocol } from './protocol';
 
 export class CRExecutionContext implements js.ExecutionContextDelegate {

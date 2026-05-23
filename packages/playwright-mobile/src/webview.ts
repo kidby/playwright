@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { AppiumClient } from './appiumClient';
+import type { AppiumClient } from './appiumClient.js';
 
 const DEFAULT_TIMEOUT_MS = 120_000;
 const DEFAULT_POLL_MS = 500;

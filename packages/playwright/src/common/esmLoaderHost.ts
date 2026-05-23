@@ -16,9 +16,9 @@
 
 import url from 'url';
 
-import { addToCompilationCache, serializeCompilationCache } from '../transform/compilationCache';
-import { PortTransport } from '../transform/portTransport';
-import { singleTSConfig, transformConfig } from '../transform/transform';
+import { addToCompilationCache, serializeCompilationCache } from '../transform/compilationCache.js';
+import { PortTransport } from '../transform/portTransport.js';
+import { singleTSConfig, transformConfig } from '../transform/transform.js';
 
 let loaderChannel: PortTransport | undefined;
 

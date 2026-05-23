@@ -20,16 +20,16 @@ import path from 'path';
 import mime from 'mime';
 
 import { isUnderTest } from '@utils/debug';
-import * as js from './javascript';
-import { prepareFilesForUpload } from './fileUploadUtils';
-import * as rawInjectedScriptSource from '../generated/injectedScriptSource';
+import * as js from './javascript.js';
+import { prepareFilesForUpload } from './fileUploadUtils.js';
+import * as rawInjectedScriptSource from '../generated/injectedScriptSource.js';
 
-import type * as frames from './frames';
+import type * as frames from './frames.js';
 import type { ElementState, HitTargetInterceptionResult, InjectedScript, InjectedScriptOptions } from '@injected/injectedScript';
-import type { Page } from './page';
-import type { Progress } from './progress';
-import type { ScreenshotOptions } from './screenshotter';
-import type * as types from './types';
+import type { Page } from './page.js';
+import type { Progress } from './progress.js';
+import type { ScreenshotOptions } from './screenshotter.js';
+import type * as types from './types.js';
 import type * as channels from '@protocol/channels';
 
 export type InputFilesItems = {

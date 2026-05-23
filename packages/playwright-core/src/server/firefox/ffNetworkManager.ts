@@ -16,14 +16,14 @@
  */
 
 import { eventsHelper } from '@utils/eventsHelper';
-import * as network from '../network';
+import * as network from '../network.js';
 
-import type { FFSession } from './ffConnection';
-import type { HeadersArray } from '../../server/types';
+import type { FFSession } from './ffConnection.js';
+import type { HeadersArray } from '../../server/types.js';
 import type { RegisteredListener } from '@utils/eventsHelper';
-import type * as frames from '../frames';
-import type { Page } from '../page';
-import type * as types from '../types';
+import type * as frames from '../frames.js';
+import type { Page } from '../page.js';
+import type * as types from '../types.js';
 import type { Protocol } from './protocol';
 
 export class FFNetworkManager {

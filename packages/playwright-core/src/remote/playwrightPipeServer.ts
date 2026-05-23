@@ -20,11 +20,11 @@ import fs from 'fs';
 import { debugLogger } from '@utils/debugLogger';
 import { decorateServer } from '@utils/network';
 import { Semaphore } from '@isomorphic/semaphore';
-import { PlaywrightConnection } from './playwrightConnection';
-import { SocketServerTransport } from './serverTransport';
-import { Browser } from '../server/browser';
+import { PlaywrightConnection } from './playwrightConnection.js';
+import { SocketServerTransport } from './serverTransport.js';
+import { Browser } from '../server/browser.js';
 
-import type { PlaywrightInitializeResult } from './playwrightConnection';
+import type { PlaywrightInitializeResult } from './playwrightConnection.js';
 
 export class PlaywrightPipeServer {
   private _server: net.Server | undefined;

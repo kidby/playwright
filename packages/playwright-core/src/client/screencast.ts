@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { Artifact } from './artifact';
-import { DisposableStub } from './disposable';
+import { Artifact } from './artifact.js';
+import { DisposableStub } from './disposable.js';
 
 import type * as api from '../../types/types';
-import type { Page } from './page';
+import type { Page } from './page.js';
 
 export class Screencast implements api.Screencast {
   private _page: Page;

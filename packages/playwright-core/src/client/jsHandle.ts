@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { ChannelOwner } from './channelOwner';
-import { isTargetClosedError } from './errors';
-import { parseSerializedValue, serializeValue } from '../protocol/serializers';
+import { ChannelOwner } from './channelOwner.js';
+import { isTargetClosedError } from './errors.js';
+import { parseSerializedValue, serializeValue } from '../protocol/serializers.js';
 
 import type * as structs from '../../types/structs';
 import type * as api from '../../types/types';

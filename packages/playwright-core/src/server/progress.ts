@@ -18,10 +18,10 @@ import { ManualPromise } from '@isomorphic/manualPromise';
 import { assert } from '@isomorphic/assert';
 import { monotonicTime } from '@isomorphic/time';
 import { debugLogger } from '@utils/debugLogger';
-import { TimeoutError } from './errors';
+import { TimeoutError } from './errors.js';
 
 import type { Progress } from '@protocol/progress';
-import type { CallMetadata, SdkObject } from './instrumentation';
+import type { CallMetadata, SdkObject } from './instrumentation.js';
 
 export type { Progress } from '@protocol/progress';
 

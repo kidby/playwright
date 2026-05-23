@@ -16,11 +16,11 @@
 
 import { monotonicTime } from '@isomorphic/time';
 import { isUnderTest } from '@utils/debug';
-import { generateFrameSelector } from './recorderUtils';
-import { nullProgress } from '../progress';
+import { generateFrameSelector } from './recorderUtils.js';
+import { nullProgress } from '../progress.js';
 
 import type { Signal } from '../../../../recorder/src/actions';
-import type { Frame } from '../frames';
+import type { Frame } from '../frames.js';
 import type * as actions from '@recorder/actions';
 
 export interface ProcessorDelegate {

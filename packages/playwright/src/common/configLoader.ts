@@ -19,14 +19,14 @@ import path from 'path';
 
 import { isRegExp } from '@isomorphic/rtti';
 
-import { requireOrImport, setSingleTSConfig, setTransformConfig } from '../transform/transform';
-import { errorWithFile, fileIsModule } from '../util';
-import { FullConfigInternal } from './config';
-import { configureESMLoader, configureESMLoaderTransformConfig, registerESMLoader } from './esmLoaderHost';
-import { addToCompilationCache } from '../transform/compilationCache';
+import { requireOrImport, setSingleTSConfig, setTransformConfig } from '../transform/transform.js';
+import { errorWithFile, fileIsModule } from '../util.js';
+import { FullConfigInternal } from './config.js';
+import { configureESMLoader, configureESMLoaderTransformConfig, registerESMLoader } from './esmLoaderHost.js';
+import { addToCompilationCache } from '../transform/compilationCache.js';
 
-import type { ConfigLocation } from './config';
-import type { ConfigCLIOverrides, SerializedConfig } from './ipc';
+import type { ConfigLocation } from './config.js';
+import type { ConfigCLIOverrides, SerializedConfig } from './ipc.js';
 import type { Config, Project } from '../../types/test';
 
 const kDefineConfigWasUsed = Symbol('defineConfigWasUsed');

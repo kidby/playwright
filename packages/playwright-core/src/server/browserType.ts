@@ -25,22 +25,22 @@ import { debugMode } from '@utils/debug';
 import { existsAsync } from '@utils/fileUtils';
 import { envArrayToObject, launchProcess } from '@utils/processLauncher';
 import { RecentLogsCollector } from '@utils/debugLogger';
-import { normalizeProxySettings, validateBrowserContextOptions } from './browserContext';
-import { helper } from './helper';
-import { SdkObject } from './instrumentation';
-import { PipeTransport } from './pipeTransport';
-import { isProtocolError } from './protocolError';
-import { registry } from './registry';
-import { ClientCertificatesProxy } from './socksClientCertificatesInterceptor';
-import { WebSocketTransport } from './transport';
+import { normalizeProxySettings, validateBrowserContextOptions } from './browserContext.js';
+import { helper } from './helper.js';
+import { SdkObject } from './instrumentation.js';
+import { PipeTransport } from './pipeTransport.js';
+import { isProtocolError } from './protocolError.js';
+import { registry } from './registry/index.js';
+import { ClientCertificatesProxy } from './socksClientCertificatesInterceptor.js';
+import { WebSocketTransport } from './transport.js';
 
-import type { Browser, BrowserOptions, BrowserProcess } from './browser';
-import type { BrowserContext } from './browserContext';
-import type { Worker } from './page';
-import type { Progress } from './progress';
-import type { BrowserName } from './registry';
-import type { ConnectionTransport } from './transport';
-import type * as types from './types';
+import type { Browser, BrowserOptions, BrowserProcess } from './browser.js';
+import type { BrowserContext } from './browserContext.js';
+import type { Worker } from './page.js';
+import type { Progress } from './progress.js';
+import type { BrowserName } from './registry/index.js';
+import type { ConnectionTransport } from './transport.js';
+import type * as types from './types.js';
 import type * as channels from '@protocol/channels';
 
 export const kNoXServerRunningError = 'Looks like you launched a headed browser without having a XServer running.\n' +

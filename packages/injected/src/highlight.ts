@@ -21,7 +21,7 @@ import highlightCSS from './highlight.css?inline';
 
 import type { Language } from '@isomorphic/locatorGenerators';
 import type { ParsedSelector } from '@isomorphic/selectorParser';
-import type { InjectedScript } from './injectedScript';
+import type { InjectedScript } from './injectedScript.js';
 
 
 type Rect = { x: number, y: number, width: number, height: number };

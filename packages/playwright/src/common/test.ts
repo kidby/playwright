@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { rootTestType } from './testType';
-import { computeTestCaseOutcome } from '../isomorphic/teleReceiver';
+import { rootTestType } from './testType.js';
+import { computeTestCaseOutcome } from '../isomorphic/teleReceiver.js';
 
-import type { FixturesWithLocation, FullProjectInternal } from './config';
-import type { FixturePool } from './fixtures';
-import type { TestTypeImpl } from './testType';
+import type { FixturesWithLocation, FullProjectInternal } from './config.js';
+import type { FixturePool } from './fixtures.js';
+import type { TestTypeImpl } from './testType.js';
 import type { TestAnnotation } from '../../types/test';
 import type * as reporterTypes from '../../types/testReporter';
 import type { FullProject, Location } from '../../types/testReporter';

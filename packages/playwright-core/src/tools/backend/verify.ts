@@ -17,8 +17,8 @@
 import * as z from 'zod';
 import { escapeWithQuotes } from '@isomorphic/stringUtils';
 
-import { defineTabTool } from './tool';
-import type * as playwright from '../../..';
+import { defineTabTool } from './tool.js';
+import type * as playwright from '../../../index.js';
 
 const verifyElement = defineTabTool({
   capability: 'testing',

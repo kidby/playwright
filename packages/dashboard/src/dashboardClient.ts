@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { Transport } from './transport';
+import { Transport } from './transport.js';
 
-import type { DashboardChannel } from './dashboardChannel';
+import type { DashboardChannel } from './dashboardChannel.js';
 
 export type DashboardClientChannel = DashboardChannel & {
   onopen?: () => void;

@@ -31,7 +31,7 @@ import type { RawStack } from '@isomorphic/stackTrace';
 import type { Location } from './../types/testReporter';
 import type { TestInfoError } from './../types/test';
 import type { StackFrame } from '@protocol/channels';
-import type { TestCase } from './common/test';
+import type { TestCase } from './common/test.js';
 
 const PLAYWRIGHT_TEST_PATH = path.join(__dirname, '..');
 const PLAYWRIGHT_CORE_PATH = path.dirname(require.resolve('playwright-core/package.json'));

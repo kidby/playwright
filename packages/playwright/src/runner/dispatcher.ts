@@ -18,16 +18,16 @@ import colors from 'picocolors';
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { eventsHelper } from '@utils/eventsHelper';
 
-import { addSuggestedRebaseline } from './rebase';
-import { WorkerHost } from './workerHost';
-import { ipc, test as testNs } from '../common';
-import { addLocationAndSnippetToError } from '../reporters/internalReporter';
-import { serializeError } from '../util';
+import { addSuggestedRebaseline } from './rebase.js';
+import { WorkerHost } from './workerHost.js';
+import { ipc, test as testNs } from '../common/index.js';
+import { addLocationAndSnippetToError } from '../reporters/internalReporter.js';
+import { serializeError } from '../util.js';
 
 import type { RegisteredListener } from '@utils/eventsHelper';
-import type { ProcessExitData } from './processHost';
-import type { TestRun } from './tasks';
-import type { TestGroup } from './testGroups';
+import type { ProcessExitData } from './processHost.js';
+import type { TestRun } from './tasks.js';
+import type { TestGroup } from './testGroups.js';
 import type { TestError, TestResult, TestStep } from '../../types/testReporter';
 
 export type EnvByProjectId = Map<string, Record<string, string | undefined>>;

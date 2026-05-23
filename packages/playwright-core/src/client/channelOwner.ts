@@ -16,14 +16,14 @@
 
 import { getMetainfo } from '@isomorphic/protocolMetainfo';
 import { stringifyStackFrames } from '@isomorphic/stackTrace';
-import { EventEmitter } from './eventEmitter';
-import { ValidationError, maybeFindValidator  } from '../protocol/validator';
-import { captureLibraryStackTrace } from './clientStackTrace';
+import { EventEmitter } from './eventEmitter.js';
+import { ValidationError, maybeFindValidator  } from '../protocol/validator.js';
+import { captureLibraryStackTrace } from './clientStackTrace.js';
 
-import type { ClientInstrumentation } from './clientInstrumentation';
-import type { Connection } from './connection';
-import type { Logger } from './types';
-import type { ValidatorContext } from '../protocol/validator';
+import type { ClientInstrumentation } from './clientInstrumentation.js';
+import type { Connection } from './connection.js';
+import type { Logger } from './types.js';
+import type { ValidatorContext } from '../protocol/validator.js';
 import type { Platform } from '@isomorphic/platform';
 import type * as channels from '@protocol/channels';
 

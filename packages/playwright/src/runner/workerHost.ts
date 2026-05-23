@@ -19,11 +19,11 @@ import path from 'path';
 
 import { removeFolders } from '@utils/fileUtils';
 
-import { ProcessHost } from './processHost';
-import { ipc } from '../common';
-import { artifactsFolderName } from '../isomorphic/folders';
+import { ProcessHost } from './processHost.js';
+import { ipc } from '../common/index.js';
+import { artifactsFolderName } from '../isomorphic/folders.js';
 
-import type { TestGroup } from './testGroups';
+import type { TestGroup } from './testGroups.js';
 
 
 let lastWorkerIndex = 0;

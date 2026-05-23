@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-import type * as input from '../input';
-import type { Page } from '../page';
-import type { Progress } from '../progress';
-import type * as types from '../types';
-import type { FFSession } from './ffConnection';
+import type * as input from '../input.js';
+import type { Page } from '../page.js';
+import type { Progress } from '../progress.js';
+import type * as types from '../types.js';
+import type { FFSession } from './ffConnection.js';
 
 // Firefox exposes AudioVolume* as KeyboardEvent.key values, but synthesized
 // volume keys need Firefox-specific code/keyCode values (Volume* and 181-183).

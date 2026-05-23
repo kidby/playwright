@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { expectTypes, formatMatcherMessage, printReceivedStringContainExpectedResult, printReceivedStringContainExpectedSubstring } from './matcherHint';
+import { expectTypes, formatMatcherMessage, printReceivedStringContainExpectedResult, printReceivedStringContainExpectedSubstring } from './matcherHint.js';
 
-import type { MatcherResult } from './matcherHint';
+import type { MatcherResult } from './matcherHint.js';
 import type { Page, Locator } from 'playwright-core';
 import type { ExpectResult } from 'playwright-core/lib/client/frame';
-import type { ExpectMatcherStateInternal } from './matchers';
+import type { ExpectMatcherStateInternal } from './matchers.js';
 
 export async function toMatchText(
   this: ExpectMatcherStateInternal,

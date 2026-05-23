@@ -18,12 +18,12 @@ import path from 'path';
 
 import { createGuid } from '@utils/crypto';
 
-import { serializeRegexPatterns } from '../isomorphic/teleReceiver';
+import { serializeRegexPatterns } from '../isomorphic/teleReceiver.js';
 
-import type { ReporterV2 } from './reporterV2';
+import type { ReporterV2 } from './reporterV2.js';
 import type * as reporterTypes from '../../types/testReporter';
 import type { TestAnnotation } from '../../types/test';
-import type * as teleReceiver from '../isomorphic/teleReceiver';
+import type * as teleReceiver from '../isomorphic/teleReceiver.js';
 
 export type TeleReporterEmitterOptions = {
   omitOutput?: boolean;

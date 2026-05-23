@@ -16,13 +16,13 @@
  */
 
 import { isString } from '@isomorphic/stringUtils';
-import * as input from '../input';
-import { macEditingCommands } from '../macEditingCommands';
+import * as input from '../input.js';
+import { macEditingCommands } from '../macEditingCommands.js';
 
-import type * as types from '../types';
-import type { WKSession } from './wkConnection';
-import type { Page } from '../page';
-import type { Progress } from '../progress';
+import type * as types from '../types.js';
+import type { WKSession } from './wkConnection.js';
+import type { Page } from '../page.js';
+import type { Progress } from '../progress.js';
 
 function toModifiersMask(modifiers: Set<types.KeyboardModifier>): number {
   // From Source/WebKit/Shared/WebEvent.h

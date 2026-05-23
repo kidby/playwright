@@ -25,12 +25,12 @@ import dotenv from 'dotenv';
 import { program } from 'commander';
 import { gracefullyProcessExitDoNotHang } from '@utils/processLauncher';
 import { ManualPromise } from '@isomorphic/manualPromise';
-import { playwright } from '../inprocess';
-import type { Browser } from '../client/browser';
-import type { BrowserContext } from '../client/browserContext';
-import type { BrowserType } from '../client/browserType';
-import type { Page } from '../client/page';
-import type { BrowserContextOptions, LaunchOptions } from '../client/types';
+import { playwright } from '../inprocess.js';
+import type { Browser } from '../client/browser.js';
+import type { BrowserContext } from '../client/browserContext.js';
+import type { BrowserType } from '../client/browserType.js';
+import type { Page } from '../client/page.js';
+import type { BrowserContextOptions, LaunchOptions } from '../client/types.js';
 
 export type Options = {
   browser: string;

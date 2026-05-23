@@ -17,15 +17,15 @@
 import path from 'path';
 import util from 'util';
 
-import * as esmLoaderHost from './esmLoaderHost';
-import { isWorkerProcess, setCurrentlyLoadingFileSuite } from '../globals';
-import { Suite } from './test';
-import { startCollectingFileDeps, stopCollectingFileDeps } from '../transform/compilationCache';
-import { requireOrImport } from '../transform/transform';
-import { filterStackTrace } from '../util';
+import * as esmLoaderHost from './esmLoaderHost.js';
+import { isWorkerProcess, setCurrentlyLoadingFileSuite } from '../globals.js';
+import { Suite } from './test.js';
+import { startCollectingFileDeps, stopCollectingFileDeps } from '../transform/compilationCache.js';
+import { requireOrImport } from '../transform/transform.js';
+import { filterStackTrace } from '../util.js';
 
 import type { TestError } from '../../types/testReporter';
-import type { FullConfigInternal } from './config';
+import type { FullConfigInternal } from './config.js';
 
 export const defaultTimeout = 30000;
 

@@ -26,7 +26,7 @@ import { assert } from '@isomorphic/assert';
 import { calculateSha1 } from '@utils/crypto';
 import { ZipFile } from '@utils/zipFile';
 import { removeFolders, resolveWithinRoot } from '@utils/fileUtils';
-import { HarBackend } from './harBackend';
+import { HarBackend } from './harBackend.js';
 import type * as channels from '@protocol/channels';
 import type * as har from '@trace/har';
 import type EventEmitter from 'events';

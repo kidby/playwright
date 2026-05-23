@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { ChannelOwner } from './channelOwner';
-import { Page } from './page';
-import { isTargetClosedError } from './errors';
+import { ChannelOwner } from './channelOwner.js';
+import { Page } from './page.js';
+import { isTargetClosedError } from './errors.js';
 
 import type * as api from '../../types/types';
 import type * as channels from '@protocol/channels';

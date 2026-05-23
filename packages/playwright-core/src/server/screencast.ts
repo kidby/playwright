@@ -17,12 +17,12 @@
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { renderTitleForCall } from '@isomorphic/protocolFormatter';
 import { debugLogger } from '@utils/debugLogger';
-import { Page } from './page';
-import { nullProgress } from './progress';
-import { ElementHandle } from './dom';
+import { Page } from './page.js';
+import { nullProgress } from './progress.js';
+import { ElementHandle } from './dom.js';
 
-import type { CallMetadata, InstrumentationListener, SdkObject } from './instrumentation';
-import type * as types from './types';
+import type { CallMetadata, InstrumentationListener, SdkObject } from './instrumentation.js';
+import type * as types from './types.js';
 
 export type ScreencastClient = {
   onFrame: (frame: types.ScreencastFrame) => Promise<void> | void;

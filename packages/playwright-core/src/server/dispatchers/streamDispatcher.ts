@@ -15,10 +15,10 @@
  */
 
 import { ManualPromise } from '@isomorphic/manualPromise';
-import { Dispatcher } from './dispatcher';
-import { SdkObject } from '../instrumentation';
+import { Dispatcher } from './dispatcher.js';
+import { SdkObject } from '../instrumentation.js';
 
-import type { ArtifactDispatcher } from './artifactDispatcher';
+import type { ArtifactDispatcher } from './artifactDispatcher.js';
 import type * as channels from '@protocol/channels';
 import type * as stream from 'stream';
 import type { Progress } from '@protocol/progress';

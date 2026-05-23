@@ -17,16 +17,16 @@
 import yaml from 'yaml';
 import { parseAriaSnapshotUnsafe } from '@isomorphic/ariaSnapshot';
 import { renderTitleForCall } from '@isomorphic/protocolFormatter';
-import { Frame } from '../frames';
-import { Dispatcher } from './dispatcher';
-import { ElementHandleDispatcher } from './elementHandlerDispatcher';
-import { parseArgument, serializeResult } from './jsHandleDispatcher';
-import { ResponseDispatcher } from './networkDispatchers';
-import { RequestDispatcher } from './networkDispatchers';
-import type { Progress } from '../progress';
-import type { BrowserContextDispatcher } from './browserContextDispatcher';
-import type { PageDispatcher } from './pageDispatcher';
-import type { NavigationEvent } from '../frames';
+import { Frame } from '../frames.js';
+import { Dispatcher } from './dispatcher.js';
+import { ElementHandleDispatcher } from './elementHandlerDispatcher.js';
+import { parseArgument, serializeResult } from './jsHandleDispatcher.js';
+import { ResponseDispatcher } from './networkDispatchers.js';
+import { RequestDispatcher } from './networkDispatchers.js';
+import type { Progress } from '../progress.js';
+import type { BrowserContextDispatcher } from './browserContextDispatcher.js';
+import type { PageDispatcher } from './pageDispatcher.js';
+import type { NavigationEvent } from '../frames.js';
 import type * as channels from '@protocol/channels';
 
 export class FrameDispatcher extends Dispatcher<Frame, channels.FrameChannel, BrowserContextDispatcher | PageDispatcher> implements channels.FrameChannel {

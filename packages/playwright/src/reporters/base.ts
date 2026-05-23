@@ -25,10 +25,10 @@ import { parseErrorStack } from '@isomorphic/stackTrace';
 import { getPackageManagerExecCommand } from '@utils/env';
 import { fitToWidth } from '@utils/stringWidth';
 
-import { resolveReporterOutputPath, stripAnsiEscapes } from '../util';
+import { resolveReporterOutputPath, stripAnsiEscapes } from '../util.js';
 
 import type { Colors } from '@isomorphic/colors';
-import type { ReporterV2 } from './reporterV2';
+import type { ReporterV2 } from './reporterV2.js';
 import type { FullConfig, FullResult, Location, Suite, TestCase, TestError, TestResult, TestStep } from '../../types/testReporter';
 
 const realColors: Colors = { ...pc, enabled: pc.isColorSupported, grey: pc.gray };

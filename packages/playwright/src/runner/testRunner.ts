@@ -24,24 +24,24 @@ import { ManualPromise } from '@isomorphic/manualPromise';
 import { setPlaywrightTestProcessEnv } from '@utils/env';
 import { gracefullyProcessExitDoNotHang } from '@utils/processLauncher';
 
-import { cc, configLoader, FullConfigInternal, ipc } from '../common';
-import { FSWatcher } from './fsWatcher';
-import { baseFullConfig } from '../isomorphic/teleReceiver';
-import { addGitCommitInfoPlugin } from '../plugins/gitCommitInfoPlugin';
-import { webServerPluginsForConfig } from '../plugins/webServerPlugin';
-import { internalScreen } from '../reporters/base';
-import { InternalReporter } from '../reporters/internalReporter';
-import { serializeError } from '../util';
-import { createErrorCollectingReporter, createReporters } from './reporters';
-import { TestRun, createApplyRebaselinesTask, createClearCacheTask, createGlobalSetupTasks, createListFilesTask, createLoadTask, createPluginSetupTasks, createReportBeginTask, createRunTestsTasks, runTasks, runTasksDeferCleanup } from './tasks';
-import { LastRunReporter } from './lastRun';
-import { filterProjects } from './projectUtils';
+import { cc, configLoader, FullConfigInternal, ipc } from '../common/index.js';
+import { FSWatcher } from './fsWatcher.js';
+import { baseFullConfig } from '../isomorphic/teleReceiver.js';
+import { addGitCommitInfoPlugin } from '../plugins/gitCommitInfoPlugin.js';
+import { webServerPluginsForConfig } from '../plugins/webServerPlugin.js';
+import { internalScreen } from '../reporters/base.js';
+import { InternalReporter } from '../reporters/internalReporter.js';
+import { serializeError } from '../util.js';
+import { createErrorCollectingReporter, createReporters } from './reporters.js';
+import { TestRun, createApplyRebaselinesTask, createClearCacheTask, createGlobalSetupTasks, createListFilesTask, createLoadTask, createPluginSetupTasks, createReportBeginTask, createRunTestsTasks, runTasks, runTasksDeferCleanup } from './tasks.js';
+import { LastRunReporter } from './lastRun.js';
+import { filterProjects } from './projectUtils.js';
 
-import type { TestPausedParams, TestRunOptions } from './tasks';
+import type { TestPausedParams, TestRunOptions } from './tasks.js';
 import type * as reporterTypes from '../../types/testReporter';
-import type { ConfigLocation } from '../common';
-import type { TestRunnerPluginRegistration } from '../plugins';
-import type { AnyReporter } from '../reporters/reporterV2';
+import type { ConfigLocation } from '../common/index.js';
+import type { TestRunnerPluginRegistration } from '../plugins/index.js';
+import type { AnyReporter } from '../reporters/reporterV2.js';
 
 export const TestRunnerEvent = {
   TestFilesChanged: 'testFilesChanged',

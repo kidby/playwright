@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import { resolveConfig } from './config';
-import { filteredTools } from '../backend/tools';
-import { createBrowserWithInfo } from './browserFactory';
-import { BrowserBackend } from '../backend/browserBackend';
-import { createServer } from '../utils/mcp/server';
-import { packageJSON } from '../../package';
+import { resolveConfig } from './config.js';
+import { filteredTools } from '../backend/tools.js';
+import { createBrowserWithInfo } from './browserFactory.js';
+import { BrowserBackend } from '../backend/browserBackend.js';
+import { createServer } from '../utils/mcp/server.js';
+import { packageJSON } from '../../package.js';
 
 import type { BrowserContext } from 'playwright';
 import type { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import type { ClientInfo, ServerBackendFactory } from '../utils/mcp/server';
-import type { Config } from './config.d';
+import type { ClientInfo, ServerBackendFactory } from '../utils/mcp/server.js';
+import type { Config } from './config.d.js';
 
 export async function createConnection(userConfig: Config = {}, contextGetter?: () => Promise<BrowserContext>): Promise<Server> {
   const config = await resolveConfig(userConfig);

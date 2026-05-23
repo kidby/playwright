@@ -23,12 +23,12 @@ import { isString } from '@isomorphic/stringUtils';
 import { compareBuffersOrStrings, getComparator } from '@utils/comparators';
 import { addSuffixToFilePath } from '@utils/fileUtils';
 
-import { callLogText, expectTypes, formatMatcherMessage } from './matcherHint';
-import { expectConfig } from './expect';
+import { callLogText, expectTypes, formatMatcherMessage } from './matcherHint.js';
+import { expectConfig } from './expect.js';
 
-import type { MatcherAttachment, MatcherResult } from './matcherHint';
-import type { ExpectMatcherStateInternal } from './matchers';
-import type { ExpectTestInfo } from './expect';
+import type { MatcherAttachment, MatcherResult } from './matcherHint.js';
+import type { ExpectMatcherStateInternal } from './matchers.js';
+import type { ExpectTestInfo } from './expect.js';
 import type { Locator, Page } from 'playwright-core';
 import type { ExpectScreenshotOptions, Page as PageEx } from 'playwright-core/lib/client/page';
 import type { Comparator, ImageComparatorOptions } from '@utils/comparators';

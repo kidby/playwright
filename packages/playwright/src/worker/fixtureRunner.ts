@@ -17,11 +17,11 @@
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { escapeWithQuotes } from '@isomorphic/stringUtils';
 
-import { fixtures } from '../common';
-import { filterStackFile, formatLocation } from '../util';
+import { fixtures } from '../common/index.js';
+import { filterStackFile, formatLocation } from '../util.js';
 
-import type { TestInfoImpl } from './testInfo';
-import type { FixtureDescription, RunnableDescription } from './timeoutManager';
+import type { TestInfoImpl } from './testInfo.js';
+import type { FixtureDescription, RunnableDescription } from './timeoutManager.js';
 import type { WorkerInfo } from '../../types/test';
 import type { Location } from '../../types/testReporter';
 

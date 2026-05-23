@@ -16,7 +16,7 @@
 
 import { normalizeWhiteSpace } from '@isomorphic/stringUtils';
 
-import { getAriaLabelledByElements } from './roleUtils';
+import { getAriaLabelledByElements } from './roleUtils.js';
 
 import type { AttributeSelectorPart } from '@isomorphic/selectorParser';
 

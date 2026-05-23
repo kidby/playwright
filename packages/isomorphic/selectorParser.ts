@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { InvalidSelectorError, parseCSS } from './cssParser';
+import { InvalidSelectorError, parseCSS } from './cssParser.js';
 
-import type { CSSComplexSelectorList } from './cssParser';
-export { InvalidSelectorError, isInvalidSelectorError } from './cssParser';
+import type { CSSComplexSelectorList } from './cssParser.js';
+export { InvalidSelectorError, isInvalidSelectorError } from './cssParser.js';
 
 export type NestedSelectorBody = { parsed: ParsedSelector, distance?: number };
 const kNestedSelectorNames = new Set(['internal:has', 'internal:has-not', 'internal:and', 'internal:or', 'internal:chain', 'left-of', 'right-of', 'above', 'below', 'near']);

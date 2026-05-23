@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { captureRawStack } from './stackTrace';
+import { captureRawStack } from './stackTrace.js';
 
 export class ManualPromise<T = void> extends Promise<T> {
   private _resolve!: (t: T) => void;

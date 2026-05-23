@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { SelectorEngine, SelectorRoot } from './selectorEngine';
+import type { SelectorEngine, SelectorRoot } from './selectorEngine.js';
 
 export const XPathEngine: SelectorEngine = {
   queryAll(root: SelectorRoot, selector: string): Element[] {

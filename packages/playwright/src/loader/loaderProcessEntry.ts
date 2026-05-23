@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { startProcessRunner } from '../common';
-import { create } from './loaderMain';
+import { startProcessRunner } from '../common/index.js';
+import { create } from './loaderMain.js';
 
 startProcessRunner(create);

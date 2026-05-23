@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { TeleReporterEmitter } from '../reporters/teleEmitter';
+import { TeleReporterEmitter } from '../reporters/teleEmitter.js';
 
 class UIModeReporter extends TeleReporterEmitter {
   constructor(options: any) {

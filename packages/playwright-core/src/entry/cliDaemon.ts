@@ -15,6 +15,6 @@
  */
 
 import { program } from 'commander';
-import { tools } from '../coreBundle';
+import { tools } from '../coreBundle.js';
 tools.decorateCliDaemonProgram(program);
 void program.parseAsync();

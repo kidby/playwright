@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { debugLog } from './relayConnection';
-import { PendingConnections } from './pendingConnection';
-import { ConnectedTabGroup, cleanupStalePlaywrightGroups, isNonDebuggableUrl } from './connectedTabGroup';
+import { debugLog } from './relayConnection.js';
+import { PendingConnections } from './pendingConnection.js';
+import { ConnectedTabGroup, cleanupStalePlaywrightGroups, isNonDebuggableUrl } from './connectedTabGroup.js';
 
 type PageMessage = {
   type: 'connectionRequested';

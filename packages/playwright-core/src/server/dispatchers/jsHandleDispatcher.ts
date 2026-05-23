@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { Dispatcher } from './dispatcher';
-import { ElementHandleDispatcher } from './elementHandlerDispatcher';
-import { parseSerializedValue, serializeValue } from '../../protocol/serializers';
+import { Dispatcher } from './dispatcher.js';
+import { ElementHandleDispatcher } from './elementHandlerDispatcher.js';
+import { parseSerializedValue, serializeValue } from '../../protocol/serializers.js';
 
-import type * as js from '../javascript';
-import type { ElectronApplicationDispatcher } from './electronDispatcher';
-import type { FrameDispatcher } from './frameDispatcher';
-import type { PageDispatcher, WorkerDispatcher } from './pageDispatcher';
+import type * as js from '../javascript.js';
+import type { ElectronApplicationDispatcher } from './electronDispatcher.js';
+import type { FrameDispatcher } from './frameDispatcher.js';
+import type { PageDispatcher, WorkerDispatcher } from './pageDispatcher.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 

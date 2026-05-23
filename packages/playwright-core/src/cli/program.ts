@@ -16,21 +16,21 @@
 
 /* eslint-disable no-console */
 
-import '../bootstrap';
+import '../bootstrap.js';
 import { program } from 'commander';
 import { gracefullyProcessExitDoNotHang } from '@utils/processLauncher';
 import { getPackageManagerExecCommand } from '@utils/env';
-import { packageJSON } from '../package';
-import { addTraceCommands } from '../tools/trace/traceCli';
-import { runDriver, runServer, printApiJson, launchBrowserServer } from './driver';
-import { markDockerImage } from './installActions';
-import { open, codegen } from './browserActions';
-import { installBrowsers, uninstallBrowsers, installDeps } from './installActions';
-import { runTraceInBrowser, runTraceViewerApp } from '../server/trace/viewer/traceViewer';
-import { screenshot, pdf } from './browserActions';
-import { program as cliProgram } from '../tools/cli-client/program';
+import { packageJSON } from '../package.js';
+import { addTraceCommands } from '../tools/trace/traceCli.js';
+import { runDriver, runServer, printApiJson, launchBrowserServer } from './driver.js';
+import { markDockerImage } from './installActions.js';
+import { open, codegen } from './browserActions.js';
+import { installBrowsers, uninstallBrowsers, installDeps } from './installActions.js';
+import { runTraceInBrowser, runTraceViewerApp } from '../server/trace/viewer/traceViewer.js';
+import { screenshot, pdf } from './browserActions.js';
+import { program as cliProgram } from '../tools/cli-client/program.js';
 
-import type { TraceViewerServerOptions } from '../server/trace/viewer/traceViewer';
+import type { TraceViewerServerOptions } from '../server/trace/viewer/traceViewer.js';
 import type { Command } from 'commander';
 
 export function decorateProgram(program: Command) {

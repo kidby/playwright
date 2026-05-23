@@ -19,13 +19,13 @@ import { raceAgainstDeadline } from '@isomorphic/timeoutRunner';
 import { getPackageManagerExecCommand } from '@utils/env';
 import { currentZone } from '@utils/zones';
 
-import { currentTestInfo, currentlyLoadingFileSuite, setCurrentlyLoadingFileSuite } from '../globals';
-import { Suite, TestCase } from './test';
-import { expect } from '../matchers/expect';
-import { wrapFunctionWithLocation } from '../transform/transform';
-import { validateTestDetails } from './validators';
+import { currentTestInfo, currentlyLoadingFileSuite, setCurrentlyLoadingFileSuite } from '../globals.js';
+import { Suite, TestCase } from './test.js';
+import { expect } from '../matchers/expect.js';
+import { wrapFunctionWithLocation } from '../transform/transform.js';
+import { validateTestDetails } from './validators.js';
 
-import type { FixturesWithLocation } from './config';
+import type { FixturesWithLocation } from './config.js';
 import type { Fixtures, TestDetails, TestStepInfo, TestType } from '../../types/test';
 import type { Location } from '../../types/testReporter';
 

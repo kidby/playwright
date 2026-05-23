@@ -21,10 +21,10 @@ import * as z from 'zod';
 import { getExtensionForMimeType, isTextualMimeType } from '@isomorphic/mimeType';
 import { isRegexString } from '@isomorphic/rtti';
 
-import { defineTool, defineTabTool } from './tool';
+import { defineTool, defineTabTool } from './tool.js';
 
-import type { Response as ToolResponse } from './response';
-import type * as playwright from '../../..';
+import type { Response as ToolResponse } from './response.js';
+import type * as playwright from '../../../index.js';
 
 const requests = defineTabTool({
   capability: 'core',

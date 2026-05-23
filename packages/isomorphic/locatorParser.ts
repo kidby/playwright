@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { asLocators } from './locatorGenerators';
-import { encodeTestIdAttributeName } from './locatorUtils';
-import { parseSelector } from './selectorParser';
-import { escapeForAttributeSelector, escapeForTextSelector } from './stringUtils';
+import { asLocators } from './locatorGenerators.js';
+import { encodeTestIdAttributeName } from './locatorUtils.js';
+import { parseSelector } from './selectorParser.js';
+import { escapeForAttributeSelector, escapeForTextSelector } from './stringUtils.js';
 
-import type { Language, Quote } from './locatorGenerators';
+import type { Language, Quote } from './locatorGenerators.js';
 
 type TemplateParams = { quote: string, text: string }[];
 function parseLocator(locator: string, testIdAttributeName: string): { selector: string, preferredQuote: Quote | undefined } {

@@ -20,12 +20,12 @@ import fs from 'fs';
 import net from 'net';
 import os from 'os';
 import path from 'path';
-import { libPath } from '../../package';
-import { compareSemver, SocketConnection } from '../utils/socketConnection';
-import { resolveSessionName } from './registry';
+import { libPath } from '../../package.js';
+import { compareSemver, SocketConnection } from '../utils/socketConnection.js';
+import { resolveSessionName } from './registry.js';
 
-import type { SessionConfig, ClientInfo, SessionFile } from './registry';
-import type { MinimistArgs } from './minimist';
+import type { SessionConfig, ClientInfo, SessionFile } from './registry.js';
+import type { MinimistArgs } from './minimist.js';
 
 export class Session {
   readonly name: string;

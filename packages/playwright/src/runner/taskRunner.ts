@@ -19,11 +19,11 @@ import debug from 'debug';
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { monotonicTime } from '@isomorphic/time';
 
-import { SigIntWatcher } from './sigIntWatcher';
-import { serializeError } from '../util';
+import { SigIntWatcher } from './sigIntWatcher.js';
+import { serializeError } from '../util.js';
 
 import type { FullResult, TestError } from '../../types/testReporter';
-import type { InternalReporter } from '../reporters/internalReporter';
+import type { InternalReporter } from '../reporters/internalReporter.js';
 
 type TaskPhase<Context> = (context: Context, errors: TestError[], softErrors: TestError[]) => Promise<void> | void;
 export type Task<Context> = { title: string, setup?: TaskPhase<Context>, teardown?: TaskPhase<Context> };

@@ -16,8 +16,8 @@
 
 import { assert } from '@isomorphic/assert';
 import { resolveWithinRoot } from '@utils/fileUtils';
-import { Page } from './page';
-import { Artifact } from './artifact';
+import { Page } from './page.js';
+import { Artifact } from './artifact.js';
 
 export class Download {
   readonly artifact: Artifact;

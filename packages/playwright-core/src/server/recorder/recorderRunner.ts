@@ -15,14 +15,14 @@
  */
 
 import { serializeExpectedTextValues } from '@isomorphic/expectUtils';
-import { toKeyboardModifiers } from '../codegen/language';
-import { buildFullSelector, mainFrameForAction } from './recorderUtils';
-import { Progress } from '../progress';
+import { toKeyboardModifiers } from '../codegen/language.js';
+import { buildFullSelector, mainFrameForAction } from './recorderUtils.js';
+import { Progress } from '../progress.js';
 
-import type { Page } from '../page';
-import type * as types from '../types';
+import type { Page } from '../page.js';
+import type * as types from '../types.js';
 import type * as actions from '@recorder/actions';
-import type { Frame } from '../frames';
+import type { Frame } from '../frames.js';
 
 export async function performAction(progress: Progress, pageAliases: Map<Page, string>, actionInContext: actions.ActionInContext) {
   const mainFrame = mainFrameForAction(pageAliases, actionInContext);

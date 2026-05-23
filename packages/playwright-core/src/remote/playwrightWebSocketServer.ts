@@ -17,11 +17,11 @@
 import { debugLogger } from '@utils/debugLogger';
 import { WSServer } from '@utils/wsServer';
 import { Semaphore } from '@isomorphic/semaphore';
-import { PlaywrightConnection } from './playwrightConnection';
-import { WebSocketServerTransport } from './serverTransport';
-import { Browser } from '../server/browser';
+import { PlaywrightConnection } from './playwrightConnection.js';
+import { WebSocketServerTransport } from './serverTransport.js';
+import { Browser } from '../server/browser.js';
 
-import type { PlaywrightInitializeResult } from './playwrightConnection';
+import type { PlaywrightInitializeResult } from './playwrightConnection.js';
 
 export class PlaywrightWebSocketServer {
   private _wsServer: WSServer;

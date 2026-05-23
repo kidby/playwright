@@ -20,8 +20,8 @@ import path from 'path';
 import * as z from 'zod';
 import { isPathInside, resolveWithinRoot } from '@utils/fileUtils';
 
-import { defineTestTool } from './testTool';
-import { GeneratorJournal } from './testContext';
+import { defineTestTool } from './testTool.js';
+import { GeneratorJournal } from './testContext.js';
 
 export const setupPage = defineTestTool({
   schema: {

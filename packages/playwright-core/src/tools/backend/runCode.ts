@@ -20,7 +20,7 @@ import vm from 'vm';
 import * as z from 'zod';
 import { ManualPromise } from '@isomorphic/manualPromise';
 
-import { defineTabTool } from './tool';
+import { defineTabTool } from './tool.js';
 
 const codeSchema = z.object({
   code: z.string().optional().describe(`A JavaScript function containing Playwright code to execute. It will be invoked with a single argument, page, which you can use for any page interaction. For example: \`async (page) => { await page.getByRole('button', { name: 'Submit' }).click(); return await page.title(); }\``),

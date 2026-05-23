@@ -20,13 +20,13 @@ import { TraceLoader } from '@isomorphic/trace/traceLoader';
 import { gracefullyCloseAll } from '@utils/processLauncher';
 import { HttpServer } from '@utils/httpServer';
 import { SnapshotServer } from '@isomorphic/trace/snapshotServer';
-import { BrowserBackend } from '../backend/browserBackend';
-import { browserTools } from '../backend/tools';
-import { playwright } from '../../inprocess';
-import { parseCommand } from '../cli-daemon/command';
-import { minimist } from '../cli-client/minimist';
-import { commands } from '../cli-daemon/commands';
-import { loadTrace } from './traceUtils';
+import { BrowserBackend } from '../backend/browserBackend.js';
+import { browserTools } from '../backend/tools.js';
+import { playwright } from '../../inprocess.js';
+import { parseCommand } from '../cli-daemon/command.js';
+import { minimist } from '../cli-client/minimist.js';
+import { commands } from '../cli-daemon/commands.js';
+import { loadTrace } from './traceUtils.js';
 
 import type { SnapshotStorage } from '@isomorphic/trace/snapshotStorage';
 

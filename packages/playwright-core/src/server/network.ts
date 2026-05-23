@@ -16,15 +16,15 @@
 
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { assert } from '@isomorphic/assert';
-import { BrowserContext } from './browserContext';
-import { APIRequestContext } from './fetch';
-import { SdkObject } from './instrumentation';
+import { BrowserContext } from './browserContext.js';
+import { APIRequestContext } from './fetch.js';
+import { SdkObject } from './instrumentation.js';
 
-import type * as contexts from './browserContext';
-import type * as frames from './frames';
-import type * as pages from './page';
-import type * as types from './types';
-import type { NormalizedContinueOverrides } from './types';
+import type * as contexts from './browserContext.js';
+import type * as frames from './frames.js';
+import type * as pages from './page.js';
+import type * as types from './types.js';
+import type { NormalizedContinueOverrides } from './types.js';
 import type { HeadersArray, NameValue } from '@isomorphic/types';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';

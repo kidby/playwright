@@ -15,11 +15,11 @@
  */
 
 import { preconnect } from '@utils/bunPreconnect';
-import { detectCI  } from './ciAdapter';
+import { detectCI  } from './ciAdapter.js';
 
-import type { CIMetadata } from './ciAdapter';
+import type { CIMetadata } from './ciAdapter.js';
 
-import type { ReporterV2 } from './reporterV2';
+import type { ReporterV2 } from './reporterV2.js';
 import type { FullConfig, FullResult, Suite, TestCase, TestResult } from '../../types/testReporter';
 
 export type WebhookMode = 'per-test' | 'summary' | 'both';

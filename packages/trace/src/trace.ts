@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { FrameSnapshot, ResourceSnapshot } from './snapshot';
+import type { FrameSnapshot, ResourceSnapshot } from './snapshot.js';
 import type { Language } from '@isomorphic/locatorGenerators';
 import type { Point, SerializedError, StackFrame } from '@protocol/channels';
 

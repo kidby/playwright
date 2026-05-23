@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import type { BrowserContextOptions } from '../../..';
-import type * as types from '../types';
-import type { LanguageGenerator, LanguageGeneratorOptions } from './types';
+import type { BrowserContextOptions } from '../../../index.js';
+import type * as types from '../types.js';
+import type { LanguageGenerator, LanguageGeneratorOptions } from './types.js';
 import type * as actions from '@recorder/actions';
 
 export function generateCode(actions: actions.ActionInContext[], languageGenerator: LanguageGenerator, options: LanguageGeneratorOptions) {

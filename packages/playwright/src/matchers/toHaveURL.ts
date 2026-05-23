@@ -16,11 +16,11 @@
 
 import { urlMatches } from '@isomorphic/urlMatch';
 
-import { formatMatcherMessage, printReceivedStringContainExpectedResult } from './matcherHint';
+import { formatMatcherMessage, printReceivedStringContainExpectedResult } from './matcherHint.js';
 
-import type { MatcherResult } from './matcherHint';
+import type { MatcherResult } from './matcherHint.js';
 import type { Page } from 'playwright-core';
-import type { ExpectMatcherStateInternal } from './matchers';
+import type { ExpectMatcherStateInternal } from './matchers.js';
 
 export async function toHaveURLWithPredicate(
   this: ExpectMatcherStateInternal,

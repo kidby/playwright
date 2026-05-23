@@ -16,36 +16,36 @@
 import fs from 'fs';
 import { calculateSha1 } from '@utils/crypto';
 
-import { loadReporter } from './loadUtils';
-import { formatError } from '../reporters/base';
-import { BlobReporter } from '../reporters/blob';
-import DotReporter from '../reporters/dot';
-import EmptyReporter from '../reporters/empty';
-import GitHubReporter from '../reporters/github';
-import HtmlReporter from '../reporters/html';
-import JSONReporter from '../reporters/json';
-import JUnitReporter from '../reporters/junit';
-import LineReporter from '../reporters/line';
-import ListReporter from '../reporters/list';
-import ListModeReporter from '../reporters/listModeReporter';
-import { wrapReporterAsV2 } from '../reporters/reporterV2';
+import { loadReporter } from './loadUtils.js';
+import { formatError } from '../reporters/base.js';
+import { BlobReporter } from '../reporters/blob.js';
+import DotReporter from '../reporters/dot.js';
+import EmptyReporter from '../reporters/empty.js';
+import GitHubReporter from '../reporters/github.js';
+import HtmlReporter from '../reporters/html.js';
+import JSONReporter from '../reporters/json.js';
+import JUnitReporter from '../reporters/junit.js';
+import LineReporter from '../reporters/line.js';
+import ListReporter from '../reporters/list.js';
+import ListModeReporter from '../reporters/listModeReporter.js';
+import { wrapReporterAsV2 } from '../reporters/reporterV2.js';
 // Fork additions — grouped below the upstream imports to keep the rebase
 // diff small.
-import AIReporter from '../reporters/ai';
-import CatalogReporter from '../reporters/catalog';
-import CSVReporter from '../reporters/csv';
-import IntellumSocialReporter from '../reporters/intellumSocial';
-import JiraReporter from '../reporters/jira';
-import NewRelicReporter from '../reporters/newRelic';
-import SlackReporter from '../reporters/slack';
-import XrayReporter from '../reporters/xray';
+import AIReporter from '../reporters/ai.js';
+import CatalogReporter from '../reporters/catalog.js';
+import CSVReporter from '../reporters/csv.js';
+import IntellumSocialReporter from '../reporters/intellumSocial.js';
+import JiraReporter from '../reporters/jira.js';
+import NewRelicReporter from '../reporters/newRelic.js';
+import SlackReporter from '../reporters/slack.js';
+import XrayReporter from '../reporters/xray.js';
 
 import type { ReporterDescription } from '../../types/test';
 import type { TestError } from '../../types/testReporter';
-import type { config as commonConfig, FullConfigInternal } from '../common';
-import type { CommonReporterOptions, Screen } from '../reporters/base';
-import type { ReporterV2 } from '../reporters/reporterV2';
-import type { TestRunOptions } from './tasks';
+import type { config as commonConfig, FullConfigInternal } from '../common/index.js';
+import type { CommonReporterOptions, Screen } from '../reporters/base.js';
+import type { ReporterV2 } from '../reporters/reporterV2.js';
+import type { TestRunOptions } from './tasks.js';
 
 export async function createReporters(config: FullConfigInternal, mode: 'list' | 'test' | 'merge', descriptions?: ReporterDescription[], runOptions?: TestRunOptions): Promise<ReporterV2[]> {
   const defaultReporters: { [key in commonConfig.BuiltInReporter]: new(arg: any) => ReporterV2 } = {

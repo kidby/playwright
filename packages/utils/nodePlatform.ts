@@ -21,14 +21,17 @@ import * as util from 'util';
 import { Readable, Writable, pipeline } from 'stream';
 import { EventEmitter } from 'events';
 
-import colors from 'picocolors';
-import { debugLogger } from './debugLogger';
-import { currentZone, emptyZone } from './zones';
-import { debugMode, isUnderTest } from './debug';
+import pc from 'picocolors';
+import { debugLogger } from './debugLogger.js';
+import { currentZone, emptyZone } from './zones.js';
+import { debugMode, isUnderTest } from './debug.js';
 
+import type { Colors } from '@isomorphic/colors';
 import type { Platform, Zone } from '@isomorphic/platform';
-import type { Zone as ZoneImpl } from './zones';
+import type { Zone as ZoneImpl } from './zones.js';
 import type * as channels from '@protocol/channels';
+
+const colors: Colors = { ...pc, enabled: pc.isColorSupported, grey: pc.gray };
 
 const pipelineAsync = util.promisify(pipeline);
 

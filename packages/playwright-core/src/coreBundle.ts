@@ -16,13 +16,13 @@
 
 export * as iso from '@isomorphic/index';
 export * as utils from '@utils/index';
-export { EventEmitter as clientEventEmitter } from './client/eventEmitter';
-export * as libCli from './cli/program';
-export * as libCliTestStub from './cli/programWithTestStub';
-export * as inprocess from './inprocess';
-export * as oop from './outofprocess';
-export * as remote from './remote/playwrightServer';
-export * as registry from './server/registry/index';
-export * as server from './server/index';
-export * as tools from './tools';
-export { getUserAgent, getPlaywrightVersion } from './server/userAgent';
+export { EventEmitter as clientEventEmitter } from './client/eventEmitter.js';
+export * as libCli from './cli/program.js';
+export * as libCliTestStub from './cli/programWithTestStub.js';
+export * as inprocess from './inprocess.js';
+export * as oop from './outofprocess.js';
+export * as remote from './remote/playwrightServer.js';
+export * as registry from './server/registry/index.js';
+export * as server from './server/index.js';
+export * as tools from './tools/index.js';
+export { getUserAgent, getPlaywrightVersion } from './server/userAgent.js';

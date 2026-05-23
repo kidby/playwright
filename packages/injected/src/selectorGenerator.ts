@@ -17,11 +17,11 @@
 import { splitTestIdAttributeNames } from '@isomorphic/locatorUtils';
 import { escapeForAttributeSelector, escapeForTextSelector, escapeRegExp, quoteCSSAttributeValue } from '@isomorphic/stringUtils';
 
-import { beginDOMCaches, closestCrossShadow, endDOMCaches, isElementVisible, isInsideScope, parentElementOrShadowHost } from './domUtils';
-import { beginAriaCaches, endAriaCaches, getAriaRole, getElementAccessibleDescription, getElementAccessibleName } from './roleUtils';
-import { elementText, getElementLabels } from './selectorUtils';
+import { beginDOMCaches, closestCrossShadow, endDOMCaches, isElementVisible, isInsideScope, parentElementOrShadowHost } from './domUtils.js';
+import { beginAriaCaches, endAriaCaches, getAriaRole, getElementAccessibleDescription, getElementAccessibleName } from './roleUtils.js';
+import { elementText, getElementLabels } from './selectorUtils.js';
 
-import type { InjectedScript } from './injectedScript';
+import type { InjectedScript } from './injectedScript.js';
 
 type SelectorToken = {
   engine: string;

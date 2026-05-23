@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as css from './cssTokenizer';
+import * as css from './cssTokenizer.js';
 
 export class InvalidSelectorError extends Error {
 }

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { SdkObject } from './instrumentation';
+import { SdkObject } from './instrumentation.js';
 
-import type { Page } from './page';
-import type { BrowserContext } from './browserContext';
+import type { Page } from './page.js';
+import type { BrowserContext } from './browserContext.js';
 
 export interface Disposable {
   dispose(): Promise<void>;

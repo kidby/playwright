@@ -15,7 +15,7 @@
  */
 
 import type { FullConfig, Suite } from '../../types/testReporter';
-import type { ReporterV2 } from '../reporters/reporterV2';
+import type { ReporterV2 } from '../reporters/reporterV2.js';
 
 export interface TestRunnerPlugin {
   name: string;
@@ -35,4 +35,4 @@ export type TestRunnerPluginRegistration = {
   projectId?: string;
 };
 
-export { webServer } from './webServerPlugin';
+export { webServer } from './webServerPlugin.js';

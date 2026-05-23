@@ -17,24 +17,24 @@
 
 import { splitErrorMessage } from '@isomorphic/stackTrace';
 import { eventsHelper } from '@utils/eventsHelper';
-import * as dialog from '../dialog';
-import * as dom from '../dom';
-import { InitScript } from '../page';
-import { Page, Worker } from '../page';
-import { FFSession } from './ffConnection';
-import { createHandle, FFExecutionContext } from './ffExecutionContext';
-import { RawKeyboardImpl, RawMouseImpl, RawTouchscreenImpl } from './ffInput';
-import { FFNetworkManager } from './ffNetworkManager';
-import { TargetClosedError } from '../errors';
-import { startAutomaticVideoRecording } from '../videoRecorder';
+import * as dialog from '../dialog.js';
+import * as dom from '../dom.js';
+import { InitScript } from '../page.js';
+import { Page, Worker } from '../page.js';
+import { FFSession } from './ffConnection.js';
+import { createHandle, FFExecutionContext } from './ffExecutionContext.js';
+import { RawKeyboardImpl, RawMouseImpl, RawTouchscreenImpl } from './ffInput.js';
+import { FFNetworkManager } from './ffNetworkManager.js';
+import { TargetClosedError } from '../errors.js';
+import { startAutomaticVideoRecording } from '../videoRecorder.js';
 
-import type { Progress } from '../progress';
-import type { FFBrowserContext } from './ffBrowser';
+import type { Progress } from '../progress.js';
+import type { FFBrowserContext } from './ffBrowser.js';
 import type { Protocol } from './protocol';
 import type { RegisteredListener } from '@utils/eventsHelper';
-import type * as frames from '../frames';
-import type { PageDelegate } from '../page';
-import type * as types from '../types';
+import type * as frames from '../frames.js';
+import type { PageDelegate } from '../page.js';
+import type * as types from '../types.js';
 
 export const UTILITY_WORLD_NAME = '__playwright_utility_world__';
 

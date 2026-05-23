@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import type { Browser } from './types/types';
+import type { Browser } from './types/types.js';
 
-export * from './types/types';
+export * from './types/types.js';
 
 export type Options = {
   headless?: boolean;

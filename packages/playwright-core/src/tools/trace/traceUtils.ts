@@ -21,7 +21,7 @@ import { TraceModel, buildActionTree } from '@isomorphic/trace/traceModel';
 import { TraceLoader } from '@isomorphic/trace/traceLoader';
 import { renderTitleForCall } from '@isomorphic/protocolFormatter';
 import { resolveWithinRoot } from '@utils/fileUtils';
-import { DirTraceLoaderBackend, extractTrace } from './traceParser';
+import { DirTraceLoaderBackend, extractTrace } from './traceParser.js';
 
 import type { ActionTraceEventInContext } from '@isomorphic/trace/traceModel';
 

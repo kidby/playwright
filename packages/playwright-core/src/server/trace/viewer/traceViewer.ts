@@ -24,16 +24,16 @@ import { gracefullyProcessExitDoNotHang } from '@utils/processLauncher';
 import { isUnderTest } from '@utils/debug';
 import { isCodingAgent } from '@utils/env';
 import { isPathInside } from '@utils/fileUtils';
-import { libPath } from '../../../package';
-import { syncLocalStorageWithSettings } from '../../launchApp';
-import { launchApp } from '../../launchApp';
-import { createPlaywright } from '../../playwright';
-import { ProgressController } from '../../progress';
-import { nullProgress } from '../../progress';
+import { libPath } from '../../../package.js';
+import { syncLocalStorageWithSettings } from '../../launchApp.js';
+import { launchApp } from '../../launchApp.js';
+import { createPlaywright } from '../../playwright.js';
+import { ProgressController } from '../../progress.js';
+import { nullProgress } from '../../progress.js';
 
 import type { Transport } from '@utils/httpServer';
-import type { BrowserType } from '../../browserType';
-import type { Page } from '../../page';
+import type { BrowserType } from '../../browserType.js';
+import type { Page } from '../../page.js';
 import type http from 'http';
 
 // HMR: build-time flag — `true` in watch builds, `false` in release. Mirror of

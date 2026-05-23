@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import * as rawClockSource from '../generated/clockSource';
-import { nullProgress } from './progress';
+import * as rawClockSource from '../generated/clockSource.js';
+import { nullProgress } from './progress.js';
 
-import type { BrowserContext } from './browserContext';
-import type { InitScript } from './page';
+import type { BrowserContext } from './browserContext.js';
+import type { InitScript } from './page.js';
 import type { Progress } from '@protocol/progress';
 
 export class Clock {

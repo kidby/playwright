@@ -17,13 +17,13 @@
 import path from 'path';
 
 import { SerializedFS } from '@utils/serializedFS';
-import { Artifact } from '../artifact';
-import { HarTracer } from './harTracer';
+import { Artifact } from '../artifact.js';
+import { HarTracer } from './harTracer.js';
 
-import type { APIRequestContext } from '../fetch';
-import type { BrowserContext } from '../browserContext';
-import type { HarTracerDelegate } from './harTracer';
-import type { Page } from '../page';
+import type { APIRequestContext } from '../fetch.js';
+import type { BrowserContext } from '../browserContext.js';
+import type { HarTracerDelegate } from './harTracer.js';
+import type { Page } from '../page.js';
 import type { NameValue } from '@isomorphic/types';
 import type * as channels from '@protocol/channels';
 import type * as har from '@trace/har';

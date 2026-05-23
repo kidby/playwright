@@ -17,15 +17,15 @@
 import { assert } from '@isomorphic/assert';
 import { isString } from '@isomorphic/rtti';
 import { getMimeTypeForPath } from '@isomorphic/mimeType';
-import { Frame } from './frame';
-import { JSHandle, parseResult, serializeArgument } from './jsHandle';
-import { fileUploadSizeLimit, mkdirIfNeeded } from './fileUtils';
-import { WritableStream } from './writableStream';
+import { Frame } from './frame.js';
+import { JSHandle, parseResult, serializeArgument } from './jsHandle.js';
+import { fileUploadSizeLimit, mkdirIfNeeded } from './fileUtils.js';
+import { WritableStream } from './writableStream.js';
 
-import type { BrowserContext } from './browserContext';
-import type { ChannelOwner } from './channelOwner';
-import type { Locator } from './locator';
-import type { FilePayload, Rect, SelectOption, SelectOptionOptions, TimeoutOptions } from './types';
+import type { BrowserContext } from './browserContext.js';
+import type { ChannelOwner } from './channelOwner.js';
+import type { Locator } from './locator.js';
+import type { FilePayload, Rect, SelectOption, SelectOptionOptions, TimeoutOptions } from './types.js';
 import type * as structs from '../../types/structs';
 import type * as api from '../../types/types';
 import type { Platform } from '@isomorphic/platform';

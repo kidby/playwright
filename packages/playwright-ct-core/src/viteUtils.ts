@@ -20,7 +20,7 @@ import path from 'path';
 import { cc, transform } from 'playwright/lib/common';
 import { debug } from 'playwright-core/lib/utilsBundle';
 
-import type { ImportInfo } from './tsxTransform';
+import type { ImportInfo } from './tsxTransform.js';
 import type { PlaywrightTestConfig as BasePlaywrightTestConfig } from 'playwright/types/test';
 import type { FullConfig } from 'playwright/types/testReporter';
 import type { InlineConfig, Plugin, TransformResult, UserConfig } from 'vite';

@@ -16,7 +16,7 @@
 
 import { Readable } from 'stream';
 
-import { ChannelOwner } from './channelOwner';
+import { ChannelOwner } from './channelOwner.js';
 
 import type * as channels from '@protocol/channels';
 

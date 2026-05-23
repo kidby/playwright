@@ -22,17 +22,17 @@ import { isUnderTest } from '@utils/debug';
 import { assert } from '@isomorphic/assert';
 import { monotonicTime } from '@isomorphic/time';
 import { rewriteErrorMessage } from '@isomorphic/stackTrace';
-import { ValidationError, createMetadataValidator, createWaitInfoValidator, findValidator  } from '../../protocol/validator';
-import { TargetClosedError, isTargetClosedError, serializeError } from '../errors';
-import { createRootSdkObject, SdkObject } from '../instrumentation';
-import { isProtocolError } from '../protocolError';
-import { compressCallLog } from '../callLog';
-import { Progress, ProgressController } from '../progress';
+import { ValidationError, createMetadataValidator, createWaitInfoValidator, findValidator  } from '../../protocol/validator.js';
+import { TargetClosedError, isTargetClosedError, serializeError } from '../errors.js';
+import { createRootSdkObject, SdkObject } from '../instrumentation.js';
+import { isProtocolError } from '../protocolError.js';
+import { compressCallLog } from '../callLog.js';
+import { Progress, ProgressController } from '../progress.js';
 
-import type { CallMetadata } from '../instrumentation';
-import type { PlaywrightDispatcher } from './playwrightDispatcher';
+import type { CallMetadata } from '../instrumentation.js';
+import type { PlaywrightDispatcher } from './playwrightDispatcher.js';
 import type { RegisteredListener } from '@utils/eventsHelper';
-import type { ValidatorContext } from '../../protocol/validator';
+import type { ValidatorContext } from '../../protocol/validator.js';
 import type * as channels from '@protocol/channels';
 
 const metadataValidator = createMetadataValidator();

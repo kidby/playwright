@@ -21,15 +21,15 @@ import { locatorOrSelectorAsSelector } from '@isomorphic/locatorParser';
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { eventsHelper } from '@utils/eventsHelper';
 import { disposeAll } from '@isomorphic/disposable';
-import { waitForCompletion, eventWaiter } from './utils';
-import { LogFile } from './logFile';
-import { ModalState } from './tool';
-import { handleDialog } from './dialogs';
-import { uploadFile } from './files';
+import { waitForCompletion, eventWaiter } from './utils.js';
+import { LogFile } from './logFile.js';
+import { ModalState } from './tool.js';
+import { handleDialog } from './dialogs.js';
+import { uploadFile } from './files.js';
 
 import type { Disposable } from '@isomorphic/disposable';
-import type { Context, ContextConfig } from './context';
-import type * as playwright from '../../..';
+import type { Context, ContextConfig } from './context.js';
+import type * as playwright from '../../../index.js';
 
 const TabEvents = {
   modalState: 'modalState'

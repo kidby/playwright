@@ -14,30 +14,30 @@
  * limitations under the License.
  */
 
-export { setupExitWatchdog } from './mcp/watchdog';
+export { setupExitWatchdog } from './mcp/watchdog.js';
 
-export { BrowserBackend } from './backend/browserBackend';
-export { parseResponse } from './backend/response';
-export { Tab } from './backend/tab';
-export { browserTools, filteredTools } from './backend/tools';
-export { start } from './utils/mcp/server';
-export { createConnection } from './mcp/index';
-export { resolveCLIConfigForCLI, resolveCLIConfigForMCP } from './mcp/config';
-export { outputDir } from './backend/context';
+export { BrowserBackend } from './backend/browserBackend.js';
+export { parseResponse } from './backend/response.js';
+export { Tab } from './backend/tab.js';
+export { browserTools, filteredTools } from './backend/tools.js';
+export { start } from './utils/mcp/server.js';
+export { createConnection } from './mcp/index.js';
+export { resolveCLIConfigForCLI, resolveCLIConfigForMCP } from './mcp/config.js';
+export { outputDir } from './backend/context.js';
 export { isSystemDirectory } from '@utils/fileUtils';
-export { isProfileLocked } from './mcp/browserFactory';
-export { compareSemver } from './utils/socketConnection';
-export { extractTrace, DirTraceLoaderBackend } from './trace/traceParser';
-export { decorateMCPCommand } from './mcp/program';
-export { program as cliProgram } from './cli-client/program';
-export { generateHelp, generateHelpJSON } from './cli-daemon/helpGenerator';
-export { decorateProgram as decorateCliDaemonProgram } from './cli-daemon/program';
-export { openDashboardApp, openDashboardForContext } from './dashboard/dashboardApp';
+export { isProfileLocked } from './mcp/browserFactory.js';
+export { compareSemver } from './utils/socketConnection.js';
+export { extractTrace, DirTraceLoaderBackend } from './trace/traceParser.js';
+export { decorateMCPCommand } from './mcp/program.js';
+export { program as cliProgram } from './cli-client/program.js';
+export { generateHelp, generateHelpJSON } from './cli-daemon/helpGenerator.js';
+export { decorateProgram as decorateCliDaemonProgram } from './cli-daemon/program.js';
+export { openDashboardApp, openDashboardForContext } from './dashboard/dashboardApp.js';
 
-export type { ContextConfig } from './backend/context';
-export type { CallToolRequest, CallToolResult, Tool } from './backend/tool';
-export type { ClientInfo } from './utils/mcp/server';
-export type { FullConfig } from './mcp/config';
-export type { ServerBackend } from './utils/mcp/server';
-export type { ToolSchema } from './utils/mcp/tool';
-export type { ServerBackendFactory } from './utils/mcp/server';
+export type { ContextConfig } from './backend/context.js';
+export type { CallToolRequest, CallToolResult, Tool } from './backend/tool.js';
+export type { ClientInfo } from './utils/mcp/server.js';
+export type { FullConfig } from './mcp/config.js';
+export type { ServerBackend } from './utils/mcp/server.js';
+export type { ToolSchema } from './utils/mcp/tool.js';
+export type { ServerBackendFactory } from './utils/mcp/server.js';

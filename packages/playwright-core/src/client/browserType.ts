@@ -16,16 +16,16 @@
 
 import { assert } from '@isomorphic/assert';
 import { headersObjectToArray } from '@isomorphic/headers';
-import { Browser } from './browser';
-import { BrowserContext, prepareBrowserContextParams } from './browserContext';
-import { ChannelOwner } from './channelOwner';
-import { envObjectToArray } from './clientHelper';
-import { connectToBrowser } from './connect';
-import { TimeoutSettings } from './timeoutSettings';
-import { Worker } from './worker';
+import { Browser } from './browser.js';
+import { BrowserContext, prepareBrowserContextParams } from './browserContext.js';
+import { ChannelOwner } from './channelOwner.js';
+import { envObjectToArray } from './clientHelper.js';
+import { connectToBrowser } from './connect.js';
+import { TimeoutSettings } from './timeoutSettings.js';
+import { Worker } from './worker.js';
 
-import type { Playwright } from './playwright';
-import type { ConnectOptions, LaunchOptions, LaunchPersistentContextOptions, LaunchServerOptions } from './types';
+import type { Playwright } from './playwright.js';
+import type { ConnectOptions, LaunchOptions, LaunchPersistentContextOptions, LaunchServerOptions } from './types.js';
 import type * as api from '../../types/types';
 import type * as channels from '@protocol/channels';
 import type { ChildProcess } from 'child_process';

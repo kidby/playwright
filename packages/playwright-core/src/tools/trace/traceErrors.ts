@@ -16,7 +16,7 @@
 
 /* eslint-disable no-console */
 
-import { loadTrace, actionTitle } from './traceUtils';
+import { loadTrace, actionTitle } from './traceUtils.js';
 
 export async function traceErrors() {
   const trace = await loadTrace();

@@ -20,10 +20,10 @@ import * as z from 'zod';
 import { formatObject } from '@isomorphic/stringUtils';
 
 import { scaleImageToSize } from '@isomorphic/imageUtils';
-import { defineTabTool } from './tool';
-import { optionalElementSchema } from './snapshot';
+import { defineTabTool } from './tool.js';
+import { optionalElementSchema } from './snapshot.js';
 
-import type * as playwright from '../../..';
+import type * as playwright from '../../../index.js';
 
 const screenshotSchema = optionalElementSchema.extend({
   type: z.enum(['png', 'jpeg']).default('png').describe('Image format for the screenshot. Default is png.'),

@@ -15,10 +15,10 @@
  */
 
 import type { z } from 'zod';
-import type { Context } from './context';
-import type * as playwright from '../../..';
-import type { Tab } from './tab';
-import type { Response } from './response';
+import type { Context } from './context.js';
+import type * as playwright from '../../../index.js';
+import type { Tab } from './tab.js';
+import type { Response } from './response.js';
 
 export type { CallToolResult, CallToolRequest } from '@modelcontextprotocol/sdk/types.js';
 

@@ -20,7 +20,7 @@
 
 /* eslint-disable no-restricted-globals */
 
-import { monotonicTime } from './time';
+import { monotonicTime } from './time.js';
 
 export async function raceAgainstDeadline<T>(cb: () => Promise<T>, deadline: number): Promise<{ result: T, timedOut: false } | { timedOut: true }> {
   let timer: NodeJS.Timeout | undefined;

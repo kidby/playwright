@@ -16,7 +16,7 @@
 
 import * as zod from 'zod';
 import type { z } from 'zod';
-import type * as mcpServer from './server';
+import type * as mcpServer from './server.js';
 
 export type ToolSchema<Input extends z.Schema> = {
   name: string;

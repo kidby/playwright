@@ -23,8 +23,14 @@
 // `packages/playwright-core/src/server/**` via .oxlintrc.json overrides where
 // the Progress pattern is the convention and false positives are unlikely.
 
+function isProgressIdentifier(node) {
+  // Accept any identifier whose name ends in `progress` or `Progress` —
+  // covers `progress`, `nullProgress`, `subProgress`, `myProgress`, etc.
+  return node && node.type === 'Identifier' && /[pP]rogress$/.test(node.name);
+}
+
 function hasProgressParam(node) {
-  return node.params.some(p => p.type === 'Identifier' && p.name === 'progress');
+  return node.params.some(p => isProgressIdentifier(p));
 }
 
 function isProgressRace(node) {
@@ -52,10 +58,7 @@ function passesProgressAsFirstArg(node) {
   const root = unwrapPromiseChain(node);
   if (root.type !== 'CallExpression')
     return false;
-  const firstArg = root.arguments[0];
-  if (!firstArg)
-    return false;
-  return firstArg.type === 'Identifier' && firstArg.name === 'progress';
+  return isProgressIdentifier(root.arguments[0]);
 }
 
 function isInsideProgressRace(node) {

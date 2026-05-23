@@ -18,23 +18,23 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 
-import { playwright } from '../../inprocess';
-import { registryDirectory } from '../../server/registry/index';
-import { testDebug } from './log';
-import { outputDir } from '../backend/context';
-import { createExtensionBrowser } from './extensionContextFactory';
-import { connectToBrowserAcrossVersions } from '../utils/connect';
-import { serverRegistry } from '../../serverRegistry';
-import { resolveExtensionOptions } from './config';
+import { playwright } from '../../inprocess.js';
+import { registryDirectory } from '../../server/registry/index.js';
+import { testDebug } from './log.js';
+import { outputDir } from '../backend/context.js';
+import { createExtensionBrowser } from './extensionContextFactory.js';
+import { connectToBrowserAcrossVersions } from '../utils/connect.js';
+import { serverRegistry } from '../../serverRegistry.js';
+import { resolveExtensionOptions } from './config.js';
 // eslint-disable-next-line no-restricted-imports
-import { connectToBrowser } from '../../client/connect';
+import { connectToBrowser } from '../../client/connect.js';
 
-import type { CLIOptions, FullConfig } from './config';
-import type { ClientInfo } from '../utils/mcp/server';
+import type { CLIOptions, FullConfig } from './config.js';
+import type { ClientInfo } from '../utils/mcp/server.js';
 // eslint-disable-next-line no-restricted-imports
-import type { Playwright } from '../../client/playwright';
-import type * as playwrightTypes from '../../..';
-import type { BrowserInfo } from '../../serverRegistry';
+import type { Playwright } from '../../client/playwright.js';
+import type * as playwrightTypes from '../../../index.js';
+import type { BrowserInfo } from '../../serverRegistry.js';
 
 type BrowserWithInfo = {
   browser: playwrightTypes.Browser,

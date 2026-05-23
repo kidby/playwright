@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { rewriteURLForCustomProtocol, SnapshotRenderer } from './snapshotRenderer';
-import { LRUCache } from '../lruCache';
+import { rewriteURLForCustomProtocol, SnapshotRenderer } from './snapshotRenderer.js';
+import { LRUCache } from '../lruCache.js';
 
 import type { FrameSnapshot, ResourceSnapshot } from '@trace/snapshot';
-import type { PageEntry } from './entries';
+import type { PageEntry } from './entries.js';
 
 
 export class SnapshotStorage {

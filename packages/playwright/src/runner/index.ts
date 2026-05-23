@@ -19,20 +19,20 @@
 // re-exported here. Files inside the bundle keep using direct relative
 // imports.
 
-export * as testRunner from './testRunner';
-export * as testServer from './testServer';
-export * as watchMode from './watchMode';
-export * as projectUtils from './projectUtils';
-export * as runnerReporters from './reporters';
-export * as base from '../reporters/base';
-export * as html from '../reporters/html';
-export * as merge from '../reporters/merge';
-export { default as ListReporter } from '../reporters/list';
-export { default as ListModeReporter } from '../reporters/listModeReporter';
-export type { ReporterV2 } from '../reporters/reporterV2';
+export * as testRunner from './testRunner.js';
+export * as testServer from './testServer.js';
+export * as watchMode from './watchMode.js';
+export * as projectUtils from './projectUtils.js';
+export * as runnerReporters from './reporters.js';
+export * as base from '../reporters/base.js';
+export * as html from '../reporters/html.js';
+export * as merge from '../reporters/merge.js';
+export { default as ListReporter } from '../reporters/list.js';
+export { default as ListModeReporter } from '../reporters/listModeReporter.js';
+export type { ReporterV2 } from '../reporters/reporterV2.js';
 
 // Public re-export of TestServerConnection used by external test fixtures.
-export { TestServerConnection } from '../isomorphic/testServerConnection';
+export { TestServerConnection } from '../isomorphic/testServerConnection.js';
 
 // Public re-export of webServer plugin used by test fixtures.
-export { webServer } from '../plugins/webServerPlugin';
+export { webServer } from '../plugins/webServerPlugin.js';

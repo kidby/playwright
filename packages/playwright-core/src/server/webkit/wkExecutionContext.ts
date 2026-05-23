@@ -17,12 +17,12 @@
 
 import { assert } from '@isomorphic/assert';
 import { parseEvaluationResultValue } from '@isomorphic/utilityScriptSerializers';
-import * as js from '../javascript';
-import * as dom from '../dom';
-import { isSessionClosedError } from '../protocolError';
+import * as js from '../javascript.js';
+import * as dom from '../dom.js';
+import { isSessionClosedError } from '../protocolError.js';
 
 import type { Protocol } from './protocol';
-import type { WKSession } from './wkConnection';
+import type { WKSession } from './wkConnection.js';
 
 export class WKExecutionContext implements js.ExecutionContextDelegate {
   private readonly _session: WKSession;

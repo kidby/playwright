@@ -19,25 +19,25 @@ import path from 'path';
 
 import { assert } from '@isomorphic/assert';
 import { createGuid } from '@utils/crypto';
-import { Artifact } from '../artifact';
-import { Browser } from '../browser';
-import { BrowserContext, verifyGeolocation } from '../browserContext';
-import { Frame } from '../frames';
-import * as network from '../network';
-import { Page } from '../page';
-import { CRConnection, ConnectionEvents } from './crConnection';
-import { CRPage } from './crPage';
-import { saveProtocolStream } from './crProtocolHelper';
-import { CRServiceWorker } from './crServiceWorker';
+import { Artifact } from '../artifact.js';
+import { Browser } from '../browser.js';
+import { BrowserContext, verifyGeolocation } from '../browserContext.js';
+import { Frame } from '../frames.js';
+import * as network from '../network.js';
+import { Page } from '../page.js';
+import { CRConnection, ConnectionEvents } from './crConnection.js';
+import { CRPage } from './crPage.js';
+import { saveProtocolStream } from './crProtocolHelper.js';
+import { CRServiceWorker } from './crServiceWorker.js';
 
-import type { InitScript, Worker } from '../page';
-import type { ConnectionTransport } from '../transport';
-import type * as types from '../types';
-import type { CDPSession, CRSession } from './crConnection';
-import type { CRDevTools } from './crDevTools';
+import type { InitScript, Worker } from '../page.js';
+import type { ConnectionTransport } from '../transport.js';
+import type * as types from '../types.js';
+import type { CDPSession, CRSession } from './crConnection.js';
+import type { CRDevTools } from './crDevTools.js';
 import type { Protocol } from './protocol';
-import type { BrowserOptions } from '../browser';
-import type { SdkObject } from '../instrumentation';
+import type { BrowserOptions } from '../browser.js';
+import type { SdkObject } from '../instrumentation.js';
 import type * as channels from '@protocol/channels';
 
 export class CRBrowser extends Browser {

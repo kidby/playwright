@@ -16,12 +16,12 @@
 
 import path from 'path';
 
-import { formatError, terminalScreen } from './base';
+import { formatError, terminalScreen } from './base.js';
 
 import type { FullConfig, TestError } from '../../types/testReporter';
-import type { test } from '../common';
-import type { TerminalScreen } from './base';
-import type { ReporterV2 } from './reporterV2';
+import type { test } from '../common/index.js';
+import type { TerminalScreen } from './base.js';
+import type { ReporterV2 } from './reporterV2.js';
 
 class ListModeReporter implements ReporterV2 {
   private config!: FullConfig;

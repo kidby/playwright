@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { serializeError } from '../util';
+import { serializeError } from '../util.js';
 
 import type { TestInfoError } from '../../types/test';
-import type { MatcherResultProperty } from '../matchers/matcherHint';
+import type { MatcherResultProperty } from '../matchers/matcherHint.js';
 
 export function testInfoError(error: Error | any): TestInfoError {
   const result = serializeError(error);

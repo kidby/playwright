@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RelayConnection, debugLog } from './relayConnection';
+import { RelayConnection, debugLog } from './relayConnection.js';
 
 const PLAYWRIGHT_GROUP_TITLE = 'Playwright';
 const PLAYWRIGHT_GROUP_COLOR = 'green';

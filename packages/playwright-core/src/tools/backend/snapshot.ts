@@ -16,9 +16,9 @@
 
 import * as z from 'zod';
 import { formatObject, formatObjectOrVoid } from '@isomorphic/stringUtils';
-import { defineTabTool } from './tool';
+import { defineTabTool } from './tool.js';
 
-import type * as playwright from '../../..';
+import type * as playwright from '../../../index.js';
 
 const elementTargetDescription = 'Exact target element reference from the page snapshot, or a unique element selector';
 

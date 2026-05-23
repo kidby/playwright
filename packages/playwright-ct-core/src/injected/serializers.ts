@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { isImportRef } from './importRegistry';
+import { isImportRef } from './importRegistry.js';
 
 type FunctionRef = {
   __pw_type: 'function';

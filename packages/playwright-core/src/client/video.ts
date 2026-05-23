@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { Artifact } from './artifact';
-import { EventEmitter } from './eventEmitter';
+import { Artifact } from './artifact.js';
+import { EventEmitter } from './eventEmitter.js';
 
-import type { Connection } from './connection';
-import type { Page } from './page';
+import type { Connection } from './connection.js';
+import type { Page } from './page.js';
 import type * as api from '../../types/types';
 
 export class Video extends EventEmitter implements api.Video {

@@ -17,12 +17,12 @@
 
 import { assert } from '@isomorphic/assert';
 import { headersArrayToObject, headersObjectToArray } from '@isomorphic/headers';
-import * as network from '../network';
+import * as network from '../network.js';
 
-import type * as frames from '../frames';
-import type * as types from '../types';
+import type * as frames from '../frames.js';
+import type * as types from '../types.js';
 import type { Protocol } from './protocol';
-import type { WKSession } from './wkConnection';
+import type { WKSession } from './wkConnection.js';
 
 
 const errorReasons: { [reason: string]: Protocol.Network.ResourceErrorType } = {

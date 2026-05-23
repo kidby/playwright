@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-export * as cc from '../transform/compilationCache';
-export * as config from './config';
-export * as configLoader from './configLoader';
-export * as esm from './esmLoaderHost';
-export * as fixtures from './fixtures';
-export * as ipc from './ipc';
-export * as poolBuilder from './poolBuilder';
-export * as processRunner from './process';
-export * as suiteUtils from './suiteUtils';
-export * as test from './test';
-export * as testLoader from './testLoader';
-export * as testType from './testType';
-export * as transform from '../transform/transform';
-export { FullConfigInternal, builtInReporters } from './config';
-export { ProcessRunner, startProcessRunner } from './process';
-export { defineConfig } from './configLoader';
-export { mergeTests } from './testType';
-export type { ConfigLocation } from './config';
+export * as cc from '../transform/compilationCache.js';
+export * as config from './config.js';
+export * as configLoader from './configLoader.js';
+export * as esm from './esmLoaderHost.js';
+export * as fixtures from './fixtures.js';
+export * as ipc from './ipc.js';
+export * as poolBuilder from './poolBuilder.js';
+export * as processRunner from './process.js';
+export * as suiteUtils from './suiteUtils.js';
+export * as test from './test.js';
+export * as testLoader from './testLoader.js';
+export * as testType from './testType.js';
+export * as transform from '../transform/transform.js';
+export { FullConfigInternal, builtInReporters } from './config.js';
+export { ProcessRunner, startProcessRunner } from './process.js';
+export { defineConfig } from './configLoader.js';
+export { mergeTests } from './testType.js';
+export type { ConfigLocation } from './config.js';

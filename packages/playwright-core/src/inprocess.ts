@@ -15,13 +15,13 @@
  */
 
 import { nodePlatform } from '@utils/nodePlatform';
-import { AndroidServerLauncherImpl } from './androidServerImpl';
-import { BrowserServerLauncherImpl } from './browserServerImpl';
-import { DispatcherConnection, PlaywrightDispatcher, RootDispatcher, createPlaywright } from './server';
-import { Connection } from './client/connection';
-import { packageRoot } from './package';
+import { AndroidServerLauncherImpl } from './androidServerImpl.js';
+import { BrowserServerLauncherImpl } from './browserServerImpl.js';
+import { DispatcherConnection, PlaywrightDispatcher, RootDispatcher, createPlaywright } from './server/index.js';
+import { Connection } from './client/connection.js';
+import { packageRoot } from './package.js';
 
-import type { Playwright as PlaywrightAPI } from './client/playwright';
+import type { Playwright as PlaywrightAPI } from './client/playwright.js';
 import type { Language } from '@isomorphic/locatorGenerators';
 
 export function createInProcessPlaywright(): PlaywrightAPI {

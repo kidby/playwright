@@ -28,11 +28,11 @@
 
 import { ManualPromise } from '@isomorphic/manualPromise';
 
-import { logUnhandledError } from './log';
-import { BrowserModel } from './browserModel';
+import { logUnhandledError } from './log.js';
+import { BrowserModel } from './browserModel.js';
 
-import type { ExtensionProtocolHandler, SendCommand, SendToCDPClient } from './cdpRelayHandler';
-import type { ExtensionEventsV2 } from './protocol';
+import type { ExtensionProtocolHandler, SendCommand, SendToCDPClient } from './cdpRelayHandler.js';
+import type { ExtensionEventsV2 } from './protocol.js';
 
 export class ExtensionProtocolV2 implements ExtensionProtocolHandler {
   private _model: BrowserModel;

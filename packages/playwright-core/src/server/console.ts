@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import type * as js from './javascript';
-import type { Page, Worker } from './page';
-import type { ConsoleMessageLocation } from './types';
+import type * as js from './javascript.js';
+import type { Page, Worker } from './page.js';
+import type { ConsoleMessageLocation } from './types.js';
 
 export class ConsoleMessage {
   private _type: string;

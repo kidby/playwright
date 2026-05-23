@@ -16,11 +16,11 @@
 
 import util from 'util';
 
-import { serializeCompilationCache } from '../transform/compilationCache';
+import { serializeCompilationCache } from '../transform/compilationCache.js';
 
-import type { ConfigLocation, FullConfigInternal } from './config';
+import type { ConfigLocation, FullConfigInternal } from './config.js';
 import type { ReporterDescription, TestInfoError, TestStatus } from '../../types/test';
-import type { SerializedCompilationCache  } from '../transform/compilationCache';
+import type { SerializedCompilationCache  } from '../transform/compilationCache.js';
 
 export type ConfigCLIOverrides = {
   argv?: string[];

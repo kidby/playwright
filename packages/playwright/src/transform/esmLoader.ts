@@ -17,10 +17,10 @@
 import fs from 'fs';
 import url from 'url';
 
-import { addToCompilationCache, currentFileDepsCollector, serializeCompilationCache, startCollectingFileDeps, stopCollectingFileDeps } from './compilationCache';
-import { PortTransport } from './portTransport';
-import { resolveHook, setSingleTSConfig, setTransformConfig, shouldTransform, transformHook } from './transform';
-import { fileIsModule } from '../util';
+import { addToCompilationCache, currentFileDepsCollector, serializeCompilationCache, startCollectingFileDeps, stopCollectingFileDeps } from './compilationCache.js';
+import { PortTransport } from './portTransport.js';
+import { resolveHook, setSingleTSConfig, setTransformConfig, shouldTransform, transformHook } from './transform.js';
+import { fileIsModule } from '../util.js';
 
 // Before each import of the ESM module, a preflight request with the .esm.preflight extension is issued.
 // When handled, it is resolved similarly to the reqular import, but loading it yields empty content.

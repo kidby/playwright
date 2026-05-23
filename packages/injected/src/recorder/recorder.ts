@@ -16,13 +16,13 @@
 
 // This is the only dependency this file is allowed to have, because we are fine with a dupe.
 // See DEPS.list for more details.
-import clipPaths from './clipPaths';
+import clipPaths from './clipPaths.js';
 
 import type { Point } from '@isomorphic/types';
-import type { AriaSnapshot } from '../ariaSnapshot';
-import type { Highlight, HighlightEntry } from '../highlight';
-import type { InjectedScript } from '../injectedScript';
-import type { ElementText } from '../selectorUtils';
+import type { AriaSnapshot } from '../ariaSnapshot.js';
+import type { Highlight, HighlightEntry } from '../highlight.js';
+import type { InjectedScript } from '../injectedScript.js';
+import type { ElementText } from '../selectorUtils.js';
 import type * as actions from '@recorder/actions';
 import type { ElementInfo, Mode, OverlayState, UIState } from '@recorder/recorderTypes';
 import type { Language } from '@isomorphic/locatorGenerators';

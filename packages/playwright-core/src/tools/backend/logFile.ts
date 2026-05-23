@@ -18,7 +18,7 @@ import fs from 'fs';
 import path from 'path';
 
 import debug from 'debug';
-import type { Context } from './context';
+import type { Context } from './context.js';
 
 export type LogChunk = {
   type: string;

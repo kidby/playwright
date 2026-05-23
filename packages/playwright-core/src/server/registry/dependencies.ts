@@ -22,10 +22,10 @@ import path from 'path';
 import { wrapInASCIIBox } from '@utils/ascii';
 import { hostPlatform, isOfficiallySupportedPlatform } from '@utils/hostPlatform';
 import { spawnAsync } from '@utils/spawnAsync';
-import { getPlaywrightVersion } from '../userAgent';
-import { deps } from './nativeDeps';
+import { getPlaywrightVersion } from '../userAgent.js';
+import { deps } from './nativeDeps.js';
 
-import { packageJSON, binPath } from '../../package';
+import { packageJSON, binPath } from '../../package.js';
 import { buildPlaywrightCLICommand, registry } from '.';
 
 const languageBindingVersion = process.env.PW_CLI_DISPLAY_VERSION || packageJSON.version;

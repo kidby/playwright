@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { BrowserContextDispatcher } from './browserContextDispatcher';
-import { FrameDispatcher } from './frameDispatcher';
-import { JSHandleDispatcher, parseArgument, serializeResult } from './jsHandleDispatcher';
+import { BrowserContextDispatcher } from './browserContextDispatcher.js';
+import { FrameDispatcher } from './frameDispatcher.js';
+import { JSHandleDispatcher, parseArgument, serializeResult } from './jsHandleDispatcher.js';
 
-import type { ElementHandle } from '../dom';
-import type { Frame } from '../frames';
-import type * as js from '../javascript';
+import type { ElementHandle } from '../dom.js';
+import type { Frame } from '../frames.js';
+import type * as js from '../javascript.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 

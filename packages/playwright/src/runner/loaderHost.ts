@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { ProcessHost } from './processHost';
-import { cc, esm, FullConfigInternal, ipc, poolBuilder, test as testNs, testLoader } from '../common';
+import { ProcessHost } from './processHost.js';
+import { cc, esm, FullConfigInternal, ipc, poolBuilder, test as testNs, testLoader } from '../common/index.js';
 
 import type { TestError } from '../../types/testReporter';
 

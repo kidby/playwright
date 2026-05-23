@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import { BrowserContextDispatcher } from './browserContextDispatcher';
-import { Dispatcher } from './dispatcher';
-import { JSHandleDispatcher, parseArgument, serializeResult } from './jsHandleDispatcher';
-import { ElectronApplication } from '../electron/electron';
+import { BrowserContextDispatcher } from './browserContextDispatcher.js';
+import { Dispatcher } from './dispatcher.js';
+import { JSHandleDispatcher, parseArgument, serializeResult } from './jsHandleDispatcher.js';
+import { ElectronApplication } from '../electron/electron.js';
 
-import type { RootDispatcher } from './dispatcher';
-import type { PageDispatcher } from './pageDispatcher';
-import type { ConsoleMessage } from '../console';
-import type { Electron } from '../electron/electron';
+import type { RootDispatcher } from './dispatcher.js';
+import type { PageDispatcher } from './pageDispatcher.js';
+import type { ConsoleMessage } from '../console.js';
+import type { Electron } from '../electron/electron.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 

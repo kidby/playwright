@@ -16,21 +16,21 @@
 
 import net from 'net';
 import { resolveGlobToRegexPattern } from '@isomorphic/urlMatch';
-import { fetchData } from '../utils';
-import { getUserAgent } from '../userAgent';
-import { Dispatcher } from './dispatcher';
-import { SdkObject } from '../instrumentation';
-import * as localUtils from '../localUtils';
-import { deviceDescriptors as descriptors }  from '../deviceDescriptors';
-import { JsonPipeDispatcher } from '../dispatchers/jsonPipeDispatcher';
-import { PipeTransport } from '../pipeTransport';
-import { Progress } from '../progress';
-import { SocksInterceptor } from '../socksInterceptor';
-import { WebSocketTransport } from '../transport';
+import { fetchData } from '../utils.js';
+import { getUserAgent } from '../userAgent.js';
+import { Dispatcher } from './dispatcher.js';
+import { SdkObject } from '../instrumentation.js';
+import * as localUtils from '../localUtils.js';
+import { deviceDescriptors as descriptors }  from '../deviceDescriptors.js';
+import { JsonPipeDispatcher } from '../dispatchers/jsonPipeDispatcher.js';
+import { PipeTransport } from '../pipeTransport.js';
+import { Progress } from '../progress.js';
+import { SocksInterceptor } from '../socksInterceptor.js';
+import { WebSocketTransport } from '../transport.js';
 
-import type { HarBackend } from '../harBackend';
-import type { Playwright } from '../playwright';
-import type { RootDispatcher } from './dispatcher';
+import type { HarBackend } from '../harBackend.js';
+import type { Playwright } from '../playwright.js';
+import type { RootDispatcher } from './dispatcher.js';
 import type * as channels from '@protocol/channels';
 import type * as http from 'http';
 import type { HTTPRequestParams } from '@utils/network';

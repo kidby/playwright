@@ -16,9 +16,9 @@
 
 import { test as base } from 'playwright/test';
 
-import { Device } from './device';
+import { Device } from './device.js';
 
-import type { AppiumCapabilities } from './appiumClient';
+import type { AppiumCapabilities } from './appiumClient.js';
 import type { TestFixture } from 'playwright/test';
 
 export type MobileFixtures = {

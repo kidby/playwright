@@ -17,8 +17,8 @@
 import { ChildProcess } from 'child_process';
 import { Readable } from 'stream';
 import { ReadStream } from 'fs';
-import { Protocol } from './protocol';
-import { Serializable, EvaluationArgument, PageFunction, PageFunctionOn, SmartHandle, ElementHandleForTag, BindingSource } from './structs';
+import { Protocol } from './protocol.js';
+import { Serializable, EvaluationArgument, PageFunction, PageFunctionOn, SmartHandle, ElementHandleForTag, BindingSource } from './structs.js';
 
 // Use the global URLPattern type if available (Node.js 22+, modern browsers),
 // otherwise fall back to `never` so it disappears from union types.

@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import { Artifact } from './artifact';
-import { BrowserContext, prepareBrowserContextParams } from './browserContext';
-import { CDPSession } from './cdpSession';
-import { ChannelOwner } from './channelOwner';
-import { isTargetClosedError } from './errors';
-import { Events } from './events';
-import { mkdirIfNeeded } from './fileUtils';
+import { Artifact } from './artifact.js';
+import { BrowserContext, prepareBrowserContextParams } from './browserContext.js';
+import { CDPSession } from './cdpSession.js';
+import { ChannelOwner } from './channelOwner.js';
+import { isTargetClosedError } from './errors.js';
+import { Events } from './events.js';
+import { mkdirIfNeeded } from './fileUtils.js';
 
-import type { BrowserType } from './browserType';
-import type { Page } from './page';
-import type { BrowserContextOptions, LaunchOptions, Logger } from './types';
+import type { BrowserType } from './browserType.js';
+import type { Page } from './page.js';
+import type { BrowserContextOptions, LaunchOptions, Logger } from './types.js';
 import type * as api from '../../types/types';
 import type * as channels from '@protocol/channels';
 

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { Dispatcher } from './dispatcher';
-import { PageDispatcher } from './pageDispatcher';
+import { Dispatcher } from './dispatcher.js';
+import { PageDispatcher } from './pageDispatcher.js';
 
-import type { Dialog } from '../dialog';
-import type { BrowserContextDispatcher } from './browserContextDispatcher';
+import type { Dialog } from '../dialog.js';
+import type { BrowserContextDispatcher } from './browserContextDispatcher.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 

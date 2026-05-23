@@ -17,13 +17,13 @@
 import { customCSSNames } from '@isomorphic/selectorParser';
 import { normalizeWhiteSpace } from '@isomorphic/stringUtils';
 
-import { isElementVisible, parentElementOrShadowHost } from './domUtils';
-import { layoutSelectorScore } from './layoutSelectorUtils';
-import { elementMatchesText, elementText, shouldSkipForTextMatching } from './selectorUtils';
+import { isElementVisible, parentElementOrShadowHost } from './domUtils.js';
+import { layoutSelectorScore } from './layoutSelectorUtils.js';
+import { elementMatchesText, elementText, shouldSkipForTextMatching } from './selectorUtils.js';
 
 import type { CSSComplexSelector, CSSComplexSelectorList, CSSFunctionArgument, CSSSimpleSelector } from '@isomorphic/cssParser';
-import type { LayoutSelectorName } from './layoutSelectorUtils';
-import type { ElementText } from './selectorUtils';
+import type { LayoutSelectorName } from './layoutSelectorUtils.js';
+import type { ElementText } from './selectorUtils.js';
 
 type QueryContext = {
   scope: Element | Document;

@@ -16,9 +16,9 @@
  */
 
 import { assert } from '@isomorphic/assert';
-import { readProtocolStream } from './crProtocolHelper';
+import { readProtocolStream } from './crProtocolHelper.js';
 
-import type { CRSession } from './crConnection';
+import type { CRSession } from './crConnection.js';
 import type * as channels from '@protocol/channels';
 
 const PagePaperFormats: { [key: string]: { width: number, height: number }} = {

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { WebhookReporterBase   } from './webhookBase';
-import type { WebhookFormatterInput, WebhookReporterOptions } from './webhookBase';
+import { WebhookReporterBase   } from './webhookBase.js';
+import type { WebhookFormatterInput, WebhookReporterOptions } from './webhookBase.js';
 
 export type SlackReporterOptions = WebhookReporterOptions;
 

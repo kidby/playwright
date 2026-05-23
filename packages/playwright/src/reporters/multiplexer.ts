@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import type { ReportConfigureParams, ReportEndParams, ReporterV2 } from './reporterV2';
+import type { ReportConfigureParams, ReportEndParams, ReporterV2 } from './reporterV2.js';
 import type { FullConfig, FullResult, TestCase, TestError, TestResult, TestStep, WorkerInfo } from '../../types/testReporter';
-import type { test } from '../common';
+import type { test } from '../common/index.js';
 
 export class Multiplexer implements ReporterV2 {
   private _reporters: ReporterV2[];

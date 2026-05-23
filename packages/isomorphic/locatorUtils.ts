@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { escapeForAttributeSelector, escapeForTextSelector } from './stringUtils';
+import { escapeForAttributeSelector, escapeForTextSelector } from './stringUtils.js';
 
 export type ByRoleOptions = {
   checked?: boolean;

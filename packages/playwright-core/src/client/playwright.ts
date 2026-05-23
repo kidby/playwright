@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { Android } from './android';
-import { Browser } from './browser';
-import { BrowserType } from './browserType';
-import { ChannelOwner } from './channelOwner';
-import { Electron } from './electron';
-import { TimeoutError } from './errors';
-import { APIRequest } from './fetch';
-import { Selectors } from './selectors';
+import { Android } from './android.js';
+import { Browser } from './browser.js';
+import { BrowserType } from './browserType.js';
+import { ChannelOwner } from './channelOwner.js';
+import { Electron } from './electron.js';
+import { TimeoutError } from './errors.js';
+import { APIRequest } from './fetch.js';
+import { Selectors } from './selectors.js';
 
 import type * as channels from '@protocol/channels';
 import type { LaunchOptions } from 'playwright-core';

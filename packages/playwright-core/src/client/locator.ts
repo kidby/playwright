@@ -19,11 +19,11 @@ import { getByAltTextSelector, getByClassNameSelector, getByIdSelector, getByLab
 import { escapeForTextSelector } from '@isomorphic/stringUtils';
 import { isString } from '@isomorphic/rtti';
 import { monotonicTime } from '@isomorphic/time';
-import { ElementHandle } from './elementHandle';
-import { DisposableStub } from './disposable';
+import { ElementHandle } from './elementHandle.js';
+import { DisposableStub } from './disposable.js';
 
-import type { ExpectResult, Frame } from './frame';
-import type { DropPayload, FilePayload, FrameExpectParams, Rect, SelectOption, SelectOptionOptions, TimeoutOptions } from './types';
+import type { ExpectResult, Frame } from './frame.js';
+import type { DropPayload, FilePayload, FrameExpectParams, Rect, SelectOption, SelectOptionOptions, TimeoutOptions } from './types.js';
 import type * as structs from '../../types/structs';
 import type * as api from '../../types/types';
 import type { ByRoleOptions } from '@isomorphic/locatorUtils';

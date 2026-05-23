@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import type * as playwright from '../../..';
-import type { Tab } from './tab';
+import type * as playwright from '../../../index.js';
+import type { Tab } from './tab.js';
 
 export async function waitForCompletion<R>(tab: Tab, callback: () => Promise<R>): Promise<R> {
   const requests: playwright.Request[] = [];

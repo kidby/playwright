@@ -16,41 +16,41 @@
 
 import { renderTitleForCall } from '@isomorphic/protocolFormatter';
 import { deserializeURLMatch, urlMatches } from '@isomorphic/urlMatch';
-import { Page, Worker } from '../page';
-import { Dispatcher } from './dispatcher';
-import { parseError, serializeError } from '../errors';
-import { ArtifactDispatcher } from './artifactDispatcher';
-import { ElementHandleDispatcher } from './elementHandlerDispatcher';
-import { FrameDispatcher } from './frameDispatcher';
-import { JSHandleDispatcher, parseArgument, serializeResult } from './jsHandleDispatcher';
-import { RequestDispatcher } from './networkDispatchers';
-import { ResponseDispatcher } from './networkDispatchers';
-import { RouteDispatcher, WebSocketDispatcher } from './networkDispatchers';
-import { WebSocketRouteDispatcher } from './webSocketRouteDispatcher';
-import { DisposableDispatcher } from './disposableDispatcher';
-import { SdkObject } from '../instrumentation';
-import { Recorder } from '../recorder';
-import { disposeAll } from '../disposable';
-import { VideoRecorder } from '../videoRecorder';
-import { nullProgress } from '../progress';
+import { Page, Worker } from '../page.js';
+import { Dispatcher } from './dispatcher.js';
+import { parseError, serializeError } from '../errors.js';
+import { ArtifactDispatcher } from './artifactDispatcher.js';
+import { ElementHandleDispatcher } from './elementHandlerDispatcher.js';
+import { FrameDispatcher } from './frameDispatcher.js';
+import { JSHandleDispatcher, parseArgument, serializeResult } from './jsHandleDispatcher.js';
+import { RequestDispatcher } from './networkDispatchers.js';
+import { ResponseDispatcher } from './networkDispatchers.js';
+import { RouteDispatcher, WebSocketDispatcher } from './networkDispatchers.js';
+import { WebSocketRouteDispatcher } from './webSocketRouteDispatcher.js';
+import { DisposableDispatcher } from './disposableDispatcher.js';
+import { SdkObject } from '../instrumentation.js';
+import { Recorder } from '../recorder.js';
+import { disposeAll } from '../disposable.js';
+import { VideoRecorder } from '../videoRecorder.js';
+import { nullProgress } from '../progress.js';
 
-import type { Artifact } from '../artifact';
-import type { BrowserContext } from '../browserContext';
-import type { CRCoverage } from '../chromium/crCoverage';
-import type { Download } from '../download';
-import type { FileChooser } from '../fileChooser';
-import type { BrowserContextDispatcher } from './browserContextDispatcher';
-import type { Frame } from '../frames';
-import type { RouteHandler } from '../network';
-import type { InitScript } from '../page';
-import type { Disposable } from '../disposable';
-import type { BrowserTypeDispatcher } from './browserTypeDispatcher';
-import type { ConsoleMessage } from '../console';
+import type { Artifact } from '../artifact.js';
+import type { BrowserContext } from '../browserContext.js';
+import type { CRCoverage } from '../chromium/crCoverage.js';
+import type { Download } from '../download.js';
+import type { FileChooser } from '../fileChooser.js';
+import type { BrowserContextDispatcher } from './browserContextDispatcher.js';
+import type { Frame } from '../frames.js';
+import type { RouteHandler } from '../network.js';
+import type { InitScript } from '../page.js';
+import type { Disposable } from '../disposable.js';
+import type { BrowserTypeDispatcher } from './browserTypeDispatcher.js';
+import type { ConsoleMessage } from '../console.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 import type { URLMatch } from '@isomorphic/urlMatch';
-import type { ScreencastFrame } from '../types';
-import type { ScreencastClient } from '../screencast';
+import type { ScreencastFrame } from '../types.js';
+import type { ScreencastClient } from '../screencast.js';
 
 export class PageDispatcher extends Dispatcher<Page, channels.PageChannel, BrowserContextDispatcher> implements channels.PageChannel {
   _type_Page = true;
@@ -417,6 +417,7 @@ export class PageDispatcher extends Dispatcher<Page, channels.PageChannel, Brows
 
   async screencastStop(params: channels.PageScreencastStopParams, progress?: Progress): Promise<channels.PageScreencastStopResult> {
     if (this._videoRecorder) {
+      // oxlint-disable-next-line progress/await-must-use-progress -- cleanup; progress is optional and finalization must always complete
       await this._videoRecorder.stop();
       this._videoRecorder = undefined;
     }

@@ -10,3 +10,6 @@ node_modules/source-map-support
 [babelBundle.ts]
 node_modules/@babel/core
 node_modules/@babel/traverse
+
+[oxcBundle.ts]
+node_modules/oxc-transform

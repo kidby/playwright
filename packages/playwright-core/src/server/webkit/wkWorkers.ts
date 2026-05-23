@@ -15,14 +15,14 @@
  */
 
 import { eventsHelper } from '@utils/eventsHelper';
-import { Worker } from '../page';
-import { WKSession } from './wkConnection';
-import { createHandle, WKExecutionContext } from './wkExecutionContext';
+import { Worker } from '../page.js';
+import { WKSession } from './wkConnection.js';
+import { createHandle, WKExecutionContext } from './wkExecutionContext.js';
 
 import type { Protocol } from './protocol';
 import type { RegisteredListener } from '@utils/eventsHelper';
-import type { Page } from '../page';
-import type * as types from '../types';
+import type { Page } from '../page.js';
+import type * as types from '../types.js';
 
 export class WKWorkers {
   private _sessionListeners: RegisteredListener[] = [];

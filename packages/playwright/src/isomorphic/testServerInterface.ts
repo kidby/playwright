@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import type { Event } from './events';
-import type { JsonEvent } from './teleReceiver';
+import type { Event } from './events.js';
+import type { JsonEvent } from './teleReceiver.js';
 import type * as reporterTypes from '../../types/testReporter';
 
 // -- Reuse boundary -- Everything below this line is reused in the vscode extension.

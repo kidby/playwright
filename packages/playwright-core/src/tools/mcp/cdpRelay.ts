@@ -33,18 +33,18 @@ import os from 'os';
 import debug from 'debug';
 import ws, { WebSocketServer as wsServer } from 'ws';
 import { ManualPromise } from '@isomorphic/manualPromise';
-import { registry } from '../../server/registry/index';
+import { registry } from '../../server/registry/index.js';
 
-import { playwrightExtensionId } from '../utils/extension';
-import { addressToString } from '../utils/mcp/http';
-import { logUnhandledError } from './log';
-import { ExtensionProtocolV1 } from './cdpRelayV1';
-import { ExtensionProtocolV2 } from './cdpRelayV2';
-import * as protocol from './protocol';
+import { playwrightExtensionId } from '../utils/extension.js';
+import { addressToString } from '../utils/mcp/http.js';
+import { logUnhandledError } from './log.js';
+import { ExtensionProtocolV1 } from './cdpRelayV1.js';
+import { ExtensionProtocolV2 } from './cdpRelayV2.js';
+import * as protocol from './protocol.js';
 
 import type websocket from 'ws';
-import type { ExtensionCommand, ExtensionEvents } from './protocol';
-import type { CDPMessage, ExtensionProtocolHandler } from './cdpRelayHandler';
+import type { ExtensionCommand, ExtensionEvents } from './protocol.js';
+import type { CDPMessage, ExtensionProtocolHandler } from './cdpRelayHandler.js';
 import type { WebSocket, WebSocketServer } from 'ws';
 
 

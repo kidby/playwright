@@ -18,14 +18,14 @@ import { startProfiling, stopProfiling } from '@utils/profiler';
 import { debugLogger } from '@utils/debugLogger';
 import { monotonicTime } from '@isomorphic/time';
 import { Semaphore } from '@isomorphic/semaphore';
-import { DispatcherConnection, PlaywrightDispatcher, RootDispatcher } from '../server';
-import { AndroidDevice } from '../server/android/android';
-import { Browser } from '../server/browser';
-import { DebugControllerDispatcher } from '../server/dispatchers/debugControllerDispatcher';
-import { PlaywrightDispatcherOptions } from '../server/dispatchers/playwrightDispatcher';
+import { DispatcherConnection, PlaywrightDispatcher, RootDispatcher } from '../server/index.js';
+import { AndroidDevice } from '../server/android/android.js';
+import { Browser } from '../server/browser.js';
+import { DebugControllerDispatcher } from '../server/dispatchers/debugControllerDispatcher.js';
+import { PlaywrightDispatcherOptions } from '../server/dispatchers/playwrightDispatcher.js';
 
-import type { DispatcherScope, Playwright } from '../server';
-import type { ServerTransport } from './serverTransport';
+import type { DispatcherScope, Playwright } from '../server/index.js';
+import type { ServerTransport } from './serverTransport.js';
 
 export interface PlaywrightInitializeResult extends PlaywrightDispatcherOptions {
   dispose?(): Promise<void>;

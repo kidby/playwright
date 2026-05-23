@@ -15,34 +15,34 @@
  */
 
 import * as z from 'zod';
-import common from './common';
-import config from './config';
-import console from './console';
-import cookies from './cookies';
-import devtools from './devtools';
-import dialogs from './dialogs';
-import evaluate from './evaluate';
-import files from './files';
-import form from './form';
-import keyboard from './keyboard';
-import mouse from './mouse';
-import navigate from './navigate';
-import network from './network';
-import pdf from './pdf';
-import route from './route';
-import runCode from './runCode';
-import snapshot from './snapshot';
-import screenshot from './screenshot';
-import storage from './storage';
-import tabs from './tabs';
-import tracing from './tracing';
-import verify from './verify';
-import video from './video';
-import wait from './wait';
-import webstorage from './webstorage';
+import common from './common.js';
+import config from './config.js';
+import console from './console.js';
+import cookies from './cookies.js';
+import devtools from './devtools.js';
+import dialogs from './dialogs.js';
+import evaluate from './evaluate.js';
+import files from './files.js';
+import form from './form.js';
+import keyboard from './keyboard.js';
+import mouse from './mouse.js';
+import navigate from './navigate.js';
+import network from './network.js';
+import pdf from './pdf.js';
+import route from './route.js';
+import runCode from './runCode.js';
+import snapshot from './snapshot.js';
+import screenshot from './screenshot.js';
+import storage from './storage.js';
+import tabs from './tabs.js';
+import tracing from './tracing.js';
+import verify from './verify.js';
+import video from './video.js';
+import wait from './wait.js';
+import webstorage from './webstorage.js';
 
-import type { Tool } from './tool';
-import type { ContextConfig } from './context';
+import type { Tool } from './tool.js';
+import type { ContextConfig } from './context.js';
 
 export const browserTools: Tool<any>[] = [
   ...common,

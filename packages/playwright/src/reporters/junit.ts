@@ -19,10 +19,10 @@ import path from 'path';
 
 import { getAsBooleanFromENV } from '@utils/env';
 
-import { CommonReporterOptions, formatFailure, nonTerminalScreen, resolveOutputFile } from './base';
-import { stripAnsiEscapes } from '../util';
+import { CommonReporterOptions, formatFailure, nonTerminalScreen, resolveOutputFile } from './base.js';
+import { stripAnsiEscapes } from '../util.js';
 
-import type { ReporterV2 } from './reporterV2';
+import type { ReporterV2 } from './reporterV2.js';
 import type { JUnitReporterOptions } from '../../types/test';
 import type { FullConfig, FullResult, Suite, TestCase, TestResult } from '../../types/testReporter';
 

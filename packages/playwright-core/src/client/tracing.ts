@@ -15,11 +15,11 @@
  */
 
 import { isRegExp, isString } from '@isomorphic/rtti';
-import { Artifact } from './artifact';
-import { ChannelOwner } from './channelOwner';
-import { DisposableStub } from './disposable';
+import { Artifact } from './artifact.js';
+import { ChannelOwner } from './channelOwner.js';
+import { DisposableStub } from './disposable.js';
 
-import type { Page } from './page';
+import type { Page } from './page.js';
 import type * as api from '../../types/types';
 import type * as channels from '@protocol/channels';
 

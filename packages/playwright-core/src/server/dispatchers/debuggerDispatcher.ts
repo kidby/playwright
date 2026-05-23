@@ -15,10 +15,10 @@
  */
 
 import { renderTitleForCall } from '@isomorphic/protocolFormatter';
-import { Dispatcher } from './dispatcher';
-import { Debugger } from '../debugger';
+import { Dispatcher } from './dispatcher.js';
+import { Debugger } from '../debugger.js';
 
-import type { BrowserContextDispatcher } from './browserContextDispatcher';
+import type { BrowserContextDispatcher } from './browserContextDispatcher.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 

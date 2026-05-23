@@ -19,15 +19,15 @@ import path from 'path';
 
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { wrapInASCIIBox } from '@utils/ascii';
-import { BrowserType, kNoXServerRunningError } from '../browserType';
-import { BidiBrowser } from './bidiBrowser';
-import { kBrowserCloseMessageId, kShutdownSessionNewMessageId } from './bidiConnection';
-import { createProfile } from './third_party/firefoxPrefs';
+import { BrowserType, kNoXServerRunningError } from '../browserType.js';
+import { BidiBrowser } from './bidiBrowser.js';
+import { kBrowserCloseMessageId, kShutdownSessionNewMessageId } from './bidiConnection.js';
+import { createProfile } from './third_party/firefoxPrefs.js';
 
-import type { BrowserOptions } from '../browser';
-import type { SdkObject } from '../instrumentation';
-import type { ConnectionTransport } from '../transport';
-import type * as types from '../types';
+import type { BrowserOptions } from '../browser.js';
+import type { SdkObject } from '../instrumentation.js';
+import type { ConnectionTransport } from '../transport.js';
+import type * as types from '../types.js';
 import type { RecentLogsCollector } from '@utils/debugLogger';
 
 

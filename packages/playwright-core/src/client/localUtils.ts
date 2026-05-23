@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { ChannelOwner } from './channelOwner';
+import { ChannelOwner } from './channelOwner.js';
 
-import type { Size } from './types';
+import type { Size } from './types.js';
 import type * as channels from '@protocol/channels';
 
 type DeviceDescriptor = {

@@ -20,15 +20,15 @@ import path from 'path';
 import { isUnderTest } from '@utils/debug';
 import { rewriteErrorMessage } from '@isomorphic/stackTrace';
 import { wrapInASCIIBox } from '@utils/ascii';
-import { libPath } from '../package';
-import { buildPlaywrightCLICommand, findChromiumChannelBestEffort } from './registry';
-import { registryDirectory } from './registry';
-import { nullProgress, ProgressController } from './progress';
+import { libPath } from '../package.js';
+import { buildPlaywrightCLICommand, findChromiumChannelBestEffort } from './registry/index.js';
+import { registryDirectory } from './registry/index.js';
+import { nullProgress, ProgressController } from './progress.js';
 
-import type { BrowserType } from './browserType';
-import type { CRPage } from './chromium/crPage';
-import type { Page } from './page';
-import type * as types from './types';
+import type { BrowserType } from './browserType.js';
+import type { CRPage } from './chromium/crPage.js';
+import type { Page } from './page.js';
+import type * as types from './types.js';
 
 
 export async function launchApp(browserType: BrowserType, options: {

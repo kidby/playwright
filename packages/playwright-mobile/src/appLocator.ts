@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { AppiumClient, ElementHandle, LocatorStrategy } from './appiumClient';
+import type { AppiumClient, ElementHandle, LocatorStrategy } from './appiumClient.js';
 
 export type LocatorChainPart = { using: LocatorStrategy; value: string };
 

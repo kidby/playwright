@@ -17,8 +17,8 @@
 import * as z from 'zod';
 import { escapeWithQuotes } from '@isomorphic/stringUtils';
 
-import { defineTabTool } from './tool';
-import { elementSchema } from './snapshot';
+import { defineTabTool } from './tool.js';
+import { elementSchema } from './snapshot.js';
 
 const fillForm = defineTabTool({
   capability: 'core',

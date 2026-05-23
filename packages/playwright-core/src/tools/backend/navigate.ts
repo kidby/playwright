@@ -15,7 +15,7 @@
  */
 
 import * as z from 'zod';
-import { defineTool, defineTabTool } from './tool';
+import { defineTool, defineTabTool } from './tool.js';
 
 const navigate = defineTool({
   capability: 'core-navigation',

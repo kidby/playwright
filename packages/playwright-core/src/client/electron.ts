@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-import { BrowserContext, prepareBrowserContextParams } from './browserContext';
-import { ChannelOwner } from './channelOwner';
-import { envObjectToArray } from './clientHelper';
-import { ConsoleMessage } from './consoleMessage';
-import { TargetClosedError, isTargetClosedError } from './errors';
-import { Events } from './events';
-import { JSHandle, parseResult, serializeArgument } from './jsHandle';
-import { Waiter } from './waiter';
-import { TimeoutSettings } from './timeoutSettings';
+import { BrowserContext, prepareBrowserContextParams } from './browserContext.js';
+import { ChannelOwner } from './channelOwner.js';
+import { envObjectToArray } from './clientHelper.js';
+import { ConsoleMessage } from './consoleMessage.js';
+import { TargetClosedError, isTargetClosedError } from './errors.js';
+import { Events } from './events.js';
+import { JSHandle, parseResult, serializeArgument } from './jsHandle.js';
+import { Waiter } from './waiter.js';
+import { TimeoutSettings } from './timeoutSettings.js';
 
-import type { Page } from './page';
-import type { BrowserContextOptions, Headers, WaitForEventOptions } from './types';
+import type { Page } from './page.js';
+import type { BrowserContextOptions, Headers, WaitForEventOptions } from './types.js';
 import type * as structs from '../../types/structs';
 import type * as api from '../../types/types';
 import type * as channels from '@protocol/channels';
 import type * as childProcess from 'child_process';
 import type { BrowserWindow } from 'electron';
-import type { Playwright } from './playwright';
+import type { Playwright } from './playwright.js';
 
 type ElectronOptions = Omit<channels.ElectronLaunchOptions, 'env'|'extraHTTPHeaders'|'recordHar'|'colorScheme'|'acceptDownloads'> & {
   env?: NodeJS.ProcessEnv,

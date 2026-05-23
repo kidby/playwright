@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { ElementHandle } from './dom';
+import type { ElementHandle } from './dom.js';
 
 export class FileChooser {
   private _elementHandle: ElementHandle;

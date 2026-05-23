@@ -22,7 +22,7 @@ import { assert } from '@isomorphic/assert';
 import { monotonicTime, timeOrigin } from '@isomorphic/time';
 import { raceAgainstDeadline } from '@isomorphic/timeoutRunner';
 
-import type { ipc, processRunner } from '../common';
+import type { ipc, processRunner } from '../common/index.js';
 
 export type ProcessExitData = {
   unexpectedly: boolean;

@@ -20,16 +20,16 @@ import path from 'path';
 
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { wrapInASCIIBox } from '@utils/ascii';
-import { FFBrowser } from './ffBrowser';
-import { kBrowserCloseMessageId } from './ffConnection';
-import { BrowserType, kNoXServerRunningError } from '../browserType';
+import { FFBrowser } from './ffBrowser.js';
+import { kBrowserCloseMessageId } from './ffConnection.js';
+import { BrowserType, kNoXServerRunningError } from '../browserType.js';
 
-import type { Browser, BrowserOptions } from '../browser';
-import type { SdkObject } from '../instrumentation';
-import type { ConnectionTransport } from '../transport';
-import type * as types from '../types';
+import type { Browser, BrowserOptions } from '../browser.js';
+import type { SdkObject } from '../instrumentation.js';
+import type { ConnectionTransport } from '../transport.js';
+import type * as types from '../types.js';
 import type { RecentLogsCollector } from '@utils/debugLogger';
-import type { BrowserContext } from '../browserContext';
+import type { BrowserContext } from '../browserContext.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 

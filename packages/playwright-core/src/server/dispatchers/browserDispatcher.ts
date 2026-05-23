@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import { Browser } from '../browser';
-import { BrowserContextDispatcher } from './browserContextDispatcher';
-import { CDPSessionDispatcher } from './cdpSessionDispatcher';
-import { Dispatcher } from './dispatcher';
-import { BrowserContext } from '../browserContext';
-import { ArtifactDispatcher } from './artifactDispatcher';
-import { nullProgress } from '../progress';
+import { Browser } from '../browser.js';
+import { BrowserContextDispatcher } from './browserContextDispatcher.js';
+import { CDPSessionDispatcher } from './cdpSessionDispatcher.js';
+import { Dispatcher } from './dispatcher.js';
+import { BrowserContext } from '../browserContext.js';
+import { ArtifactDispatcher } from './artifactDispatcher.js';
+import { nullProgress } from '../progress.js';
 
-import type { BrowserTypeDispatcher } from './browserTypeDispatcher';
-import type { PageDispatcher } from './pageDispatcher';
-import type { CRBrowser } from '../chromium/crBrowser';
+import type { BrowserTypeDispatcher } from './browserTypeDispatcher.js';
+import type { PageDispatcher } from './pageDispatcher.js';
+import type { CRBrowser } from '../chromium/crBrowser.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 

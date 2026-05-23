@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { Language } from '../locatorGenerators';
+import type { Language } from '../locatorGenerators.js';
 import type { ResourceSnapshot } from '@trace/snapshot';
 import type * as trace from '@trace/trace';
 

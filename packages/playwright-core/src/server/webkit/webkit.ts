@@ -19,14 +19,14 @@ import path from 'path';
 
 import { wrapInASCIIBox } from '@utils/ascii';
 import { spawnAsync } from '@utils/spawnAsync';
-import { kBrowserCloseMessageId } from './wkConnection';
-import { BrowserType, kNoXServerRunningError } from '../browserType';
-import { WKBrowser } from '../webkit/wkBrowser';
+import { kBrowserCloseMessageId } from './wkConnection.js';
+import { BrowserType, kNoXServerRunningError } from '../browserType.js';
+import { WKBrowser } from '../webkit/wkBrowser.js';
 
-import type { BrowserOptions } from '../browser';
-import type { SdkObject } from '../instrumentation';
-import type { ConnectionTransport } from '../transport';
-import type * as types from '../types';
+import type { BrowserOptions } from '../browser.js';
+import type { SdkObject } from '../instrumentation.js';
+import type { ConnectionTransport } from '../transport.js';
+import type * as types from '../types.js';
 
 export class WebKit extends BrowserType {
   constructor(parent: SdkObject) {

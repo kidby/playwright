@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { WebSocketTransport } from '../transport';
+import { WebSocketTransport } from '../transport.js';
 
-import type { ConnectionTransport, ProtocolResponse } from '../transport';
+import type { ConnectionTransport, ProtocolResponse } from '../transport.js';
 
 export type ChatMessage = {
   content: string;

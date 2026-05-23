@@ -16,10 +16,10 @@
  */
 
 import { assert } from '@isomorphic/assert';
-import { SdkObject } from './instrumentation';
+import { SdkObject } from './instrumentation.js';
 
-import type { Instrumentation } from './instrumentation';
-import type { Page } from './page';
+import type { Instrumentation } from './instrumentation.js';
+import type { Page } from './page.js';
 import type { Progress } from '@protocol/progress';
 
 type OnHandle = (accept: boolean, promptText?: string) => Promise<void>;

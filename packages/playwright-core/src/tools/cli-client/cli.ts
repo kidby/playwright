@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { program } from './program';
+import { program } from './program.js';
 
 program().catch(e => {
   /* eslint-disable no-console */

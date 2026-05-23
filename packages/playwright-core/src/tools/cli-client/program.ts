@@ -22,17 +22,17 @@ import crypto from 'crypto';
 import os from 'os';
 import path from 'path';
 
-import { isKnownChannel, listChannelSessions } from './channelSessions';
-import { JsonOutput, TextOutput } from './output';
-import { clientKey, createClientInfo, explicitSessionName, Registry, resolveSessionName } from './registry';
-import { Session } from './session';
-import { libPath } from '../../package';
-import { serverRegistry } from '../../serverRegistry';
-import { minimist } from './minimist';
+import { isKnownChannel, listChannelSessions } from './channelSessions.js';
+import { JsonOutput, TextOutput } from './output.js';
+import { clientKey, createClientInfo, explicitSessionName, Registry, resolveSessionName } from './registry.js';
+import { Session } from './session.js';
+import { libPath } from '../../package.js';
+import { serverRegistry } from '../../serverRegistry.js';
+import { minimist } from './minimist.js';
 
-import type { ListData, ListedBrowser, Output } from './output';
-import type { ClientInfo, SessionFile } from './registry';
-import type { MinimistArgs } from './minimist';
+import type { ListData, ListedBrowser, Output } from './output.js';
+import type { ClientInfo, SessionFile } from './registry.js';
+import type { MinimistArgs } from './minimist.js';
 
 type GlobalOptions = {
   help?: boolean;
@@ -327,8 +327,8 @@ async function runInitWorkspace(args: MinimistArgs, output: Output) {
 
 async function installBrowser() {
   const argv = process.argv.map(arg => arg === 'install-browser' ? 'install' : arg);
-  const { libCli } = require('../../coreBundle.js') as typeof import('../../coreBundle');
-  const { program } = require('../../utilsBundle.js') as typeof import('../../utilsBundle');
+  const { libCli } = require('../../coreBundle.js') as typeof import('../../coreBundle.js');
+  const { program } = require('../../utilsBundle.js') as typeof import('../../utilsBundle.js');
   if (!program.version())
     libCli.decorateProgram(program);
   program.parse(argv);

@@ -17,22 +17,22 @@
 import { isRegExp, isString } from '@isomorphic/rtti';
 import { monotonicTime } from '@isomorphic/time';
 import { raceAgainstDeadline } from '@isomorphic/timeoutRunner';
-import { EventEmitter } from './eventEmitter';
-import { BrowserContext, prepareBrowserContextParams } from './browserContext';
-import { ChannelOwner } from './channelOwner';
-import { TargetClosedError, isTargetClosedError } from './errors';
-import { Events } from './events';
-import { Waiter } from './waiter';
-import { TimeoutSettings } from './timeoutSettings';
-import { connectToEndpoint } from './connect';
+import { EventEmitter } from './eventEmitter.js';
+import { BrowserContext, prepareBrowserContextParams } from './browserContext.js';
+import { ChannelOwner } from './channelOwner.js';
+import { TargetClosedError, isTargetClosedError } from './errors.js';
+import { Events } from './events.js';
+import { Waiter } from './waiter.js';
+import { TimeoutSettings } from './timeoutSettings.js';
+import { connectToEndpoint } from './connect.js';
 
-import type { Page } from './page';
-import type * as types from './types';
+import type { Page } from './page.js';
+import type * as types from './types.js';
 import type * as api from '../../types/types';
-import type { AndroidServerLauncherImpl } from '../androidServerImpl';
+import type { AndroidServerLauncherImpl } from '../androidServerImpl.js';
 import type { Platform } from '@isomorphic/platform';
 import type * as channels from '@protocol/channels';
-import type { Playwright } from './playwright';
+import type { Playwright } from './playwright.js';
 
 type Direction = 'down' | 'up' | 'left' | 'right';
 type SpeedOptions = { speed?: number };

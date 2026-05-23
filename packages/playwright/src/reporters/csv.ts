@@ -17,11 +17,11 @@
 import path from 'path';
 
 import { stripAnsiEscapes } from '@isomorphic/stringUtils';
-import { resolveOutputFile  } from './base';
-import { writeFileAtomic } from './runtimeIO';
-import type { CommonReporterOptions } from './base';
+import { resolveOutputFile  } from './base.js';
+import { writeFileAtomic } from './runtimeIO.js';
+import type { CommonReporterOptions } from './base.js';
 
-import type { ReporterV2 } from './reporterV2';
+import type { ReporterV2 } from './reporterV2.js';
 import type { FullConfig, FullResult, Suite, TestCase, TestResult } from '../../types/testReporter';
 
 export type CsvReporterOptions = {

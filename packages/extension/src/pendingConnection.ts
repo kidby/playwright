@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RelayConnection, debugLog } from './relayConnection';
+import { RelayConnection, debugLog } from './relayConnection.js';
 
 interface PendingEntry {
   connect(): Promise<RelayConnection>;

@@ -17,7 +17,7 @@
 import fs from 'fs';
 
 import * as ini from 'ini';
-import type { Config } from './config.d';
+import type { Config } from './config.d.js';
 
 export function configFromIniFile(filePath: string): Config {
   const content = fs.readFileSync(filePath, 'utf8');

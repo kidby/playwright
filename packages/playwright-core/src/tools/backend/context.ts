@@ -23,14 +23,14 @@ import { escapeWithQuotes } from '@isomorphic/stringUtils';
 import { disposeAll } from '@isomorphic/disposable';
 import { eventsHelper } from '@utils/eventsHelper';
 import { isPathInside, isSystemDirectory, isWritable } from '@utils/fileUtils';
-import { playwright } from '../../inprocess';
+import { playwright } from '../../inprocess.js';
 
-import { Tab } from './tab';
+import { Tab } from './tab.js';
 
-import type * as playwrightTypes from '../../..';
-import type { SessionLog } from './sessionLog';
+import type * as playwrightTypes from '../../../index.js';
+import type { SessionLog } from './sessionLog.js';
 import type { Disposable } from '@isomorphic/disposable';
-import type { ToolCapability } from './tool';
+import type { ToolCapability } from './tool.js';
 
 const testDebug = debug('pw:mcp:test');
 

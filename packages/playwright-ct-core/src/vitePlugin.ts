@@ -22,17 +22,17 @@ import { colors, debug } from 'playwright-core/lib/utilsBundle';
 import { cc, transform } from 'playwright/lib/common';
 import { removeDirAndLogToConsole } from 'playwright/lib/util';
 
-import { source as injectedSource } from './generated/indexSource';
-import { createConfig, frameworkConfig, hasJSComponents, populateComponentsFromTests, resolveDirs, transformIndexFile } from './viteUtils';
+import { source as injectedSource } from './generated/indexSource.js';
+import { createConfig, frameworkConfig, hasJSComponents, populateComponentsFromTests, resolveDirs, transformIndexFile } from './viteUtils.js';
 
 import type http from 'http';
 import type { AddressInfo } from 'net';
 import type { FullConfig, Suite } from 'playwright/types/testReporter';
 import type { PluginContext } from 'rollup';
 import type { Plugin, ResolveFn, ResolvedConfig } from 'vite';
-import type { TestRunnerPlugin } from '../../playwright/src/plugins';
-import type { ImportInfo } from './tsxTransform';
-import type { ComponentRegistry } from './viteUtils';
+import type { TestRunnerPlugin } from '../../playwright/src/plugins/index.js';
+import type { ImportInfo } from './tsxTransform.js';
+import type { ComponentRegistry } from './viteUtils.js';
 
 
 const log = debug('pw:vite');

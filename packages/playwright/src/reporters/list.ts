@@ -17,12 +17,12 @@
 import { msToString } from '@isomorphic/formatUtils';
 import { getAsBooleanFromENV } from '@utils/env';
 
-import { markErrorsAsReported, TerminalReporter, stepSuffix } from './base';
-import { stripAnsiEscapes } from '../util';
+import { markErrorsAsReported, TerminalReporter, stepSuffix } from './base.js';
+import { stripAnsiEscapes } from '../util.js';
 
 import type { ListReporterOptions } from '../../types/test';
 import type { FullResult, Suite, TestCase, TestError, TestResult, TestStep } from '../../types/testReporter';
-import type { CommonReporterOptions, TerminalReporterOptions } from './base';
+import type { CommonReporterOptions, TerminalReporterOptions } from './base.js';
 
 // Allow it in the Visual Studio Code Terminal and the new Windows Terminal
 const DOES_NOT_SUPPORT_UTF8_IN_TERMINAL = process.platform === 'win32' && process.env.TERM_PROGRAM !== 'vscode' && !process.env.WT_SESSION;

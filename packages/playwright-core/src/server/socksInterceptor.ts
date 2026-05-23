@@ -18,10 +18,10 @@ import EventEmitter from 'events';
 
 import * as socks from '@utils/socksProxy';
 import { isUnderTest } from '@utils/debug';
-import { ValidationError, findValidator } from '../protocol/validator';
+import { ValidationError, findValidator } from '../protocol/validator.js';
 
-import type { WebSocketTransport } from './transport';
-import type { ValidatorContext } from '../protocol/validator';
+import type { WebSocketTransport } from './transport.js';
+import type { ValidatorContext } from '../protocol/validator.js';
 import type * as channels from '@protocol/channels';
 
 export class SocksInterceptor {

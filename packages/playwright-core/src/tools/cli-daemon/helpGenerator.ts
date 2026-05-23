@@ -15,10 +15,10 @@
  */
 
 import * as z from 'zod';
-import { commands } from './commands';
+import { commands } from './commands.js';
 
 import type zodType from 'zod';
-import type { AnyCommandSchema, Category } from './command';
+import type { AnyCommandSchema, Category } from './command.js';
 
 type CommandArg = { name: string, description: string, optional: boolean };
 

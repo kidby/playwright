@@ -17,12 +17,12 @@
 import EventEmitter from 'events';
 
 import { createGuid } from '@utils/crypto';
-import { PlaywrightServer } from './remote/playwrightServer';
-import { createPlaywright } from './server/playwright';
-import { nullProgress, ProgressController } from './server/progress';
+import { PlaywrightServer } from './remote/playwrightServer.js';
+import { createPlaywright } from './server/playwright.js';
+import { nullProgress, ProgressController } from './server/progress.js';
 
-import type { BrowserServer } from './client/browserType';
-import type { LaunchAndroidServerOptions } from './client/types';
+import type { BrowserServer } from './client/browserType.js';
+import type { LaunchAndroidServerOptions } from './client/types.js';
 
 export class AndroidServerLauncherImpl {
   async launchServer(options: LaunchAndroidServerOptions = {}): Promise<BrowserServer> {

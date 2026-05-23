@@ -34,7 +34,7 @@
     "no-proto": "error",
     "require-yield": "error",
     "accessor-pairs": ["error", { "getWithoutSet": false, "setWithoutGet": false }],
-    "eslint/no-unused-vars": "off",
+    "no-unused-vars": "off",
     "typescript/no-unused-vars": ["error", { "args": "none", "caughtErrors": "none" }],
     "react/react-in-jsx-scope": "off"
   },
@@ -44,11 +44,12 @@
       "rules": {
         "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
         "no-console": "error",
+        "no-unused-vars": "off",
         "curly": ["error", "multi-or-nest", "consistent"]
       }
     },
     {
-      "files": ["packages/playwright-core/src/server/**/*.ts"],
+      "files": ["packages/playwright-core/src/server/**/*.ts", "packages/utils/**/*.ts"],
       "rules": {
         "progress/await-must-use-progress": "error"
       }

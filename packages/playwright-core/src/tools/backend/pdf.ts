@@ -17,7 +17,7 @@
 import * as z from 'zod';
 import { formatObject } from '@isomorphic/stringUtils';
 
-import { defineTabTool } from './tool';
+import { defineTabTool } from './tool.js';
 
 const pdfSchema = z.object({
   filename: z.string().optional().describe('File name to save the pdf to. Defaults to `page-{timestamp}.pdf` if not specified. Prefer relative file names to stay within the output directory.'),

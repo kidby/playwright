@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import type { Artifact } from './artifact';
-import type { Page } from './page';
+import type { Artifact } from './artifact.js';
+import type { Page } from './page.js';
 import type * as api from '../../types/types';
 import type { Readable } from 'stream';
 

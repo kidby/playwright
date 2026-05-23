@@ -20,10 +20,10 @@ import path from 'path';
 import { gracefullyProcessExitDoNotHang } from '@utils/processLauncher';
 import { startProfiling, stopProfiling } from '@utils/profiler';
 
-import { builtInReporters, configLoader, ipc } from '../common';
-import { base, projectUtils, testServer, watchMode, testRunner, runnerReporters } from '../runner';
+import { builtInReporters, configLoader, ipc } from '../common/index.js';
+import { base, projectUtils, testServer, watchMode, testRunner, runnerReporters } from '../runner/index.js';
 import type { ReporterDescription } from '../../types/test';
-import type { TestRunOptions } from '../runner/tasks';
+import type { TestRunOptions } from '../runner/tasks.js';
 
 export async function runTests(args: string[], opts: { [key: string]: any }) {
   await startProfiling();

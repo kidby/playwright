@@ -16,7 +16,7 @@
 
 /* eslint-disable no-console */
 
-import { loadTrace, formatTimestamp } from './traceUtils';
+import { loadTrace, formatTimestamp } from './traceUtils.js';
 
 export async function traceConsole(options: { errorsOnly?: boolean, warnings?: boolean, browser?: boolean, stdio?: boolean }) {
   const trace = await loadTrace();

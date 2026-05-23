@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { ArtifactDispatcher } from './artifactDispatcher';
-import { Dispatcher } from './dispatcher';
-import { nullProgress } from '../progress';
+import { ArtifactDispatcher } from './artifactDispatcher.js';
+import { Dispatcher } from './dispatcher.js';
+import { nullProgress } from '../progress.js';
 
-import type { BrowserContextDispatcher } from './browserContextDispatcher';
-import type { APIRequestContextDispatcher } from './networkDispatchers';
-import type { PageDispatcher } from './pageDispatcher';
-import type { Tracing } from '../trace/recorder/tracing';
+import type { BrowserContextDispatcher } from './browserContextDispatcher.js';
+import type { APIRequestContextDispatcher } from './networkDispatchers.js';
+import type { PageDispatcher } from './pageDispatcher.js';
+import type { Tracing } from '../trace/recorder/tracing.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 

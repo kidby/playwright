@@ -17,16 +17,16 @@
 import { assert } from '@isomorphic/assert';
 import { headersObjectToArray } from '@isomorphic/headers';
 import { isString } from '@isomorphic/rtti';
-import { toClientCertificatesProtocol } from './browserContext';
-import { ChannelOwner } from './channelOwner';
-import { TargetClosedError, isTargetClosedError } from './errors';
-import { RawHeaders } from './network';
-import { Tracing } from './tracing';
-import { mkdirIfNeeded } from './fileUtils';
-import { TimeoutSettings } from './timeoutSettings';
+import { toClientCertificatesProtocol } from './browserContext.js';
+import { ChannelOwner } from './channelOwner.js';
+import { TargetClosedError, isTargetClosedError } from './errors.js';
+import { RawHeaders } from './network.js';
+import { Tracing } from './tracing.js';
+import { mkdirIfNeeded } from './fileUtils.js';
+import { TimeoutSettings } from './timeoutSettings.js';
 
-import type { Playwright } from './playwright';
-import type { ClientCertificate, FilePayload, Headers, RemoteAddr, SecurityDetails, SetStorageState, StorageState, TimeoutOptions } from './types';
+import type { Playwright } from './playwright.js';
+import type { ClientCertificate, FilePayload, Headers, RemoteAddr, SecurityDetails, SetStorageState, StorageState, TimeoutOptions } from './types.js';
 import type { Serializable } from '../../types/structs';
 import type * as api from '../../types/types';
 import type { HeadersArray, NameValue } from '@isomorphic/types';

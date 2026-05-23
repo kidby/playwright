@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Worker } from '../page';
-import { createHandle, CRExecutionContext } from './crExecutionContext';
-import { CRNetworkManager } from './crNetworkManager';
-import { BrowserContext } from '../browserContext';
-import * as network from '../network';
-import { ConsoleMessage } from '../console';
-import { stackTraceToLocation } from './crProtocolHelper';
+import { Worker } from '../page.js';
+import { createHandle, CRExecutionContext } from './crExecutionContext.js';
+import { CRNetworkManager } from './crNetworkManager.js';
+import { BrowserContext } from '../browserContext.js';
+import * as network from '../network.js';
+import { ConsoleMessage } from '../console.js';
+import { stackTraceToLocation } from './crProtocolHelper.js';
 
-import type { CRBrowserContext } from './crBrowser';
-import type { CRSession } from './crConnection';
+import type { CRBrowserContext } from './crBrowser.js';
+import type { CRSession } from './crConnection.js';
 import type { Protocol } from './protocol';
 
 export class CRServiceWorker extends Worker {

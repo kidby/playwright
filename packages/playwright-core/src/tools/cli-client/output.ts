@@ -19,10 +19,10 @@
 
 import path from 'path';
 
-import { playwrightExtensionInstallUrl } from '../utils/extension';
+import { playwrightExtensionInstallUrl } from '../utils/extension.js';
 
-import type { ChannelSession } from './channelSessions';
-import type { BrowserDescriptor } from '../../serverRegistry';
+import type { ChannelSession } from './channelSessions.js';
+import type { BrowserDescriptor } from '../../serverRegistry.js';
 
 export type ListedBrowser = {
   name: string;

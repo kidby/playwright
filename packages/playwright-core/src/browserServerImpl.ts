@@ -20,16 +20,16 @@ import { createGuid } from '@utils/crypto';
 import { isUnderTest } from '@utils/debug';
 import { rewriteErrorMessage } from '@isomorphic/stackTrace';
 import { DEFAULT_PLAYWRIGHT_LAUNCH_TIMEOUT } from '@isomorphic/time';
-import { PlaywrightServer } from './remote/playwrightServer';
-import { helper } from './server/helper';
-import { createPlaywright } from './server/playwright';
-import * as validatorPrimitives from './protocol/validatorPrimitives';
-import { ProgressController } from './server/progress';
+import { PlaywrightServer } from './remote/playwrightServer.js';
+import { helper } from './server/helper.js';
+import { createPlaywright } from './server/playwright.js';
+import * as validatorPrimitives from './protocol/validatorPrimitives.js';
+import { ProgressController } from './server/progress.js';
 
-import type { BrowserServer, BrowserServerLauncher } from './client/browserType';
-import type { LaunchServerOptions, Logger } from './client/types';
-import type { ProtocolLogger } from './server/types';
-import type { Browser } from './server/browser';
+import type { BrowserServer, BrowserServerLauncher } from './client/browserType.js';
+import type { LaunchServerOptions, Logger } from './client/types.js';
+import type { ProtocolLogger } from './server/types.js';
+import type { Browser } from './server/browser.js';
 
 export class BrowserServerLauncherImpl implements BrowserServerLauncher {
   private _browserName: 'chromium' | 'firefox' | 'webkit';

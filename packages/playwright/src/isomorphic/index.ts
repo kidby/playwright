@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-export * from './testServerConnection';
+export * from './testServerConnection.js';

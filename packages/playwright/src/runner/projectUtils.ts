@@ -21,9 +21,9 @@ import { promisify } from 'util';
 import minimatch from 'minimatch';
 import { escapeRegExp } from '@isomorphic/stringUtils';
 
-import { createFileMatcher } from '../util';
+import { createFileMatcher } from '../util.js';
 
-import type { config as commonConfig, FullConfigInternal } from '../common';
+import type { config as commonConfig, FullConfigInternal } from '../common/index.js';
 
 
 const readFileAsync = promisify(fs.readFile);

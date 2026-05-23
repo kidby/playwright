@@ -15,7 +15,7 @@
  */
 
 import { gracefullyCloseAll, gracefullyCloseSet } from '@utils/processLauncher';
-import { testDebug } from './log';
+import { testDebug } from './log.js';
 
 export function setupExitWatchdog() {
   let isExiting = false;

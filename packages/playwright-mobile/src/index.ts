@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-export { AppiumClient } from './appiumClient';
-export type { AppiumCapabilities, ElementHandle, LocatorStrategy } from './appiumClient';
-export { AppLocator } from './appLocator';
-export type { LocatorChainPart } from './appLocator';
-export { Device } from './device';
-export type { AndroidKey } from './device';
-export { listWebViewContexts, switchToWebViewContext, waitForWebViewContext, NATIVE_APP_CONTEXT } from './webview';
-export type { WebViewContextDescriptor, WebViewSelector } from './webview';
-export { convertPageSourceToSnapshot, parsePageSource } from './snapshot';
-export type { AccessibilityNode } from './snapshot';
-export { gestures } from './gestures';
-export type { GestureApi, SwipeDirection, SwipeOptions, TapOptions, LongPressOptions, DoubleTapOptions, ScrollToElementOptions, PullToRefreshOptions } from './gestures';
-export { androidCapabilities, iosCapabilities } from './capabilities';
-export type { AndroidCapabilityOptions, IosCapabilityOptions } from './capabilities';
-export { mobileTest, expect, captureFailureArtifacts } from './mobileTest';
-export type { MobileFixtures, AttachableTestInfo } from './mobileTest';
+export { AppiumClient } from './appiumClient.js';
+export type { AppiumCapabilities, ElementHandle, LocatorStrategy } from './appiumClient.js';
+export { AppLocator } from './appLocator.js';
+export type { LocatorChainPart } from './appLocator.js';
+export { Device } from './device.js';
+export type { AndroidKey } from './device.js';
+export { listWebViewContexts, switchToWebViewContext, waitForWebViewContext, NATIVE_APP_CONTEXT } from './webview.js';
+export type { WebViewContextDescriptor, WebViewSelector } from './webview.js';
+export { convertPageSourceToSnapshot, parsePageSource } from './snapshot.js';
+export type { AccessibilityNode } from './snapshot.js';
+export { gestures } from './gestures.js';
+export type { GestureApi, SwipeDirection, SwipeOptions, TapOptions, LongPressOptions, DoubleTapOptions, ScrollToElementOptions, PullToRefreshOptions } from './gestures.js';
+export { androidCapabilities, iosCapabilities } from './capabilities.js';
+export type { AndroidCapabilityOptions, IosCapabilityOptions } from './capabilities.js';
+export { mobileTest, expect, captureFailureArtifacts } from './mobileTest.js';
+export type { MobileFixtures, AttachableTestInfo } from './mobileTest.js';

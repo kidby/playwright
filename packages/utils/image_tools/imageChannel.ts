@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { blendWithWhite } from './colorUtils';
+import { blendWithWhite } from './colorUtils.js';
 
 export type PaddingOptions = {
   paddingSize?: number,

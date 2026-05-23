@@ -17,11 +17,11 @@
 import { InvalidSelectorError,  splitSelectorByFrame, stringifySelector, visitAllSelectorParts } from '@isomorphic/selectorParser';
 import { asLocator } from '@isomorphic/locatorGenerators';
 
-import type { ElementHandle, FrameExecutionContext } from './dom';
-import type { Frame } from './frames';
+import type { ElementHandle, FrameExecutionContext } from './dom.js';
+import type { Frame } from './frames.js';
 import type { InjectedScript } from '@injected/injectedScript';
-import type { JSHandle } from './javascript';
-import type * as types from './types';
+import type { JSHandle } from './javascript.js';
+import type * as types from './types.js';
 import type { ParsedSelector } from '@isomorphic/selectorParser';
 
 

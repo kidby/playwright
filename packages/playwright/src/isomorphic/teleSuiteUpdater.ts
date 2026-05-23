@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { TeleReporterReceiver, TeleSuite } from './teleReceiver';
-import { statusEx } from './testTree';
+import { TeleReporterReceiver, TeleSuite } from './teleReceiver.js';
+import { statusEx } from './testTree.js';
 
 import type * as reporterTypes from '../../types/testReporter';
-import type { ReporterV2 } from '../reporters/reporterV2';
+import type { ReporterV2 } from '../reporters/reporterV2.js';
 
 export type TeleSuiteUpdaterProgress = {
   total: number;

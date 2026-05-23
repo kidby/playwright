@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-import { registry } from '../coreBundle';
+import { registry } from '../coreBundle.js';
 
 registry.runOopDownloadBrowserMain();

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { wrapObject } from './injected/serializers';
-import { Router } from './router';
+import { wrapObject } from './injected/serializers.js';
+import { Router } from './router.js';
 
 import type { config, FullConfigInternal } from 'playwright/lib/common';
-import type { RouterFixture } from '../index';
-import type { ImportRef } from './injected/importRegistry';
+import type { RouterFixture } from '../index.js';
+import type { ImportRef } from './injected/importRegistry.js';
 import type { Component, JsxComponent, MountOptions, ObjectComponentOptions } from '../types/component';
 import type { Fixtures, Locator, Page, PlaywrightTestArgs, PlaywrightTestOptions, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from 'playwright/test';
 import type { Page as PageImpl } from 'playwright-core/lib/client/page';

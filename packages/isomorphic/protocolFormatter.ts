@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getMetainfo } from './protocolMetainfo';
+import { getMetainfo } from './protocolMetainfo.js';
 
 export function formatProtocolParam(params: Record<string, string> | undefined, alternatives: string): string | undefined {
   return _formatProtocolParam(params, alternatives)?.replaceAll('\n', '\\n');

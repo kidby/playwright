@@ -22,15 +22,15 @@ import { execFile } from 'child_process';
 import { Disposable } from '@isomorphic/disposable';
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { eventsHelper } from '@utils/eventsHelper';
-import { createClientInfo } from '../cli-client/registry';
+import { createClientInfo } from '../cli-client/registry.js';
 
-import { SessionProviderEvent } from './sessionProvider';
+import { SessionProviderEvent } from './sessionProvider.js';
 
-import type * as api from '../../..';
+import type * as api from '../../../index.js';
 import type { Transport } from '@utils/httpServer';
 import type { SubmittedAnnotationFrame, Tab } from '@dashboard/dashboardChannel';
-import type { BrowserDescriptor } from '../../serverRegistry';
-import type { SessionProvider } from './sessionProvider';
+import type { BrowserDescriptor } from '../../serverRegistry.js';
+import type { SessionProvider } from './sessionProvider.js';
 
 export type AnnotateResult =
   | { type: 'submitted', frames: SubmittedAnnotationFrame[], feedback: string }

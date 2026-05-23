@@ -33,10 +33,10 @@
  *     same model inputs and are translated into CDP events on the fly.
  */
 
-import { logUnhandledError } from './log';
+import { logUnhandledError } from './log.js';
 
-import type { CDPMessage, SendCommand, SendToCDPClient } from './cdpRelayHandler';
-import type { DebuggerSession, Debuggee, Tab } from './protocol';
+import type { CDPMessage, SendCommand, SendToCDPClient } from './cdpRelayHandler.js';
+import type { DebuggerSession, Debuggee, Tab } from './protocol.js';
 
 type TabSession = {
   tabId: number;

@@ -17,7 +17,7 @@
 
 import deviceDescriptorsSource from './deviceDescriptorsSource.json';
 
-import type { Devices } from './types';
+import type { Devices } from './types.js';
 
 
 export const deviceDescriptors = deviceDescriptorsSource as Devices;

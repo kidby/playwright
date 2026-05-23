@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { Connection } from '../../playwright-core/src/client/connection';
-import { webPlatform } from './webPlatform';
+import { Connection } from '../../playwright-core/src/client/connection.js';
+import { webPlatform } from './webPlatform.js';
 
-import type { Browser } from '../../playwright-core/src/client/browser';
+import type { Browser } from '../../playwright-core/src/client/browser.js';
 
 export type Options = {
   headless?: boolean;

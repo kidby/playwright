@@ -1,6 +1,5 @@
 {
   "name": "@playwright/client",
-  "private": true,
   "version": "0.0.0",
   "description": "A thin client for Playwright",
   "repository": {
@@ -11,6 +10,8 @@
   "engines": {
     "node": ">=24"
   },
+  "type": "module",
+  "private": true,
   "author": {
     "name": "Microsoft Corporation"
   },
@@ -18,8 +19,6 @@
   "exports": {
     ".": {
       "types": "./index.d.ts",
-      "import": "./index.mjs",
-      "require": "./index.js",
       "default": "./index.js"
     },
     "./package.json": "./package.json"

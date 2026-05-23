@@ -18,10 +18,10 @@ import { asLocator } from '@isomorphic/locatorGenerators';
 import { getByAltTextSelector, getByLabelSelector, getByPlaceholderSelector, getByRoleSelector, getByTestIdSelector, getByTextSelector, getByTitleSelector } from '@isomorphic/locatorUtils';
 import { escapeForTextSelector } from '@isomorphic/stringUtils';
 
-import type { InjectedScript } from './injectedScript';
+import type { InjectedScript } from './injectedScript.js';
 import type { Language } from '@isomorphic/locatorGenerators';
 import type { ByRoleOptions } from '@isomorphic/locatorUtils';
-import type { AriaTreeOptions } from './ariaSnapshot';
+import type { AriaTreeOptions } from './ariaSnapshot.js';
 
 const selectorSymbol = Symbol('selector');
 

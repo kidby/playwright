@@ -16,7 +16,7 @@
 
 import * as z from 'zod';
 import { formatObjectOrVoid } from '@isomorphic/stringUtils';
-import { defineTabTool } from './tool';
+import { defineTabTool } from './tool.js';
 
 const mouseMove = defineTabTool({
   capability: 'vision',

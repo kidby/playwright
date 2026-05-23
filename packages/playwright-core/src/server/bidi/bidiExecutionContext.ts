@@ -16,13 +16,13 @@
 
 import { parseEvaluationResultValue } from '@isomorphic/utilityScriptSerializers';
 import { assert } from '@isomorphic/assert';
-import * as js from '../javascript';
-import * as dom from '../dom';
-import * as bidi from './third_party/bidiProtocol';
-import { BidiSerializer } from './third_party/bidiSerializer';
-import { deserializeBidiValue } from './bidiDeserializer';
+import * as js from '../javascript.js';
+import * as dom from '../dom.js';
+import * as bidi from './third_party/bidiProtocol.js';
+import { BidiSerializer } from './third_party/bidiSerializer.js';
+import { deserializeBidiValue } from './bidiDeserializer.js';
 
-import type { BidiSession } from './bidiConnection';
+import type { BidiSession } from './bidiConnection.js';
 
 export class BidiExecutionContext implements js.ExecutionContextDelegate {
   private readonly _session: BidiSession;

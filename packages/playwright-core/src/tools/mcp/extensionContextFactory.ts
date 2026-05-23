@@ -17,11 +17,11 @@
 import debug from 'debug';
 import { createHttpServer, startHttpServer } from '@utils/network';
 import { defaultUserDataDirForChannel } from '@utils/chromiumChannels';
-import { playwright } from '../../inprocess';
-import { isPlaywrightExtensionInstalled, playwrightExtensionInstallUrl } from '../utils/extension';
-import { CDPRelayServer } from './cdpRelay';
+import { playwright } from '../../inprocess.js';
+import { isPlaywrightExtensionInstalled, playwrightExtensionInstallUrl } from '../utils/extension.js';
+import { CDPRelayServer } from './cdpRelay.js';
 
-import type * as playwrightTypes from '../../..';
+import type * as playwrightTypes from '../../../index.js';
 
 const debugLogger = debug('pw:mcp:relay');
 

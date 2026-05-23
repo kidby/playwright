@@ -15,18 +15,18 @@
  */
 
 import { Option as ProgramOption } from 'commander';
-import * as mcpServer from '../utils/mcp/server';
-import { commaSeparatedList, dotenvFileLoader, enumParser, headerParser, numberParser, resolutionParser, resolveCLIConfigForMCP, semicolonSeparatedList } from './config';
-import { setupExitWatchdog } from './watchdog';
-import { createBrowserWithInfo } from './browserFactory';
-import { BrowserBackend } from '../backend/browserBackend';
-import { filteredTools } from '../backend/tools';
-import { testDebug } from './log';
-import { packageJSON } from '../../package';
+import * as mcpServer from '../utils/mcp/server.js';
+import { commaSeparatedList, dotenvFileLoader, enumParser, headerParser, numberParser, resolutionParser, resolveCLIConfigForMCP, semicolonSeparatedList } from './config.js';
+import { setupExitWatchdog } from './watchdog.js';
+import { createBrowserWithInfo } from './browserFactory.js';
+import { BrowserBackend } from '../backend/browserBackend.js';
+import { filteredTools } from '../backend/tools.js';
+import { testDebug } from './log.js';
+import { packageJSON } from '../../package.js';
 
 import type { Command } from 'commander';
-import type { ClientInfo } from '../utils/mcp/server';
-import type * as playwright from '../../..';
+import type { ClientInfo } from '../utils/mcp/server.js';
+import type * as playwright from '../../../index.js';
 
 const version = packageJSON.version;
 

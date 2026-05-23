@@ -16,7 +16,7 @@
 
 import { Writable } from 'stream';
 
-import { stripAnsiEscapes } from '../../util';
+import { stripAnsiEscapes } from '../../util.js';
 
 export class StringWriteStream extends Writable {
   private _output: string[];

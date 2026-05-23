@@ -18,8 +18,8 @@ import { SnapshotServer } from '@isomorphic/trace/snapshotServer';
 import { TraceLoader } from '@isomorphic/trace/traceLoader';
 import { TraceVersionError } from '@isomorphic/trace/traceModernizer';
 
-import { Progress, splitProgress } from './progress';
-import { FetchTraceLoaderBackend, ZipTraceLoaderBackend } from './traceLoaderBackends';
+import { Progress, splitProgress } from './progress.js';
+import { FetchTraceLoaderBackend, ZipTraceLoaderBackend } from './traceLoaderBackends.js';
 
 type Client = {
   id: string;

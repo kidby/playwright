@@ -22,17 +22,18 @@ import url from 'url';
 import crypto from 'crypto';
 
 import sourceMapSupport from 'source-map-support';
-import { loadTsConfig } from './tsconfig-loader';
-import { libPath, packageJSON } from '../package';
-import { createFileMatcher, debugTest, fileIsModule, resolveImportSpecifierAfterMapping } from '../util';
-import { importUnderBun, isBun } from './bunRuntime';
-import { belongsToNodeModules, currentFileDepsCollector, getFromCompilationCache, installSourceMapSupport } from './compilationCache';
-import { addHook } from './pirates';
+import { loadTsConfig } from './tsconfig-loader.js';
+import { libPath, packageJSON } from '../package.js';
+import { createFileMatcher, debugTest, fileIsModule, resolveImportSpecifierAfterMapping } from '../util.js';
+import { importUnderBun, isBun } from './bunRuntime.js';
+import { belongsToNodeModules, currentFileDepsCollector, getFromCompilationCache, installSourceMapSupport } from './compilationCache.js';
+import { addHook } from './pirates.js';
 
-import type { BabelPlugin, BabelTransformFunction } from './babelBundle';
+import type { BabelPlugin, BabelTransformFunction } from './babelBundle.js';
+import type { OxcTransformFunction } from './oxcBundle.js';
 import type { Location } from '../../types/testReporter';
-import type { LoadedTsConfig } from './tsconfig-loader';
-import type { Matcher } from '../util';
+import type { LoadedTsConfig } from './tsconfig-loader.js';
+import type { Matcher } from '../util.js';
 
 
 const version = packageJSON.version;
@@ -233,6 +234,22 @@ export function transformHook(originalCode: string, filename: string, moduleUrl?
   const { cachedCode, addToCache, serializedCache } = getFromCompilationCache(filename, hash, moduleUrl);
   if (cachedCode !== undefined)
     return { code: cachedCode, serializedCache };
+
+  // Fast path: oxc-transform handles TS/JSX/decorators ~10× faster than Babel.
+  // For CJS files, oxcBundle chains through a stripped-down Babel pass with
+  // only `transform-modules-commonjs` (oxc doesn't expose ES→CJS conversion).
+  // We only skip the fast path when the user has configured custom Babel
+  // plugins — those have no oxc equivalent and need the full Babel pipeline.
+  if (!pluginsPrologue.length && !pluginsEpilogue.length) {
+    const { oxcTransform }: { oxcTransform: OxcTransformFunction } = require(libPath('transform', 'oxcBundle'));
+    transformData = new Map<string, any>();
+    const oxcResult = oxcTransform(originalCode, filename, _transformConfig.jsxImportSource);
+    if (!oxcResult?.code)
+      return { code: originalCode, serializedCache };
+    const { code, map } = oxcResult;
+    const added = addToCache!(code, map, transformData);
+    return { code, serializedCache: added.serializedCache };
+  }
 
   // We don't use any browserslist data, but babel checks it anyway.
   // Silence the annoying warning.

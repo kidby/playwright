@@ -16,7 +16,7 @@
 
 import { asLocator } from '@isomorphic/locatorGenerators';
 
-import type { Language, LanguageGenerator, LanguageGeneratorOptions } from './types';
+import type { Language, LanguageGenerator, LanguageGeneratorOptions } from './types.js';
 import type * as actions from '@recorder/actions';
 
 export class JsonlLanguageGenerator implements LanguageGenerator {

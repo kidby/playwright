@@ -16,10 +16,10 @@
 
 import { getMetainfo } from '@isomorphic/protocolMetainfo';
 import { monotonicTime } from '@isomorphic/time';
-import { SdkObject } from './instrumentation';
-import { BrowserContext } from './browserContext';
+import { SdkObject } from './instrumentation.js';
+import { BrowserContext } from './browserContext.js';
 
-import type { CallMetadata, InstrumentationListener } from './instrumentation';
+import type { CallMetadata, InstrumentationListener } from './instrumentation.js';
 import type { Progress } from '@protocol/progress';
 
 const symbol = Symbol('Debugger');

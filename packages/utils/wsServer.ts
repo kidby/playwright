@@ -15,9 +15,9 @@
  */
 
 import { WebSocketServer as wsServer } from 'ws';
-import { computeAllowedHosts, hostnameFromHostHeader, urlHostFromAddress } from './httpServer';
-import { createHttpServer } from './network';
-import { debugLogger } from './debugLogger';
+import { computeAllowedHosts, hostnameFromHostHeader, urlHostFromAddress } from './httpServer.js';
+import { createHttpServer } from './network.js';
+import { debugLogger } from './debugLogger.js';
 
 import type { WebSocket, WebSocketServer } from 'ws';
 import type http from 'http';

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import type * as playwright from '../../..';
-import type { BrowserDescriptor } from '../../serverRegistry';
+import type * as playwright from '../../../index.js';
+import type { BrowserDescriptor } from '../../serverRegistry.js';
 
 export async function connectToBrowserAcrossVersions(descriptor: BrowserDescriptor): Promise<playwright.Browser> {
   const pw = require(descriptor.playwrightLib);

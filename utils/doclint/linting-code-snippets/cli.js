@@ -22,7 +22,6 @@ const fs = require('fs');
 const path = require('path');
 const { parseApi } = require('../api_parser');
 const md = require('../../markdown');
-const { ESLint } = require('eslint')
 const child_process = require('child_process');
 const os = require('os');
 
@@ -138,84 +137,81 @@ class JSLintingService extends LintingService {
     'experimental-ct',
   ];
 
-  async _init() {
-    if (this._eslint)
-      return this._eslint;
-
-    const { fixupConfigRules } = await import('@eslint/compat');
-    const { FlatCompat }  = await import('@eslint/eslintrc');
-      // @ts-ignore
-    const js = (await import('@eslint/js')).default;
-
-    const compat = new FlatCompat({
-      baseDirectory: __dirname,
-      // @ts-ignore
-      recommendedConfig: js.configs.recommended,
-      allConfig: js.configs.all
-    });
-    const baseConfig = fixupConfigRules(compat.extends('plugin:react/recommended', 'plugin:@typescript-eslint/disable-type-checked'));
-    const { baseRules }= await import('../../../eslint.config.mjs');
-
-    this._eslint = new ESLint({
-      baseConfig,
-      plugins: /** @type {any}*/({
-        '@stylistic': (await import('@stylistic/eslint-plugin')).default,
-      }),
-      ignore: false,
-      overrideConfig: {
-        files: ['**/*.ts', '**/*.tsx'],
-        settings: {
-          react: { version: 'detect' },
-        },
-        languageOptions: {
-          // @ts-ignore
-          parser: await import('@typescript-eslint/parser'),
-          ecmaVersion: 'latest',
-          sourceType: 'module',
-        },
-        rules: /** @type {any}*/({
-          ...baseRules,
-          'notice/notice': 'off',
-          '@typescript-eslint/no-unused-vars': 'off',
-          'max-len': ['error', { code: 100 }],
-          'react/react-in-jsx-scope': 'off',
-          'eol-last': 'off',
-          '@typescript-eslint/consistent-type-imports': 'off',
-        }),
-      }
-    });
-    return this._eslint;
-  }
-
   supports(codeLang) {
     return codeLang === 'js' || codeLang === 'ts';
   }
 
   /**
-   * @param {CodeSnippet} snippet
-   * @returns {Promise<LintResult>}
-   */
-  async _lintSnippet(snippet) {
-    const eslint = await this._init();
-    if (this._knownBadSnippets.some(s => snippet.code.includes(s)))
-      return { status: 'ok' };
-    const results = await eslint.lintText(snippet.code, { filePath: path.join(__dirname, 'file.tsx') });
-    if (!results || !results.length || !results[0].messages.length)
-      return { status: 'ok' };
-    const result = results[0];
-    const error = result.source ? results[0].messages[0].message + '\n\n' + codeFrameColumns(result.source, { start: result.messages[0] }, { highlightCode: true }) : results[0].messages[0].message;
-    return { status: 'error', error };
-  }
-
-  /**
+   * Validates JS/TS doc snippets by writing each to a temp .tsx file and
+   * running oxlint once over the batch. Snippets containing patterns that
+   * can't lint cleanly out of context (mount/render/vue-router/ct imports)
+   * are skipped to match the prior ESLint pipeline's behavior.
+   *
    * @param {CodeSnippet[]} snippets
    * @returns {Promise<LintResult[]>}
    */
   async lint(snippets) {
-    const result = [];
-    for (let i = 0; i < snippets.length; ++i)
-      result.push(await this._lintSnippet(snippets[i]));
-    return result;
+    const tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'pw-doc-snippets-'));
+    /** @type {{ snippet: CodeSnippet, file: string | null }[]} */
+    const entries = [];
+    try {
+      for (let i = 0; i < snippets.length; i++) {
+        const snippet = snippets[i];
+        if (this._knownBadSnippets.some(s => snippet.code.includes(s))) {
+          entries.push({ snippet, file: null });
+          continue;
+        }
+        const file = path.join(tempDir, `snippet-${i}.tsx`);
+        await fs.promises.writeFile(file, snippet.code);
+        entries.push({ snippet, file });
+      }
+      const filesToLint = entries.map(e => e.file).filter(f => f !== null);
+      const errorsByFile = filesToLint.length ? await this._runOxlint(filesToLint) : new Map();
+      return entries.map(({ file }) => {
+        if (file === null)
+          return { status: 'ok' };
+        const error = errorsByFile.get(path.basename(file));
+        return error ? { status: 'error', error } : { status: 'ok' };
+      });
+    } finally {
+      await fs.promises.rm(tempDir, { recursive: true, force: true }).catch(() => {});
+    }
+  }
+
+  /**
+   * @param {string[]} files
+   * @returns {Promise<Map<string, string>>} basename → error message
+   */
+  async _runOxlint(files) {
+    return new Promise(resolve => {
+      const oxlintBin = path.join(PROJECT_DIR, 'node_modules', '.bin', 'oxlint');
+      const args = [
+        '--config', path.join(__dirname, 'oxlint.snippet.json'),
+        '--disable-oxlint-config',
+        '--silent',
+        ...files,
+      ];
+      const child = child_process.spawn(oxlintBin, args, { cwd: PROJECT_DIR });
+      let stderr = '';
+      child.stderr.on('data', data => stderr += data.toString());
+      let stdout = '';
+      child.stdout.on('data', data => stdout += data.toString());
+      child.on('exit', () => {
+        const errorsByFile = new Map();
+        const output = stdout + stderr;
+        for (const line of output.split('\n')) {
+          // oxlint default text format: `<path>:<line>:<col>: <severity> <rule>: <msg>`
+          const match = line.match(/^(.*?):(\d+):(\d+): (?:error|warning) ([^:]+): (.+)$/);
+          if (!match)
+            continue;
+          const [, file, , , rule, msg] = match;
+          const basename = path.basename(file);
+          if (!errorsByFile.has(basename))
+            errorsByFile.set(basename, `${rule}: ${msg}`);
+        }
+        resolve(errorsByFile);
+      });
+    });
   }
 }
 

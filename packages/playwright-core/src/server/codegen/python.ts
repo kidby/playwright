@@ -16,11 +16,11 @@
 
 import { asLocator } from '@isomorphic/locatorGenerators';
 import { escapeWithQuotes, toSnakeCase } from '@isomorphic/stringUtils';
-import { sanitizeDeviceOptions, toClickOptionsForSourceCode, toKeyboardModifiers, toSignalMap } from './language';
-import { deviceDescriptors } from '../deviceDescriptors';
+import { sanitizeDeviceOptions, toClickOptionsForSourceCode, toKeyboardModifiers, toSignalMap } from './language.js';
+import { deviceDescriptors } from '../deviceDescriptors.js';
 
-import type { Language, LanguageGenerator, LanguageGeneratorOptions } from './types';
-import type { BrowserContextOptions } from '../../..';
+import type { Language, LanguageGenerator, LanguageGeneratorOptions } from './types.js';
+import type { BrowserContextOptions } from '../../../index.js';
 import type * as actions from '@recorder/actions';
 
 export class PythonLanguageGenerator implements LanguageGenerator {

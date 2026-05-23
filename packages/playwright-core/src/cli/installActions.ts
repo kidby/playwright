@@ -21,9 +21,9 @@ import path from 'path';
 import { wrapInASCIIBox } from '@utils/ascii';
 import { isLikelyNpxGlobal } from '@utils/env';
 import { assert } from '@isomorphic/assert';
-import { registry, writeDockerVersion } from '../server/registry';
+import { registry, writeDockerVersion } from '../server/registry/index.js';
 
-import type { BrowserInfo } from '../server/registry';
+import type { BrowserInfo } from '../server/registry/index.js';
 
 function printInstalledBrowsers(browsers: BrowserInfo[]) {
   const browserPaths = new Set<string>();

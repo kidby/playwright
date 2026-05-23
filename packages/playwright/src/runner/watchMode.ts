@@ -26,14 +26,14 @@ import { createGuid } from '@utils/crypto';
 import { getPackageManagerExecCommand } from '@utils/env';
 import { eventsHelper } from '@utils/eventsHelper';
 
-import { separator, terminalScreen } from '../reporters/base';
-import { TestServerDispatcher } from './testServer';
-import { TeleSuiteUpdater } from '../isomorphic/teleSuiteUpdater';
-import { TestServerConnection  } from '../isomorphic/testServerConnection';
+import { separator, terminalScreen } from '../reporters/base.js';
+import { TestServerDispatcher } from './testServer.js';
+import { TeleSuiteUpdater } from '../isomorphic/teleSuiteUpdater.js';
+import { TestServerConnection  } from '../isomorphic/testServerConnection.js';
 
 import type * as reporterTypes from '../../types/testReporter';
-import type { ConfigLocation } from '../common';
-import type { TestServerTransport } from '../isomorphic/testServerConnection';
+import type { ConfigLocation } from '../common/index.js';
+import type { TestServerTransport } from '../isomorphic/testServerConnection.js';
 
 /* eslint-disable no-restricted-properties */
 

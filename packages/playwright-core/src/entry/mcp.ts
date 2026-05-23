@@ -15,8 +15,8 @@
  */
 
 import { program } from 'commander';
-import { tools, utils } from '../coreBundle';
-import { packageJSON } from '../package';
+import { tools, utils } from '../coreBundle.js';
+import { packageJSON } from '../package.js';
 
 const p = program.version('Version ' + packageJSON.version).name('Playwright MCP');
 tools.decorateMCPCommand(p);

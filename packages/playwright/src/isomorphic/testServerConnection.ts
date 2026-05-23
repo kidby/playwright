@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as events from './events';
+import * as events from './events.js';
 
 import type { TestServerInterface, TestServerInterfaceEvents } from '@testIsomorphic/testServerInterface';
 import type * as reporterTypes from '../../types/testReporter';

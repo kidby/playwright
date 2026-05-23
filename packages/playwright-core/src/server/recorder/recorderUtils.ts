@@ -18,10 +18,10 @@ import { renderTitleForCall } from '@isomorphic/protocolFormatter';
 import { raceAgainstDeadline } from '@isomorphic/timeoutRunner';
 import { monotonicTime } from '@isomorphic/time';
 import { quoteCSSAttributeValue } from '@isomorphic/stringUtils';
-import { Frame } from '../frames';
+import { Frame } from '../frames.js';
 
-import type { CallMetadata } from '../instrumentation';
-import type { Page } from '../page';
+import type { CallMetadata } from '../instrumentation.js';
+import type { Page } from '../page.js';
 import type * as actions from '@recorder/actions';
 import type { CallLog, CallLogStatus } from '@recorder/recorderTypes';
 import type { Progress } from '@protocol/progress';

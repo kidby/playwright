@@ -15,8 +15,8 @@
  */
 
 import * as z from 'zod';
-import { defineTabTool } from './tool';
-import { elementSchema } from './snapshot';
+import { defineTabTool } from './tool.js';
+import { elementSchema } from './snapshot.js';
 
 const press = defineTabTool({
   capability: 'core-input',

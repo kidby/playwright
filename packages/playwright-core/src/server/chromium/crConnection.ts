@@ -18,15 +18,15 @@
 import { debugLogger } from '@utils/debugLogger';
 import { assert } from '@isomorphic/assert';
 import { eventsHelper } from '@utils/eventsHelper';
-import { helper } from '../helper';
-import { ProtocolError } from '../protocolError';
-import { SdkObject } from '../instrumentation';
+import { helper } from '../helper.js';
+import { ProtocolError } from '../protocolError.js';
+import { SdkObject } from '../instrumentation.js';
 
 import type { RegisteredListener } from '@utils/eventsHelper';
-import type { ConnectionTransport, ProtocolRequest, ProtocolResponse } from '../transport';
+import type { ConnectionTransport, ProtocolRequest, ProtocolResponse } from '../transport.js';
 import type { Protocol } from './protocol';
 import type { RecentLogsCollector } from '@utils/debugLogger';
-import type { ProtocolLogger } from '../types';
+import type { ProtocolLogger } from '../types.js';
 import type { Progress } from '@protocol/progress';
 
 

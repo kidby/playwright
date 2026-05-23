@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import {  parseAttributeSelector, parseSelector, stringifySelector } from './selectorParser';
-import { escapeWithQuotes, normalizeEscapedRegexQuotes, toSnakeCase, toTitleCase } from './stringUtils';
+import {  parseAttributeSelector, parseSelector, stringifySelector } from './selectorParser.js';
+import { escapeWithQuotes, normalizeEscapedRegexQuotes, toSnakeCase, toTitleCase } from './stringUtils.js';
 
-import type { NestedSelectorBody } from './selectorParser';
-import type { ParsedSelector } from './selectorParser';
+import type { NestedSelectorBody } from './selectorParser.js';
+import type { ParsedSelector } from './selectorParser.js';
 
 export type Language = 'javascript' | 'python' | 'java' | 'csharp' | 'jsonl';
 export type LocatorType = 'default' | 'role' | 'text' | 'label' | 'placeholder' | 'alt' | 'title' | 'test-id' | 'nth' | 'first' | 'last' | 'visible' | 'has-text' | 'has-not-text' | 'has' | 'hasNot' | 'frame' | 'frame-locator' | 'and' | 'or' | 'chain';

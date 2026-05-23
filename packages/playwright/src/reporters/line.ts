@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { markErrorsAsReported, TerminalReporter } from './base';
+import { markErrorsAsReported, TerminalReporter } from './base.js';
 
 import type { FullResult, Suite, TestCase, TestError, TestResult, TestStep } from '../../types/testReporter';
 

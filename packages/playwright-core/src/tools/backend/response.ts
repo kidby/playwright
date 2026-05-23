@@ -18,13 +18,13 @@ import fs from 'fs';
 import path from 'path';
 
 import debug from 'debug';
-import { renderModalStates } from './tab';
-import { scaleImageToFitMessage } from './screenshot';
+import { renderModalStates } from './tab.js';
+import { scaleImageToFitMessage } from './screenshot.js';
 
-import type * as playwright from '../../..';
-import type { TabHeader } from './tab';
+import type * as playwright from '../../../index.js';
+import type { TabHeader } from './tab.js';
 import type { CallToolResult, ImageContent, TextContent } from '@modelcontextprotocol/sdk/types.js';
-import type { Context, FilenameTemplate } from './context';
+import type { Context, FilenameTemplate } from './context.js';
 
 export const requestDebug = debug('pw:mcp:request');
 

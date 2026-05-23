@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { Page } from './page';
+import type { Page } from './page.js';
 import type * as api from '../../types/types';
 import type * as channels from '@protocol/channels';
 

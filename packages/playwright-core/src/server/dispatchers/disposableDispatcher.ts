@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { Dispatcher } from './dispatcher';
+import { Dispatcher } from './dispatcher.js';
 
-import type { DisposableObject } from '../disposable';
-import type { DispatcherScope } from './dispatcher';
+import type { DisposableObject } from '../disposable.js';
+import type { DispatcherScope } from './dispatcher.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 

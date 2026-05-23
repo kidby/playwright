@@ -15,9 +15,9 @@
  */
 
 import { rewriteErrorMessage } from '@isomorphic/stackTrace';
-import { TimeoutError } from './errors';
+import { TimeoutError } from './errors.js';
 
-import type { ChannelOwner } from './channelOwner';
+import type { ChannelOwner } from './channelOwner.js';
 import type * as channels from '@protocol/channels';
 import type { EventEmitter } from 'events';
 import type { Zone } from '@isomorphic/platform';

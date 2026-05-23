@@ -20,10 +20,10 @@ import path from 'path';
 import { PipeTransport } from '@utils/pipeTransport';
 import { nodePlatform } from '@utils/nodePlatform';
 import { ManualPromise } from '@isomorphic/manualPromise';
-import { Connection } from './client/connection';
-import { packageRoot } from './package';
+import { Connection } from './client/connection.js';
+import { packageRoot } from './package.js';
 
-import type { Playwright } from './client/playwright';
+import type { Playwright } from './client/playwright.js';
 
 
 export async function start(env: any = {}): Promise<{ playwright: Playwright, stop: () => Promise<void> }> {

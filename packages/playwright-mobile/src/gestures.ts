@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import type { AppiumClient } from './appiumClient';
-import type { AppLocator } from './appLocator';
+import type { AppiumClient } from './appiumClient.js';
+import type { AppLocator } from './appLocator.js';
 
 const DEFAULT_SWIPE_DISTANCE = 0.5;
 const DEFAULT_SWIPE_DURATION_MS = 800;

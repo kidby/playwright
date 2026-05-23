@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { Dispatcher } from './dispatcher';
-import { CDPSession } from '../chromium/crConnection';
+import { Dispatcher } from './dispatcher.js';
+import { CDPSession } from '../chromium/crConnection.js';
 
-import type { BrowserContextDispatcher } from './browserContextDispatcher';
-import type { BrowserDispatcher } from './browserDispatcher';
+import type { BrowserContextDispatcher } from './browserContextDispatcher.js';
+import type { BrowserDispatcher } from './browserDispatcher.js';
 import type * as channels from '@protocol/channels';
 import type { Progress } from '@protocol/progress';
 

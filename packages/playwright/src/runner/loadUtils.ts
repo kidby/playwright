@@ -20,17 +20,17 @@ import fs from 'fs';
 import sourceMapSupport from 'source-map-support';
 import { toPosixPath } from '@utils/fileUtils';
 
-import { InProcessLoaderHost, OutOfProcessLoaderHost } from './loaderHost';
-import { createTitleMatcher, errorWithFile, parseLocationArg } from '../util';
-import { buildProjectsClosure, collectFilesForProject } from './projectUtils';
-import {  createTestGroups, filterForShard } from './testGroups';
-import { cc, config as commonConfig, FullConfigInternal, suiteUtils, test as testNs, transform } from '../common';
+import { InProcessLoaderHost, OutOfProcessLoaderHost } from './loaderHost.js';
+import { createTitleMatcher, errorWithFile, parseLocationArg } from '../util.js';
+import { buildProjectsClosure, collectFilesForProject } from './projectUtils.js';
+import {  createTestGroups, filterForShard } from './testGroups.js';
+import { cc, config as commonConfig, FullConfigInternal, suiteUtils, test as testNs, transform } from '../common/index.js';
 
 import type { RawSourceMap } from 'source-map';
-import type { TestRun } from './tasks';
-import type { TestGroup } from './testGroups';
+import type { TestRun } from './tasks.js';
+import type { TestGroup } from './testGroups.js';
 import type { FullConfig, Reporter, TestError } from '../../types/testReporter';
-import type { Matcher, TestCaseFilter } from '../util';
+import type { Matcher, TestCaseFilter } from '../util.js';
 
 
 export async function collectProjectsAndTestFiles(testRun: TestRun, doNotRunTestsOutsideProjectFilter: boolean) {

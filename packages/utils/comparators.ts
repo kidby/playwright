@@ -21,8 +21,8 @@ import * as diff from 'diff';
 import { PNG } from 'pngjs';
 import { padImageToSize } from '@isomorphic/imageUtils';
 // @ts-ignore
-import pixelmatch from './third_party/pixelmatch';
-import { compare } from './image_tools/compare';
+import pixelmatch from './third_party/pixelmatch.js';
+import { compare } from './image_tools/compare.js';
 
 import type { ImageData } from '@isomorphic/imageUtils';
 

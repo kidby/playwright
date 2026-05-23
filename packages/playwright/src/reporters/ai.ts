@@ -17,13 +17,13 @@
 import fs from 'fs';
 import path from 'path';
 
-import { detectCI  } from './ciAdapter';
-import { resolveOutputFile  } from './base';
-import { writeFileAtomic } from './runtimeIO';
-import type { CIMetadata } from './ciAdapter';
-import type { CommonReporterOptions } from './base';
+import { detectCI  } from './ciAdapter.js';
+import { resolveOutputFile  } from './base.js';
+import { writeFileAtomic } from './runtimeIO.js';
+import type { CIMetadata } from './ciAdapter.js';
+import type { CommonReporterOptions } from './base.js';
 
-import type { ReporterV2 } from './reporterV2';
+import type { ReporterV2 } from './reporterV2.js';
 import type { FullConfig, FullResult, Suite, TestCase, TestResult } from '../../types/testReporter';
 
 export type AIReporterOptions = {

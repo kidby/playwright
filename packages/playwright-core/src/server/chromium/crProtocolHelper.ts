@@ -20,9 +20,9 @@ import fs from 'fs';
 import { splitErrorMessage } from '@isomorphic/stackTrace';
 import { mkdirIfNeeded } from '@utils/fileUtils';
 
-import type { CRSession } from './crConnection';
+import type { CRSession } from './crConnection.js';
 import type { Protocol } from './protocol';
-import type * as types from '../types';
+import type * as types from '../types.js';
 
 
 export function getExceptionMessage(exceptionDetails: Protocol.Runtime.ExceptionDetails): string {

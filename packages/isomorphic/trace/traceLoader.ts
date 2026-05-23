@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { parseClientSideCallMetadata } from './traceUtils';
+import { parseClientSideCallMetadata } from './traceUtils.js';
 
-import { SnapshotStorage } from './snapshotStorage';
-import { TraceModernizer } from './traceModernizer';
+import { SnapshotStorage } from './snapshotStorage.js';
+import { TraceModernizer } from './traceModernizer.js';
 
-import type { ContextEntry } from './entries';
+import type { ContextEntry } from './entries.js';
 
 export interface TraceLoaderBackend {
   entryNames(): Promise<string[]>;

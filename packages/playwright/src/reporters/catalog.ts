@@ -18,7 +18,7 @@ import path from 'path';
 
 import { stripAnsiEscapes } from '@isomorphic/stringUtils';
 
-import type { ReporterV2 } from './reporterV2';
+import type { ReporterV2 } from './reporterV2.js';
 import type { FullConfig, FullResult, Suite, TestCase, TestResult } from '../../types/testReporter';
 
 const DEFAULT_AREA = 'default';
