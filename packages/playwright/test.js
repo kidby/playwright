@@ -14,22 +14,31 @@
  * limitations under the License.
  */
 
-import playwright from './test.js';
+// Re-export both surfaces directly. The runner introspects `test` via the
+// `[testTypeSymbol]` it stamped on; going through an object-spread loses the
+// symbol because `{ ...mod }` only copies string keys. Direct ESM re-exports
+// preserve the original `test` reference.
+export {
+  test,
+  expect,
+  defineConfig,
+  mergeTests,
+  mergeExpects,
+  _baseTest,
+  _utilityTest,
+} from './lib/index.js';
 
-export const chromium = playwright.chromium;
-export const firefox = playwright.firefox;
-export const webkit = playwright.webkit;
-export const selectors = playwright.selectors;
-export const devices = playwright.devices;
-export const errors = playwright.errors;
-export const request = playwright.request;
-export const _electron = playwright._electron;
-export const _android = playwright._android;
-export const _baseTest = playwright._baseTest;
-export const _utilityTest = playwright._utilityTest;
-export const test = playwright.test;
-export const expect = playwright.expect;
-export const defineConfig = playwright.defineConfig;
-export const mergeTests = playwright.mergeTests;
-export const mergeExpects = playwright.mergeExpects;
-export default playwright.test;
+import { test as _testDefault } from './lib/index.js';
+export default _testDefault;
+
+export {
+  chromium,
+  firefox,
+  webkit,
+  selectors,
+  devices,
+  errors,
+  request,
+  _electron,
+  _android,
+} from 'playwright-core';

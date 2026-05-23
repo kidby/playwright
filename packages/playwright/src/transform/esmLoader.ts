@@ -84,7 +84,10 @@ async function load(moduleUrl: string, context: { format?: string }, defaultLoad
     transport?.post('pushToCompilationCache', { cache: transformed.serializedCache });
 
   return {
-    format: kSupportedFormats.get(context.format) || (fileIsModule(originalFilename) ? 'module' : 'commonjs'),
+    // ESM-only fork: oxc-transform always emits ESM (with CJS-compat banner
+    // providing `require`/`__dirname`/`__filename`), so we always declare the
+    // output as 'module' regardless of the file's package.json scope.
+    format: 'module',
     source: isPreflight ? `void 0;` : transformed.code,
     shortCircuit: true,
   };
@@ -129,4 +132,4 @@ function createTransport(port: MessagePort) {
 }
 
 
-module.exports = { initialize, load, resolve };
+export { initialize, load, resolve };

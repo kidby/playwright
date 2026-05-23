@@ -27,7 +27,6 @@ import { libPath, packageJSON } from '../package.js';
 import { createFileMatcher, debugTest, fileIsModule, resolveImportSpecifierAfterMapping } from '../util.js';
 import { importUnderBun, isBun } from './bunRuntime.js';
 import { belongsToNodeModules, currentFileDepsCollector, getFromCompilationCache, installSourceMapSupport } from './compilationCache.js';
-import { addHook } from './pirates.js';
 
 import type { BabelPlugin, BabelTransformFunction } from './babelBundle.js';
 import type { OxcTransformFunction } from './oxcBundle.js';
@@ -293,32 +292,24 @@ export async function requireOrImport(file: string) {
   if (isBun())
     return await importUnderBun(file).finally(nextTask);
 
-  const isModule = fileIsModule(file);
-  if (isModule) {
-    const fileName = url.pathToFileURL(file);
-    const esmImport = () => eval(`import(${JSON.stringify(fileName)})`);
+  // ESM-only fork: always import. Routes the file through our ESM loader hook
+  // (which applies oxc-transform + CJS-compat banner) instead of letting
+  // Node 23+'s native TS handler strip types without our transform.
+  const fileName = url.pathToFileURL(file);
+  const esmImport = () => eval(`import(${JSON.stringify(fileName)})`);
 
-    // The .esm.preflight extension is a synthetic specifier handled by our
-    // node:module ESM loader to flush source maps before the real import.
-    await eval(`import(${JSON.stringify(fileName + '.esm.preflight')})`)
-        .catch((error: any) => debugTest('Failed to load preflight for ' + file + ', source maps may be missing for errors thrown during loading.', error))
-        .finally(nextTask);
+  // The .esm.preflight extension is a synthetic specifier handled by our
+  // node:module ESM loader to flush source maps before the real import.
+  await eval(`import(${JSON.stringify(fileName + '.esm.preflight')})`)
+      .catch((error: any) => debugTest('Failed to load preflight for ' + file + ', source maps may be missing for errors thrown during loading.', error))
+      .finally(nextTask);
 
-    // Compilation cache, which includes source maps, is populated in a post task.
-    // When importing a module results in an error, the very next access to `error.stack`
-    // will need source maps. To make sure source maps have arrived, we insert a task
-    // that will be processed after compilation cache and guarantee that
-    // source maps are available, before `error.stack` is accessed.
-    return await esmImport().finally(nextTask);
-  }
-  const result = require(file);
-  const depsCollector = currentFileDepsCollector();
-  if (depsCollector) {
-    const module = require.cache[file];
-    if (module)
-      collectCJSDependencies(module, depsCollector);
-  }
-  return result;
+  // Compilation cache, which includes source maps, is populated in a post task.
+  // When importing a module results in an error, the very next access to `error.stack`
+  // will need source maps. To make sure source maps have arrived, we insert a task
+  // that will be processed after compilation cache and guarantee that
+  // source maps are available, before `error.stack` is accessed.
+  return await esmImport().finally(nextTask);
 }
 
 let transformInstalled = false;
@@ -343,11 +334,8 @@ function installTransformIfNeeded() {
     return originalResolveFilename.call(this, specifier, parent, ...rest);
   }
   (Module as any)._resolveFilename = resolveFilename;
-
-  // Hopefully, one day we can migrate to synchronous loader hooks instead, similar to our esmLoader...
-  addHook((code, filename) => {
-    return transformHook(code, filename).code;
-  }, shouldTransform, ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.mts', '.cjs', '.cts']);
+  // ESM-only: the Node ESM loader hook (registered via esmLoaderHost) handles
+  // all .ts/.tsx/.js/.jsx transformation. No CJS pirates hook needed.
 }
 
 const collectCJSDependencies = (module: Module, dependencies: Set<string>) => {

@@ -16,6 +16,20 @@
 
 import { transformSync as oxcTransformSync } from 'oxc-transform';
 
+// CJS-compat shims injected at the top of every transformed module so user
+// configs / spec files that still use `require`, `__dirname`, `__filename`
+// continue to work under our ESM-only runtime. Cheap to inject; ignored if
+// unused.
+const CJS_COMPAT_BANNER = [
+  `import { createRequire as __pwCreateRequire } from 'module';`,
+  `import { dirname as __pwDirname } from 'path';`,
+  `import { fileURLToPath as __pwFileURLToPath } from 'url';`,
+  `const require = __pwCreateRequire(import.meta.url);`,
+  `const __filename = __pwFileURLToPath(import.meta.url);`,
+  `const __dirname = __pwDirname(__filename);`,
+  ``,
+].join('\n');
+
 export type OxcTransformResult = { code: string; map?: { version: number; sources: string[]; mappings: string; names: string[] } } | null;
 
 export type OxcTransformFunction = (code: string, filename: string, jsxImportSource?: string) => OxcTransformResult;
@@ -54,7 +68,7 @@ export const oxcTransform: OxcTransformFunction = (code, filename, jsxImportSour
   }
 
   return {
-    code: result.code,
+    code: CJS_COMPAT_BANNER + result.code,
     map: result.map as any,
   };
 };

@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-import playwright from './index.js';
+import { inprocess } from './lib/coreBundle.js';
+
+const playwright = inprocess.playwright;
 
 export const chromium = playwright.chromium;
 export const firefox = playwright.firefox;

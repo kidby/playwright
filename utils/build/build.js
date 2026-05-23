@@ -291,7 +291,7 @@ class EsbuildStep extends Step {
     // output. The injected `require` is also used by
     // `dynamicImportToRequirePlugin`'s alias rewrites and
     // `_rewriteVendoredImports`.
-    if (options.bundle && options.format === 'esm') {
+    if (options.format === 'esm') {
       const cjsCompat = [
         `import { createRequire as __pwCreateRequire } from 'module';`,
         `import { dirname as __pwDirname } from 'path';`,
@@ -792,7 +792,7 @@ steps.push(new EsbuildStep({
   external: [
     'playwright-core',
     'playwright-core/*',
-    '../common.js',
+    '../common/index.js',
     '../globals.js',
     '../package.js',
     '../util.js',
@@ -830,7 +830,7 @@ steps.push(new EsbuildStep({
   external: [
     'playwright-core',
     'playwright-core/*',
-    '../common.js',
+    '../common/index.js',
     '../globals.js',
     '../package.js',
     '../util.js',
@@ -849,7 +849,7 @@ steps.push(new EsbuildStep({
   external: [
     'playwright-core',
     'playwright-core/*',
-    '../common.js',
+    '../common/index.js',
     '../globals.js',
     '../package.js',
     '../utils.js',
