@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { test, expect } from './playwright-test-fixtures';
-import { extractDryRunPayloads } from './dry-run-helpers';
+import { test, expect } from './playwright-test-fixtures.js';
+import { extractDryRunPayloads } from './dry-run-helpers.js';
 
 test('emits structured payload with kind, body, and CI meta', async ({ runInlineTest }) => {
   const result = await runInlineTest({

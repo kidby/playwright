@@ -18,7 +18,7 @@
 import fs from 'fs';
 import url from 'url';
 import zlib from 'zlib';
-import { expect, test as it } from './pageTest';
+import { expect, test as it } from './pageTest.js';
 
 it('should work @smoke', async ({ page, server }) => {
   server.setRoute('/empty.html', (req, res) => {

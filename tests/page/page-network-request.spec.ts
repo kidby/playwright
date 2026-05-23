@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
-import { attachFrame } from '../config/utils';
+import { test as it, expect } from './pageTest.js';
+import { attachFrame } from '../config/utils.js';
 import fs from 'fs';
 
 function adjustServerHeaders(headers: Object, browserName: string) {

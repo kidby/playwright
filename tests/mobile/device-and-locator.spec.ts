@@ -16,8 +16,8 @@
 
 import { test, expect } from '@playwright/test';
 
-import { Device } from '../../packages/playwright-mobile/src/device';
-import { startMockAppium } from './mockAppium';
+import { Device } from '../../packages/playwright-mobile/src/device.js';
+import { startMockAppium } from './mockAppium.js';
 
 test('Device.start ↔ stop opens and closes a session', async () => {
   const server = await startMockAppium();

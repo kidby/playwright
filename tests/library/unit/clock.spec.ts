@@ -15,9 +15,9 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { createClock as rawCreateClock, install as rawInstall } from '../../../packages/injected/src/clock';
-import type { InstallConfig, ClockController } from '../../../packages/injected/src/clock';
-import type { Builtins } from '../../../packages/injected/src/utilityScript';
+import { createClock as rawCreateClock, install as rawInstall } from '../../../packages/injected/src/clock.js';
+import type { InstallConfig, ClockController } from '../../../packages/injected/src/clock.js';
+import type { Builtins } from '../../../packages/injected/src/utilityScript.js';
 
 const createClock = (now?: number): ClockController & Builtins => {
   const { clock, api } = rawCreateClock(globalThis);

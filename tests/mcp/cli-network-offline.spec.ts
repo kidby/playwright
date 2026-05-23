@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './cli-fixtures';
+import { test, expect } from './cli-fixtures.js';
 
 test('network-state-set toggles offline state', async ({ cli, server }) => {
   await cli('open', server.EMPTY_PAGE);

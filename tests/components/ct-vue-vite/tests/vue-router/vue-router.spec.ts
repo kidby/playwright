@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/experimental-ct-vue';
-import type { HooksConfig } from '../../playwright';
+import type { HooksConfig } from '../../playwright/index.js';
 import App from '@/App.vue';
 
 test('navigate to a page by clicking a link', async ({ page, mount }) => {

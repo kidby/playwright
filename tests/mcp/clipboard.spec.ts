@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './fixtures';
+import { test, expect } from './fixtures.js';
 
 test('clipboard write without permission dialog', async ({ startClient, server, mcpBrowser }) => {
   test.skip(mcpBrowser === 'firefox' || mcpBrowser === 'webkit', 'Clipboard permissions are fully supported only in Chromium');

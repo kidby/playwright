@@ -20,7 +20,7 @@ process.env.PWTEST_UNDER_TEST = '1';
 
 import type { Config, PlaywrightTestOptions, PlaywrightWorkerOptions } from '@playwright/test';
 import * as path from 'path';
-import type { ServerWorkerOptions } from '../config/serverFixtures';
+import type { ServerWorkerOptions } from '../config/serverFixtures.js';
 
 process.env.PWPAGE_IMPL = 'android';
 

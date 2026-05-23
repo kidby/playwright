@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 import url from 'url';
 
 it('page.goBack should work @smoke', async ({ page, server }) => {

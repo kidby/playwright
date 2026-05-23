@@ -16,8 +16,8 @@
 
 import os from 'os';
 import * as util from 'util';
-import { getPlaywrightVersion } from '../../packages/playwright-core/lib/coreBundle';
-import { expect, playwrightTest as base } from '../config/browserTest';
+import { getPlaywrightVersion } from '../../packages/playwright-core/lib/coreBundle.js';
+import { expect, playwrightTest as base } from '../config/browserTest.js';
 
 const it = base.extend({
   context: async ({}, use) => {

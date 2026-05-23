@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
 import { PNG } from 'playwright-core/lib/utilsBundle';
-import { expect, playwrightTest as it } from '../config/browserTest';
+import { expect, playwrightTest as it } from '../config/browserTest.js';
 
 const { compare } = utils;
 

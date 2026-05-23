@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { browserTest as it, expect } from '../config/browserTest';
+import { browserTest as it, expect } from '../config/browserTest.js';
 
 const createTagSelector = () => ({
   query(root, selector) {

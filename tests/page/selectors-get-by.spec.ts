@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 it('getByTestId should work', async ({ page }) => {
   await page.setContent('<div><div data-testid="Hello">Hello world</div></div>');

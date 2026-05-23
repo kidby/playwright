@@ -15,9 +15,9 @@
  */
 
 import fs from 'fs';
-import { playwrightTest as it, expect } from '../../config/browserTest';
-import { TestServer } from '../../config/testserver';
-import { inheritAndCleanEnv } from '../../config/utils';
+import { playwrightTest as it, expect } from '../../config/browserTest.js';
+import { TestServer } from '../../config/testserver/index.js';
+import { inheritAndCleanEnv } from '../../config/utils.js';
 
 it('should pass firefox user preferences', async ({ browserType, mode }) => {
   it.skip(mode.startsWith('service'));

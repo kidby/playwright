@@ -16,7 +16,7 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { test, expect, stripAnsi } from './playwright-test-fixtures';
+import { test, expect, stripAnsi } from './playwright-test-fixtures.js';
 
 test('should support spec.ok and stats', async ({ runInlineTest }) => {
   const result = await runInlineTest({

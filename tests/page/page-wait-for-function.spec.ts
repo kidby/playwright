@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { attachFrame, detachFrame } from '../config/utils';
-import { test as it, expect } from './pageTest';
+import { attachFrame, detachFrame } from '../config/utils.js';
+import { test as it, expect } from './pageTest.js';
 
 it('should timeout', async ({ page }) => {
   const startTime = Date.now();

@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import { kTargetClosedErrorMessage } from '../config/errors';
-import { browserTest as it, expect } from '../config/browserTest';
-import { attachFrame, verifyViewport } from '../config/utils';
+import { kTargetClosedErrorMessage } from '../config/errors.js';
+import { browserTest as it, expect } from '../config/browserTest.js';
+import { attachFrame, verifyViewport } from '../config/utils.js';
 import type { Page } from '@playwright/test';
 
 it('should create new context @smoke', async function({ browser }) {

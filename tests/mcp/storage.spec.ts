@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { test, expect } from './fixtures';
+import { test, expect } from './fixtures.js';
 
 test('browser_storage_state unavailable', async ({ startClient, server }) => {
   const { client } = await startClient();

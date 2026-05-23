@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
-import { test, expect, parseResponse, consoleEntries } from './fixtures';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
+import { test, expect, parseResponse, consoleEntries } from './fixtures.js';
 
 test.describe('crash recovery', () => {
   test.skip(({ mcpBrowser }) => mcpBrowser !== 'chromium' && mcpBrowser !== 'chrome', 'chrome://crash is chromium-specific');

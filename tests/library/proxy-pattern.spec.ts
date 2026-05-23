@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
-import { playwrightTest as test, expect } from '../config/browserTest';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
+import { playwrightTest as test, expect } from '../config/browserTest.js';
 
 const { parsePattern } = utils;
 

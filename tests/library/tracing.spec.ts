@@ -17,12 +17,12 @@
 import fs from 'fs';
 import { jpegjs } from 'playwright-core/lib/utilsBundle';
 import path from 'path';
-import { browserTest, contextTest as test, expect } from '../config/browserTest';
-import { parseTraceRaw } from '../config/utils';
+import { browserTest, contextTest as test, expect } from '../config/browserTest.js';
+import { parseTraceRaw } from '../config/utils.js';
 import type { StackFrame } from '@protocol/channels';
-import type { ActionTraceEvent } from '../../packages/trace/src/trace';
-import { artifactsFolderName } from '../../packages/playwright/src/isomorphic/folders';
-import { rafraf } from '../page/pageTest';
+import type { ActionTraceEvent } from '../../packages/trace/src/trace.js';
+import { artifactsFolderName } from '../../packages/playwright/src/isomorphic/folders.js';
+import { rafraf } from '../page/pageTest.js';
 
 test.skip(({ trace }) => trace === 'on');
 

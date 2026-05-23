@@ -16,11 +16,11 @@
 
 import { test, expect } from '@playwright/test';
 
-import { Device, captureFailureArtifacts, iosCapabilities } from '../../packages/playwright-mobile/src';
-import { startMockAppium } from './mockAppium';
+import { Device, captureFailureArtifacts, iosCapabilities } from '../../packages/playwright-mobile/src/index.js';
+import { startMockAppium } from './mockAppium.js';
 
-import type { AttachableTestInfo } from '../../packages/playwright-mobile/src';
-import type { MockAppium } from './mockAppium';
+import type { AttachableTestInfo } from '../../packages/playwright-mobile/src/index.js';
+import type { MockAppium } from './mockAppium.js';
 
 type AttachCall = { name: string; contentType: string; size: number };
 

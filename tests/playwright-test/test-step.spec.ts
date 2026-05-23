@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect, stripAnsi } from './playwright-test-fixtures';
+import { test, expect, stripAnsi } from './playwright-test-fixtures.js';
 
 const stepIndentReporter = `
 import { FullConfig, Location, Reporter, Suite, TestStep } from '@playwright/test/reporter';

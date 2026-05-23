@@ -16,7 +16,7 @@
  */
 
 import type { ServerResponse } from 'http';
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 it('Page.Events.Request @smoke', async ({ page, server }) => {
   const requests = [];

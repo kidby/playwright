@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { test, expect } from './npmTest';
+import { test, expect } from './npmTest.js';
 import path from 'path';
 
 test('npm: @playwright/test should work', async ({ exec, tmpWorkspace }) => {

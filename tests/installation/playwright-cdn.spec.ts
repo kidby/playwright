@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { test, expect } from './npmTest';
+import { test, expect } from './npmTest.js';
 import http from 'http';
 import net from 'net';
 import type { AddressInfo } from 'net';

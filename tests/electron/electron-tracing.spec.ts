@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { electronTest as test, expect } from './electronTest';
+import { electronTest as test, expect } from './electronTest.js';
 import fs from 'fs';
 import path from 'path';
 

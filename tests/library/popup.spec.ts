@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { browserTest as it, expect } from '../config/browserTest';
+import { browserTest as it, expect } from '../config/browserTest.js';
 import type { Page } from 'playwright-core';
 
 it('should inherit user agent from browser context @smoke', async function({ browser, server, isFrozenWebkit }) {

@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 import type { Page } from 'playwright-core';
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { baseTest as test } from '../config/baseTest';
+import { baseTest as test } from '../config/baseTest.js';
 import { expect } from '@playwright/test';
 
 for (let i = 0; i < 100; ++i) {

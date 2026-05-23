@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { kTargetClosedErrorMessage } from '../config/errors';
-import { browserTest as test, expect } from '../config/browserTest';
+import { kTargetClosedErrorMessage } from '../config/errors.js';
+import { browserTest as test, expect } from '../config/browserTest.js';
 
 test('should return browserType', function({ browser, browserType }) {
   expect(browser.browserType()).toBe(browserType);

@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import { stripAnsi } from '../config/utils';
-import type { TestServer } from '../config/testserver';
-import { test as it, expect } from './pageTest';
+import { stripAnsi } from '../config/utils.js';
+import type { TestServer } from '../config/testserver/index.js';
+import { test as it, expect } from './pageTest.js';
 
 function initServer(server: TestServer): string[] {
   const messages = [];

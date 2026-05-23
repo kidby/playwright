@@ -16,11 +16,11 @@
 
 // @ts-nocheck
 
-import { test as baseTest, expect } from './ui-mode-fixtures';
-import { TestServerConnection } from '../../packages/playwright/lib/isomorphic';
-import { playwrightCtConfigText } from './playwright-test-fixtures';
+import { test as baseTest, expect } from './ui-mode-fixtures.js';
+import { TestServerConnection } from '../../packages/playwright/lib/isomorphic.js';
+import { playwrightCtConfigText } from './playwright-test-fixtures.js';
 import ws from 'ws';
-import type { TestChildProcess } from '../config/commonFixtures';
+import type { TestChildProcess } from '../config/commonFixtures.js';
 
 class WSTransport {
   private _ws: ws.WebSocket;

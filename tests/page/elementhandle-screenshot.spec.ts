@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { test as it, expect, rafraf } from './pageTest';
-import { verifyViewport } from '../config/utils';
+import { test as it, expect, rafraf } from './pageTest.js';
+import { verifyViewport } from '../config/utils.js';
 import path from 'path';
 import fs from 'fs';
 

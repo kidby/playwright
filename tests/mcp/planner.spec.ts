@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect, writeFiles } from './fixtures';
+import { test, expect, writeFiles } from './fixtures.js';
 
 import fs from 'fs';
 import path from 'path';

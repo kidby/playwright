@@ -15,10 +15,10 @@
  */
 
 import type { IncomingMessage } from 'http';
-import type { ProxyServer } from '../third_party/proxy';
-import { createProxy } from '../third_party/proxy';
+import type { ProxyServer } from '../third_party/proxy/index.js';
+import { createProxy } from '../third_party/proxy/index.js';
 import net from 'net';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
 
 type SocksSocketClosedPayload = utils.SocksSocketClosedPayload;
 type SocksSocketDataPayload = utils.SocksSocketDataPayload;

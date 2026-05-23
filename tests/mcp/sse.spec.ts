@@ -19,10 +19,10 @@ import fs from 'fs';
 import { ChildProcess, spawn } from 'child_process';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { test as baseTest, expect, mcpServerPath, formatLog } from './fixtures';
-import { inheritAndCleanEnv } from '../config/utils';
+import { test as baseTest, expect, mcpServerPath, formatLog } from './fixtures.js';
+import { inheritAndCleanEnv } from '../config/utils.js';
 
-import type { Config } from '../../packages/playwright-core/src/tools/mcp/config.d';
+import type { Config } from '../../packages/playwright-core/src/tools/mcp/config.d.js';
 
 const test = baseTest.extend<{ serverEndpoint: (options?: { args?: string[], noPort?: boolean }) => Promise<{ url: URL, stderr: () => string }> }>({
   serverEndpoint: async ({ mcpHeadless }, use, testInfo) => {

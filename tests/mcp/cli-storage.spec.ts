@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { test, expect } from './cli-fixtures';
+import { test, expect } from './cli-fixtures.js';
 
 test('state-save saves storage state to file', async ({ cli, server }, testInfo) => {
   const config = { capabilities: ['storage'] };

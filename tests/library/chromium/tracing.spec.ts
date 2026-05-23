@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { browserTest as it, expect } from '../../config/browserTest';
+import { browserTest as it, expect } from '../../config/browserTest.js';
 import fs from 'fs';
 import path from 'path';
-import { rafraf } from '../../page/pageTest';
+import { rafraf } from '../../page/pageTest.js';
 
 it('should output a trace', async ({ browser, server }, testInfo) => {
   let warning = null;

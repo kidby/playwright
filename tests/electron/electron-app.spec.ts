@@ -17,7 +17,7 @@
 import type { BrowserWindow } from 'electron';
 import path from 'path';
 import fs from 'fs';
-import { electronTest as test, expect, selectors } from './electronTest';
+import { electronTest as test, expect, selectors } from './electronTest.js';
 import type { ConsoleMessage } from 'playwright';
 
 test('should fire close event via ElectronApplication.close();', async ({ launchElectronApp }) => {

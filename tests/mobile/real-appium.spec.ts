@@ -16,7 +16,7 @@
 
 import { test, expect } from '@playwright/test';
 
-import { AppiumClient } from '../../packages/playwright-mobile/src';
+import { AppiumClient } from '../../packages/playwright-mobile/src/index.js';
 
 const enabled = process.env.APPIUM_TEST === '1';
 const url = process.env.APPIUM_URL || 'http://127.0.0.1:4723';

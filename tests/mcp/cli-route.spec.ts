@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './cli-fixtures';
+import { test, expect } from './cli-fixtures.js';
 
 test('route-list shows no routes when empty', async ({ cli, server }) => {
   await cli('open', server.EMPTY_PAGE);

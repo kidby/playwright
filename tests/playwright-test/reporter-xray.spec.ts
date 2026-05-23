@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { test, expect } from './playwright-test-fixtures';
-import { lastDryRunPayload } from './dry-run-helpers';
+import { test, expect } from './playwright-test-fixtures.js';
+import { lastDryRunPayload } from './dry-run-helpers.js';
 
 test('extracts test keys from titles, skips tests with no key', async ({ runInlineTest }) => {
   const result = await runInlineTest({

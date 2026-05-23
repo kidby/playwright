@@ -21,9 +21,9 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import events from 'events';
-import { EventEmitter } from './utils';
+import { EventEmitter } from './utils.js';
 import { test, expect } from '@playwright/test';
-import * as common from './utils';
+import * as common from './utils.js';
 
 test('defaultMaxListeners', () => {
   const e = new EventEmitter();

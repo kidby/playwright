@@ -16,10 +16,10 @@
 
 import { test, expect } from '@playwright/test';
 
-import { Device, iosCapabilities } from '../../packages/playwright-mobile/src';
-import { startMockAppium } from './mockAppium';
+import { Device, iosCapabilities } from '../../packages/playwright-mobile/src/index.js';
+import { startMockAppium } from './mockAppium.js';
 
-import type { MockAppium } from './mockAppium';
+import type { MockAppium } from './mockAppium.js';
 
 let mock: MockAppium;
 test.beforeEach(async () => { mock = await startMockAppium(); });

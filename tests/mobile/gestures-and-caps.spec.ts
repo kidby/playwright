@@ -16,9 +16,9 @@
 
 import { test, expect } from '@playwright/test';
 
-import { Device } from '../../packages/playwright-mobile/src/device';
-import { androidCapabilities, iosCapabilities } from '../../packages/playwright-mobile/src/capabilities';
-import { startMockAppium } from './mockAppium';
+import { Device } from '../../packages/playwright-mobile/src/device.js';
+import { androidCapabilities, iosCapabilities } from '../../packages/playwright-mobile/src/capabilities.js';
+import { startMockAppium } from './mockAppium.js';
 
 test('androidCapabilities builder fills sensible defaults + appium: prefix', () => {
   const caps = androidCapabilities({ app: '/apks/dev.apk', deviceName: 'Pixel 6' });

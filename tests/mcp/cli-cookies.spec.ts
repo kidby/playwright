@@ -15,7 +15,7 @@
  */
 
 import fs from 'fs';
-import { test, expect } from './cli-fixtures';
+import { test, expect } from './cli-fixtures.js';
 
 // Cookie tests
 

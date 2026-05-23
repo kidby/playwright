@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { test, expect, findDefaultSession, daemonFolder } from './cli-fixtures';
+import { test, expect, findDefaultSession, daemonFolder } from './cli-fixtures.js';
 
 test('should not save user data by default (in-memory mode)', async ({ cli, server, mcpBrowserNormalized }, testInfo) => {
   await cli('open', server.HELLO_WORLD);

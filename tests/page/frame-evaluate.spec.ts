@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
-import { attachFrame, detachFrame } from '../config/utils';
+import { test as it, expect } from './pageTest.js';
+import { attachFrame, detachFrame } from '../config/utils.js';
 
 it('should have different execution contexts', async ({ page, server }) => {
   await page.goto(server.EMPTY_PAGE);

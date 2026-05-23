@@ -16,8 +16,8 @@
 
 import path from 'path';
 import fs from 'fs';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
-import { TMP_WORKSPACES } from './npmTest';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
+import { TMP_WORKSPACES } from './npmTest.js';
 
 const { spawnAsync, removeFolders } = utils;
 

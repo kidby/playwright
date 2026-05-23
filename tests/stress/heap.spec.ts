@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { contextTest as test, expect } from '../config/browserTest';
-import { server as coreServer } from '../../packages/playwright-core/lib/coreBundle';
-import { queryObjectCount } from '../config/queryObjects';
+import { contextTest as test, expect } from '../config/browserTest.js';
+import { server as coreServer } from '../../packages/playwright-core/lib/coreBundle.js';
+import { queryObjectCount } from '../config/queryObjects.js';
 
 test.describe.configure({ mode: 'serial' });
 test.skip(({ browserName }) => browserName !== 'chromium');

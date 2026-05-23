@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { stripAnsi } from '../config/utils';
-import { test as it, expect } from './pageTest';
+import { stripAnsi } from '../config/utils.js';
+import { test as it, expect } from './pageTest.js';
 
 it('should outlive frame navigation', async ({ page, server }) => {
   await page.goto(server.EMPTY_PAGE);

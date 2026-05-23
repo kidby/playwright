@@ -15,7 +15,7 @@
  */
 
 import assert from 'assert';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
 const { spawnAsync } = utils;
 
 export default async () => {

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { browserTest as it, expect } from '../config/browserTest';
+import { browserTest as it, expect } from '../config/browserTest.js';
 import type { Route } from '@playwright/test';
-import { iso } from '../../packages/playwright-core/lib/coreBundle';
+import { iso } from '../../packages/playwright-core/lib/coreBundle.js';
 
 const { ManualPromise } = iso;
 

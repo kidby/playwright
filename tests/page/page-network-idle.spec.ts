@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 import type { Frame } from 'playwright-core';
-import type { TestServer } from '../config/testserver';
+import type { TestServer } from '../config/testserver/index.js';
 
 it('should navigate to empty page with networkidle', async ({ page, server }) => {
   const response = await page.goto(server.EMPTY_PAGE, { waitUntil: 'networkidle' });

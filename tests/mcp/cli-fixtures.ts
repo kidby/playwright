@@ -19,14 +19,14 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
-import { test as baseTest, expect } from './fixtures';
-import { killProcessGroup } from '../config/commonFixtures';
-import { inheritAndCleanEnv } from '../config/utils';
+import { test as baseTest, expect } from './fixtures.js';
+import { killProcessGroup } from '../config/commonFixtures.js';
+import { inheritAndCleanEnv } from '../config/utils.js';
 
 import type { Page, Browser } from 'playwright-core';
-import type { CommonFixtures } from '../config/commonFixtures';
+import type { CommonFixtures } from '../config/commonFixtures.js';
 
-export { expect } from './fixtures';
+export { expect } from './fixtures.js';
 export const test = baseTest.extend<{
   boundBrowser: Browser,
   cliEnv: Record<string, string>,

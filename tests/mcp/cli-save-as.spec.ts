@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './cli-fixtures';
+import { test, expect } from './cli-fixtures.js';
 
 test('screenshot', async ({ cli, server, mcpBrowser }) => {
   await cli('open', server.HELLO_WORLD);

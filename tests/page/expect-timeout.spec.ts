@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { stripAnsi } from '../config/utils';
-import { test, expect } from './pageTest';
+import { stripAnsi } from '../config/utils.js';
+import { test, expect } from './pageTest.js';
 
 test('should print element not found', async ({ page }) => {
   await page.setContent('<div id=node>Text content</div>');

@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { attachFrame, detachFrame } from '../config/utils';
-import { test as it, expect } from './pageTest';
+import { attachFrame, detachFrame } from '../config/utils.js';
+import { test as it, expect } from './pageTest.js';
 
 it('should work @smoke', async ({ page }) => {
   const result = await page.evaluate(() => 7 * 3);

@@ -16,7 +16,7 @@
  */
 
 import type { Page } from '@playwright/test';
-import { test as it, expect, rafraf } from './pageTest';
+import { test as it, expect, rafraf } from './pageTest.js';
 
 const giveItAChanceToFill = (page: Page) => rafraf(page, 5);
 

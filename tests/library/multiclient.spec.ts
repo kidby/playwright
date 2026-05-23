@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { kTargetClosedErrorMessage } from '../config/errors';
-import { expect, playwrightTest } from '../config/browserTest';
-import { ensureSomeFrames } from '../config/utils';
+import { kTargetClosedErrorMessage } from '../config/errors.js';
+import { expect, playwrightTest } from '../config/browserTest.js';
+import { ensureSomeFrames } from '../config/utils.js';
 import type { Browser, BrowserContext, BrowserServer, ConnectOptions, Page } from 'playwright-core';
 
 type ExtraFixtures = {

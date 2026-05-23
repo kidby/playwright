@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
-import { iso } from '../../packages/playwright-core/lib/coreBundle';
+import { test as it, expect } from './pageTest.js';
+import { iso } from '../../packages/playwright-core/lib/coreBundle.js';
 import vm from 'vm';
 
 const { globToRegexPattern, urlMatches } = iso;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './playwright-test-fixtures';
+import { test, expect } from './playwright-test-fixtures.js';
 
 test('should check types of fixtures', async ({ runTSC }) => {
   const result = await runTSC({

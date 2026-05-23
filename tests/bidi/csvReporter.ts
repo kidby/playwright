@@ -17,7 +17,7 @@
 import type {
   FullConfig, FullResult, Reporter, Suite
 } from '@playwright/test/reporter';
-import { stripAnsi } from '../config/utils';
+import { stripAnsi } from '../config/utils.js';
 import fs from 'fs';
 import path from 'path';
 

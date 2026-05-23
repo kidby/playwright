@@ -16,7 +16,7 @@
 
 import fs from 'fs/promises';
 import { pathToFileURL } from 'url';
-import { test, expect } from './fixtures';
+import { test, expect } from './fixtures.js';
 
 test('browser_navigate', async ({ client, server }) => {
   expect(await client.callTool({

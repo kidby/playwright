@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 it('should work with css selector', async ({ page, server }) => {
   await page.setContent('<section id="testAttribute">43543</section>');

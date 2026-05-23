@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { playwrightTest as it, expect } from '../config/browserTest';
+import { playwrightTest as it, expect } from '../config/browserTest.js';
 
 it.describe('launch server', () => {
   it.skip(({ mode }) => mode !== 'default');

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect, connectAndNavigate } from './extension-fixtures';
+import { test, expect, connectAndNavigate } from './extension-fixtures.js';
 
 test.skip(({ protocolVersion }) => protocolVersion === 1, 'Multi-tab not supported in protocol v1');
 

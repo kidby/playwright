@@ -19,7 +19,7 @@ import type { Server } from 'http';
 import type http from 'http';
 import https from 'https';
 import path from 'path';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
 
 const { spawnAsync, createHttpServer } = utils;
 

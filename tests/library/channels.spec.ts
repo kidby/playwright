@@ -16,7 +16,7 @@
  */
 
 import domain from 'domain';
-import { playwrightTest, expect } from '../config/browserTest';
+import { playwrightTest, expect } from '../config/browserTest.js';
 
 // Use something worker-scoped (e.g. expectScopeState) forces a new worker for this file.
 // Otherwise, a browser launched for other tests in this worker will affect the expectations.

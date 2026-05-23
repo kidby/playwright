@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { Page } from 'playwright-core';
-import { test as it, expect, rafraf } from './pageTest';
+import { test as it, expect, rafraf } from './pageTest.js';
 
 it.skip(({ isAndroid }) => {
   return isAndroid;

@@ -17,7 +17,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { test, expect } from './fixtures';
+import { test, expect } from './fixtures.js';
 
 test('--init-page', async ({ startClient }) => {
   const initPagePath = test.info().outputPath('aa.ts');

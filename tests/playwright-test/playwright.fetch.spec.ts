@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './playwright-test-fixtures';
+import { test, expect } from './playwright-test-fixtures.js';
 
 test('should expose request fixture', async ({ runInlineTest, server }) => {
   const result = await runInlineTest({

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { test } from '../playwright-test/stable-test-runner';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
+import { test } from '../playwright-test/stable-test-runner/index.js';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
 
 import referenceSSIM from 'ssim.js';
-import { randomPNG, assertEqual, grayChannel } from './utils';
+import { randomPNG, assertEqual, grayChannel } from './utils.js';
 
 const { ssim, FastStats, ImageChannel, srgb2xyz, xyz2lab, colorDeltaE94 } = utils;
 type ImageChannel = InstanceType<typeof ImageChannel>;

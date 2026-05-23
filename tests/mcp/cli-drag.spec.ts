@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './cli-fixtures';
+import { test, expect } from './cli-fixtures.js';
 
 test('drag between elements', async ({ cli, server }) => {
   server.setContent('/', `

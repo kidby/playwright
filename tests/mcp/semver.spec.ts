@@ -15,7 +15,7 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { tools } from '../../packages/playwright-core/lib/coreBundle';
+import { tools } from '../../packages/playwright-core/lib/coreBundle.js';
 
 const { compareSemver } = tools;
 

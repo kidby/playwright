@@ -17,7 +17,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { test, expect } from './playwright-test-fixtures';
+import { test, expect } from './playwright-test-fixtures.js';
 
 test('should clear cache with type:module', async ({ runCLICommand }) => {
   const result = await runCLICommand({

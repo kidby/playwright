@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { browserTest as it, expect } from '../config/browserTest';
+import { browserTest as it, expect } from '../config/browserTest.js';
 
 it('should allow service workers by default', async ({ page, server }) => {
   await page.goto(server.PREFIX + '/serviceworkers/empty/sw.html');

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './pageTest';
+import { test, expect } from './pageTest.js';
 
 test('should work', async ({ page, server, toImpl }) => {
   await page.goto(server.EMPTY_PAGE);

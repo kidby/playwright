@@ -15,8 +15,8 @@
  */
 
 import path from 'path';
-import { test, expect, parseTestRunnerOutput, stripAnsi } from './playwright-test-fixtures';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
+import { test, expect, parseTestRunnerOutput, stripAnsi } from './playwright-test-fixtures.js';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
 const { spawnAsync } = utils;
 
 test('should not expand huge arrays', async ({ runInlineTest }) => {

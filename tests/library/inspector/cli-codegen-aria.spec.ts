@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { test, expect } from './inspectorTest';
-import { roundBox } from '../../config/utils';
+import { test, expect } from './inspectorTest.js';
+import { roundBox } from '../../config/utils.js';
 
 test.describe(() => {
   test('should generate aria snapshot', async ({ openRecorder }) => {

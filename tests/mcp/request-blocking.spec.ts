@@ -15,7 +15,7 @@
  */
 
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { test, expect } from './fixtures';
+import { test, expect } from './fixtures.js';
 
 const BLOCK_MESSAGE = /Blocked by Web Inspector|NS_ERROR_FAILURE|net::ERR_BLOCKED_BY_CLIENT/g;
 

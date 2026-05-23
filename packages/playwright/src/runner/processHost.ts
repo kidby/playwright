@@ -16,6 +16,7 @@
 
 import child_process from 'child_process';
 import { EventEmitter } from 'events';
+import url from 'url';
 
 import debug from 'debug';
 import { assert } from '@isomorphic/assert';
@@ -52,7 +53,11 @@ export class ProcessHost extends EventEmitter {
 
   async startRunner(runnerParams: any, options: { onStdOut?: (chunk: Buffer | string) => void, onStdErr?: (chunk: Buffer | string) => void } = {}): Promise<ProcessExitData | undefined> {
     assert(!this.process, 'Internal error: starting the same process twice');
-    this.process = child_process.fork(this._entryScript, {
+    // ESM-only fork: Node 25's `child_process.fork(path)` chokes on entries in
+    // a `"type": "module"` workspace because it tries to read the entry via
+    // the file:// URL form as if it were a path. Workaround: spawn `node`
+    // directly with the path argument.
+    this.process = child_process.spawn(process.execPath, [this._entryScript], {
       // Note: we pass detached:false, so that workers are in the same process group.
       // This way Ctrl+C or a kill command can shutdown all workers in case they misbehave.
       // Otherwise user can end up with a bunch of workers stuck in a busy loop without self-destructing.
@@ -67,7 +72,8 @@ export class ProcessHost extends EventEmitter {
         (options.onStdErr && !process.env.PW_RUNNER_DEBUG) ? 'pipe' : 'inherit',
         'ipc',
       ],
-    });
+      serialization: 'json',
+    } as any);
     this.process.on('exit', async (code, signal) => {
       this._processDidExit = true;
       await this.onExit();

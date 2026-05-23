@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect, parseResponse } from './fixtures';
+import { test, expect, parseResponse } from './fixtures.js';
 
 test('ini config sets viewport', async ({ startClient, server }) => {
   server.setContent('/', `

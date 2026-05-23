@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { test as base, expect, extensionId, clickAllowAndSelect } from './extension-fixtures';
+import { test as base, expect, extensionId, clickAllowAndSelect } from './extension-fixtures.js';
 
-import type { CliResult } from './extension-fixtures';
+import type { CliResult } from './extension-fixtures.js';
 import type { Page } from 'playwright';
 
 const test = base.extend<{

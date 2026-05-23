@@ -16,8 +16,8 @@
  */
 
 import url from 'url';
-import { test as it, expect } from './pageTest';
-import { expectedSSLError } from '../config/utils';
+import { test as it, expect } from './pageTest.js';
+import { expectedSSLError } from '../config/utils.js';
 
 it('should work @smoke', async ({ page, server }) => {
   await page.goto(server.EMPTY_PAGE);

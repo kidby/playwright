@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './inspectorTest';
+import { test, expect } from './inspectorTest.js';
 
 test.describe('cli codegen', () => {
   test('should contain open page', async ({ openRecorder }) => {

@@ -17,7 +17,7 @@
 import { spawnSync } from 'child_process';
 import fs from 'fs';
 import { PNG } from 'playwright-core/lib/utilsBundle';
-import { registry } from '../../packages/playwright-core/lib/coreBundle';
+import { registry } from '../../packages/playwright-core/lib/coreBundle.js';
 
 export class VideoPlayer {
   fileName: string;

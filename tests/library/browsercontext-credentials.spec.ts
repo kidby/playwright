@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { browserTest as base, expect } from '../config/browserTest';
+import { browserTest as base, expect } from '../config/browserTest.js';
 
 const it = base.extend<{ failsOn401: boolean }>({
   failsOn401: async ({ browserName, isHeadlessShell }, use) => {

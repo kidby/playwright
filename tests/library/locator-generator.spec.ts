@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { contextTest as it, expect } from '../config/browserTest';
-import { iso } from '../../packages/playwright-core/lib/coreBundle';
+import { contextTest as it, expect } from '../config/browserTest.js';
+import { iso } from '../../packages/playwright-core/lib/coreBundle.js';
 import type { Page, Frame, Locator, FrameLocator } from 'playwright-core';
 
 const { asLocator, asLocators, asLocatorDescription, locatorOrSelectorAsSelector: parseLocator } = iso;

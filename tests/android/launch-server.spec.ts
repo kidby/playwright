@@ -15,8 +15,8 @@
  */
 
 import { WebSocket, WebSocketServer, type AddressInfo } from 'ws';
-import { androidTest as test, expect } from './androidTest';
-import { kTargetClosedErrorMessage } from '../config/errors';
+import { androidTest as test, expect } from './androidTest.js';
+import { kTargetClosedErrorMessage } from '../config/errors.js';
 
 // Force a separate worker to avoid messing up with `androidDevice` fixture.
 test.use({ launchOptions: [async ({ launchOptions }, use) => use(launchOptions), { scope: 'worker' }] });

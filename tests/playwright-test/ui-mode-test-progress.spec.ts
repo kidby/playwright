@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { iso } from '../../packages/playwright-core/lib/coreBundle';
-import { test, expect, retries, dumpTestTree } from './ui-mode-fixtures';
+import { iso } from '../../packages/playwright-core/lib/coreBundle.js';
+import { test, expect, retries, dumpTestTree } from './ui-mode-fixtures.js';
 
 const { ManualPromise } = iso;
 

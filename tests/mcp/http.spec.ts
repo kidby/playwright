@@ -20,10 +20,10 @@ import dns from 'dns';
 import { ChildProcess, spawn } from 'child_process';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { test as baseTest, expect, mcpServerPath, formatLog } from './fixtures';
-import { inheritAndCleanEnv } from '../config/utils';
+import { test as baseTest, expect, mcpServerPath, formatLog } from './fixtures.js';
+import { inheritAndCleanEnv } from '../config/utils.js';
 
-import type { Config } from '../../packages/playwright-core/src/tools/mcp/config.d';
+import type { Config } from '../../packages/playwright-core/src/tools/mcp/config.d.js';
 import { ListRootsRequestSchema } from 'playwright-core/lib/utilsBundle';
 
 const test = baseTest.extend<{ serverEndpoint: (options?: { args?: string[], noPort?: boolean }) => Promise<{ url: URL, stderr: () => string }> }>({

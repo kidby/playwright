@@ -19,12 +19,12 @@ import os from 'os';
 import path from 'path';
 import { chromium } from 'playwright';
 import { spawn } from 'child_process';
-import { test as base, expect } from '../mcp/fixtures';
-import { kTargetClosedErrorMessage } from '../config/errors';
+import { test as base, expect } from '../mcp/fixtures.js';
+import { kTargetClosedErrorMessage } from '../config/errors.js';
 
 import type { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import type { BrowserContext, Page } from 'playwright';
-import type { StartClient } from '../mcp/fixtures';
+import type { StartClient } from '../mcp/fixtures.js';
 
 export type BrowserWithExtension = {
   userDataDir: string;

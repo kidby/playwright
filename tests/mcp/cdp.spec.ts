@@ -15,7 +15,7 @@
  */
 
 import { spawnSync } from 'child_process';
-import { test, expect, mcpServerPath } from './fixtures';
+import { test, expect, mcpServerPath } from './fixtures.js';
 
 test.describe.configure({
   retries: 1,

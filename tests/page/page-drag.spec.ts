@@ -15,8 +15,8 @@
  */
 
 import type { ElementHandle, Page, Route } from 'playwright-core';
-import { test as it, expect } from './pageTest';
-import { attachFrame } from '../config/utils';
+import { test as it, expect } from './pageTest.js';
+import { attachFrame } from '../config/utils.js';
 
 it.skip(({ browserName, browserMajorVersion }) => browserName === 'chromium' && browserMajorVersion < 91);
 it.skip(({ isAndroid }) => isAndroid, 'No drag&drop on Android.');

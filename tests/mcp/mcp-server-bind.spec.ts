@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './cli-fixtures';
+import { test, expect } from './cli-fixtures.js';
 
 test('browser started by MCP is bound to server registry', async ({ startClient, cli, cliEnv, server }) => {
   const { client } = await startClient({

@@ -15,8 +15,8 @@
  */
 
 import path from 'path';
-import { test, expect } from './cli-fixtures';
-import { writeFiles } from './fixtures';
+import { test, expect } from './cli-fixtures.js';
+import { writeFiles } from './fixtures.js';
 
 const testEntrypoint = path.join(__dirname, '../../packages/playwright-test/cli.js');
 

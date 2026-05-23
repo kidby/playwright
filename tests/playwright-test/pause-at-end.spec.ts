@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { TestCase, TestResult, TestStep } from '../../packages/playwright-test/reporter';
-import { ReporterV2 } from '../../packages/playwright/src/reporters/reporterV2';
-import { test, expect } from './playwright-test-fixtures';
+import { TestCase, TestResult, TestStep } from '../../packages/playwright-test/reporter.js';
+import { ReporterV2 } from '../../packages/playwright/src/reporters/reporterV2.js';
+import { test, expect } from './playwright-test-fixtures.js';
 
 test.describe.configure({ mode: 'parallel' });
 

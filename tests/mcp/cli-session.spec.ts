@@ -16,9 +16,9 @@
 
 import fs from 'fs';
 import path from 'path';
-import { test, expect, daemonFolder } from './cli-fixtures';
-import { killProcessGroup } from '../config/commonFixtures';
-import playwright from '../../packages/playwright-core';
+import { test, expect, daemonFolder } from './cli-fixtures.js';
+import { killProcessGroup } from '../config/commonFixtures.js';
+import playwright from '../../packages/playwright-core/index.js';
 
 test('list', async ({ cli, server }) => {
   const { output: emptyOutput } = await cli('list');

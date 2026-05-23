@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect, retries, dumpTestTree } from './ui-mode-fixtures';
+import { test, expect, retries, dumpTestTree } from './ui-mode-fixtures.js';
 
 test.describe.configure({ mode: 'parallel', retries });
 

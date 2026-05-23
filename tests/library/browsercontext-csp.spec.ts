@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { browserTest as it, expect } from '../config/browserTest';
-import { attachFrame } from '../config/utils';
+import { browserTest as it, expect } from '../config/browserTest.js';
+import { attachFrame } from '../config/utils.js';
 
 it('should bypass CSP meta tag @smoke', async ({ browser, server }) => {
   // Make sure CSP prohibits addScriptTag.

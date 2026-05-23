@@ -15,7 +15,7 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { getAPIRequestCodeGen } from '../../../packages/trace-viewer/src/ui/codegen';
+import { getAPIRequestCodeGen } from '../../../packages/trace-viewer/src/ui/codegen.js';
 
 test.describe('javascript', () => {
   const impl = getAPIRequestCodeGen('javascript');

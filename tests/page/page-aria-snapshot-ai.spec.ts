@@ -15,8 +15,8 @@
  */
 
 
-import { test as it, expect } from './pageTest';
-import { unshift } from '../config/utils';
+import { test as it, expect } from './pageTest.js';
+import { unshift } from '../config/utils.js';
 import type { Page } from 'playwright-core';
 
 async function snapshotForAI(page: Page, options?: Omit<Parameters<Page['ariaSnapshot']>[0], 'mode'> & { _track?: string }): Promise<string> {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect, eventsPage } from './cli-fixtures';
+import { test, expect, eventsPage } from './cli-fixtures.js';
 
 test('mousemove', async ({ cli, server }) => {
   server.setContent('/', eventsPage, 'text/html');

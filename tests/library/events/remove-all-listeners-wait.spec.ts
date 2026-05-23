@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { iso } from '../../../packages/playwright-core/lib/coreBundle';
-import { EventEmitter } from './utils';
+import { iso } from '../../../packages/playwright-core/lib/coreBundle.js';
+import { EventEmitter } from './utils.js';
 import { test, expect } from '@playwright/test';
 
 const { ManualPromise } = iso;

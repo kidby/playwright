@@ -15,7 +15,7 @@
  */
 
 import colors from 'picocolors';
-import { test, expect } from './playwright-test-fixtures';
+import { test, expect } from './playwright-test-fixtures.js';
 
 for (const useIntermediateMergeReport of [false, true] as const) {
   test.describe(`${useIntermediateMergeReport ? 'merged' : 'created'}`, () => {

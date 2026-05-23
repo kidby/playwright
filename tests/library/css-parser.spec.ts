@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { playwrightTest as it, expect } from '../config/browserTest';
-import { iso } from '../../packages/playwright-core/lib/coreBundle';
+import { playwrightTest as it, expect } from '../config/browserTest.js';
+import { iso } from '../../packages/playwright-core/lib/coreBundle.js';
 
 const { parseCSS, serializeSelector: serialize } = iso;
 

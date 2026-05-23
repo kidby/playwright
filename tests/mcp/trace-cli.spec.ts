@@ -17,7 +17,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { test, expect } from './trace-cli-fixtures';
+import { test, expect } from './trace-cli-fixtures.js';
 
 test.skip(({ mcpBrowser }) => mcpBrowser !== 'chrome', 'Chrome-only');
 

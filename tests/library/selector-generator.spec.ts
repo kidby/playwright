@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { contextTest as it, expect } from '../config/browserTest';
+import { contextTest as it, expect } from '../config/browserTest.js';
 import type { Page, Frame } from 'playwright-core';
 
 async function generate(pageOrFrame: Page | Frame, target: string, expected?: string): Promise<string> {

@@ -18,10 +18,10 @@ import { execFileSync, spawnSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
-import { test, expect } from './playwright-test-fixtures';
+import { test, expect } from './playwright-test-fixtures.js';
 
 const bunRuntimeJs = require.resolve('../../packages/playwright/lib/transform/bunRuntime');
-const { isBun, stripTypeImports } = require(bunRuntimeJs) as typeof import('../../packages/playwright/src/transform/bunRuntime');
+const { isBun, stripTypeImports } = require(bunRuntimeJs) as typeof import('../../packages/playwright/src/transform/bunRuntime.js');
 
 const bunPath = (() => {
   if (process.env.BUN === '0')

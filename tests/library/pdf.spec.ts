@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { browserTest as it, expect } from '../config/browserTest';
+import { browserTest as it, expect } from '../config/browserTest.js';
 import fs from 'fs';
 
 it('should be able to save file', async ({ contextFactory, browserName }, testInfo) => {

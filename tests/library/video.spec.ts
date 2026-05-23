@@ -17,9 +17,9 @@
 import fs from 'fs';
 import path from 'path';
 import { jpegjs } from 'playwright-core/lib/utilsBundle';
-import { expect, browserTest as it } from '../config/browserTest';
-import { ensureSomeFrames, parseTraceRaw } from '../config/utils';
-import { VideoPlayer } from './videoPlayer';
+import { expect, browserTest as it } from '../config/browserTest.js';
+import { ensureSomeFrames, parseTraceRaw } from '../config/utils.js';
+import { VideoPlayer } from './videoPlayer.js';
 
 type Pixel = { r: number, g: number, b: number, alpha: number };
 type PixelPredicate = (pixel: Pixel) => boolean;

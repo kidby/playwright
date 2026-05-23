@@ -15,7 +15,7 @@
  */
 import os from 'os';
 import path from 'path';
-import { test } from './npmTest';
+import { test } from './npmTest.js';
 
 test('connect to selenium', async ({ exec, tmpWorkspace }, testInfo) => {
   test.skip(os.platform() !== 'linux');

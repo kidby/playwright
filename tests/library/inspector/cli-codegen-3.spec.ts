@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import type { TestServer } from '../../config/testserver';
-import type { Recorder } from './inspectorTest';
-import { test, expect } from './inspectorTest';
+import type { TestServer } from '../../config/testserver/index.js';
+import type { Recorder } from './inspectorTest.js';
+import { test, expect } from './inspectorTest.js';
 import type { Page } from '@playwright/test';
 
 test.describe('cli codegen', () => {

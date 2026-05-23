@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 it('should fail page.textContent in strict mode', async ({ page }) => {
   await page.setContent(`<span>span1</span><div><span>target</span></div>`);

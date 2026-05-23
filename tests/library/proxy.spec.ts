@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { setupSocksForwardingServer } from '../config/proxy';
-import { playwrightTest as it, expect } from '../config/browserTest';
+import { setupSocksForwardingServer } from '../config/proxy.js';
+import { playwrightTest as it, expect } from '../config/browserTest.js';
 import net from 'net';
 
 it.skip(({ mode }) => mode.startsWith('service'));

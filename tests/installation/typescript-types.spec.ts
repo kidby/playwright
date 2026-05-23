@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { test } from './npmTest';
+import { test } from './npmTest.js';
 
 test('typescript types should work', async ({ exec, tsc, writeFiles }) => {
   const libraryPackages = [

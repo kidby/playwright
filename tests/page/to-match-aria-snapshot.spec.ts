@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { stripAnsi } from '../config/utils';
-import { test, expect } from './pageTest';
+import { stripAnsi } from '../config/utils.js';
+import { test, expect } from './pageTest.js';
 
 test('should match page', async ({ page }) => {
   await page.setContent(`<h1>title</h1>`);

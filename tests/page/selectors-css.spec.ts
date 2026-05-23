@@ -16,7 +16,7 @@
  */
 
 import type { ElementHandle } from '@playwright/test';
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 it('should work with large DOM @smoke', async ({ page, server }) => {
   await page.evaluate(() => {

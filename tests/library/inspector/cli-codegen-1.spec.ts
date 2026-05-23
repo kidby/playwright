@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './inspectorTest';
+import { test, expect } from './inspectorTest.js';
 import type { ConsoleMessage } from 'playwright';
 
 test.describe('cli codegen', () => {

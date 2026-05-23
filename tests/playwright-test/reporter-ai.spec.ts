@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { test, expect } from './playwright-test-fixtures';
+import { test, expect } from './playwright-test-fixtures.js';
 
 test('ai reporter writes per-failure markdown + index + jsonl', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({

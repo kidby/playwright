@@ -16,10 +16,10 @@
  */
 
 import { devices } from '@playwright/test';
-import { contextTest as it, expect } from '../config/browserTest';
-import { browserTest } from '../config/browserTest';
-import { verifyViewport } from '../config/utils';
-import { server as coreServer } from '../../packages/playwright-core/lib/coreBundle';
+import { contextTest as it, expect } from '../config/browserTest.js';
+import { browserTest } from '../config/browserTest.js';
+import { verifyViewport } from '../config/utils.js';
+import { server as coreServer } from '../../packages/playwright-core/lib/coreBundle.js';
 const { deviceDescriptors } = coreServer;
 
 it('should get the proper default viewport size', async ({ page, server }) => {

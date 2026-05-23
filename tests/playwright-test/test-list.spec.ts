@@ -16,7 +16,7 @@
 
 import path from 'path';
 import fs from 'fs';
-import { test, expect } from './playwright-test-fixtures';
+import { test, expect } from './playwright-test-fixtures.js';
 
 const varietyWorkspace = {
   'playwright.config.ts': `

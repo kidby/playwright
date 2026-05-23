@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { test, expect } from './pageTest';
-import { attachFrame } from '../config/utils';
+import { test, expect } from './pageTest.js';
+import { attachFrame } from '../config/utils.js';
 
 import fs from 'fs';
 import formidable from 'formidable';

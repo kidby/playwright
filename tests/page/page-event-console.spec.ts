@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 import util from 'util';
 
 it('should work @smoke', async ({ page, browserName, channel }) => {

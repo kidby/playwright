@@ -21,7 +21,7 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import { test, expect } from '@playwright/test';
-import { EventEmitter } from './utils';
+import { EventEmitter } from './utils.js';
 
 let callbacks_called = [];
 const e = new EventEmitter();

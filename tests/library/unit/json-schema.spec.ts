@@ -15,8 +15,8 @@
  */
 
 import { test as it, expect } from '@playwright/test';
-import type { iso } from '../../../packages/playwright-core/lib/coreBundle';
-import { iso as _iso } from '../../../packages/playwright-core/lib/coreBundle';
+import type { iso } from '../../../packages/playwright-core/lib/coreBundle.js';
+import { iso as _iso } from '../../../packages/playwright-core/lib/coreBundle.js';
 
 const { validate } = _iso;
 type JsonSchema = iso.JsonSchema;

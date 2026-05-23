@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { test, expect } from './fixtures';
+import { test, expect } from './fixtures.js';
 
 test('check that trace is saved with browser_start_tracing', async ({ startClient, server }, testInfo) => {
   const outputDir = testInfo.outputPath('output');

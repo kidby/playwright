@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { test, expect } from './playwright-test-fixtures';
-import { detectCI } from '../../packages/playwright/src/reporters/ciAdapter';
+import { test, expect } from './playwright-test-fixtures.js';
+import { detectCI } from '../../packages/playwright/src/reporters/ciAdapter.js';
 
 const CI_ENV_VARS = [
   'CIRCLECI', 'CIRCLE_BRANCH', 'CIRCLE_SHA1', 'CIRCLE_BUILD_URL', 'CIRCLE_JOB',

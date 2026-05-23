@@ -20,11 +20,11 @@ import type https from 'https';
 import zlib from 'zlib';
 import type http2 from 'http2';
 import type http from 'http';
-import { expect, playwrightTest as base } from '../config/browserTest';
+import { expect, playwrightTest as base } from '../config/browserTest.js';
 import type net from 'net';
-import type { BrowserContextOptions } from '../../packages/playwright-test';
-import { setupSocksForwardingServer } from '../config/proxy';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
+import type { BrowserContextOptions } from '../../packages/playwright-test/index.js';
+import { setupSocksForwardingServer } from '../config/proxy.js';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
 const { createHttpsServer, createHttp2Server } = utils;
 
 type TestOptions = {

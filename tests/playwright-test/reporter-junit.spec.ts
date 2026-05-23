@@ -16,7 +16,7 @@
 
 import xml2js from 'xml2js';
 import path from 'path';
-import { test, expect } from './playwright-test-fixtures';
+import { test, expect } from './playwright-test-fixtures.js';
 import fs from 'fs';
 
 for (const useIntermediateMergeReport of [false, true] as const) {

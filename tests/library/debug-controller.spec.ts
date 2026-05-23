@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { expect, playwrightTest as baseTest } from '../config/browserTest';
-import { remote, utils } from '../../packages/playwright-core/lib/coreBundle';
+import { expect, playwrightTest as baseTest } from '../config/browserTest.js';
+import { remote, utils } from '../../packages/playwright-core/lib/coreBundle.js';
 const { PlaywrightServer } = remote;
-import { Backend } from '../config/debugControllerBackend';
+import { Backend } from '../config/debugControllerBackend.js';
 import type { Browser, BrowserContext } from '@playwright/test';
 import type * as channels from '@protocol/channels';
-import { roundBox } from '../config/utils';
+import { roundBox } from '../config/utils.js';
 
 const { createGuid } = utils;
 

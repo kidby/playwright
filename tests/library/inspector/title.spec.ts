@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './inspectorTest';
+import { test, expect } from './inspectorTest.js';
 
 test('should reflect formatted URL of the page', async ({
   openRecorder,

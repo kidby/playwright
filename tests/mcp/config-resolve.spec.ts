@@ -18,10 +18,10 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
-import { test, expect } from './fixtures';
+import { test, expect } from './fixtures.js';
 
-import { tools } from '../../packages/playwright-core/lib/coreBundle';
-import type { Config } from '../../packages/playwright-core/src/tools/mcp/config.d';
+import { tools } from '../../packages/playwright-core/lib/coreBundle.js';
+import type { Config } from '../../packages/playwright-core/src/tools/mcp/config.d.js';
 
 const { resolveCLIConfigForCLI, resolveCLIConfigForMCP, isSystemDirectory, outputDir } = tools;
 

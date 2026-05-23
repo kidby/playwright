@@ -16,7 +16,7 @@
 
 import fs from 'node:fs';
 
-import { test, expect } from './fixtures';
+import { test, expect } from './fixtures.js';
 
 test('browser_type', async ({ startClient, server }) => {
   const secretsFile = test.info().outputPath('secrets.env');

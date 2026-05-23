@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 it('should respect first() and last() @smoke', async ({ page }) => {
   await page.setContent(`

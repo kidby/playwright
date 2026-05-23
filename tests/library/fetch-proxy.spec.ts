@@ -15,8 +15,8 @@
  */
 
 import https from 'node:https';
-import { contextTest as it, expect } from '../config/browserTest';
-import { TestServer } from '../config/testserver';
+import { contextTest as it, expect } from '../config/browserTest.js';
+import { TestServer } from '../config/testserver/index.js';
 
 it.skip(({ mode }) => mode !== 'default');
 

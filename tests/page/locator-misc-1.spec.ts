@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 import path from 'path';
 
 it('should hover @smoke', async ({ page, server, headless }) => {

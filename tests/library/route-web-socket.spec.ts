@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { attachFrame, detachFrame } from '../config/utils';
-import { contextTest as test, expect } from '../config/browserTest';
+import { attachFrame, detachFrame } from '../config/utils.js';
+import { contextTest as test, expect } from '../config/browserTest.js';
 import type { Frame, Page, WebSocketRoute } from '@playwright/test';
-import { TestServer } from '../config/testserver';
+import { TestServer } from '../config/testserver/index.js';
 
 declare global {
   interface Window {

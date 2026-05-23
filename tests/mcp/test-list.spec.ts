@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect, writeFiles } from './fixtures';
+import { test, expect, writeFiles } from './fixtures.js';
 
 test.use({ mcpServerType: 'test-mcp' });
 

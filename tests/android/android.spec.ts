@@ -15,7 +15,7 @@
  */
 
 import net from 'net';
-import { androidTest as test, expect } from './androidTest';
+import { androidTest as test, expect } from './androidTest.js';
 
 // Force a separate worker to avoid messing up with `androidDevice` fixture.
 test.use({ launchOptions: [async ({ launchOptions }, use) => use(launchOptions), { scope: 'worker' }] });

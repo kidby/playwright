@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { test, expect } from './playwright-test-fixtures';
-import { lastDryRunPayload } from './dry-run-helpers';
+import { test, expect } from './playwright-test-fixtures.js';
+import { lastDryRunPayload } from './dry-run-helpers.js';
 
 test('emits one event per test with CI metadata and extraAttributes', async ({ runInlineTest }) => {
   const result = await runInlineTest({

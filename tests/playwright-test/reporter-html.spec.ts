@@ -18,8 +18,8 @@ import fs from 'fs';
 import path from 'path';
 import url from 'url';
 import * as yazl from 'yazl';
-import { test as baseTest, expect as baseExpect, cliEntrypoint, createImage } from './playwright-test-fixtures';
-import { iso, utils } from '../../packages/playwright-core/lib/coreBundle';
+import { test as baseTest, expect as baseExpect, cliEntrypoint, createImage } from './playwright-test-fixtures.js';
+import { iso, utils } from '../../packages/playwright-core/lib/coreBundle.js';
 
 type HttpServer = utils.HttpServer;
 

@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { test, expect } from './npmTest';
+import { test, expect } from './npmTest.js';
 import { chromium } from '@playwright/test';
 import path from 'path';
 import http from 'http';
 import https from 'https';
 import { Writable } from 'stream';
-import { TestProxy } from '../config/proxy';
-import { TestServer } from '../config/testserver';
+import { TestProxy } from '../config/proxy.js';
+import { TestServer } from '../config/testserver/index.js';
 
 test.use({ isolateBrowsers: true });
 

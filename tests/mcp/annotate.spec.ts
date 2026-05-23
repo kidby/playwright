@@ -19,8 +19,8 @@ import path from 'path';
 
 import * as zipjs from '@zip.js/zip.js';
 
-import { test, expect, installSaveFilePickerMock, mockAbortingFilePicker } from './cli-fixtures';
-import { inheritAndCleanEnv } from '../config/utils';
+import { test, expect, installSaveFilePickerMock, mockAbortingFilePicker } from './cli-fixtures.js';
+import { inheritAndCleanEnv } from '../config/utils.js';
 
 function activeSession(dashboard: import('playwright-core').Page) {
   return dashboard.getByRole('region', { name: /^Session / }).filter({ has: dashboard.getByRole('option', { selected: true }) });

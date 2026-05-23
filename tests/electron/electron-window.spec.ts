@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { electronTest as test, expect } from './electronTest';
+import { electronTest as test, expect } from './electronTest.js';
 
 test('should click the button', async ({ launchElectronApp, newWindow, server }) => {
   const app = await launchElectronApp('electron-app.js');

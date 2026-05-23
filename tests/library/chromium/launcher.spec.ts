@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { playwrightTest as it, expect } from '../../config/browserTest';
+import { playwrightTest as it, expect } from '../../config/browserTest.js';
 
 it('should throw with remote-debugging-pipe argument', async ({ browserType, mode }) => {
   it.skip(mode !== 'default');

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { browserTest as it, expect } from '../config/browserTest';
+import { browserTest as it, expect } from '../config/browserTest.js';
 
 it('should not fail page.textContent in non-strict mode', async ({ page }) => {
   await page.setContent(`<span>span1</span><div><span>target</span></div>`);

@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-import { contextTest as it, expect } from '../config/browserTest';
+import { contextTest as it, expect } from '../config/browserTest.js';
 import util from 'util';
 import zlib from 'zlib';
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './fixtures';
+import { test, expect } from './fixtures.js';
 
 test('action timeout (default)', async ({ server, startClient }) => {
   const { client } = await startClient({ noTimeoutForTest: true });

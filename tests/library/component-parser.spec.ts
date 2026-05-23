@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { playwrightTest as it, expect } from '../config/browserTest';
-import type { iso } from '../../packages/playwright-core/lib/coreBundle';
-import { iso as _iso } from '../../packages/playwright-core/lib/coreBundle';
+import { playwrightTest as it, expect } from '../config/browserTest.js';
+import type { iso } from '../../packages/playwright-core/lib/coreBundle.js';
+import { iso as _iso } from '../../packages/playwright-core/lib/coreBundle.js';
 
 type AttributeSelector = iso.AttributeSelector;
 const { parseAttributeSelector } = _iso;

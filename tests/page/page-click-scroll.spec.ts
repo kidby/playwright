@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { expect, test as it } from './pageTest';
+import { expect, test as it } from './pageTest.js';
 
 it('should not hit scroll bar', async ({ page, browserName, platform }) => {
   it.fixme(browserName === 'webkit' && platform === 'linux', 'Fails in headless and in headful on Ubuntu 22.04');

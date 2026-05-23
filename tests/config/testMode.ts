@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { oop, client } from '../../packages/playwright-core/lib/coreBundle';
+import { oop, client } from '../../packages/playwright-core/lib/coreBundle.js';
 
 export type TestModeName = 'default' | 'driver';
 

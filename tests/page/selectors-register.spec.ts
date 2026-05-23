@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 it.skip(!!process.env.PW_TEST_CONNECT_WS_ENDPOINT, 'selectors.register does not support reuse');
 

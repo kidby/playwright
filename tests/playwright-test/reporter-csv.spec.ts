@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { test, expect } from './playwright-test-fixtures';
+import { test, expect } from './playwright-test-fixtures.js';
 
 test('csv reporter emits header + one row per test', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({

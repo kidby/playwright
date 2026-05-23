@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './fixtures';
+import { test, expect } from './fixtures.js';
 
 test('browser_wait_for(text)', async ({ client, server }) => {
   server.setContent('/', `

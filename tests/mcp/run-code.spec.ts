@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 
-import { test, expect, parseResponse, consoleEntries } from './fixtures';
+import { test, expect, parseResponse, consoleEntries } from './fixtures.js';
 
 test('browser_run_code_unsafe', async ({ client, server }) => {
   server.setContent('/', `

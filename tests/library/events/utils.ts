@@ -20,7 +20,7 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import { expect } from '@playwright/test';
-import { clientEventEmitter, utils } from '../../../packages/playwright-core/lib/coreBundle';
+import { clientEventEmitter, utils } from '../../../packages/playwright-core/lib/coreBundle.js';
 
 const { nodePlatform } = utils;
 

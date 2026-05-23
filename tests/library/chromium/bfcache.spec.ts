@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { contextTest as test, expect } from '../../config/browserTest';
+import { contextTest as test, expect } from '../../config/browserTest.js';
 
 test.use({
   launchOptions: async ({ launchOptions }, use) => {

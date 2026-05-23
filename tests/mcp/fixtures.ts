@@ -22,19 +22,19 @@ import { test as baseTest, expect as baseExpect } from '@playwright/test';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { ListRootsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import { TestServer } from '../config/testserver';
-import { serverFixtures } from '../config/serverFixtures';
-import { tools } from '../../packages/playwright-core/lib/coreBundle';
-import { commonFixtures } from '../config/commonFixtures';
-import { RunServer } from '../config/remoteServer';
-import { inheritAndCleanEnv } from '../config/utils';
+import { TestServer } from '../config/testserver/index.js';
+import { serverFixtures } from '../config/serverFixtures.js';
+import { tools } from '../../packages/playwright-core/lib/coreBundle.js';
+import { commonFixtures } from '../config/commonFixtures.js';
+import { RunServer } from '../config/remoteServer.js';
+import { inheritAndCleanEnv } from '../config/utils.js';
 
-import type { CommonFixtures, CommonWorkerFixtures } from '../config/commonFixtures';
-import type { Config } from '../../packages/playwright-core/src/tools/mcp/config.d';
+import type { CommonFixtures, CommonWorkerFixtures } from '../config/commonFixtures.js';
+import type { Config } from '../../packages/playwright-core/src/tools/mcp/config.d.js';
 import type { BrowserContext } from 'playwright';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 import type { Stream } from 'stream';
-import type { ServerFixtures, ServerWorkerOptions } from '../config/serverFixtures';
+import type { ServerFixtures, ServerWorkerOptions } from '../config/serverFixtures.js';
 
 export const { parseResponse } = tools;
 

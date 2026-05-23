@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { expect, browserTest as test } from '../config/browserTest';
+import { expect, browserTest as test } from '../config/browserTest.js';
 
 test.skip(({ mode }) => mode !== 'default', 'Annotations use an open shadow root only in default mode');
 

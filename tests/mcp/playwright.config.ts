@@ -18,7 +18,7 @@ import dotenv from 'dotenv';
 
 import { defineConfig } from '@playwright/test';
 
-import type { TestOptions } from './fixtures';
+import type { TestOptions } from './fixtures.js';
 import type { ReporterDescription } from '@playwright/test';
 
 process.env.PWTEST_UNDER_TEST = '1';

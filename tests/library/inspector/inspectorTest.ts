@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { contextTest } from '../../config/browserTest';
+import { contextTest } from '../../config/browserTest.js';
 import type { Locator, Page } from 'playwright-core';
-import { step } from '../../config/baseTest';
+import { step } from '../../config/baseTest.js';
 import * as path from 'path';
 import fs from 'fs';
 import type { Source } from '../../../packages/recorder/src/recorderTypes';
-import type { CommonFixtures, TestChildProcess } from '../../config/commonFixtures';
+import type { CommonFixtures, TestChildProcess } from '../../config/commonFixtures.js';
 import { expect } from '@playwright/test';
 export { expect } from '@playwright/test';
 
@@ -47,7 +47,7 @@ const codegenLang2Id: Map<string, string> = new Map([
 ]);
 const codegenLangId2lang = new Map([...codegenLang2Id.entries()].map(([lang, langId]) => [langId, lang]));
 
-import { inprocess } from '../../../packages/playwright-core/lib/coreBundle';
+import { inprocess } from '../../../packages/playwright-core/lib/coreBundle.js';
 // Use a separate Playwright instance for automating the inspector so that
 // contexts created here do not get tracked by the test runner's tracing.
 const playwrightToAutomateInspector = inprocess.createInProcessPlaywright();

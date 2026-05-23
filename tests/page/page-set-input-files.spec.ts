@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './pageTest';
+import { test, expect } from './pageTest.js';
 
 import path from 'path';
 import fs from 'fs';

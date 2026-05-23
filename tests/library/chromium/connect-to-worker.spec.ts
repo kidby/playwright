@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { playwrightTest as test, expect } from '../../config/browserTest';
+import { playwrightTest as test, expect } from '../../config/browserTest.js';
 
 test('should connect, evaluate, receive console and disconnect', async ({ browserType, childProcess }) => {
   const child = childProcess({ command: [process.execPath, '--inspect-brk=0', '-e', 'console.log("hello from node"); setTimeout(() => {}, 1e9)'] });

@@ -15,9 +15,9 @@
  */
 
 import type { Page, Frame, ElementHandle } from '@playwright/test';
-import { contextTest as it, expect } from '../config/browserTest';
-import { attachFrame } from '../config/utils';
-import type { TestServer } from '../config/testserver';
+import { contextTest as it, expect } from '../config/browserTest.js';
+import { attachFrame } from '../config/utils.js';
+import type { TestServer } from '../config/testserver/index.js';
 
 async function checkSlowMo(toImpl: (api: any) => any, page: Page, task: () => Promise<unknown>) {
   let didSlowMo = false;

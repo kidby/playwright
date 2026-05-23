@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { contextTest as test, expect } from '../config/browserTest';
-import { server as coreServer } from '../../packages/playwright-core/lib/coreBundle';
+import { contextTest as test, expect } from '../config/browserTest.js';
+import { server as coreServer } from '../../packages/playwright-core/lib/coreBundle.js';
 
 test.slow();
 

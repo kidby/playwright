@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './fixtures';
+import { test, expect } from './fixtures.js';
 
 import type { Client } from '@modelcontextprotocol/sdk/client/index.js';
 

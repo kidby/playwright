@@ -19,11 +19,11 @@ import path from 'path';
 
 import { test, expect } from '@playwright/test';
 
-import { convertPageSourceToSnapshot, parsePageSource } from '../../packages/playwright-mobile/src/snapshot';
-import { Device, iosCapabilities } from '../../packages/playwright-mobile/src';
-import { startMockAppium } from './mockAppium';
+import { convertPageSourceToSnapshot, parsePageSource } from '../../packages/playwright-mobile/src/snapshot.js';
+import { Device, iosCapabilities } from '../../packages/playwright-mobile/src/index.js';
+import { startMockAppium } from './mockAppium.js';
 
-import type { MockAppium } from './mockAppium';
+import type { MockAppium } from './mockAppium.js';
 
 const iosFixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'ios-page-source.xml'), 'utf-8');
 const androidFixture = fs.readFileSync(path.join(__dirname, 'fixtures', 'android-page-source.xml'), 'utf-8');

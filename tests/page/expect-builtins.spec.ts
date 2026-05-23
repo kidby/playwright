@@ -9,7 +9,7 @@
 // Adapted from jest/packages/expect/src/__tests__/matchers.test.js,
 // asymmetricMatchers.test.ts and toThrowMatchers.test.ts.
 
-import { test, expect } from './pageTest';
+import { test, expect } from './pageTest.js';
 
 test.describe('.toBe()', () => {
   test('does not throw', () => {

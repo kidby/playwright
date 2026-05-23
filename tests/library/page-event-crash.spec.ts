@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
-import { contextTest as testBase, expect } from '../config/browserTest';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
+import { contextTest as testBase, expect } from '../config/browserTest.js';
 
 const test = testBase.extend<{ crash: () => void }, { dummy: string }>({
   crash: async ({ page, toImpl, browserName }, run) => {

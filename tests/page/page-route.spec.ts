@@ -16,7 +16,7 @@
  */
 
 import type { Route } from 'playwright-core';
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 it('should intercept @smoke', async ({ page, server }) => {
   let intercepted = false;

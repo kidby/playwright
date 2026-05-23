@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { browserTest as test, expect } from '../config/browserTest';
+import { browserTest as test, expect } from '../config/browserTest.js';
 import type { ElementHandle } from 'playwright-core';
 
 test('console event should work @smoke', async ({ page }) => {

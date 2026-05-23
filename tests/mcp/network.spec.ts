@@ -17,7 +17,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { test, expect, parseResponse } from './fixtures';
+import { test, expect, parseResponse } from './fixtures.js';
 
 test('browser_network_requests', async ({ client, server }) => {
   server.setContent('/', `

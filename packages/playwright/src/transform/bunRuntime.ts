@@ -108,7 +108,7 @@ export function stripTypeImports(source: string): string {
 
 export async function importUnderBun(file: string): Promise<unknown> {
   const fileUrl = Bun!.pathToFileURL(file).toString();
-  return await eval(`import(${JSON.stringify(fileUrl)})`);
+  return await import(fileUrl);
 }
 
 installBunRuntime();

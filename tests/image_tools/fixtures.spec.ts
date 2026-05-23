@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { test, expect } from '../playwright-test/stable-test-runner';
+import { test, expect } from '../playwright-test/stable-test-runner/index.js';
 import { PNG } from 'playwright-core/lib/utilsBundle';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
 import fs from 'fs';
 import path from 'path';
 

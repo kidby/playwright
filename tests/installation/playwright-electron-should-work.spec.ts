@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { test } from './npmTest';
+import { test } from './npmTest.js';
 import fs from 'fs';
-import { expect } from '../../packages/playwright-test';
+import { expect } from '../../packages/playwright-test/index.js';
 import path from 'path';
 
 test('electron should work', async ({ exec, tsc, writeFiles }) => {

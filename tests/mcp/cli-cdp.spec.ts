@@ -15,7 +15,7 @@
  */
 
 import fs from 'fs';
-import { test, expect, daemonFolder } from './cli-fixtures';
+import { test, expect, daemonFolder } from './cli-fixtures.js';
 
 test.describe.configure({
   retries: 1,

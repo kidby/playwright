@@ -17,7 +17,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import { test, expect, parseResponse } from './fixtures';
+import { test, expect, parseResponse } from './fixtures.js';
 
 test('browser_file_upload', async ({ client, server }, testInfo) => {
   server.setContent('/', `

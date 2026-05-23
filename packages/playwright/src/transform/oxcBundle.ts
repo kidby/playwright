@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import * as babel from '@babel/core';
 import { transformSync as oxcTransformSync } from 'oxc-transform';
 
 // CJS-compat shims injected at the top of every transformed module so user
@@ -67,8 +68,31 @@ export const oxcTransform: OxcTransformFunction = (code, filename, jsxImportSour
     throw new Error(`${filename}: ${err.message}${err.codeframe ? '\n' + err.codeframe : ''}`);
   }
 
+  let finalCode = result.code;
+
+  // oxc-transform doesn't yet transform TC39 stage-3 decorators (e.g. `@step`)
+  // — it preserves them as-is. Node 25 can't execute them natively, so we run a
+  // focused Babel pass with only the decorator plugin when the output still has
+  // `@` decorators in it. Cheap precondition check skips the babel cost for
+  // files that don't use decorators.
+  if (/^\s*@\w[\w.]*/m.test(finalCode)) {
+    const babelResult = babel.transformSync(finalCode, {
+      filename,
+      babelrc: false,
+      configFile: false,
+      browserslistConfigFile: false,
+      sourceMaps: false,
+      compact: false,
+      plugins: [
+        [require('@babel/plugin-proposal-decorators'), { version: '2023-05' }],
+      ],
+    });
+    if (babelResult?.code)
+      finalCode = babelResult.code;
+  }
+
   return {
-    code: CJS_COMPAT_BANNER + result.code,
+    code: CJS_COMPAT_BANNER + finalCode,
     map: result.map as any,
   };
 };

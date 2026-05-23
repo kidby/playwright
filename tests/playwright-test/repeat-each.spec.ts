@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './playwright-test-fixtures';
+import { test, expect } from './playwright-test-fixtures.js';
 
 test('should repeat from command line', async ({ runInlineTest }) => {
   const result = await runInlineTest({

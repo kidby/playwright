@@ -18,8 +18,8 @@ import type {
   FullConfig, FullResult, Reporter, Suite, TestCase
 } from '@playwright/test/reporter';
 import fs from 'fs';
-import { parseBidiExpectations as parseExpectations, projectExpectationPath } from './expectationUtil';
-import type { TestExpectation } from './expectationUtil';
+import { parseBidiExpectations as parseExpectations, projectExpectationPath } from './expectationUtil.js';
+import type { TestExpectation } from './expectationUtil.js';
 
 type ReporterOptions = {
   rebase?: boolean;

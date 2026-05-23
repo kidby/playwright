@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { tools } from '../../packages/playwright-core/lib/coreBundle';
-import { utils, iso } from '../../packages/playwright-core/lib/coreBundle';
+import { tools } from '../../packages/playwright-core/lib/coreBundle.js';
+import { utils, iso } from '../../packages/playwright-core/lib/coreBundle.js';
 
-import type { iso as isoType } from '../../packages/playwright-core/lib/coreBundle';
+import type { iso as isoType } from '../../packages/playwright-core/lib/coreBundle.js';
 import type { Locator, Frame, Page } from 'playwright-core';
 import type { StackFrame } from '../../packages/protocol/src/channels';
 import type { ActionTraceEvent, TraceEvent } from '@trace/trace';

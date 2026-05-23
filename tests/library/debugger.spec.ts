@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { contextTest as it, expect } from '../config/browserTest';
+import { contextTest as it, expect } from '../config/browserTest.js';
 
 it('should pause at next and resume', async ({ context, server }) => {
   const page = await context.newPage();

@@ -17,7 +17,7 @@
 import colors from 'picocolors';
 import * as fs from 'fs';
 import * as path from 'path';
-import { test, expect, createWhiteImage, paintBlackPixels } from './playwright-test-fixtures';
+import { test, expect, createWhiteImage, paintBlackPixels } from './playwright-test-fixtures.js';
 
 const files = {
   'helper.ts': `

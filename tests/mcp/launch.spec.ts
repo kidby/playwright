@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 
-import { test, expect, formatLog } from './fixtures';
+import { test, expect, formatLog } from './fixtures.js';
 
 test('test reopen browser', async ({ startClient, server }) => {
   const { client, stderr } = await startClient({

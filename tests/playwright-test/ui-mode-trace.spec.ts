@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { createImage } from './playwright-test-fixtures';
-import { test, expect, retries } from './ui-mode-fixtures';
+import { createImage } from './playwright-test-fixtures.js';
+import { test, expect, retries } from './ui-mode-fixtures.js';
 
 test.describe.configure({ mode: 'parallel', retries });
 

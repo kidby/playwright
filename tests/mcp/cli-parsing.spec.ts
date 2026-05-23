@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './cli-fixtures';
+import { test, expect } from './cli-fixtures.js';
 
 test('unknown option', async ({ cli, server }) => {
   const { error, exitCode } = await cli('open', '--some-option', 'value', 'about:blank');

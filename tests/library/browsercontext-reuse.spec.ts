@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { browserTest, expect } from '../config/browserTest';
-import { verifyViewport } from '../config/utils';
+import { browserTest, expect } from '../config/browserTest.js';
+import { verifyViewport } from '../config/utils.js';
 import type { Browser, BrowserServer, BrowserContext, Page, BrowserContextOptions, BrowserType } from '@playwright/test';
 
 class LaunchScenario {

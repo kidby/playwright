@@ -16,10 +16,10 @@
 
 import fs from 'fs';
 import path from 'path';
-import { expect, browserTest as test } from '../config/browserTest';
-import { ensureSomeFrames } from '../config/utils';
-import { kTargetClosedErrorMessage } from '../config/errors';
-import { VideoPlayer } from './videoPlayer';
+import { expect, browserTest as test } from '../config/browserTest.js';
+import { ensureSomeFrames } from '../config/utils.js';
+import { kTargetClosedErrorMessage } from '../config/errors.js';
+import { VideoPlayer } from './videoPlayer.js';
 
 test.skip(({ mode }) => mode !== 'default', 'screencast is not available in remote mode');
 test.skip(({ video }) => video === 'on', 'conflicts with built-in video recording');

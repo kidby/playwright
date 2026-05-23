@@ -17,13 +17,13 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import type { TestChildProcess } from '../config/commonFixtures';
-import { cliEntrypoint, test as base, writeFiles, removeFolders } from './playwright-test-fixtures';
-import type { Files, RunOptions } from './playwright-test-fixtures';
-import type { Browser, Page, TestInfo } from './stable-test-runner';
-import { chromium, expect as baseExpect } from './stable-test-runner';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
-import { inheritAndCleanEnv } from '../config/utils';
+import type { TestChildProcess } from '../config/commonFixtures.js';
+import { cliEntrypoint, test as base, writeFiles, removeFolders } from './playwright-test-fixtures.js';
+import type { Files, RunOptions } from './playwright-test-fixtures.js';
+import type { Browser, Page, TestInfo } from './stable-test-runner/index.js';
+import { chromium, expect as baseExpect } from './stable-test-runner/index.js';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
+import { inheritAndCleanEnv } from '../config/utils.js';
 
 const { createGuid } = utils;
 

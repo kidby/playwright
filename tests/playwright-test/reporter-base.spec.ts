@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect, stripAnsi } from './playwright-test-fixtures';
+import { test, expect, stripAnsi } from './playwright-test-fixtures.js';
 import * as path from 'path';
 
 for (const useIntermediateMergeReport of [false, true] as const) {

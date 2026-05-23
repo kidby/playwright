@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import path from 'path';
-import { test, expect } from './npmTest';
+import { test, expect } from './npmTest.js';
 import fs from 'fs';
 
 test('installs local packages', async ({ registry, exec, tmpWorkspace }) => {

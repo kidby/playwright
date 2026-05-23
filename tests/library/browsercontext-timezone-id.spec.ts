@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { browserTest as it, expect } from '../config/browserTest';
+import { browserTest as it, expect } from '../config/browserTest.js';
 
 it('should work @smoke', async ({ browser, browserName }) => {
   // Note: timezone names are rendered differently between browsers and platforms,

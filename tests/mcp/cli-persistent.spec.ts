@@ -15,7 +15,7 @@
  */
 
 import fs from 'fs';
-import { test, expect } from './cli-fixtures';
+import { test, expect } from './cli-fixtures.js';
 
 test('should use userDataDir from config without --persistent flag', async ({ cli, server }, testInfo) => {
   const customDir = testInfo.outputPath('my-profile');

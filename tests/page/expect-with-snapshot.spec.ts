@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './pageTest';
+import { test, expect } from './pageTest.js';
 
 test.describe('containment matchers print full element subtree', () => {
   test('toHaveText failure includes full element subtree', async ({ page }) => {

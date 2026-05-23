@@ -17,16 +17,16 @@
 // DO NOT TOUCH THIS LINE
 // It is used in the tracing.group test.
 
-import type { TraceViewerFixtures } from '../config/traceViewerFixtures';
-import { traceViewerFixtures } from '../config/traceViewerFixtures';
-import { extractZip } from '../../packages/utils/third_party/extractZip';
+import type { TraceViewerFixtures } from '../config/traceViewerFixtures.js';
+import { traceViewerFixtures } from '../config/traceViewerFixtures.js';
+import { extractZip } from '../../packages/utils/third_party/extractZip.js';
 import fs from 'fs';
 import path from 'path';
 import type http from 'http';
 import { pathToFileURL } from 'url';
-import { expect, playwrightTest } from '../config/browserTest';
+import { expect, playwrightTest } from '../config/browserTest.js';
 import type { FrameLocator } from '@playwright/test';
-import { parseTrace, rafraf, roundBox } from '../config/utils';
+import { parseTrace, rafraf, roundBox } from '../config/utils.js';
 
 const test = playwrightTest.extend<TraceViewerFixtures>(traceViewerFixtures);
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './npmTest';
+import { test, expect } from './npmTest.js';
 import path from 'path';
 import fs from 'fs';
 

@@ -17,7 +17,7 @@
 import { execFileSync, spawnSync } from 'child_process';
 import path from 'path';
 
-import { test, expect } from './playwright-test-fixtures';
+import { test, expect } from './playwright-test-fixtures.js';
 
 const bunPath = (() => {
   if (process.env.BUN === '0')

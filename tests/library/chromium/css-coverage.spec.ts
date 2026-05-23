@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { chromiumVersionLessThan } from '../../config/utils';
-import { contextTest as it, expect } from '../../config/browserTest';
+import { chromiumVersionLessThan } from '../../config/utils.js';
+import { contextTest as it, expect } from '../../config/browserTest.js';
 
 it('should work', async function({ page, server }) {
   await page.coverage.startCSSCoverage();

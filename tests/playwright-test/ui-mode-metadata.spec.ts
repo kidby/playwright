@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './ui-mode-fixtures';
+import { test, expect } from './ui-mode-fixtures.js';
 
 test('should render html report git info metadata', async ({ runUITest }) => {
   const { page } = await runUITest({

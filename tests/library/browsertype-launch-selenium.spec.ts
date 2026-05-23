@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { playwrightTest as test, expect } from '../config/browserTest';
+import { playwrightTest as test, expect } from '../config/browserTest.js';
 import type { TestInfo } from '@playwright/test';
 import path from 'path';
 import fs from 'fs';
-import { oop } from '../../packages/playwright-core/lib/coreBundle';
+import { oop } from '../../packages/playwright-core/lib/coreBundle.js';
 
 const chromeDriver = process.env.PWTEST_CHROMEDRIVER;
 const brokenDriver = path.join(__dirname, '..', 'assets', 'selenium-grid', 'broken-selenium-driver.js');

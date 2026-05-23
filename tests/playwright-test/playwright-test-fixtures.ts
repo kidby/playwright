@@ -20,15 +20,15 @@ import * as os from 'os';
 import * as path from 'path';
 import { execSync } from 'node:child_process';
 import { PNG } from 'playwright-core/lib/utilsBundle';
-import type { CommonFixtures, CommonWorkerFixtures, TestChildProcess } from '../config/commonFixtures';
-import { commonFixtures } from '../config/commonFixtures';
-import type { ServerFixtures, ServerWorkerOptions } from '../config/serverFixtures';
-import { serverFixtures } from '../config/serverFixtures';
-import type { TestInfo } from './stable-test-runner';
-import { expect } from './stable-test-runner';
-import { test as base } from './stable-test-runner';
-import { inheritAndCleanEnv } from '../config/utils';
-export { countTimes } from '../config/commonFixtures';
+import type { CommonFixtures, CommonWorkerFixtures, TestChildProcess } from '../config/commonFixtures.js';
+import { commonFixtures } from '../config/commonFixtures.js';
+import type { ServerFixtures, ServerWorkerOptions } from '../config/serverFixtures.js';
+import { serverFixtures } from '../config/serverFixtures.js';
+import type { TestInfo } from './stable-test-runner/index.js';
+import { expect } from './stable-test-runner/index.js';
+import { test as base } from './stable-test-runner/index.js';
+import { inheritAndCleanEnv } from '../config/utils.js';
+export { countTimes } from '../config/commonFixtures.js';
 
 type CliRunResult = {
   exitCode: number,
@@ -369,7 +369,7 @@ const TSCONFIG = {
   ]
 };
 
-export { expect } from './stable-test-runner';
+export { expect } from './stable-test-runner/index.js';
 
 const asciiRegex = new RegExp('[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))', 'g');
 export function stripAnsi(str: string): string {

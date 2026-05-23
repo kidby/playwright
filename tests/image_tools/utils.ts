@@ -15,7 +15,7 @@
  */
 
 import { PNG } from 'playwright-core/lib/utilsBundle';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
 
 const { ImageChannel } = utils;
 

@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { contextTest as test, expect } from '../../config/browserTest';
-import { playwrightTest } from '../../config/browserTest';
+import { contextTest as test, expect } from '../../config/browserTest.js';
+import { playwrightTest } from '../../config/browserTest.js';
 
 test('should create a worker from a service worker', async ({ page, server }) => {
   const [worker] = await Promise.all([

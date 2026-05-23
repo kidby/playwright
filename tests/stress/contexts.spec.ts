@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { contextTest as test, expect } from '../config/browserTest';
+import { contextTest as test, expect } from '../config/browserTest.js';
 
 for (let i = 0; i < 1000; ++i) {
   test('cycle contexts ' + i, async ({ page, server }) => {

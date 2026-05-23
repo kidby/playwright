@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './pageTest';
+import { test, expect } from './pageTest.js';
 
 test('should detect roles', async ({ page }) => {
   await page.setContent(`

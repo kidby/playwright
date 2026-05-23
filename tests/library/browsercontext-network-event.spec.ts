@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { browserTest as it, expect } from '../config/browserTest';
+import { browserTest as it, expect } from '../config/browserTest.js';
 import type { Request, Response } from '@playwright/test';
 
 it('BrowserContext.Events.Request', async ({ context, server }) => {

@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 
-import { test, expect } from './cli-fixtures';
+import { test, expect } from './cli-fixtures.js';
 
 test('run-code inline', async ({ cli, server }) => {
   server.setContent('/', `

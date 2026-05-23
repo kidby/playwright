@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { contextTest, expect } from '../config/browserTest';
+import { contextTest, expect } from '../config/browserTest.js';
 
 import type { Page, BrowserContext, Cookie } from 'playwright';
-import type { TestServer } from '../config/testserver';
+import type { TestServer } from '../config/testserver/index.js';
 
 type TestUrls = {
   origin1: string;

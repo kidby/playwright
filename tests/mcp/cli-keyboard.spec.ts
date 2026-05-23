@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './cli-fixtures';
+import { test, expect } from './cli-fixtures.js';
 
 test('press', async ({ cli, server }) => {
   server.setContent('/', `<input type=text>`, 'text/html');

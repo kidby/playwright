@@ -16,8 +16,8 @@
 
 import { test, expect } from '@playwright/test';
 
-import { AppiumClient } from '../../packages/playwright-mobile/src/appiumClient';
-import { startMockAppium } from './mockAppium';
+import { AppiumClient } from '../../packages/playwright-mobile/src/appiumClient.js';
+import { startMockAppium } from './mockAppium.js';
 
 test('createSession sends W3C capability envelope and stores returned id', async () => {
   const server = await startMockAppium();

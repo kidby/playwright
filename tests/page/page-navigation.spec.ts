@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { test as it } from './pageTest';
+import { test as it } from './pageTest.js';
 
 it('should work with _blank target', async ({ page, server }) => {
   server.setRoute('/empty.html', (req, res) => {

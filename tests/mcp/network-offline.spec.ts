@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect, parseResponse } from './fixtures';
+import { test, expect, parseResponse } from './fixtures.js';
 
 // Enable the 'network' capability for context-level tools
 test.use({

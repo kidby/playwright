@@ -20,7 +20,7 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { EventEmitter } from './utils';
+import { EventEmitter } from './utils.js';
 import { test, expect } from '@playwright/test';
 
 test('should support symbols', () => {

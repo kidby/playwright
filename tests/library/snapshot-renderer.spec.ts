@@ -15,10 +15,10 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { SnapshotRenderer } from '../../packages/isomorphic/trace/snapshotRenderer';
-import { LRUCache } from '../../packages/isomorphic/lruCache';
-import { stripAnsiEscapes } from '../../packages/isomorphic/stringUtils';
-import type { FrameSnapshot } from '../../packages/trace/src/snapshot';
+import { SnapshotRenderer } from '../../packages/isomorphic/trace/snapshotRenderer.js';
+import { LRUCache } from '../../packages/isomorphic/lruCache.js';
+import { stripAnsiEscapes } from '../../packages/isomorphic/stringUtils.js';
+import type { FrameSnapshot } from '../../packages/trace/src/snapshot.js';
 
 function makeSnapshot(overrides: Partial<FrameSnapshot> = {}): FrameSnapshot {
   return {

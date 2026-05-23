@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { contextTest as it, expect } from '../config/browserTest';
+import { contextTest as it, expect } from '../config/browserTest.js';
 
 function getPermission(page, name) {
   return page.evaluate(name => navigator.permissions.query({ name }).then(result => result.state), name);

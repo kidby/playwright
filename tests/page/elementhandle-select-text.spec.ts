@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 it('should select textarea', async ({ page, server, browserName }) => {
   await page.goto(server.PREFIX + '/input/textarea.html');

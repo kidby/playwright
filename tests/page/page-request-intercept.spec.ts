@@ -16,7 +16,7 @@
  */
 
 import type { Route, Request } from 'playwright-core';
-import { expect, test as base } from './pageTest';
+import { expect, test as base } from './pageTest.js';
 import fs from 'fs';
 import path from 'path';
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { expect, test } from './ui-mode-fixtures';
+import { expect, test } from './ui-mode-fixtures.js';
 
 test('should filter network requests by resource type', async ({ runUITest, server }) => {
   server.setRoute('/api/endpoint', (_, res) => res.setHeader('Content-Type', 'application/json').end());

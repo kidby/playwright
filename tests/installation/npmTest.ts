@@ -19,10 +19,10 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import debugLogger from 'debug';
-import { Registry }  from './registry';
-import type { CommonFixtures, CommonWorkerFixtures } from '../config/commonFixtures';
-import { commonFixtures } from '../config/commonFixtures';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
+import { Registry }  from './registry.js';
+import type { CommonFixtures, CommonWorkerFixtures } from '../config/commonFixtures.js';
+import { commonFixtures } from '../config/commonFixtures.js';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
 import type { SpawnOptions } from 'child_process';
 
 const { removeFolders, spawnAsync } = utils;

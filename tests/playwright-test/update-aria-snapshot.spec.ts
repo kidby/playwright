@@ -15,7 +15,7 @@
  */
 
 import * as fs from 'fs';
-import { test, expect, playwrightCtConfigText, stripAnsi } from './playwright-test-fixtures';
+import { test, expect, playwrightCtConfigText, stripAnsi } from './playwright-test-fixtures.js';
 import { execSync } from 'child_process';
 
 test.describe.configure({ mode: 'parallel' });

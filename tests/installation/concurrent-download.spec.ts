@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test } from './npmTest';
+import { test } from './npmTest.js';
 import fs from 'fs';
 test.use({ isolateBrowsers: true });
 

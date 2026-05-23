@@ -17,12 +17,12 @@
 import * as fs from 'fs';
 import type { PlaywrightTestConfig } from '@playwright/test';
 import path from 'path';
-import { expect as baseExpect, test as baseTest, stripAnsi } from './playwright-test-fixtures';
-import { extractZip } from '../../packages/utils/third_party/extractZip';
+import { expect as baseExpect, test as baseTest, stripAnsi } from './playwright-test-fixtures.js';
+import { extractZip } from '../../packages/utils/third_party/extractZip.js';
 import * as yazl from 'yazl';
-import { utils, getUserAgent } from '../../packages/playwright-core/lib/coreBundle';
+import { utils, getUserAgent } from '../../packages/playwright-core/lib/coreBundle.js';
 import { Readable } from 'stream';
-import type { FullResult, JSONReportTestResult } from '../../packages/playwright-test/reporter';
+import type { FullResult, JSONReportTestResult } from '../../packages/playwright-test/reporter.js';
 
 type HttpServer = utils.HttpServer;
 

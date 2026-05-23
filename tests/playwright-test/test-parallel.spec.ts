@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect, countTimes } from './playwright-test-fixtures';
+import { test, expect, countTimes } from './playwright-test-fixtures.js';
 
 test('test.describe.parallel should throw inside test.describe.serial', async ({ runInlineTest }) => {
   const result = await runInlineTest({

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './inspectorTest';
+import { test, expect } from './inspectorTest.js';
 
 import type { Page } from '@playwright/test';
 import type * as actions from '@recorder/actions';

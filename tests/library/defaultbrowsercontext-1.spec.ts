@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { playwrightTest as it, expect } from '../config/browserTest';
-import { verifyViewport } from '../config/utils';
+import { playwrightTest as it, expect } from '../config/browserTest.js';
+import { verifyViewport } from '../config/utils.js';
 import fs from 'fs';
 
 function maybeFilterCookies(channel: string | undefined, cookies: any[]) {

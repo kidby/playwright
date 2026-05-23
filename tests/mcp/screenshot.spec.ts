@@ -16,8 +16,8 @@
 
 import fs from 'fs';
 
-import { test, expect } from './fixtures';
-import { jpegjs, PNG } from '../../packages/playwright-core/lib/utilsBundle';
+import { test, expect } from './fixtures.js';
+import { jpegjs, PNG } from '../../packages/playwright-core/lib/utilsBundle.js';
 
 test('browser_take_screenshot (viewport)', async ({ startClient, server }, testInfo) => {
   const { client } = await startClient({

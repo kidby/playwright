@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { test, expect } from './playwright-test-fixtures';
+import { test, expect } from './playwright-test-fixtures.js';
 
 const bunRuntimeJs = require.resolve('../../packages/playwright/lib/transform/bunRuntime');
-const { isBun } = require(bunRuntimeJs) as typeof import('../../packages/playwright/src/transform/bunRuntime');
+const { isBun } = require(bunRuntimeJs) as typeof import('../../packages/playwright/src/transform/bunRuntime.js');
 
 // The shared `server` fixture (Node http.createServer) doesn't reach the
 // inline-test child reliably under Bun — the child gets ECONNREFUSED even

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { browserTest as it, expect } from '../config/browserTest';
+import { browserTest as it, expect } from '../config/browserTest.js';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import type { Download } from 'playwright-core';
-import { kTargetClosedErrorMessage } from '../config/errors';
+import { kTargetClosedErrorMessage } from '../config/errors.js';
 
 it.describe('download event', () => {
   it.skip(({ mode }) => mode !== 'default', 'download.path() is not available in remote mode');

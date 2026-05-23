@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { test as baseTest, expect } from './playwright-test-fixtures';
-import { RunServer } from '../config/remoteServer';
-import type { PlaywrightServer } from '../config/remoteServer';
+import { test as baseTest, expect } from './playwright-test-fixtures.js';
+import { RunServer } from '../config/remoteServer.js';
+import type { PlaywrightServer } from '../config/remoteServer.js';
 
 const test = baseTest.extend<{ runServer: () => Promise<PlaywrightServer> }>({
   runServer: async ({ childProcess }, use) => {

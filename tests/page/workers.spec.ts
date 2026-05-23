@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 import type { Worker as PwWorker } from '@playwright/test';
-import { attachFrame } from '../config/utils';
+import { attachFrame } from '../config/utils.js';
 import type { ConsoleMessage } from 'playwright-core';
 import fs from 'fs';
-import { kTargetClosedErrorMessage } from '../config/errors';
+import { kTargetClosedErrorMessage } from '../config/errors.js';
 
 it('Page.workers @smoke', async function({ page, server, browserName, browserMajorVersion }) {
   it.skip(browserName === 'chromium' && browserMajorVersion < 143, 'needs workerScriptLoaded event');

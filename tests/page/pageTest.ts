@@ -15,15 +15,15 @@
  */
 
 import type { TestType } from '@playwright/test';
-import type { PlatformWorkerFixtures } from '../config/platformFixtures';
-import type { TestModeTestFixtures, TestModeWorkerFixtures, TestModeWorkerOptions } from '../config/testModeFixtures';
-import { androidTest } from '../android/androidTest';
-import { browserTest } from '../config/browserTest';
-import { electronTest } from '../electron/electronTest';
-import type { PageTestFixtures, PageWorkerFixtures } from './pageTestApi';
-import type { ServerFixtures, ServerWorkerOptions } from '../config/serverFixtures';
+import type { PlatformWorkerFixtures } from '../config/platformFixtures.js';
+import type { TestModeTestFixtures, TestModeWorkerFixtures, TestModeWorkerOptions } from '../config/testModeFixtures.js';
+import { androidTest } from '../android/androidTest.js';
+import { browserTest } from '../config/browserTest.js';
+import { electronTest } from '../electron/electronTest.js';
+import type { PageTestFixtures, PageWorkerFixtures } from './pageTestApi.js';
+import type { ServerFixtures, ServerWorkerOptions } from '../config/serverFixtures.js';
 import { expect as baseExpect } from '@playwright/test';
-export { rafraf } from '../config/utils';
+export { rafraf } from '../config/utils.js';
 
 let impl: TestType<PageTestFixtures & ServerFixtures & TestModeTestFixtures, PageWorkerFixtures & PlatformWorkerFixtures & TestModeWorkerFixtures & TestModeWorkerOptions & ServerWorkerOptions> = browserTest;
 

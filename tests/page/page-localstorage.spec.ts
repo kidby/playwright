@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 it('localStorage.items returns empty array on fresh origin', async ({ page, server }) => {
   await page.goto(server.EMPTY_PAGE);

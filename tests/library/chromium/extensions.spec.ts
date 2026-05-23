@@ -16,7 +16,7 @@
  */
 
 import type { BrowserType, BrowserContext } from 'playwright-core';
-import { playwrightTest as base, expect } from '../../config/browserTest';
+import { playwrightTest as base, expect } from '../../config/browserTest.js';
 
 const it = base.extend<{
   launchPersistentContext: (extensionPath: string, options?: Parameters<BrowserType['launchPersistentContext']>[1]) => Promise<BrowserContext>;

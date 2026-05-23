@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { kTargetClosedErrorMessage } from '../config/errors';
-import { contextTest as it, expect } from '../config/browserTest';
+import { kTargetClosedErrorMessage } from '../config/errors.js';
+import { contextTest as it, expect } from '../config/browserTest.js';
 import { WebSocketServer, type WebSocket as WsSocket } from 'ws';
 
 it('should work @smoke', async ({ page, server }) => {

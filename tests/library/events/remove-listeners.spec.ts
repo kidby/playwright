@@ -20,9 +20,9 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { EventEmitter } from './utils';
+import { EventEmitter } from './utils.js';
 import { test, expect } from '@playwright/test';
-import * as common from './utils';
+import * as common from './utils.js';
 
 const listener1 = () => {};
 const listener2 = () => {};

@@ -16,7 +16,7 @@
  */
 
 import type { Page } from 'playwright-core';
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 async function routeIframe(page: Page) {
   await page.route('**/empty.html', route => {

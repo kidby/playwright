@@ -16,7 +16,7 @@
 
 import path from 'path';
 import type { BrowserType, Browser } from 'playwright-core';
-import type { CommonFixtures, TestChildProcess } from './commonFixtures';
+import type { CommonFixtures, TestChildProcess } from './commonFixtures.js';
 
 export interface PlaywrightServer {
   wsEndpoint(): string;

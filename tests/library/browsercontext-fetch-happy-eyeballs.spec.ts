@@ -15,7 +15,7 @@
  */
 
 import type { LookupAddress } from 'dns';
-import { contextTest as it, expect } from '../config/browserTest';
+import { contextTest as it, expect } from '../config/browserTest.js';
 
 it.skip(({ mode }) => mode !== 'default');
 

@@ -20,8 +20,8 @@ process.env.PWTEST_UNDER_TEST = '1';
 
 import { type Config, type PlaywrightTestOptions, type PlaywrightWorkerOptions, type ReporterDescription } from '@playwright/test';
 import * as path from 'path';
-import type { TestModeWorkerOptions } from '../config/testModeFixtures';
-import type { TestModeName } from '../config/testMode';
+import type { TestModeWorkerOptions } from '../config/testModeFixtures.js';
+import type { TestModeName } from '../config/testMode.js';
 
 type BrowserName = 'chromium' | 'firefox' | 'webkit';
 

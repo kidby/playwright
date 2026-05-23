@@ -17,15 +17,15 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { baseTest } from './baseTest';
-import { RunServer, RemoteServer } from './remoteServer';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
-import { isBidiChannel, parseHar } from '../config/utils';
-import { createSkipTestPredicate } from '../bidi/expectationUtil';
-import type { PageTestFixtures, PageWorkerFixtures } from '../page/pageTestApi';
-import type { RemoteServerOptions, PlaywrightServer } from './remoteServer';
+import { baseTest } from './baseTest.js';
+import { RunServer, RemoteServer } from './remoteServer.js';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
+import { isBidiChannel, parseHar } from '../config/utils.js';
+import { createSkipTestPredicate } from '../bidi/expectationUtil.js';
+import type { PageTestFixtures, PageWorkerFixtures } from '../page/pageTestApi.js';
+import type { RemoteServerOptions, PlaywrightServer } from './remoteServer.js';
 import type { BrowserContext, BrowserContextOptions, BrowserType, Page } from 'playwright-core';
-import type { Log } from '../../packages/trace/src/har';
+import type { Log } from '../../packages/trace/src/har.js';
 import type { TestInfo } from '@playwright/test';
 
 const { removeFolders, hostPlatform } = utils;

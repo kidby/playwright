@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect, expectTestHelper } from './playwright-test-fixtures';
+import { test, expect, expectTestHelper } from './playwright-test-fixtures.js';
 
 test('test modifiers should work', async ({ runInlineTest }) => {
   const result = await runInlineTest({

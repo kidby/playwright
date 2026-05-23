@@ -19,7 +19,7 @@ import type { ChildProcess } from 'child_process';
 import { execSync, spawn } from 'child_process';
 import net from 'net';
 import fs from 'fs';
-import { inheritAndCleanEnv, stripAnsi } from './utils';
+import { inheritAndCleanEnv, stripAnsi } from './utils.js';
 
 type TestChildParams = {
   command: string[],

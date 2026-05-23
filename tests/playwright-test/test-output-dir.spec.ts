@@ -16,7 +16,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { test, expect } from './playwright-test-fixtures';
+import { test, expect } from './playwright-test-fixtures.js';
 
 test('should work and remove non-failures', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({

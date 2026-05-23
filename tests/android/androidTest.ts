@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { baseTest } from '../config/baseTest';
-import type { PageTestFixtures, PageWorkerFixtures } from '../page/pageTestApi';
+import { baseTest } from '../config/baseTest.js';
+import type { PageTestFixtures, PageWorkerFixtures } from '../page/pageTestApi.js';
 import type { AndroidDevice, BrowserContext } from 'playwright-core';
 export { expect } from '@playwright/test';
 

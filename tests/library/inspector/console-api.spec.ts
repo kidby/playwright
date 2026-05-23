@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './inspectorTest';
+import { test as it, expect } from './inspectorTest.js';
 
 let scriptPromise: Promise<void>;
 

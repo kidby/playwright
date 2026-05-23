@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { attachFrame } from '../config/utils';
-import { browserTest as it, expect } from '../config/browserTest';
+import { attachFrame } from '../config/utils.js';
+import { browserTest as it, expect } from '../config/browserTest.js';
 import fs from 'fs';
 
 import type { BrowserContext } from 'playwright-core';

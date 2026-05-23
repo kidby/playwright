@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 it('should press @smoke', async ({ page }) => {
   await page.setContent(`<input type='text' />`);

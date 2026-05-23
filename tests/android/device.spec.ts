@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 import { PNG } from 'playwright-core/lib/utilsBundle';
-import { androidTest as test, expect } from './androidTest';
+import { androidTest as test, expect } from './androidTest.js';
 
 test('androidDevice.shell', async function({ androidDevice }) {
   const output = await androidDevice.shell('echo 123');

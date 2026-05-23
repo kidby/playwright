@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import type { Page } from '../../packages/playwright-test';
-import { test as it, expect as baseExpect } from './pageTest';
+import type { Page } from '../../packages/playwright-test/index.js';
+import { test as it, expect as baseExpect } from './pageTest.js';
 
 const expect = baseExpect.extend({
   async toMatchMedia(page: Page, mediaQuery: string) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './fixtures';
+import { test, expect } from './fixtures.js';
 
 test('browser_fill_form (textbox)', async ({ client, server }) => {
   server.setContent('/', `

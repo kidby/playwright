@@ -15,8 +15,8 @@
  */
 
 import { test } from '@playwright/test';
-import type { TestModeName } from './testMode';
-import { DefaultTestMode, DriverTestMode } from './testMode';
+import type { TestModeName } from './testMode.js';
+import { DefaultTestMode, DriverTestMode } from './testMode.js';
 
 export type TestModeWorkerOptions = {
   mode: TestModeName;

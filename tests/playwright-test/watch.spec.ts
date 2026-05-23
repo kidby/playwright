@@ -16,7 +16,7 @@
 
 import path from 'path';
 import timers from 'timers/promises';
-import { test, expect, playwrightCtConfigText } from './playwright-test-fixtures';
+import { test, expect, playwrightCtConfigText } from './playwright-test-fixtures.js';
 
 test.describe.configure({ mode: 'parallel' });
 

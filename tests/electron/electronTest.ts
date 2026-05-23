@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import { baseTest } from '../config/baseTest';
+import { baseTest } from '../config/baseTest.js';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
 import type { ElectronApplication, Electron, Page } from 'playwright';
 import { _electron as electron } from 'playwright';
-import type { PageTestFixtures, PageWorkerFixtures } from '../page/pageTestApi';
-import type { TraceViewerFixtures } from '../config/traceViewerFixtures';
-import { traceViewerFixtures } from '../config/traceViewerFixtures';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
-import { inheritAndCleanEnv } from '../config/utils';
+import type { PageTestFixtures, PageWorkerFixtures } from '../page/pageTestApi.js';
+import type { TraceViewerFixtures } from '../config/traceViewerFixtures.js';
+import { traceViewerFixtures } from '../config/traceViewerFixtures.js';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
+import { inheritAndCleanEnv } from '../config/utils.js';
 
 export { expect, selectors } from '@playwright/test';
 

@@ -17,7 +17,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { test, expect, eventsPage } from './cli-fixtures';
+import { test, expect, eventsPage } from './cli-fixtures.js';
 
 test('open', async ({ cli, server }) => {
   const { output, snapshot } = await cli('open', server.HELLO_WORLD);

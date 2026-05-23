@@ -15,7 +15,7 @@
  */
 
 import fs from 'fs';
-import { test, expect } from './inspectorTest';
+import { test, expect } from './inspectorTest.js';
 
 const launchOptions = (channel: string) => {
   return channel ? `Channel = "${channel}",\n    Headless = false,` : `Headless = false,`;

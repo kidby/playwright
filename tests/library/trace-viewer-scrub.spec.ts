@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import type { TraceViewerFixtures } from '../config/traceViewerFixtures';
-import { traceViewerFixtures } from '../config/traceViewerFixtures';
-import { expect, playwrightTest } from '../config/browserTest';
+import type { TraceViewerFixtures } from '../config/traceViewerFixtures.js';
+import { traceViewerFixtures } from '../config/traceViewerFixtures.js';
+import { expect, playwrightTest } from '../config/browserTest.js';
 
 const test = playwrightTest.extend<TraceViewerFixtures>(traceViewerFixtures);
 

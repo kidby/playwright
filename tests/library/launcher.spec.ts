@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { inheritAndCleanEnv } from '../config/utils';
-import { playwrightTest as it, expect } from '../config/browserTest';
+import { inheritAndCleanEnv } from '../config/utils.js';
+import { playwrightTest as it, expect } from '../config/browserTest.js';
 
 it('should have an errors object', async ({ playwright }) => {
   expect(String(playwright.errors.TimeoutError)).toContain('TimeoutError');

@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { test, expect, parseTestRunnerOutput, countTimes } from './playwright-test-fixtures';
+import { test, expect, parseTestRunnerOutput, countTimes } from './playwright-test-fixtures.js';
 
 test('it should not allow multiple tests with the same name per suite', async ({ runInlineTest }) => {
   const result = await runInlineTest({

@@ -15,7 +15,7 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { test, expect } from './npmTest';
+import { test, expect } from './npmTest.js';
 
 // Lower bounds on the number of inlined npm packages per LICENSE. If a bundle drops below
 // these, something is broken with bundle generation or dependencies were silently removed.

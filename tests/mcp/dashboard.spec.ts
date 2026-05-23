@@ -18,7 +18,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
-import { test, expect, installSaveFilePickerMock } from './cli-fixtures';
+import { test, expect, installSaveFilePickerMock } from './cli-fixtures.js';
 
 function displayPath(p: string): string {
   const home = os.homedir();

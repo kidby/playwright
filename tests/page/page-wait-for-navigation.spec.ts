@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 import type { Frame } from 'playwright-core';
-import { expectedSSLError } from '../config/utils';
+import { expectedSSLError } from '../config/utils.js';
 
 it('should work', async ({ page, server }) => {
   await page.goto(server.EMPTY_PAGE);

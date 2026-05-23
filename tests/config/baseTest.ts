@@ -16,13 +16,13 @@
 
 import { mergeTests } from '@playwright/test';
 import { test } from '@playwright/test';
-import type { CommonFixtures, CommonWorkerFixtures } from './commonFixtures';
-import { commonFixtures } from './commonFixtures';
-import type { ServerFixtures, ServerWorkerOptions } from './serverFixtures';
-import { serverFixtures } from './serverFixtures';
-import { platformTest } from './platformFixtures';
-import { testModeTest } from './testModeFixtures';
-import type { Builtins } from '../../packages/injected/src/utilityScript';
+import type { CommonFixtures, CommonWorkerFixtures } from './commonFixtures.js';
+import { commonFixtures } from './commonFixtures.js';
+import type { ServerFixtures, ServerWorkerOptions } from './serverFixtures.js';
+import { serverFixtures } from './serverFixtures.js';
+import { platformTest } from './platformFixtures.js';
+import { testModeTest } from './testModeFixtures.js';
+import type { Builtins } from '../../packages/injected/src/utilityScript.js';
 
 export const base = test;
 

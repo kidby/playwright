@@ -15,7 +15,7 @@
  */
 
 import path from 'path';
-import { test, expect, stripAnsi } from './playwright-test-fixtures';
+import { test, expect, stripAnsi } from './playwright-test-fixtures.js';
 
 for (const useIntermediateMergeReport of [false, true] as const) {
   test.describe(`${useIntermediateMergeReport ? 'merged' : 'created'}`, () => {

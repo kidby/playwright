@@ -17,7 +17,7 @@
 import type { LookupAddress } from 'dns';
 import fs from 'fs';
 import type { APIRequestContext } from 'playwright-core';
-import { expect, playwrightTest } from '../config/browserTest';
+import { expect, playwrightTest } from '../config/browserTest.js';
 
 export type GlobalFetchFixtures = {
   request: APIRequestContext;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 it('should return correct postData buffer for utf-8 body', async ({ page, server }) => {
   await page.goto(server.EMPTY_PAGE);

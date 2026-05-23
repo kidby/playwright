@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect, countTimes } from './playwright-test-fixtures';
+import { test, expect, countTimes } from './playwright-test-fixtures.js';
 
 test('should handle fixture timeout', async ({ runInlineTest }) => {
   const result = await runInlineTest({

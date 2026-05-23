@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './fixtures';
+import { test, expect } from './fixtures.js';
 
 test('alert dialog', async ({ client, server }) => {
   server.setContent('/', `<title>Title</title><button onclick="alert('Alert')">Button</button>`, 'text/html');

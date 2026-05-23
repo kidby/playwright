@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { playwrightTest as it, expect } from '../config/browserTest';
+import { playwrightTest as it, expect } from '../config/browserTest.js';
 
 it('should log @smoke', async ({ browserType, mode }) => {
   it.skip(mode !== 'default', 'logger is not plumbed into the remote connection');

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './pageTest';
+import { test, expect } from './pageTest.js';
 
 test('should work', async ({ page, server }) => {
   await page.goto(server.PREFIX + '/input/handle-locator.html');

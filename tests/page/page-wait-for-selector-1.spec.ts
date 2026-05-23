@@ -16,8 +16,8 @@
  */
 
 import type { Frame } from '@playwright/test';
-import { test as it, expect, rafraf } from './pageTest';
-import { attachFrame, detachFrame } from '../config/utils';
+import { test as it, expect, rafraf } from './pageTest.js';
+import { attachFrame, detachFrame } from '../config/utils.js';
 
 async function giveItTimeToLog(frame: Frame) {
   await rafraf(frame, 2);

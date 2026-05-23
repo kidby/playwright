@@ -20,9 +20,9 @@ import fs from 'fs';
 import type { IncomingMessage } from 'http';
 import { pipeline } from 'stream';
 import zlib from 'zlib';
-import { contextTest as it, expect } from '../config/browserTest';
-import { suppressCertificateWarning } from '../config/utils';
-import { kTargetClosedErrorMessage } from '../config/errors';
+import { contextTest as it, expect } from '../config/browserTest.js';
+import { suppressCertificateWarning } from '../config/utils.js';
+import { kTargetClosedErrorMessage } from '../config/errors.js';
 
 it.skip(({ mode }) => mode !== 'default');
 

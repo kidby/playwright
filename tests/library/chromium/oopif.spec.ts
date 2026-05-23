@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { contextTest as it, expect } from '../../config/browserTest';
+import { contextTest as it, expect } from '../../config/browserTest.js';
 import type { Frame, Browser } from '@playwright/test';
 
 it.use({

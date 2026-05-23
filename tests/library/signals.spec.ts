@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { playwrightTest as test, expect } from '../config/browserTest';
+import { playwrightTest as test, expect } from '../config/browserTest.js';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import os from 'os';

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 it('should dispatch click event @smoke', async ({ page, server }) => {
   await page.goto(server.PREFIX + '/input/button.html');

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { test, expect } from './playwright-test-fixtures';
-import { parseTrace } from '../config/utils';
+import { test, expect } from './playwright-test-fixtures.js';
+import { parseTrace } from '../config/utils.js';
 import fs from 'fs';
 
 test('should reuse context', async ({ runInlineTest }) => {

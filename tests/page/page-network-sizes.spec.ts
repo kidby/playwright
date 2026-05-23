@@ -18,7 +18,7 @@
 import fs from 'fs';
 import zlib from 'zlib';
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 it.skip(({ isElectron, browserMajorVersion }) => isElectron && browserMajorVersion < 99, 'This needs Chromium >= 99');
 

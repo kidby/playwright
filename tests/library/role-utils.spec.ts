@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { contextTest as test, expect } from '../config/browserTest';
+import { contextTest as test, expect } from '../config/browserTest.js';
 import type { Page } from 'playwright-core';
 import fs from 'fs';
 

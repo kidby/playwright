@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { expect, electronTest as test } from './electronTest';
+import { expect, electronTest as test } from './electronTest.js';
 
 test('should discover WebContentsViews via Playwright electron API', {
   annotation: { type: 'issue', description: 'https://github.com/microsoft/playwright/issues/39427' },

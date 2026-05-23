@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { kTargetClosedErrorMessage } from '../../config/errors';
-import { contextTest as it, expect } from '../../config/browserTest';
-import { browserTest } from '../../config/browserTest';
+import { kTargetClosedErrorMessage } from '../../config/errors.js';
+import { contextTest as it, expect } from '../../config/browserTest.js';
+import { browserTest } from '../../config/browserTest.js';
 
 it('should work', async function({ page }) {
   const client = await page.context().newCDPSession(page);

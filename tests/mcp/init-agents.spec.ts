@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { test, expect, writeFiles } from './fixtures';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
+import { test, expect, writeFiles } from './fixtures.js';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
 import path from 'path';
 import fs from 'fs';
 

@@ -15,7 +15,7 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { test, expect } from './npmTest';
+import { test, expect } from './npmTest.js';
 
 const THRESHOLDS: Record<string, number> = {
   'playwright-core': 7 * 1024 * 1024,

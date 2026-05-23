@@ -17,7 +17,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { test, expect } from './fixtures';
+import { test, expect } from './fixtures.js';
 
 test('session log should record tool calls', async ({ startClient, server, mcpBrowser }, testInfo) => {
   test.skip(mcpBrowser === 'webkit');

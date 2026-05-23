@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import type { Reporter, TestCase, TestResult, TestStep } from '../../packages/playwright-test/reporter';
-import { test, expect } from './playwright-test-fixtures';
+import type { Reporter, TestCase, TestResult, TestStep } from '../../packages/playwright-test/reporter.js';
+import { test, expect } from './playwright-test-fixtures.js';
 
 const smallReporterJS = `
 const path = require('path');

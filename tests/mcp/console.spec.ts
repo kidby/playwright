@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { test, expect, parseResponse, consoleEntries } from './fixtures';
+import { test, expect, parseResponse, consoleEntries } from './fixtures.js';
 
 test('browser_console_messages', async ({ client, server }) => {
   server.setContent('/', `

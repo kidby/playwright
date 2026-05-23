@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { test, expect, parseTestRunnerOutput } from './playwright-test-fixtures';
+import { test, expect, parseTestRunnerOutput } from './playwright-test-fixtures.js';
 import fs from 'fs';
 import path from 'path';
 import { spawnSync } from 'child_process';
-import { registry } from '../../packages/playwright-core/lib/coreBundle';
+import { registry } from '../../packages/playwright-core/lib/coreBundle.js';
 
 const ffmpeg = registry.registry.findExecutable('ffmpeg')!.executablePath();
 

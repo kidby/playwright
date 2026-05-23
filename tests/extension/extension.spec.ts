@@ -16,8 +16,8 @@
 
 import fs from 'fs/promises';
 
-import { test, testWithOldExtensionVersion, expect, extensionId, clickAllowAndSelect, connectAndNavigate, startWithExtensionFlag } from './extension-fixtures';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
+import { test, testWithOldExtensionVersion, expect, extensionId, clickAllowAndSelect, connectAndNavigate, startWithExtensionFlag } from './extension-fixtures.js';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
 
 const { defaultUserDataDirForChannel } = utils;
 

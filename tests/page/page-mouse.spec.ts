@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { test as it, expect, rafraf } from './pageTest';
+import { test as it, expect, rafraf } from './pageTest.js';
 
 function dimensions() {
   const rect = document.querySelector('textarea').getBoundingClientRect();

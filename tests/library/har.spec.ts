@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-import { browserTest as it, expect } from '../config/browserTest';
+import { browserTest as it, expect } from '../config/browserTest.js';
 import fs from 'fs';
 import path from 'path';
 import type { BrowserContext, BrowserContextOptions } from 'playwright-core';
 import type { AddressInfo } from 'net';
-import type { Log } from '../../packages/trace/src/har';
-import { parseHar } from '../config/utils';
-import { TestServer } from '../config/testserver';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
+import type { Log } from '../../packages/trace/src/har.js';
+import { parseHar } from '../config/utils.js';
+import { TestServer } from '../config/testserver/index.js';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
 const { createHttp2Server } = utils;
 
 async function pageWithHar(contextFactory: (options?: BrowserContextOptions) => Promise<BrowserContext>, testInfo: any, options: { outputPath?: string } & Partial<Pick<BrowserContextOptions['recordHar'], 'content' | 'omitContent' | 'mode'>> = {}) {

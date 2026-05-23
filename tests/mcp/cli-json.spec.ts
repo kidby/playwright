@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './cli-fixtures';
+import { test, expect } from './cli-fixtures.js';
 
 const SNAPSHOT_FILE = expect.stringMatching(/^\.playwright-cli[\\/]page-[\dTZ:.-]+\.yml$/);
 

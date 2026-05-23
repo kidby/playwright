@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './pageTest';
+import { test, expect } from './pageTest.js';
 
 test('should work @smoke', async ({ page }) => {
   const aHandle = await page.evaluateHandle(() => document.body);

@@ -16,8 +16,8 @@
 
 import { defineConfig } from '@playwright/test';
 
-import type { TestOptions } from '../mcp/fixtures';
-import type { ExtensionTestOptions } from './extension-fixtures';
+import type { TestOptions } from '../mcp/fixtures.js';
+import type { ExtensionTestOptions } from './extension-fixtures.js';
 
 export default defineConfig<TestOptions & ExtensionTestOptions>({
   testDir: './',

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { test, expect } from './playwright-test-fixtures';
-import { lastDryRunPayload } from './dry-run-helpers';
+import { test, expect } from './playwright-test-fixtures.js';
+import { lastDryRunPayload } from './dry-run-helpers.js';
 
 test('does nothing unless enabled: true (opt-in default)', async ({ runInlineTest }) => {
   // Tickets in CI surprise teams that happen to inherit this reporter list,

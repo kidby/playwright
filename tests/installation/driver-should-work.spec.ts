@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { test, expect } from './npmTest';
+import { test, expect } from './npmTest.js';
 
 test('driver should work', async ({ exec }) => {
   await exec('npm i playwright');

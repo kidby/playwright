@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
-import { test, expect } from './playwright-test-fixtures';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
+import { test, expect } from './playwright-test-fixtures.js';
 
 test('chinese characters', () => {
   expect(utils.fitToWidth('你你好', 3)).toBe('…好');

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { test as it } from './pageTest';
+import { test as it } from './pageTest.js';
 
 it('should not fail with internal error upon navigation', async ({ page, server }) => {
   await page.goto(server.PREFIX + '/input/button.html');

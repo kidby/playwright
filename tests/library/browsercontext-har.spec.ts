@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { browserTest as it, expect } from '../config/browserTest';
+import { browserTest as it, expect } from '../config/browserTest.js';
 import fs from 'fs';
 import path from 'path';
-import { extractZip } from '../../packages/utils/third_party/extractZip';
+import { extractZip } from '../../packages/utils/third_party/extractZip.js';
 
 it('should context.routeFromHAR, matching the method and following redirects', async ({ context, asset }) => {
   const path = asset('har-fulfill.har');

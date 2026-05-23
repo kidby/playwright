@@ -15,7 +15,7 @@
  */
 
 import fs from 'fs';
-import { androidTest as test, expect } from './androidTest';
+import { androidTest as test, expect } from './androidTest.js';
 
 test('androidDevice.model', async function({ androidDevice }) {
   expect(androidDevice.model()).toContain('sdk_gphone');

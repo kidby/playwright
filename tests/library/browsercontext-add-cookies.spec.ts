@@ -17,7 +17,7 @@
 
 import type { IncomingHttpHeaders } from 'http';
 import type { Cookie } from '@playwright/test';
-import { contextTest as it, playwrightTest, expect } from '../config/browserTest';
+import { contextTest as it, playwrightTest, expect } from '../config/browserTest.js';
 
 it('should work @smoke', async ({ context, page, server }) => {
   await page.goto(server.EMPTY_PAGE);

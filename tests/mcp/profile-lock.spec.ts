@@ -16,8 +16,8 @@
 
 import { chromium } from 'playwright';
 
-import { test, expect } from './fixtures';
-import { tools } from '../../packages/playwright-core/lib/coreBundle';
+import { test, expect } from './fixtures.js';
+import { tools } from '../../packages/playwright-core/lib/coreBundle.js';
 
 test('isProfileLocked returns false for empty directory', async ({ mcpBrowser }, testInfo) => {
   test.skip(!['chromium', 'chrome', 'msedge'].includes(mcpBrowser!), 'Chromium-only');

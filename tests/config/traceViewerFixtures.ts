@@ -15,9 +15,9 @@
  */
 
 import type { Fixtures, FrameLocator, Locator, Page, Browser, BrowserContext } from '@playwright/test';
-import { step } from './baseTest';
+import { step } from './baseTest.js';
 import path from 'path';
-import { CommonFixtures, TestChildProcess } from './commonFixtures';
+import { CommonFixtures, TestChildProcess } from './commonFixtures.js';
 
 type BaseTestFixtures = CommonFixtures & {
   context: BrowserContext;

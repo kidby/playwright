@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
-import { attachFrame, detachFrame } from '../config/utils';
+import { test as it, expect } from './pageTest.js';
+import { attachFrame, detachFrame } from '../config/utils.js';
 
 const addElement = (tag: string) => document.body.appendChild(document.createElement(tag));
 

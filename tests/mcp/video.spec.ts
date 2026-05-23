@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 
-import { test, expect } from './fixtures';
+import { test, expect } from './fixtures.js';
 import type { Client } from '@modelcontextprotocol/sdk/client/index.js';
 
 for (const mode of ['isolated', 'persistent']) {

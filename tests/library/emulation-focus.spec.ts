@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { contextTest as it, browserTest, expect } from '../config/browserTest';
-import { attachFrame } from '../config/utils';
+import { contextTest as it, browserTest, expect } from '../config/browserTest.js';
+import { attachFrame } from '../config/utils.js';
 
 it('should think that it is focused by default', async ({ page }) => {
   expect(await page.evaluate('document.hasFocus()')).toBe(true);

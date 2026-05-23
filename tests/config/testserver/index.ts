@@ -24,7 +24,7 @@ import util from 'util';
 import type stream from 'stream';
 import { WebSocket, WebSocketServer } from 'ws';
 import zlib, { gzip } from 'zlib';
-import { utils } from '../../../packages/playwright-core/lib/coreBundle';
+import { utils } from '../../../packages/playwright-core/lib/coreBundle.js';
 
 const { createHttpServer, createHttpsServer } = utils;
 

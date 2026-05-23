@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { browserTest as it, expect } from '../config/browserTest';
+import { browserTest as it, expect } from '../config/browserTest.js';
 
 it('should affect accept-language header @smoke', async ({ browser, server }) => {
   const context = await browser.newContext({ locale: 'fr-CH' });

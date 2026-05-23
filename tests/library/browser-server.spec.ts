@@ -17,7 +17,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { browserTest as it, expect } from '../config/browserTest';
+import { browserTest as it, expect } from '../config/browserTest.js';
 
 it.skip(({ mode }) => mode !== 'default');
 

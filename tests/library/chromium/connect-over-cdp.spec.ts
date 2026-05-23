@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-import { playwrightTest as test, expect } from '../../config/browserTest';
+import { playwrightTest as test, expect } from '../../config/browserTest.js';
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
-import { getUserAgent, server as coreServer } from '../../../packages/playwright-core/lib/coreBundle';
-import { suppressCertificateWarning } from '../../config/utils';
+import { getUserAgent, server as coreServer } from '../../../packages/playwright-core/lib/coreBundle.js';
+import { suppressCertificateWarning } from '../../config/utils.js';
 
 const { WebSocketTransport, nullProgress } = coreServer;
 type Frame = coreServer.Frame;

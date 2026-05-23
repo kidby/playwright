@@ -15,7 +15,7 @@
  */
 
 import path from 'path';
-import { test, expect } from './playwright-test-fixtures';
+import { test, expect } from './playwright-test-fixtures.js';
 
 test('render text attachment', async ({ runInlineTest }) => {
   const result = await runInlineTest({

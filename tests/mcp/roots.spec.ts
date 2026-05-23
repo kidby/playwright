@@ -18,7 +18,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import { pathToFileURL } from 'url';
 
-import { test, expect } from './fixtures';
+import { test, expect } from './fixtures.js';
 
 const p = process.platform === 'win32' ? 'c:\\non\\existent\\folder' : '/non/existent/folder';
 

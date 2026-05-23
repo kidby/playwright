@@ -15,8 +15,8 @@
  */
 
 import type { BrowserContext } from 'playwright-core';
-import type { TestServer } from '../config/testserver';
-import { browserTest as it, expect } from '../config/browserTest';
+import type { TestServer } from '../config/testserver/index.js';
+import { browserTest as it, expect } from '../config/browserTest.js';
 import fs from 'fs';
 import os from 'os';
 

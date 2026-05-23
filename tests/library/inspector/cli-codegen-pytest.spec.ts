@@ -15,7 +15,7 @@
  */
 
 import fs from 'fs';
-import { test, expect } from './inspectorTest';
+import { test, expect } from './inspectorTest.js';
 
 test('should print the correct imports and context options', async ({ runCLI, server }) => {
   const cli = runCLI(['--target=python-pytest', server.EMPTY_PAGE]);

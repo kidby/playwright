@@ -16,9 +16,9 @@
 
 import type { Fixtures } from '@playwright/test';
 import path from 'path';
-import { TestServer } from './testserver';
-import { TestProxy } from './proxy';
-import { utils } from '../../packages/playwright-core/lib/coreBundle';
+import { TestServer } from './testserver/index.js';
+import { TestProxy } from './proxy.js';
+import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
 
 type SocksSocketRequestedPayload = utils.SocksSocketRequestedPayload;
 const { SocksProxy } = utils;

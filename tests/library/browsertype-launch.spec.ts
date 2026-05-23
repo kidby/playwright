@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import { playwrightTest as it, expect } from '../config/browserTest';
+import { playwrightTest as it, expect } from '../config/browserTest.js';
 import type { Browser, BrowserContext, Page } from '@playwright/test';
-import { kTargetClosedErrorMessage } from '../config/errors';
+import { kTargetClosedErrorMessage } from '../config/errors.js';
 
 it('should reject all promises when browser is closed', async ({ browserType }) => {
   const browser = await browserType.launch();

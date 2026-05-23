@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect } from './playwright-test-fixtures';
+import { test, expect } from './playwright-test-fixtures.js';
 
 test('prints area buckets with pass/fail/flaky counts and percentiles', async ({ runInlineTest }) => {
   const result = await runInlineTest({

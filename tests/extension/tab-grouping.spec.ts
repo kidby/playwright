@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test, expect, extensionId, clickAllowAndSelect, startWithExtensionFlag } from './extension-fixtures';
+import { test, expect, extensionId, clickAllowAndSelect, startWithExtensionFlag } from './extension-fixtures.js';
 
 test('connect page is not in group before selection', async ({ startExtensionClient, server }) => {
   const { browserContext, client } = await startExtensionClient();

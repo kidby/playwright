@@ -292,15 +292,14 @@ export async function requireOrImport(file: string) {
   if (isBun())
     return await importUnderBun(file).finally(nextTask);
 
-  // ESM-only fork: always import. Routes the file through our ESM loader hook
-  // (which applies oxc-transform + CJS-compat banner) instead of letting
-  // Node 23+'s native TS handler strip types without our transform.
-  const fileName = url.pathToFileURL(file);
-  const esmImport = () => eval(`import(${JSON.stringify(fileName)})`);
+  // ESM-only fork: always use dynamic import directly. esbuild no longer
+  // needs to rewrite `import()` → `require()` for CJS output, so we can drop
+  // the `eval()` indirection that was masking syntax issues at runtime.
+  const fileUrl = url.pathToFileURL(file).toString();
 
   // The .esm.preflight extension is a synthetic specifier handled by our
   // node:module ESM loader to flush source maps before the real import.
-  await eval(`import(${JSON.stringify(fileName + '.esm.preflight')})`)
+  await import(fileUrl + '.esm.preflight')
       .catch((error: any) => debugTest('Failed to load preflight for ' + file + ', source maps may be missing for errors thrown during loading.', error))
       .finally(nextTask);
 
@@ -309,7 +308,7 @@ export async function requireOrImport(file: string) {
   // will need source maps. To make sure source maps have arrived, we insert a task
   // that will be processed after compilation cache and guarantee that
   // source maps are available, before `error.stack` is accessed.
-  return await esmImport().finally(nextTask);
+  return await import(fileUrl).finally(nextTask);
 }
 
 let transformInstalled = false;

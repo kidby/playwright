@@ -18,8 +18,8 @@ import * as fs from 'fs';
 import { PNG } from 'playwright-core/lib/utilsBundle';
 import * as path from 'path';
 import { pathToFileURL } from 'url';
-import { test, expect, createImage, paintBlackPixels } from './playwright-test-fixtures';
-import { comparePNGs } from '../config/comparator';
+import { test, expect, createImage, paintBlackPixels } from './playwright-test-fixtures.js';
+import { comparePNGs } from '../config/comparator.js';
 
 test.describe.configure({ mode: 'parallel' });
 

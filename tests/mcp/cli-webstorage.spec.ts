@@ -15,7 +15,7 @@
  */
 
 import fs from 'fs';
-import { test, expect } from './cli-fixtures';
+import { test, expect } from './cli-fixtures.js';
 
 test('localstorage-list shows no items when empty', async ({ cli, server }, testInfo) => {
   const config = { capabilities: ['storage'] };

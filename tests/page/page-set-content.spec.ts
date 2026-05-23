@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
-import { server as coreServer } from '../../packages/playwright-core/lib/coreBundle';
+import { test as it, expect } from './pageTest.js';
+import { server as coreServer } from '../../packages/playwright-core/lib/coreBundle.js';
 const { nullProgress } = coreServer;
 
 const expectedOutput = '<html><head></head><body><div>hello</div></body></html>';

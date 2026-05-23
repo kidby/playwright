@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { expect, playwrightCtConfigText, test } from './playwright-test-fixtures';
+import { expect, playwrightCtConfigText, test } from './playwright-test-fixtures.js';
 
 test.describe.configure({ mode: 'parallel' });
 

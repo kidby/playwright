@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import { expect, browserTest } from '../config/browserTest';
+import { expect, browserTest } from '../config/browserTest.js';
 import { PNG } from 'playwright-core/lib/utilsBundle';
-import { verifyViewport } from '../config/utils';
+import { verifyViewport } from '../config/utils.js';
 
 browserTest.describe('page screenshot', () => {
   browserTest.skip(({ browserName, headless }) => browserName === 'firefox' && !headless, 'Firefox headed produces a different image.');

@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import { stripAnsi } from '../config/utils';
-import { browserTest as test, expect } from '../config/browserTest';
-import { kTargetClosedErrorMessage } from '../config/errors';
+import { stripAnsi } from '../config/utils.js';
+import { browserTest as test, expect } from '../config/browserTest.js';
+import { kTargetClosedErrorMessage } from '../config/errors.js';
 
 test('should close page with active dialog', async ({ page }) => {
   await page.evaluate('"trigger builtins.setTimeout"');

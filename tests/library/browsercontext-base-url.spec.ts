@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { browserTest as it, expect } from '../config/browserTest';
+import { browserTest as it, expect } from '../config/browserTest.js';
 
 it('should construct a new URL when a baseURL in browser.newContext is passed to page.goto @smoke', async function({ browser, server }) {
   const context = await browser.newContext({

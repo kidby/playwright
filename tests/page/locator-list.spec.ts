@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { test as it, expect } from './pageTest';
+import { test as it, expect } from './pageTest.js';
 
 it('locator.all should work', async ({ page }) => {
   await page.setContent(`<div><p>A</p><p>B</p><p>C</p></div>`);
