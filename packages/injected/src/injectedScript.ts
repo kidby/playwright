@@ -1754,7 +1754,12 @@ function createAttributeMatcher(part: AttributeSelectorPart): (s: string) => boo
     case '$=': return s => norm(s).endsWith(target);
     case '~=': return s => norm(s).split(/\s+/).includes(target);
     case '|=': return s => norm(s) === target || norm(s).startsWith(target + '-');
-    default: return s => norm(s) === target;
+    default:
+      // For the default `=` operator, the case-insensitive form (the `i` flag)
+      // is treated as substring matching. This matches how the selector
+      // generator emits "loose" candidates: `[name="value"i]` is the
+      // inexact/substring variant, `[name="value"s]` is the strict exact form.
+      return caseSensitive ? (s => s === value) : (s => norm(s).includes(target));
   }
 }
 

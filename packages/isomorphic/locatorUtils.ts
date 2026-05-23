@@ -30,10 +30,11 @@ export type ByRoleOptions = {
 };
 
 function getByAttributeTextSelector(attrName: string, text: string | RegExp, options?: { exact?: boolean }): string {
-  // The attribute-selector parser only allows op `=` with regex values;
-  // string values use `*=` for substring and `=` for exact.
-  const op = text instanceof RegExp || options?.exact ? '=' : '*=';
-  return `internal:attr=[${attrName}${op}${escapeForAttributeSelector(text, false)}]`;
+  // Always `=` with the `i`/`s` flag carrying the "exact" semantic. The
+  // attribute matcher engine treats `=` + `i` as case-insensitive substring,
+  // and `=` + `s` as case-sensitive exact, so the parser line in
+  // locatorParser.ts (which is also `=`) round-trips losslessly.
+  return `internal:attr=[${attrName}=${escapeForAttributeSelector(text, options?.exact || false)}]`;
 }
 
 // Multiple test id attribute names can be joined with a comma. Attribute names cannot contain commas.
