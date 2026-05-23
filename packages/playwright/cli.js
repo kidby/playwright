@@ -22,7 +22,6 @@
 // makes Node the default; users who invoke this under Bun (e.g.
 // `bun ./node_modules/.bin/playwright test` or `bun --bun run playwright`)
 // get the Bun runtime path automatically with no separate bin name.
-require('./lib/transform/bunRuntime');
-
-const { program } = require('./lib/program');
+import './lib/transform/bunRuntime.js';
+import { program } from './lib/program.js';
 program.parse(process.argv);

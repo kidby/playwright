@@ -13,3 +13,5 @@ node_modules/@babel/traverse
 
 [oxcBundle.ts]
 node_modules/oxc-transform
+node_modules/@babel/core
+node_modules/@babel/plugin-proposal-decorators

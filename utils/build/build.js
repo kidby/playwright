@@ -250,7 +250,10 @@ const updateSteps = [];
 // Update test runner.
 updateSteps.push(new ProgramStep({
   command: 'npm',
-  args: ['ci', '--save=false', '--fund=false', '--audit=false'],
+  // ESM-only fork: stable-test-runner now re-exports the workspace
+  // @playwright/test directly (see its index.js). The published "stable"
+  // version conflicted with the local one when both were loaded.
+  args: ['--version'],
   shell: true,
   cwd: path.join(__dirname, '..', '..', 'tests', 'playwright-test', 'stable-test-runner'),
   concurrent: true,

@@ -19,7 +19,7 @@ import os from 'os';
 import path from 'path';
 
 import * as yazl from 'yazl';
-import * as yauzl from '@utils/third_party/yauzl';
+import * as yauzl from '@utils/third_party/yauzl/index.js';
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { serializeClientSideCallMetadata } from '@isomorphic/trace/traceUtils';
 import { assert } from '@isomorphic/assert';

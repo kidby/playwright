@@ -80,7 +80,11 @@ type UtilityTestFixtures = Pick<TestFixtures, 'testIdAttribute' | 'request' | '_
 type UtilityWorkerFixtures = Pick<WorkerFixtures, 'playwright' | 'screenshot' | 'trace'>;
 const utilityFixtures: Fixtures<UtilityTestFixtures, UtilityWorkerFixtures> = {
   playwright: [async ({}, use) => {
-    await use(require('playwright-core'));
+    // `require('playwright-core')` resolves to the ESM namespace (frozen).
+    // Use the default export — the mutable Playwright class instance that
+    // every BrowserType points back to via `_playwright`.
+    const lib = require('playwright-core');
+    await use(lib.default ?? lib);
   }, { scope: 'worker', box: true }],
   screenshot: ['off', { scope: 'worker', option: true, box: true }],
   trace: ['off', { scope: 'worker', option: true, box: true }],

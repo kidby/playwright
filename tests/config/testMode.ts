@@ -32,6 +32,9 @@ export class DriverTestMode implements TestMode {
     this._impl = await start({
       NODE_OPTIONS: undefined,  // Hide driver process while debugging.
     });
+    // No ESM-namespace unwrap needed here — `start()` returns a fresh client
+    // object from `Connection.initializePlaywright()`, not the frozen
+    // `require('playwright-core')` namespace.
     return this._impl.playwright;
   }
 
@@ -42,7 +45,11 @@ export class DriverTestMode implements TestMode {
 
 export class DefaultTestMode implements TestMode {
   async setup() {
-    return require('playwright-core');
+    // `require('playwright-core')` returns the frozen ESM namespace. Reach for
+    // the default export (the mutable Playwright instance) so fixture chains
+    // can stamp test-only state like `_defaultLaunchOptions` on it.
+    const lib = require('playwright-core');
+    return (lib.default ?? lib) as client.Playwright;
   }
 
   async teardown() {

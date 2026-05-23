@@ -31,8 +31,8 @@ import { promisify } from 'util';
 
 import debugPkg from 'debug';
 import getStream from 'get-stream';
-import yauzl from './yauzl';
-import type { Entry, Options as YauzlOptions, ZipFile } from './yauzl';
+import yauzl from './yauzl/index.js';
+import type { Entry, Options as YauzlOptions, ZipFile } from './yauzl/index.js';
 
 const debug = debugPkg('extract-zip');
 

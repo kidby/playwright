@@ -69,7 +69,7 @@ export async function applySuggestedRebaselines(config: FullConfigInternal, repo
     const source = await fs.promises.readFile(fileName, 'utf8');
     const lines = source.split('\n');
     const replacements = suggestedRebaselines.get(fileName);
-    const fileNode = babel.babelParse(source, fileName, true);
+    const fileNode = babel.babelParse(source, fileName);
     const ranges: { start: number, end: number, oldText: string, newText: string }[] = [];
 
     babel.traverse(fileNode, {

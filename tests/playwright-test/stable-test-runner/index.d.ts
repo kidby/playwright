@@ -14,4 +14,8 @@
  * limitations under the License.
  */
 
-export * from './node_modules/@playwright/test';
+// The stable-test-runner alias used to point at the published @playwright/test
+// installed locally. Under the ESM-only fork the workspace copy is what `ttest`
+// actually exercises, so we re-export the workspace package directly.
+export * from '@playwright/test';
+export { default } from '@playwright/test';

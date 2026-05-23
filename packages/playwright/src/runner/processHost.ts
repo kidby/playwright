@@ -53,11 +53,14 @@ export class ProcessHost extends EventEmitter {
 
   async startRunner(runnerParams: any, options: { onStdOut?: (chunk: Buffer | string) => void, onStdErr?: (chunk: Buffer | string) => void } = {}): Promise<ProcessExitData | undefined> {
     assert(!this.process, 'Internal error: starting the same process twice');
-    // ESM-only fork: Node 25's `child_process.fork(path)` chokes on entries in
-    // a `"type": "module"` workspace because it tries to read the entry via
-    // the file:// URL form as if it were a path. Workaround: spawn `node`
-    // directly with the path argument.
-    this.process = child_process.spawn(process.execPath, [this._entryScript], {
+    // ESM-only fork: Node 25's `child_process.fork(path)` chokes on entries
+    // inside a `"type": "module"` workspace (ENOENT on the file:// URL form).
+    // Workaround: route through a sibling `.cjs` shim that dynamic-imports
+    // the ESM module. The shim file lives next to the .js entry.
+    const entryScript = this._entryScript.endsWith('.js')
+      ? this._entryScript.replace(/\.js$/, '.cjs')
+      : this._entryScript;
+    this.process = child_process.fork(entryScript, {
       // Note: we pass detached:false, so that workers are in the same process group.
       // This way Ctrl+C or a kill command can shutdown all workers in case they misbehave.
       // Otherwise user can end up with a bunch of workers stuck in a busy loop without self-destructing.
@@ -72,8 +75,7 @@ export class ProcessHost extends EventEmitter {
         (options.onStdErr && !process.env.PW_RUNNER_DEBUG) ? 'pipe' : 'inherit',
         'ipc',
       ],
-      serialization: 'json',
-    } as any);
+    });
     this.process.on('exit', async (code, signal) => {
       this._processDidExit = true;
       await this.onExit();

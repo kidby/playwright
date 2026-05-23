@@ -17,6 +17,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import url from 'url';
 
 import sourceMapSupport from 'source-map-support';
 import { calculateSha1 } from '@utils/crypto';
@@ -96,7 +97,9 @@ export function installSourceMapSupport() {
 }
 
 function identitySourceMap(source: string) {
-  const lineCount = fs.readFileSync(source, 'utf8').split('\n').length;
+  // source may be a `file://` URL in ESM contexts; readFileSync wants a path.
+  const filePath = source.startsWith('file:') ? url.fileURLToPath(source) : source;
+  const lineCount = fs.readFileSync(filePath, 'utf8').split('\n').length;
   return {
     version: 3,
     sources: [source],

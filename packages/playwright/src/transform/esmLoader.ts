@@ -20,10 +20,9 @@ import url from 'url';
 import { addToCompilationCache, currentFileDepsCollector, serializeCompilationCache, startCollectingFileDeps, stopCollectingFileDeps } from './compilationCache.js';
 import { PortTransport } from './portTransport.js';
 import { resolveHook, setSingleTSConfig, setTransformConfig, shouldTransform, transformHook } from './transform.js';
-import { fileIsModule } from '../util.js';
 
 // Before each import of the ESM module, a preflight request with the .esm.preflight extension is issued.
-// When handled, it is resolved similarly to the reqular import, but loading it yields empty content.
+// When handled, it is resolved similarly to the regular import, but loading it yields empty content.
 const esmPreflightExtension = '.esm.preflight';
 
 async function resolve(originalSpecifier: string, context: { parentURL?: string }, defaultResolve: Function) {
@@ -45,21 +44,20 @@ async function resolve(originalSpecifier: string, context: { parentURL?: string 
   return result;
 }
 
-// non-js files have undefined
-// some js files have null
-// {module/commonjs}-typescript are changed to {module,commonjs} because we handle typescript ourselves
-const kSupportedFormats = new Map([
-  ['commonjs', 'commonjs'],
-  ['module', 'module'],
-  ['commonjs-typescript', 'commonjs'],
-  ['module-typescript', 'module'],
-  [null, null],
-  [undefined, undefined]
+// Formats we transform: TS variants + JS (CJS or ESM). Anything else (wasm,
+// json, builtin) goes straight to Node's default loader.
+const kSupportedFormats = new Set([
+  'commonjs',
+  'module',
+  'commonjs-typescript',
+  'module-typescript',
+  null,
+  undefined,
 ]);
 
 async function load(moduleUrl: string, context: { format?: string }, defaultLoad: Function) {
   // Bail out for wasm, json, etc.
-  if (!kSupportedFormats.has(context.format))
+  if (!kSupportedFormats.has(context.format as any))
     return defaultLoad(moduleUrl, context, defaultLoad);
 
   // Bail for built-in modules.
@@ -71,6 +69,12 @@ async function load(moduleUrl: string, context: { format?: string }, defaultLoad
 
   // Bail for node_modules.
   if (!shouldTransform(filename))
+    return defaultLoad(moduleUrl, context, defaultLoad);
+
+  // Vendored CJS modules (e.g. third_party/yauzl with a local
+  // `package.json: {"type":"commonjs"}`) must NOT be force-loaded as ESM.
+  // Defer to Node's default loader so it honors the nearest package.json.
+  if (filename.endsWith('.js') && context.format === 'commonjs')
     return defaultLoad(moduleUrl, context, defaultLoad);
 
   const originalModuleUrl = isPreflight ? moduleUrl.slice(0, -esmPreflightExtension.length) : moduleUrl;

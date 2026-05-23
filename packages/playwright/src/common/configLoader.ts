@@ -20,7 +20,7 @@ import path from 'path';
 import { isRegExp } from '@isomorphic/rtti';
 
 import { requireOrImport, setSingleTSConfig, setTransformConfig } from '../transform/transform.js';
-import { errorWithFile, fileIsModule } from '../util.js';
+import { errorWithFile } from '../util.js';
 import { FullConfigInternal } from './config.js';
 import { configureESMLoader, configureESMLoaderTransformConfig, registerESMLoader } from './esmLoaderHost.js';
 import { addToCompilationCache } from '../transform/compilationCache.js';
@@ -103,10 +103,9 @@ async function loadUserConfig(location: ConfigLocation): Promise<Config> {
 }
 
 export async function loadConfig(location: ConfigLocation, overrides?: ConfigCLIOverrides, ignoreProjectDependencies = false, metadata?: Config['metadata']): Promise<FullConfigInternal> {
-  if (!registerESMLoader()) {
-    if (location.resolvedConfigFile && fileIsModule(location.resolvedConfigFile))
-      throw errorWithFile(location.resolvedConfigFile, `Playwright requires Node.js 24 or higher. Please update your version of Node.js.`);
-  }
+  // Node 24+ always provides `module.register`, so the ESM loader install is
+  // always available — the old CJS-only fallback path is gone.
+  registerESMLoader();
 
   // 1. Setup tsconfig; configure ESM loader with tsconfig and compilation cache.
   setSingleTSConfig(overrides?.tsconfig);

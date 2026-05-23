@@ -24,7 +24,7 @@ import crypto from 'crypto';
 import sourceMapSupport from 'source-map-support';
 import { loadTsConfig } from './tsconfig-loader.js';
 import { libPath, packageJSON } from '../package.js';
-import { createFileMatcher, debugTest, fileIsModule, resolveImportSpecifierAfterMapping } from '../util.js';
+import { createFileMatcher, debugTest, resolveImportSpecifierAfterMapping } from '../util.js';
 import { importUnderBun, isBun } from './bunRuntime.js';
 import { belongsToNodeModules, currentFileDepsCollector, getFromCompilationCache, installSourceMapSupport } from './compilationCache.js';
 

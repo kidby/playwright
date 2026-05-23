@@ -265,23 +265,6 @@ export async function normalizeAndSaveAttachment(outputPath: string, name: strin
   }
 }
 
-export function fileIsModule(file: string): boolean {
-  if (file.endsWith('.mjs') || file.endsWith('.mts'))
-    return true;
-  if (file.endsWith('.cjs') || file.endsWith('.cts'))
-    return false;
-  const folder = path.dirname(file);
-  return folderIsModule(folder);
-}
-
-function folderIsModule(folder: string): boolean {
-  const packageJsonPath = getPackageJsonPath(folder);
-  if (!packageJsonPath)
-    return false;
-  // Rely on `require` internal caching logic.
-  return require(packageJsonPath).type === 'module';
-}
-
 const packageJsonMainFieldCache = new Map<string, string | undefined>();
 
 function getMainFieldFromPackageJson(packageJsonPath: string) {

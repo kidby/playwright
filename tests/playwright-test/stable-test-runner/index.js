@@ -14,4 +14,8 @@
  * limitations under the License.
  */
 
-module.exports = require('./node_modules/@playwright/test');
+// Re-export the local workspace @playwright/test. ESM-only fork no longer
+// runs against a published "stable" version — the workspace copy is what
+// `ttest` actually uses now, so the alias just makes that explicit.
+export * from '@playwright/test';
+export { default } from '@playwright/test';

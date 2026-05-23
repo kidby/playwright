@@ -96,12 +96,6 @@ export const onExit = onExitLibrary;
 import getStreamLibrary from 'get-stream';
 export const getStream = getStreamLibrary;
 
-import httpProxyAgentLibrary from 'https-proxy-agent';
-export const httpProxyAgent = httpProxyAgentLibrary;
-
-import socksProxyAgentLibrary from 'socks-proxy-agent';
-export const socksProxyAgent = socksProxyAgentLibrary;
-
 export * as z from 'zod';
 
 export { Client } from '@modelcontextprotocol/sdk/client/index.js';
