@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { test, expect } from './npmTest.js';
+import fs from 'fs';
 import path from 'path';
 
 test('npm: @playwright/test should work', async ({ exec, tmpWorkspace }) => {
@@ -74,4 +75,34 @@ test('pnpm: @playwright/test should work', async ({ exec, tmpWorkspace }) => {
   await exec('node read-json-report.js', path.join(tmpWorkspace, 'report.json'));
   await exec('node sanity.js @playwright/test chromium firefox webkit');
   await exec('node', 'esm-playwright-test.mjs');
+});
+
+test('bun: @playwright/test should work', async ({ exec, tmpWorkspace }) => {
+  // Bun-as-package-manager: `bun add` installs via Bun's resolver, then
+  // `bunx playwright` runs the binary. The shebang (`#!/usr/bin/env node`)
+  // routes execution through Node, which is the supported runtime path.
+  await exec('bun add @playwright/test');
+  await exec('bunx playwright install');
+  await exec('bunx playwright test -c . --browser=all --reporter=list,json sample.spec.js', { env: { PLAYWRIGHT_JSON_OUTPUT_NAME: 'report.json' } });
+  await exec('node read-json-report.js', path.join(tmpWorkspace, 'report.json'));
+  await exec('node sanity.js @playwright/test chromium firefox webkit');
+  await exec('node', 'esm-playwright-test.mjs');
+});
+
+test('bun-runtime: @playwright/test should work', async ({ exec, tmpWorkspace, writeFiles }) => {
+  // Bun-as-runtime: install via Bun, then run the CLI directly under Bun
+  // (bypassing the `#!/usr/bin/env node` shebang). The bunPreload script
+  // registered via bunfig.toml strips dangling `import type {...}`
+  // statements and runs the TS transform before any user module loads.
+  await exec('bun add @playwright/test');
+  await exec('bunx playwright install');
+
+  // Layer the preload onto the bunfig.toml that npmTest.ts already wrote.
+  const existingBunfig = await fs.promises.readFile(path.join(tmpWorkspace, 'bunfig.toml'), 'utf-8');
+  await writeFiles({
+    'bunfig.toml': existingBunfig + '\npreload = ["./node_modules/playwright/lib/transform/bunPreload.js"]\n',
+  });
+
+  await exec('bun node_modules/playwright/cli.js test -c . --browser=chromium --reporter=list,json sample.spec.js', { env: { PLAYWRIGHT_JSON_OUTPUT_NAME: 'bun-runtime-report.json' } });
+  await exec('node read-json-report.js', path.join(tmpWorkspace, 'bun-runtime-report.json'), '--validate-chromium-project-only');
 });

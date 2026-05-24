@@ -72,3 +72,17 @@ test('yarn: @playwright/test plugin should work', async ({ exec, tmpWorkspace })
   await exec('yarn add typescript@5.2.2 @types/node@18');
   await exec('yarn tsc playwright-test-plugin-types.ts');
 });
+
+test('bun: @playwright/test plugin should work', async ({ exec, tmpWorkspace }) => {
+  await exec('bun add @playwright/test');
+  patchPackageJsonForPreReleaseIfNeeded(tmpWorkspace);
+  await exec('bun add playwright-test-plugin');
+  await exec('bunx playwright install chromium');
+
+  const output = await exec('bunx playwright test -c . --browser=chromium --reporter=line plugin.spec.ts');
+  expect(output).toContain('plugin value: hello from plugin');
+  expect(output).toContain('1 passed');
+
+  await exec('bun add typescript@5.2.2 @types/node@18');
+  await exec('bunx tsc playwright-test-plugin-types.ts');
+});

@@ -562,9 +562,10 @@ Slack reporter supports the following configuration options:
 | `mention` | Slack user IDs to @mention on failures. | No mentions. |
 | `dryRun` | Print payloads to stderr instead of POSTing. | `false` |
 
-### Intellum Social reporter
+### intellum-social reporter
 
-`intellum-social` is a structured-payload sibling of the Slack reporter that posts to Intellum's Tribe/Social platform. The destination is Intellum-specific, but the option shape is identical to `slack`:
+`intellum-social` is a structured-payload sibling of the Slack reporter. The
+option shape is identical to `slack`:
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';

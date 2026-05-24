@@ -51,6 +51,7 @@ Adding Playwright Test to an existing project is easy. Below are the steps to en
     {label: 'npm', value: 'npm'},
     {label: 'yarn', value: 'yarn'},
     {label: 'pnpm', value: 'pnpm'},
+    {label: 'bun', value: 'bun'},
   ]
 }>
 <TabItem value="npm">
@@ -73,6 +74,14 @@ yarn create playwright --ct
 
 ```bash
 pnpm create playwright --ct
+```
+
+ </TabItem>
+
+<TabItem value="bun">
+
+```bash
+bun create playwright --ct
 ```
 
  </TabItem>

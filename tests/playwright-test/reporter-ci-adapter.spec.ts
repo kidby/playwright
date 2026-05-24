@@ -72,8 +72,8 @@ test('circleci detection', async () => {
     CIRCLE_BUILD_URL: 'https://circleci.com/build/42',
     CIRCLE_JOB: 'test-chromium',
     CIRCLE_BUILD_NUM: '42',
-    CIRCLE_PROJECT_USERNAME: 'intellum',
-    CIRCLE_PROJECT_REPONAME: 'one-automation',
+    CIRCLE_PROJECT_USERNAME: 'example-org',
+    CIRCLE_PROJECT_REPONAME: 'example-repo',
   }, () => {
     const ci = detectCI();
     expect(ci.provider).toBe('circleci');
@@ -81,14 +81,14 @@ test('circleci detection', async () => {
     expect(ci.sha).toBe('abc123');
     expect(ci.runUrl).toBe('https://circleci.com/build/42');
     expect(ci.jobName).toBe('test-chromium');
-    expect(ci.repo).toBe('intellum/one-automation');
+    expect(ci.repo).toBe('example-org/example-repo');
   });
 });
 
 test('github-actions detection with PR ref', async () => {
   withCleanEnv({
     GITHUB_ACTIONS: 'true',
-    GITHUB_REPOSITORY: 'intellum/playwright',
+    GITHUB_REPOSITORY: 'example-org/example-repo',
     GITHUB_SERVER_URL: 'https://github.com',
     GITHUB_RUN_ID: '7',
     GITHUB_HEAD_REF: 'fix-39562',
@@ -101,10 +101,10 @@ test('github-actions detection with PR ref', async () => {
     expect(ci.provider).toBe('github-actions');
     expect(ci.branch).toBe('fix-39562');
     expect(ci.sha).toBe('sha-deadbeef');
-    expect(ci.runUrl).toBe('https://github.com/intellum/playwright/actions/runs/7');
+    expect(ci.runUrl).toBe('https://github.com/example-org/example-repo/actions/runs/7');
     expect(ci.jobName).toBe('unit');
     expect(ci.prNumber).toBe('123');
-    expect(ci.prUrl).toBe('https://github.com/intellum/playwright/pull/123');
+    expect(ci.prUrl).toBe('https://github.com/example-org/example-repo/pull/123');
   });
 });
 

@@ -114,11 +114,21 @@ export const test = _test
         const yarnYmlLines = [
           `npmRegistryServer: "${registry.url()}/"`,
           `cacheFolder: "${testInfo.outputPath('npm_cache')}"`,
+          // Per-test global folder so yarn's metadata cache (which lives at
+          // <globalFolder>/metadata/) doesn't carry stale tarball SHAs from a
+          // prior run of the suite — when our package contents change, the
+          // SHA changes too, and yarn would otherwise request the old URL.
+          `globalFolder: "${testInfo.outputPath('yarn_global')}"`,
           `nodeLinker: node-modules`,
           `enableImmutableInstalls: false`,
           // Berry refuses to install from a public-registry tgz unless the
           // hash matches — for local file: tarballs we don't have one.
           `checksumBehavior: update`,
+          // Test registry runs on http://127.0.0.1:<port>; Berry blocks it
+          // unless explicitly whitelisted.
+          `unsafeHttpWhitelist:`,
+          `  - "127.0.0.1"`,
+          `  - "localhost"`,
         ];
         const npmLines = [
           `registry = ${registry.url()}/`,
@@ -133,6 +143,15 @@ export const test = _test
         await fs.promises.writeFile(path.join(tmpWorkspace, '.yarnrc'), yarnLines.join('\n'), 'utf-8');
         await fs.promises.writeFile(path.join(tmpWorkspace, '.yarnrc.yml'), yarnYmlLines.join('\n'), 'utf-8');
         await fs.promises.writeFile(path.join(tmpWorkspace, '.npmrc'), npmLines.join('\n'), 'utf-8');
+
+        // Bun reads `bunfig.toml`. Point its install/cache at per-test
+        // directories so it doesn't share state with the user's global bun.
+        const bunfigLines = [
+          `[install]`,
+          `registry = "${registry.url()}/"`,
+          `cache = { dir = "${testInfo.outputPath('bun_cache')}", disable = false }`,
+        ];
+        await fs.promises.writeFile(path.join(tmpWorkspace, 'bunfig.toml'), bunfigLines.join('\n'), 'utf-8');
 
         await use();
         if (test.info().status === test.info().expectedStatus) {

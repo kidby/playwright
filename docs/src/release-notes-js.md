@@ -6,7 +6,7 @@ toc_max_heading_level: 2
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
-## Intellum fork — mobile parity
+## Fork — mobile parity
 
 The fork's `@playwright/experimental-mobile` package gains Tier-1 + Tier-2 parity with production mobile-test frameworks built on WebdriverIO + Appium. All additions are brand-neutral and route through Appium 2 `mobile:` extension commands; no new runtime dependencies.
 

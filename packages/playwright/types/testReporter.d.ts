@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import type { TestStatus, Metadata, PlaywrightTestOptions, PlaywrightWorkerOptions, ReporterDescription, FullConfig, FullProject, Location, WorkerInfo } from './test';
-export type { FullConfig, FullProject, TestStatus, Location, WorkerInfo } from './test';
+import type { TestStatus, Metadata, PlaywrightTestOptions, PlaywrightWorkerOptions, ReporterDescription, FullConfig, FullProject, Location, WorkerInfo } from './test.js';
+export type { FullConfig, FullProject, TestStatus, Location, WorkerInfo } from './test.js';
 
 /**
  * Result of the full test run.

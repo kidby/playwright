@@ -75,7 +75,7 @@ test('ai reporter inline prompt is prepended', async ({ runInlineTest }, testInf
   const result = await runInlineTest({
     'playwright.config.ts': `
       module.exports = {
-        reporter: [['ai', { outputDir: 'ai-out', prompt: 'You are the Intellum triage bot.\\nAlways suggest a JIRA label.' }]]
+        reporter: [['ai', { outputDir: 'ai-out', prompt: 'You are a triage bot.\\nAlways suggest a JIRA label.' }]]
       };
     `,
     'a.spec.ts': `
@@ -87,7 +87,7 @@ test('ai reporter inline prompt is prepended', async ({ runInlineTest }, testInf
   const aiDir = path.join(testInfo.outputPath(), 'ai-out');
   const files = fs.readdirSync(aiDir).filter(f => f.endsWith('.md') && f !== 'index.md');
   const briefing = fs.readFileSync(path.join(aiDir, files[0]), 'utf-8');
-  expect(briefing.startsWith('You are the Intellum triage bot.')).toBe(true);
+  expect(briefing.startsWith('You are a triage bot.')).toBe(true);
   expect(briefing).toMatch(/# Failure:.*\bbad\b/);
 });
 

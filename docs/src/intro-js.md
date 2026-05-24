@@ -18,7 +18,7 @@ Playwright Test is an end-to-end test framework for modern web apps. It bundles 
 
 Get started by installing Playwright using one of the following methods.
 
-### Using npm, yarn or pnpm
+### Using npm, yarn, pnpm or bun
 
 The command below either initializes a new project or adds Playwright to an existing one.
 
@@ -28,7 +28,8 @@ The command below either initializes a new project or adds Playwright to an exis
   values={[
     {label: 'npm', value: 'npm'},
     {label: 'yarn', value: 'yarn'},
-    {label: 'pnpm', value: 'pnpm'}
+    {label: 'pnpm', value: 'pnpm'},
+    {label: 'bun', value: 'bun'}
   ]
 }>
 <TabItem value="npm">
@@ -55,6 +56,14 @@ pnpm create playwright
 
 </TabItem>
 
+<TabItem value="bun">
+
+```bash
+bun create playwright
+```
+
+</TabItem>
+
 </Tabs>
 
 When prompted, choose / confirm:
@@ -76,7 +85,7 @@ Playwright downloads required browser binaries and creates the scaffold below.
 ```bash
 playwright.config.ts         # Test configuration
 package.json
-package-lock.json            # Or yarn.lock / pnpm-lock.yaml
+package-lock.json            # Or yarn.lock / pnpm-lock.yaml / bun.lock
 tests/
   example.spec.ts            # Minimal example test
 ```
@@ -95,7 +104,8 @@ By default tests run headless in parallel across Chromium, Firefox and WebKit (c
   values={[
     {label: 'npm', value: 'npm'},
     {label: 'yarn', value: 'yarn'},
-    {label: 'pnpm', value: 'pnpm'}
+    {label: 'pnpm', value: 'pnpm'},
+    {label: 'bun', value: 'bun'}
   ]
 }>
 <TabItem value="npm">
@@ -122,6 +132,14 @@ pnpm exec playwright test
 
 </TabItem>
 
+<TabItem value="bun">
+
+```bash
+bunx playwright test
+```
+
+</TabItem>
+
 </Tabs>
 
 ![tests running in command line](./images/getting-started/run-tests-cli.png)
@@ -144,7 +162,8 @@ After a test run, the [HTML Reporter](./test-reporters.md#html-reporter) provide
   values={[
     {label: 'npm', value: 'npm'},
     {label: 'yarn', value: 'yarn'},
-    {label: 'pnpm', value: 'pnpm'}
+    {label: 'pnpm', value: 'pnpm'},
+    {label: 'bun', value: 'bun'}
   ]
 }>
 <TabItem value="npm">
@@ -167,6 +186,14 @@ yarn playwright show-report
 
 ```bash
 pnpm exec playwright show-report
+```
+
+</TabItem>
+
+<TabItem value="bun">
+
+```bash
+bunx playwright show-report
 ```
 
 </TabItem>

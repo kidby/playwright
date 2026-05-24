@@ -33,6 +33,8 @@ lib/**/injected/
 # Include main entrypoint for ES Modules.
 !index.mjs
 !reporter.mjs
+# Include CJS bridge for `require(esm)` interop (Node 22.12+).
+!index.cjs
 # Include installer.
 !install.js
 # Include essentials.
