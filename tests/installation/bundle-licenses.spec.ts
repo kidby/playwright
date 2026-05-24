@@ -21,13 +21,26 @@ import { test, expect } from './npmTest.js';
 // these, something is broken with bundle generation or dependencies were silently removed.
 const EXPECTED: Record<string, Record<string, number>> = {
   'playwright-core': {
+    // Fork inlines picocolors directly into coreBundle.js (CORE_BUNDLE_ALLOWED_NODE_MODULES),
+    // so coreBundle now ships its own LICENSE attribution.
+    'lib/coreBundle.js.LICENSE': 1,
     'lib/serverRegistry.js.LICENSE': 10,
     'lib/utilsBundle.js.LICENSE': 80,
   },
   'playwright': {
+    // Fork bundles additional entry points that inline npm deps. ESM-only
+    // conversion added .cjs shims at loader/worker entry points and bundled
+    // common/runner. oxc-transform pulls in its own bundled deps.
+    'lib/common/index.js.LICENSE': 20,
+    'lib/loader/loaderProcessEntry.js.LICENSE': 20,
     'lib/matchers/expect.js.LICENSE': 20,
+    'lib/runner/index.js.LICENSE': 1,
+    // Babel plugin deps slimmed (oxc handles TS/JSX/decorators); the
+    // user-plugin-only path now bundles ~50 packages.
+    'lib/transform/babelBundle.js.LICENSE': 50,
     'lib/transform/esmLoader.js.LICENSE': 10,
-    'lib/transform/babelBundle.js.LICENSE': 65,
+    'lib/transform/oxcBundle.js.LICENSE': 40,
+    'lib/worker/workerProcessEntry.js.LICENSE': 1,
   },
 };
 

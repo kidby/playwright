@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-let install;
-
 try {
-  if (!require('playwright-core/lib/coreBundle').utils.isLikelyNpxGlobal())
-    install = require('playwright-core/lib/coreBundle').registry.installBrowsersForNpmInstall;
+  const { utils, registry } = await import('playwright-core/lib/coreBundle');
+  if (!utils.isLikelyNpxGlobal())
+    await registry.installBrowsersForNpmInstall(['chromium', 'chromium-headless-shell', 'ffmpeg']);
 } catch (e) {
   // Dev build, don't install browsers by default.
 }
-
-if (install)
-  install(['chromium', 'chromium-headless-shell', 'ffmpeg']);

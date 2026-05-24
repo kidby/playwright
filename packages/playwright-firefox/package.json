@@ -18,6 +18,8 @@
   "exports": {
     ".": {
       "types": "./index.d.ts",
+      "require": "./index.cjs",
+      "import": "./index.js",
       "default": "./index.js"
     },
     "./package.json": "./package.json"

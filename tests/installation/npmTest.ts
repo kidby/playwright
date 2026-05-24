@@ -105,6 +105,21 @@ export const test = _test
           `registry "${registry.url()}/"`,
           `cache "${testInfo.outputPath('npm_cache')}"`,
         ];
+        // Yarn Berry (v2+) reads `.yarnrc.yml`, not `.yarnrc`, and defaults to
+        // PnP which keeps packages in `.yarn/cache/*.zip` rather than
+        // `node_modules/`. PnP breaks `node sanity.js` (vanilla node can't
+        // resolve PnP modules without `.pnp.cjs`) and tarball-based plugin
+        // installs. Force the classic node_modules layout so the same test
+        // works under both yarn classic and yarn berry.
+        const yarnYmlLines = [
+          `npmRegistryServer: "${registry.url()}/"`,
+          `cacheFolder: "${testInfo.outputPath('npm_cache')}"`,
+          `nodeLinker: node-modules`,
+          `enableImmutableInstalls: false`,
+          // Berry refuses to install from a public-registry tgz unless the
+          // hash matches — for local file: tarballs we don't have one.
+          `checksumBehavior: update`,
+        ];
         const npmLines = [
           `registry = ${registry.url()}/`,
           `cache = ${testInfo.outputPath('npm_cache')}`,
@@ -116,6 +131,7 @@ export const test = _test
           npmLines.push(`prefix = ${testInfo.outputPath('npm_global')}`);
         }
         await fs.promises.writeFile(path.join(tmpWorkspace, '.yarnrc'), yarnLines.join('\n'), 'utf-8');
+        await fs.promises.writeFile(path.join(tmpWorkspace, '.yarnrc.yml'), yarnYmlLines.join('\n'), 'utf-8');
         await fs.promises.writeFile(path.join(tmpWorkspace, '.npmrc'), npmLines.join('\n'), 'utf-8');
 
         await use();

@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-const { test, expect, devices, defineConfig: originalDefineConfig } = require('@playwright/experimental-ct-core');
-const path = require('path');
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
+import { test, expect, devices, defineConfig as originalDefineConfig } from '@playwright/experimental-ct-core';
 
-const defineConfig = (config, ...configs) => {
+const require = createRequire(import.meta.url);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export const defineConfig = (config, ...configs) => {
   return originalDefineConfig({
     ...config,
     '@playwright/test': {
@@ -30,4 +35,4 @@ const defineConfig = (config, ...configs) => {
   }, ...configs);
 };
 
-module.exports = { test, expect, devices, defineConfig };
+export { test, expect, devices };

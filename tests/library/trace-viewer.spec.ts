@@ -389,7 +389,10 @@ test('should show params and return value', async ({ showTraceViewer }) => {
     /Evaluate/,
     /start:[\d\.]+m?s/,
     /duration:[\d]+ms/,
-    /expression:"\({↵    a↵  }\) => {↵    console\.log\(\'Info\'\);↵    console\.warn\(\'Warning\'\);↵    console/,
+    // oxc-transform preserves source layout (single-line destructuring,
+    // double-quoted strings, tab indent); babel used to break to multi-line.
+    // Accept both shapes so the test stays meaningful under either printer.
+    /expression:"\(\{\s*a\s*\}\) => \{[\s\S]*console\.(log|warn).+(Info|Warning)/,
     'isFunction:true',
     'arg:{"a":"paramA","b":4}',
     'value:"return paramA"'

@@ -297,6 +297,13 @@ function resolveScript(id: string | undefined, rootDir: string): string | undefi
   const localPath = path.resolve(rootDir, id);
   if (fs.existsSync(localPath))
     return localPath;
+  // Try the TS/JS extensions Playwright transforms — `require.resolve` under
+  // ESM no longer auto-appends them and configs commonly omit the extension
+  // (e.g. `globalSetup: path.join(__dirname, 'globalSetup')`).
+  for (const ext of ['.ts', '.tsx', '.mts', '.cts', '.js', '.mjs', '.cjs', '.jsx']) {
+    if (fs.existsSync(localPath + ext))
+      return localPath + ext;
+  }
   return require.resolve(id, { paths: [rootDir] });
 }
 

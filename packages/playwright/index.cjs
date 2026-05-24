@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-try {
-  const { utils, registry } = await import('playwright-core/lib/coreBundle');
-  if (!utils.isLikelyNpxGlobal())
-    await registry.installBrowsersForNpmInstall(['webkit']);
-} catch (e) {
-  // Dev build, don't install browsers by default.
-}
+// CJS bridge for downstream consumers running TypeScript under `--module
+// nodenext` whose own file is in a CJS context. Node 22.12+ implements
+// synchronous `require()` of ESM modules, so this just forwards the ESM
+// namespace through.
+module.exports = require('./index.js');

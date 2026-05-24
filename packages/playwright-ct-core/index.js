@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-const { test: baseTest, expect, devices, defineConfig: originalDefineConfig } = require('playwright/test');
-const { fixtures } = require('./lib/mount');
-const { createPlugin } = require('./lib/vitePlugin');
+import { createRequire } from 'module';
+import { test as baseTest, expect, devices, defineConfig as originalDefineConfig } from 'playwright/test';
+import { fixtures } from './lib/mount.js';
+import { createPlugin } from './lib/vitePlugin.js';
 
-const defineConfig = (...configs) => {
+const require = createRequire(import.meta.url);
+
+export const defineConfig = (...configs) => {
   const original = originalDefineConfig(...configs);
   return {
     ...original,
@@ -32,6 +35,5 @@ const defineConfig = (...configs) => {
   };
 };
 
-const test = baseTest.extend(fixtures);
-
-module.exports = { test, expect, devices, defineConfig };
+export const test = baseTest.extend(fixtures);
+export { expect, devices };

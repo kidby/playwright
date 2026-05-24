@@ -22,7 +22,13 @@ import type { BabelFileResult, TransformOptions } from '@babel/core';
 export { codeFrameColumns } from '@babel/code-frame';
 export { declare } from '@babel/helper-plugin-utils';
 export { types } from '@babel/core';
-export const traverse = traverseFunction;
+
+// `@babel/traverse@7.x` CJS-interop wraps its default export as
+// `{ default: traverseFn, Hub, Scope, ... }` under ESM, so the unwrapped
+// default is an object rather than the callable. Reach for the nested
+// `.default` when present.
+export const traverse: typeof traverseFunction =
+    ((traverseFunction as any)?.default ?? traverseFunction) as typeof traverseFunction;
 
 export type { NodePath, PluginObj, types as T } from '@babel/core';
 export type { BabelAPI } from '@babel/helper-plugin-utils';

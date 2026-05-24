@@ -14,10 +14,5 @@
  * limitations under the License.
  */
 
-try {
-  const { utils, registry } = await import('playwright-core/lib/coreBundle');
-  if (!utils.isLikelyNpxGlobal())
-    await registry.installBrowsersForNpmInstall(['webkit']);
-} catch (e) {
-  // Dev build, don't install browsers by default.
-}
+// CJS bridge — see ../playwright/index.cjs for rationale.
+module.exports = require('./index.js');

@@ -14,8 +14,25 @@
  * limitations under the License.
  */
 
-import jsxRuntime from './jsx-runtime.js';
+export function jsx(type, props, key) {
+  return {
+    __pw_type: 'jsx',
+    type,
+    props,
+    key,
+  };
+}
 
-export const jsx = jsxRuntime.jsx;
-export const jsxs = jsxRuntime.jsxs;
-export const Fragment = jsxRuntime.Fragment;
+export function jsxs(type, props, key) {
+  return {
+    __pw_type: 'jsx',
+    type,
+    props,
+    key,
+  };
+}
+
+// Used in <></> notation.
+export const Fragment = { __pw_jsx_fragment: true };
+
+export default { jsx, jsxs, Fragment };

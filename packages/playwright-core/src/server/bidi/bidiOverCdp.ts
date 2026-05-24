@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-import * as bidiMapper from 'chromium-bidi/lib/cjs/bidiMapper/BidiMapper';
-import * as bidiCdpConnection from 'chromium-bidi/lib/cjs/cdp/CdpConnection';
-
 import { debugLogger } from '@utils/debugLogger';
 
 import type { ConnectionTransport, ProtocolRequest, ProtocolResponse } from '../transport.js';
+import type * as bidiMapperT from 'chromium-bidi/lib/cjs/bidiMapper/BidiMapper';
 import type { ChromiumBidi } from 'chromium-bidi/lib/cjs/protocol/protocol';
 import type * as bidiTransport from 'chromium-bidi/lib/cjs/utils/transport';
 
@@ -27,16 +25,24 @@ const bidiServerLogger = (prefix: string, ...args: unknown[]): void => {
   debugLogger.log(prefix as any, args);
 };
 
+// `chromium-bidi` is a devDependency — only consumers using BiDi-over-CDP need
+// it. Under ESM bundling, a static `import` would hoist to the top of
+// `coreBundle.js` and be eagerly resolved at module load, breaking every
+// install that doesn't ship `chromium-bidi`. The dynamic imports below stay
+// dynamic in the bundle and only load when this function is actually called.
 export async function connectBidiOverCdp(cdp: ConnectionTransport): Promise<ConnectionTransport> {
-  let server: bidiMapper.BidiServer | undefined = undefined;
-  const bidiTransport = new BidiTransportImpl();
-  const bidiConnection = new BidiConnection(bidiTransport, () => server?.close());
+  const bidiMapper = await import('chromium-bidi/lib/cjs/bidiMapper/BidiMapper');
+  const bidiCdpConnection = await import('chromium-bidi/lib/cjs/cdp/CdpConnection');
+
+  let server: bidiMapperT.BidiServer | undefined = undefined;
+  const bidiTransportInstance = new BidiTransportImpl();
+  const bidiConnection = new BidiConnection(bidiTransportInstance, () => server?.close());
   const cdpTransportImpl = new CdpTransportImpl(cdp);
   const cdpConnection = new bidiCdpConnection.MapperCdpConnection(cdpTransportImpl, bidiServerLogger);
   // Make sure onclose event is propagated.
   cdp.onclose = () => bidiConnection.onclose?.();
   server = await bidiMapper.BidiServer.createAndStart(
-      bidiTransport,
+      bidiTransportInstance,
       cdpConnection,
       await cdpConnection.createBrowserSession(),
       /* selfTargetId= */ '',
@@ -45,7 +51,7 @@ export async function connectBidiOverCdp(cdp: ConnectionTransport): Promise<Conn
   return bidiConnection;
 }
 
-class BidiTransportImpl implements bidiMapper.BidiTransport {
+class BidiTransportImpl implements bidiMapperT.BidiTransport {
   _handler?: (message: ChromiumBidi.Command) => Promise<void> | void;
   _bidiConnection!: BidiConnection;
 
