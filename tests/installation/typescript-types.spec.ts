@@ -28,19 +28,15 @@ test('typescript types should work', async ({ exec, tsc, writeFiles }) => {
   await exec('npm i @playwright/test', ...libraryPackages, { env: { PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1' } });
 
   for (const libraryPackage of libraryPackages) {
-    // Default `tsc` runs --module commonjs; --moduleResolution node10 doesn't
-    // consult `exports`, so the legacy resolution finds `index.d.ts` and the
-    // imports type-check fine. This is the path most existing consumers use.
+    // Default `tsc` (--module commonjs) uses legacy resolution and finds
+    // `index.d.ts`. `--module nodenext` consults `exports` and requires an
+    // ESM-context source — use `.mts` to satisfy that.
     const tsFilename = libraryPackage + '.ts';
     await writeFiles({
       [tsFilename]: `import { Page } from '${libraryPackage}';`,
     });
     await tsc(tsFilename);
 
-    // ESM-only fork: `tsc --module nodenext` consults `exports` and rejects
-    // CJS-context static imports of ESM-only packages (TS1479). The supported
-    // migration is to use ESM-context files — either `.mts` or a workspace
-    // with `"type": "module"`. We exercise the `.mts` path here.
     const mtsFilename = libraryPackage + '.mts';
     await writeFiles({
       [mtsFilename]: `import { Page } from '${libraryPackage}';`,
@@ -49,8 +45,6 @@ test('typescript types should work', async ({ exec, tsc, writeFiles }) => {
   }
 
   await tsc('playwright-test-types.ts');
-  // Mirror the fixture into a `.mts` so `--module nodenext` resolves it under
-  // ESM-context rules (matches the supported migration path for users).
   const ptTypesSource = await fs.promises.readFile(path.join(__dirname, 'fixture-scripts', 'playwright-test-types.ts'), 'utf-8');
   await writeFiles({ 'playwright-test-types.mts': ptTypesSource });
   await tsc('--module nodenext playwright-test-types.mts');

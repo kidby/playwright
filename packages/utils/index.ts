@@ -15,6 +15,7 @@
  */
 
 export * from './ascii.js';
+export * from './bunPreconnect.js';
 export * from './chromiumChannels.js';
 export * from './comparators.js';
 export * from './crypto.js';

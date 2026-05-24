@@ -208,6 +208,39 @@ export function resolveHook(filename: string, specifier: string): string | undef
     // Do not handle module imports like `import 'fs'`
     return resolveImportSpecifierAfterMapping(specifier, false);
   }
+
+  // Legacy `node_modules/<pkg>/index.<ext>` fallback. Node's ESM resolver
+  // requires a `package.json` for any bare specifier; the CJS resolver
+  // (which playwright historically delegated to under pirates) did not.
+  // Inline test fixtures still write packages without `package.json`, so
+  // walk up the parent chain ourselves and look for an index entry. We
+  // only kick in when the specifier is a single segment (`foo` or
+  // `@scope/foo`) — anything else is a subpath that we leave to Node.
+  if (!/^(?:@[^/]+\/)?[^/]+$/.test(specifier))
+    return;
+  let dir = path.dirname(filename);
+  while (true) {
+    const candidate = path.join(dir, 'node_modules', specifier);
+    if (fileExistsCached(path.join(candidate, 'package.json'))) {
+      // Defer to Node — it can read the package.json and `exports` field.
+      return;
+    }
+    const indexHit = resolveImportSpecifierAfterMapping(path.join(candidate, 'index'), true);
+    if (indexHit)
+      return indexHit;
+    const parent = path.dirname(dir);
+    if (parent === dir)
+      return;
+    dir = parent;
+  }
+}
+
+function fileExistsCached(p: string): boolean {
+  try {
+    return fs.statSync(p, { throwIfNoEntry: false })?.isFile() ?? false;
+  } catch {
+    return false;
+  }
 }
 
 export function shouldTransform(filename: string): boolean {
@@ -292,9 +325,6 @@ export async function requireOrImport(file: string) {
   if (isBun())
     return await importUnderBun(file).finally(nextTask);
 
-  // ESM-only fork: always use dynamic import directly. esbuild no longer
-  // needs to rewrite `import()` → `require()` for CJS output, so we can drop
-  // the `eval()` indirection that was masking syntax issues at runtime.
   const fileUrl = url.pathToFileURL(file).toString();
 
   // The .esm.preflight extension is a synthetic specifier handled by our
@@ -333,8 +363,6 @@ function installTransformIfNeeded() {
     return originalResolveFilename.call(this, specifier, parent, ...rest);
   }
   (Module as any)._resolveFilename = resolveFilename;
-  // ESM-only: the Node ESM loader hook (registered via esmLoaderHost) handles
-  // all .ts/.tsx/.js/.jsx transformation. No CJS pirates hook needed.
 }
 
 const collectCJSDependencies = (module: Module, dependencies: Set<string>) => {

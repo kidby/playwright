@@ -53,10 +53,9 @@ export class ProcessHost extends EventEmitter {
 
   async startRunner(runnerParams: any, options: { onStdOut?: (chunk: Buffer | string) => void, onStdErr?: (chunk: Buffer | string) => void } = {}): Promise<ProcessExitData | undefined> {
     assert(!this.process, 'Internal error: starting the same process twice');
-    // ESM-only fork: Node 25's `child_process.fork(path)` chokes on entries
-    // inside a `"type": "module"` workspace (ENOENT on the file:// URL form).
-    // Workaround: route through a sibling `.cjs` shim that dynamic-imports
-    // the ESM module. The shim file lives next to the .js entry.
+    // Node 25's `child_process.fork(path)` chokes on entries inside a
+    // `"type": "module"` workspace (ENOENT on the file:// URL form). Route
+    // through a sibling `.cjs` shim that dynamic-imports the ESM module.
     const entryScript = this._entryScript.endsWith('.js')
       ? this._entryScript.replace(/\.js$/, '.cjs')
       : this._entryScript;

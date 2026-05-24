@@ -61,8 +61,54 @@ type TSCResult = {
 export type Files = { [key: string]: string | Buffer };
 type Params = { [key: string]: string | number | boolean | string[] };
 
+// Detect CJS-only files: `module.exports = ...` / `exports.x = ...` /
+// `export = ...` (TS CJS-export form) and no top-level ESM `import`/`export`.
+// The ESM-only loader fork forces `.ts`/`.js` files to ESM during transform,
+// so `module.exports` inside a `.ts` config raises "module is not defined".
+// Renaming to `.cjs` / `.cts` makes Node treat the file as CJS.
+function looksLikeCjs(content: string): boolean {
+  if (typeof content !== 'string')
+    return false;
+  const hasCjs = /\b(?:module\.exports\b|exports\.[A-Za-z_$])/.test(content) ||
+      /^\s*export\s*=\s*/m.test(content);
+  if (!hasCjs)
+    return false;
+  // `export = X` is TS-specific CJS syntax; `export *` / `export {` / `export
+  // default` / `export const` are ESM. Distinguish by requiring an `=` right
+  // after `export\b` for the CJS form.
+  const hasEsmImport = /^\s*import\b/m.test(content);
+  const hasEsmExport = /^\s*export\b(?!\s*=\s)/m.test(content);
+  return !hasEsmImport && !hasEsmExport;
+}
+
+function remapCjsExtension(name: string): string {
+  if (name.endsWith('.ts'))
+    return name.slice(0, -3) + '.cts';
+  if (name.endsWith('.js'))
+    return name.slice(0, -3) + '.cjs';
+  if (name.endsWith('.tsx') || name.endsWith('.mjs') || name.endsWith('.mts'))
+    return name;  // JSX or explicit ESM: leave alone.
+  return name;
+}
+
 export async function writeFiles(testInfo: TestInfo, files: Files, initial: boolean) {
   const baseDir = testInfo.outputPath();
+
+  // Inline tests historically write CJS-shaped configs as `playwright.config.ts`
+  // because the upstream loader treated `.ts` as CJS when no `type:module` was
+  // set. The ESM-only loader can't do that, so rename CJS-shaped `.ts`/`.js`
+  // files to `.cts`/`.cjs` here. Source-language stays TypeScript (`.cts` files
+  // still get TS stripped by our transformer); only the module system changes.
+  const remapped: Files = {};
+  for (const [name, content] of Object.entries(files)) {
+    if (typeof content === 'string' && looksLikeCjs(content)) {
+      const newName = remapCjsExtension(name);
+      remapped[newName] = content;
+    } else {
+      remapped[name] = content;
+    }
+  }
+  files = remapped;
 
   if (initial && !Object.keys(files).some(name => name.includes('package.json'))) {
     files = {

@@ -15,6 +15,7 @@
  */
 
 import fs from 'fs';
+import path from 'path';
 import url from 'url';
 
 import { addToCompilationCache, currentFileDepsCollector, serializeCompilationCache, startCollectingFileDeps, stopCollectingFileDeps } from './compilationCache.js';
@@ -33,7 +34,29 @@ async function resolve(originalSpecifier: string, context: { parentURL?: string 
     if (resolved !== undefined)
       specifier = url.pathToFileURL(resolved).toString();
   }
-  const result = await defaultResolve(specifier, context, defaultResolve);
+  let result;
+  try {
+    result = await defaultResolve(specifier, context, defaultResolve);
+  } catch (err: any) {
+    // Rewrite the not-found path in the error back to the original spec the
+    // user wrote. Node ESM's default message embeds an absolute file:// path
+    // (either because we resolved relative→absolute in resolveHook, or
+    // because Node's own default resolver converts the relative spec to an
+    // absolute file URL internally before reporting). Tests and user
+    // diagnostics want to see the spec from the source file.
+    if (err?.code === 'ERR_MODULE_NOT_FOUND' && typeof err.message === 'string' && context.parentURL?.startsWith('file://')) {
+      const userSpec = originalSpecifier.replace(esmPreflightExtension, '');
+      // Replace either form: the absolute file:// URL we passed in, or the
+      // absolute path Node derived from `parentURL + userSpec`.
+      err.message = err.message.split(specifier).join(userSpec);
+      if (userSpec.startsWith('./') || userSpec.startsWith('../')) {
+        const parentDir = url.fileURLToPath(context.parentURL).replace(/\/[^/]*$/, '');
+        const absFromUser = path.resolve(parentDir, userSpec);
+        err.message = err.message.split(absFromUser).join(userSpec);
+      }
+    }
+    throw err;
+  }
   // Note: we collect dependencies here that will be sent to the main thread
   // (and optionally runner process) after the loading finishes.
   if (result?.url && result.url.startsWith('file://'))
@@ -87,13 +110,22 @@ async function load(moduleUrl: string, context: { format?: string }, defaultLoad
   if (transformed.serializedCache)
     transport?.post('pushToCompilationCache', { cache: transformed.serializedCache });
 
+  // `.cts` / `.cjs` files are always CommonJS, and `.mts` / `.mjs` are always
+  // ESM. For ambiguous `.ts` / `.tsx` / `.js` / `.jsx`, fall back to whatever
+  // Node detected from the nearest package.json (`commonjs-typescript` /
+  // `commonjs` → CJS, else ESM). The transformer (`oxcBundle.ts`) skips the
+  // ESM-only banner for `.cts`/`.cjs` so the emitted code is legal CJS.
+  let format: 'commonjs' | 'module' = 'module';
+  if (originalFilename.endsWith('.cjs') || originalFilename.endsWith('.cts'))
+    format = 'commonjs';
+  else if (originalFilename.endsWith('.mjs') || originalFilename.endsWith('.mts'))
+    format = 'module';
+  else if (context.format === 'commonjs' || context.format === 'commonjs-typescript')
+    format = 'commonjs';
 
   return {
-    // ESM-only fork: oxc-transform always emits ESM (with CJS-compat banner
-    // providing `require`/`__dirname`/`__filename`), so we always declare the
-    // output as 'module' regardless of the file's package.json scope.
-    format: 'module',
-    source: isPreflight ? `void 0;` : transformed.code,
+    format,
+    source: isPreflight ? (format === 'commonjs' ? '' : 'void 0;') : transformed.code,
     shortCircuit: true,
   };
 }

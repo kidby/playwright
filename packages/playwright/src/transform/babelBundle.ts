@@ -36,11 +36,9 @@ export type { BabelAPI } from '@babel/helper-plugin-utils';
 export type BabelPlugin = [string, any?];
 export type BabelTransformFunction = (code: string, filename: string, isModule: boolean, pluginsPrefix: BabelPlugin[], pluginsSuffix: BabelPlugin[], jsxImportSource?: string) => BabelFileResult | null;
 
-// ESM-only fork: oxc handles TS/JSX/decorators/modern-syntax for every file by
-// default; babelBundle only runs when the user has configured custom plugins.
-// We only need TS stripping (preset-typescript) plus a JSX transform so the
-// user's plugin can operate on a parsed module. Node 24+ understands stage-3
-// class fields, decorators, optional chaining, etc. natively — no transforms.
+// Only runs when the user has configured custom babel plugins — oxc handles
+// the default path. Needs TS stripping + a JSX transform so user plugins
+// operate on a parsed module.
 function babelTransformOptions(isTypeScript: boolean, pluginsPrologue: [string, any?][], pluginsEpilogue: [string, any?][], jsxImportSource?: string): TransformOptions {
   return {
     browserslistConfigFile: false,

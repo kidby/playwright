@@ -216,7 +216,10 @@ function resolveReporters(reporters: Config['reporter'], rootDir: string): Repor
   return toReporters(reporters as any)?.map(([id, arg]) => {
     if (builtInReporters.includes(id as any))
       return [id, arg];
-    return [require.resolve(id, { paths: [rootDir] }), arg];
+    // `resolveScript` tries the TS/JS extensions Playwright transforms before
+    // falling back to `require.resolve`. Reporter paths are commonly written
+    // without an extension (`['./csvReporter', {...}]`).
+    return [resolveScript(id, rootDir) ?? require.resolve(id, { paths: [rootDir] }), arg];
   });
 }
 

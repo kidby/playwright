@@ -283,7 +283,7 @@ function getMainFieldFromPackageJson(packageJsonPath: string) {
 // based on the import specifier, which might or might not have an extension. See TypeScript docs:
 // https://www.typescriptlang.org/docs/handbook/modules/reference.html#file-extension-substitution.
 const kExtLookups = new Map([
-  ['.js', ['.jsx', '.ts', '.tsx']],
+  ['.js', ['.jsx', '.ts', '.tsx', '.cts']],
   ['.jsx', ['.tsx']],
   ['.cjs', ['.cts']],
   ['.mjs', ['.mts']],

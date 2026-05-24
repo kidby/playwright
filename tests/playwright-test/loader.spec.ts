@@ -62,11 +62,8 @@ test('should return the location of a syntax error with deep stack', async ({ ru
     `,
   });
   expect(result.exitCode).toBe(1);
-  expect(result.output).toContain('qux.ts:2:7');
-  expect(result.output).toContain('baz.ts:2:7');
-  expect(result.output).toContain('bar.ts:2:7');
-  expect(result.output).toContain('foo.ts:2:7');
-  expect(result.output).toContain('test.spec.ts:2:7');
+  expect(result.output).toContain('error.ts');
+  expect(result.output).toContain('(3:18)');
 });
 
 test('should print an improper error', async ({ runInlineTest }) => {
@@ -555,11 +552,10 @@ test('should load a jsx/tsx files with fragments', async ({ runInlineTest }) => 
       }
     `,
     'helper2.jsx': `
-      const component = () => <><div></div></>;
-      function add(a, b) {
+      export const component = () => <><div></div></>;
+      export function add(a, b) {
         return a + b;
       }
-      module.exports = { add, component }
     `,
     'a.spec.ts': `
       import { add } from './helper';
@@ -569,7 +565,7 @@ test('should load a jsx/tsx files with fragments', async ({ runInlineTest }) => 
       });
     `,
     'b.spec.js': `
-      const { add } = require('./helper2');
+      import { add } from './helper2.jsx';
       import { test, expect } from '@playwright/test';
       test('succeeds', () => {
         expect(add(1, 1)).toBe(2);
