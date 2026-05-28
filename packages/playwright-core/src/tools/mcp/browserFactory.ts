@@ -19,7 +19,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { playwright } from '../../inprocess.js';
-import { registryDirectory } from '../../server/registry/index.js';
+import { defaultCacheDirectory } from '../../server/registry/index.js';
 import { testDebug } from './log.js';
 import { outputDir } from '../backend/context.js';
 import { createExtensionBrowser } from './extensionContextFactory.js';
@@ -182,7 +182,7 @@ async function createPersistentBrowser(config: FullConfig, clientInfo: ClientInf
 }
 
 async function createUserDataDir(config: FullConfig, clientInfo: ClientInfo) {
-  const dir = process.env.PWMCP_PROFILES_DIR_FOR_TEST ?? registryDirectory;
+  const dir = process.env.PWMCP_PROFILES_DIR_FOR_TEST ?? path.join(defaultCacheDirectory, 'ms-playwright-mcp');
   const browserToken = config.browser.launchOptions?.channel ?? config.browser?.browserName;
   // Hesitant putting hundreds of files into the user's workspace, so using it for hashing instead.
   const rootPathToken = createHash(clientInfo.cwd);

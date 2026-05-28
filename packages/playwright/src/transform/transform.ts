@@ -18,15 +18,15 @@ import fs from 'fs';
 import Module from 'module';
 import path from 'path';
 import url from 'url';
-
 import crypto from 'crypto';
-
 import sourceMapSupport from 'source-map-support';
 import { loadTsConfig } from './tsconfig-loader.js';
 import { libPath, packageJSON } from '../package.js';
 import { createFileMatcher, debugTest, resolveImportSpecifierAfterMapping } from '../util.js';
 import { importUnderBun, isBun } from './bunRuntime.js';
-import { belongsToNodeModules, currentFileDepsCollector, getFromCompilationCache, installSourceMapSupport } from './compilationCache.js';
+import { addToCompilationCache, belongsToNodeModules, currentFileDepsCollector, getFromCompilationCache, installSourceMapSupport, serializeCompilationCache, startCollectingFileDeps as ccStartCollectingFileDeps, stopCollectingFileDeps as ccStopCollectingFileDeps } from './compilationCache.js';
+import * as esmLoaderSync from './esmLoaderSync.js';
+import { PortTransport } from './portTransport.js';
 
 import type { BabelPlugin, BabelTransformFunction } from './babelBundle.js';
 import type { OxcTransformFunction } from './oxcBundle.js';
@@ -57,9 +57,11 @@ let _transformConfig: TransformConfig = {
 
 let _externalMatcher: Matcher = () => false;
 
-export function setTransformConfig(config: TransformConfig) {
+export async function setTransformConfig(config: TransformConfig) {
   _transformConfig = config;
   _externalMatcher = createFileMatcher(_transformConfig.external);
+  if (loaderChannel)
+    await loaderChannel.send('setTransformConfig', { config });
 }
 
 export function transformConfig(): TransformConfig {
@@ -69,8 +71,10 @@ export function transformConfig(): TransformConfig {
 let _singleTSConfigPath: string | undefined;
 let _singleTSConfig: ParsedTsConfigData[] | undefined;
 
-export function setSingleTSConfig(value: string | undefined) {
+export async function setSingleTSConfig(value: string | undefined) {
   _singleTSConfigPath = value;
+  if (loaderChannel)
+    await loaderChannel.send('setSingleTSConfig', { tsconfig: value });
 }
 
 export function singleTSConfig(): string | undefined {
@@ -405,4 +409,66 @@ function isRelativeSpecifier(specifier: string) {
 
 async function nextTask() {
   return new Promise(resolve => setTimeout(resolve, 0));
+}
+
+let loaderChannel: PortTransport | undefined;
+
+function registerESMLoader() {
+  // Opt-out switch.
+  if (process.env.PW_DISABLE_TS_ESM)
+    return;
+
+  // Transpilation in `bun` is not necessary, and trying to register a hook would cause issues.
+  // https://github.com/oven-sh/bun/issues/8222#issuecomment-3665364677
+  if ('Bun' in globalThis)
+    return;
+
+  const nodeModule = require('node:module');
+
+  if (nodeModule.registerHooks && !process.env.PLAYWRIGHT_FORCE_ASYNC_LOADER) {
+    nodeModule.registerHooks({ resolve: esmLoaderSync.resolve, load: esmLoaderSync.load });
+    return;
+  }
+
+  if (!nodeModule.register)
+    return;
+
+  const { port1, port2 } = new MessageChannel();
+  // register will wait until the loader is initialized. The path is relative to
+  // the bundle output layout (lib/common/index.js → ../transform/esmLoader.js),
+  // not the source layout — esmLoader.js is its own esbuild entry point.
+  nodeModule.register(url.pathToFileURL(require.resolve('../transform/esmLoader.js')), {
+    data: { port: port2 },
+    transferList: [port2],
+  });
+  loaderChannel = new PortTransport(port1, async (method, params) => {
+    if (method === 'pushToCompilationCache')
+      addToCompilationCache(params.cache);
+  });
+  // Seed the loader thread with the state accumulated so far. Subsequent updates
+  // are pushed by setSingleTSConfig() / setTransformConfig() / startCollectingFileDeps().
+  void loaderChannel.send('setSingleTSConfig', { tsconfig: _singleTSConfigPath });
+  void loaderChannel.send('setTransformConfig', { config: _transformConfig });
+  void loaderChannel.send('addToCompilationCache', { cache: serializeCompilationCache() });
+}
+
+export async function startCollectingFileDeps() {
+  ccStartCollectingFileDeps();
+  if (loaderChannel)
+    await loaderChannel.send('startCollectingFileDeps', {});
+}
+
+export async function stopCollectingFileDeps(file: string) {
+  ccStopCollectingFileDeps(file);
+  if (loaderChannel)
+    await loaderChannel.send('stopCollectingFileDeps', { file });
+}
+
+export async function incorporateCompilationCache() {
+  if (!loaderChannel)
+    return;
+  // Gather dependency information from the esm loader that was populated by
+  // its resolve hook. We don't push this proactively during load — only at end.
+  const result = await loaderChannel.send('getCompilationCache', {});
+  addToCompilationCache(result.cache);
 }

@@ -20,13 +20,17 @@ import path from 'path';
 import { wrapInASCIIBox } from '@utils/ascii';
 import { spawnAsync } from '@utils/spawnAsync';
 import { kBrowserCloseMessageId } from './wkConnection.js';
+import { Browser } from '../browser.js';
 import { BrowserType, kNoXServerRunningError } from '../browserType.js';
-import { WKBrowser } from '../webkit/wkBrowser.js';
+import { WKBrowser } from './wkBrowser.js';
+import { connectOverRDP } from './webview/wvBrowser.js';
 
 import type { BrowserOptions } from '../browser.js';
 import type { SdkObject } from '../instrumentation.js';
+import type { Progress } from '../progress.js';
 import type { ConnectionTransport } from '../transport.js';
 import type * as types from '../types.js';
+import type * as channels from '@protocol/channels';
 
 export class WebKit extends BrowserType {
   constructor(parent: SdkObject) {
@@ -35,6 +39,10 @@ export class WebKit extends BrowserType {
 
   override connectToTransport(transport: ConnectionTransport, options: BrowserOptions): Promise<WKBrowser> {
     return WKBrowser.connect(this.attribution.playwright, transport, options);
+  }
+
+  override async connectOverCDP(progress: Progress, params: channels.BrowserTypeConnectOverCDPParams): Promise<Browser> {
+    return connectOverRDP(progress, this, params.endpointURL!, params);
   }
 
   override amendEnvironment(env: NodeJS.ProcessEnv, userDataDir: string, isPersistent: boolean, options: types.LaunchOptions): NodeJS.ProcessEnv {

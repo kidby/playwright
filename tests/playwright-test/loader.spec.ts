@@ -1192,7 +1192,7 @@ test('should compose with a custom ESM loader before playwright', {
         expect(1 + 1).toBe(2);
       });
     `,
-  });
+  }, {}, { PLAYWRIGHT_FORCE_ASYNC_LOADER: '1' });
 
   expect(result.exitCode).toBe(0);
   expect(result.passed).toBe(1);
@@ -1255,6 +1255,7 @@ test('should compose with a custom ESM loader after playwright', {
     `,
   }, {}, {
     NODE_OPTIONS: `--import ${url.pathToFileURL(testInfo.outputPath('register-loader.mjs')).toString()}`,
+    PLAYWRIGHT_FORCE_ASYNC_LOADER: '1',
   });
 
   expect(result.exitCode).toBe(0);
@@ -1305,7 +1306,7 @@ test('preflight should survive faulty ESM loader ahead of playwright', {
         expect(1 + 1).toBe(2);
       });
     `,
-  }, {}, { DEBUG: 'pw:test' });
+  }, {}, { DEBUG: 'pw:test', PLAYWRIGHT_FORCE_ASYNC_LOADER: '1' });
 
   expect(result.exitCode).toBe(0);
   expect(result.passed).toBe(1);
