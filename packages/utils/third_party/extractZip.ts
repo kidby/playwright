@@ -27,10 +27,10 @@
 import { createWriteStream, promises as fs } from 'fs';
 import path from 'path';
 import stream from 'stream';
+import { text } from 'stream/consumers';
 import { promisify } from 'util';
 
 import debugPkg from 'debug';
-import getStream from 'get-stream';
 import yauzl from './yauzl/index.js';
 import type { Entry, Options as YauzlOptions, ZipFile } from './yauzl/index.js';
 
@@ -173,7 +173,7 @@ class Extractor {
     const readStream = await promisify<Entry, stream.Readable>(this.zipfile.openReadStream.bind(this.zipfile))(entry);
 
     if (symlink) {
-      const link = await getStream(readStream);
+      const link = await text(readStream);
       debug('creating symlink', link, dest);
       await fs.symlink(link, dest);
     } else {

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import path from 'path';
+
 import chokidar from 'chokidar';
 import type { FSWatcher as ChokidarWatcher } from 'chokidar';
 
@@ -49,15 +51,21 @@ export class FSWatcher {
     if (!this._watchedPaths.length)
       return;
 
-    const ignored = [...this._ignoredFolders, '**/node_modules/**'];
+    // chokidar v4+ removed glob support in `ignored`, so match with a predicate:
+    // ignore anything inside a node_modules directory or any ignored output folder.
+    const ignored = (targetPath: string) => {
+      if (targetPath.split(path.sep).includes('node_modules'))
+        return true;
+      return ignoredFolders.some(folder => targetPath === folder || targetPath.startsWith(folder + path.sep));
+    };
     this._fsWatcher = chokidar.watch(watchedPaths, { ignoreInitial: true, ignored }).on('all', async (event, file) => {
       if (this._throttleTimer)
         clearTimeout(this._throttleTimer);
-      this._collector.push({ event, file });
+      this._collector.push({ event: event as FSEvent['event'], file });
       this._throttleTimer = setTimeout(() => this._reportEventsIfAny(), 250);
     });
 
-    await new Promise((resolve, reject) => this._fsWatcher!.once('ready', resolve).once('error', reject));
+    await new Promise((resolve, reject) => this._fsWatcher!.once('ready', () => resolve(undefined)).once('error', reject));
   }
 
   async close() {

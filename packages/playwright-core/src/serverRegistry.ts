@@ -20,6 +20,7 @@ import net from 'net';
 import path from 'path';
 import os from 'os';
 import chokidar from 'chokidar';
+import type { FSWatcher as ChokidarFSWatcher } from 'chokidar';
 
 import { packageJSON, packageRoot } from './package.js';
 
@@ -58,7 +59,7 @@ export interface ServerRegistryEvents {
 
 class ServerRegistry extends EventEmitter {
   private _descriptors = new Map<string, BrowserDescriptor>();
-  private _watcher: chokidar.FSWatcher | undefined;
+  private _watcher: ChokidarFSWatcher | undefined;
   private _watcherRefs = 0;
   private _ready: Promise<void> | undefined;
 

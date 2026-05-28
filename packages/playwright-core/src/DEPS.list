@@ -30,7 +30,6 @@ node_modules/diff
 node_modules/dotenv
 node_modules/enquirer
 node_modules/get-east-asian-width
-node_modules/get-stream
 node_modules/graceful-fs
 node_modules/https-proxy-agent
 node_modules/ini

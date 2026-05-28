@@ -59,7 +59,6 @@ const MAPPING = {
   'graceful-fs': { default: 'gracefulFs', namespace: 'gracefulFs' },
   'retry': { default: 'retry' },
   'signal-exit': { default: 'onExit' },
-  'get-stream': { default: 'getStream' },
 };
 
 const VENDORED_PACKAGES = new Set(Object.keys(MAPPING));

@@ -23,7 +23,7 @@ const path = require('path');
 const { parseApi } = require('./api_parser');
 const md = require('../markdown');
 const docs = require('./documentation');
-const toKebabCase = require('lodash/kebabCase')
+const { kebabCase: toKebabCase } = require('es-toolkit')
 
 /** @typedef {import('./documentation').Type} Type */
 /** @typedef {import('../markdown').MarkdownNode} MarkdownNode */

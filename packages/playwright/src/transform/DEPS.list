@@ -15,3 +15,6 @@ node_modules/@babel/traverse
 node_modules/oxc-transform
 node_modules/@babel/core
 node_modules/@babel/plugin-proposal-decorators
+
+[esbuildBundle.ts]
+node_modules/esbuild

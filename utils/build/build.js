@@ -20,8 +20,46 @@ const child_process = require('child_process');
 const path = require('path');
 const chokidar = require('chokidar');
 const fs = require('fs');
+const { globSync } = require('tinyglobby');
+const minimatch = require('minimatch');
 const { workspace } = require('../workspace');
 const { build, context } = require('esbuild');
+
+/**
+ * The leading non-glob directory of a pattern, e.g.
+ * `packages/playwright-core/src/**\/*.js` -> `packages/playwright-core/src`.
+ * @param {string} pattern
+ * @returns {string}
+ */
+function globBase(pattern) {
+  const segments = [];
+  for (const segment of pattern.split('/')) {
+    if (/[*?{}[\]!()]/.test(segment))
+      break;
+    segments.push(segment);
+  }
+  return segments.join('/') || '.';
+}
+
+/**
+ * chokidar v4+ dropped glob support, so watch the non-glob base directories of
+ * `patterns` and filter reported paths back down to the patterns with minimatch.
+ * @param {string[]} patterns relative glob patterns
+ * @param {string[] | undefined} ignored relative glob patterns to skip
+ * @param {(event: string, file: string) => void} handler
+ */
+function watchGlobs(patterns, ignored, handler) {
+  const absPatterns = patterns.map(filePath);
+  const absIgnored = (ignored || []).map(filePath);
+  const bases = [...new Set(patterns.map(p => filePath(globBase(p))))];
+  return chokidar.watch(bases).on('all', (event, file) => {
+    if (absIgnored.some(p => minimatch(file, p, { dot: true })))
+      return;
+    if (!absPatterns.some(p => minimatch(file, p, { dot: true })))
+      return;
+    handler(event, file);
+  });
+}
 
 /**
  * @typedef {{
@@ -176,13 +214,12 @@ async function runWatch() {
         clearTimeout(timeout);
       timeout = setTimeout(callback, 500);
     };
-    chokidar.watch([...paths, ...mustExist, onChange.script].filter(Boolean).map(filePath)).on('all', reschedule);
+    watchGlobs([...paths, ...mustExist, onChange.script].filter(Boolean), undefined, reschedule);
     callback();
   }
 
   for (const { files, from, to, ignored } of copyFiles) {
-    const watcher = chokidar.watch([filePath(files)], { ignored });
-    watcher.on('all', (event, file) => {
+    watchGlobs([files], ignored, (event, file) => {
       copyFile(file, from, to);
     });
   }
@@ -202,14 +239,8 @@ async function runWatch() {
 
 async function runBuild() {
   for (const { files, from, to, ignored } of copyFiles) {
-    const watcher = chokidar.watch([filePath(files)], {
-      ignored
-    });
-    watcher.on('add', file => {
+    for (const file of globSync(files, { cwd: ROOT, ignore: ignored, absolute: true, dot: true }))
       copyFile(file, from, to);
-    });
-    await new Promise(x => watcher.once('ready', x));
-    watcher.close();
   }
   for (const step of steps)
     await step.run();
@@ -752,6 +783,19 @@ steps.push(new EsbuildStep({
   outfile: filePath('packages/playwright/lib/transform/oxcBundle.js'),
   external: [
     'oxc-transform',
+  ],
+  plugins: [dynamicImportToRequirePlugin],
+}, [filePath('packages/playwright/src')]));
+
+// playwright/lib/transform/esbuildBundle.js — opt-in CJS-compat path for user
+// `.ts` specs in `"type":"commonjs"` packages. esbuild is a Go-native binary
+// dep — keep it external so the native binary keeps being loaded via require.
+steps.push(new EsbuildStep({
+  bundle: true,
+  entryPoints: [filePath('packages/playwright/src/transform/esbuildBundle.ts')],
+  outfile: filePath('packages/playwright/lib/transform/esbuildBundle.js'),
+  external: [
+    'esbuild',
   ],
   plugins: [dynamicImportToRequirePlugin],
 }, [filePath('packages/playwright/src')]));

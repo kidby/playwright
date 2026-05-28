@@ -17,7 +17,7 @@
 /** @typedef {'Types'|'ReleaseNotesMd'} OutputType */
 
 // @ts-check
-const toKebabCase = require('lodash/kebabCase.js')
+const { kebabCase: toKebabCase } = require('es-toolkit')
 const Documentation = require('./documentation');
 
 /**

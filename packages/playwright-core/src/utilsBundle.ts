@@ -93,9 +93,6 @@ export const retry = retryLibrary;
 import onExitLibrary from 'signal-exit';
 export const onExit = onExitLibrary;
 
-import getStreamLibrary from 'get-stream';
-export const getStream = getStreamLibrary;
-
 export * as z from 'zod';
 
 export { Client } from '@modelcontextprotocol/sdk/client/index.js';
