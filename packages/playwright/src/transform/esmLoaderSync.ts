@@ -63,12 +63,12 @@ export function load(moduleUrl: string, context: { format?: string }, nextLoad: 
     return nextLoad(moduleUrl, context);
 
   // Output format is required, so we determine it manually when unknown.
-  const format = kSupportedFormats.get(context.format) || 'module';
+  const format = (kSupportedFormats.get(context.format) || 'module') as 'commonjs' | 'module';
 
   const code = fs.readFileSync(filename, 'utf-8');
-  // Pass `moduleUrl` only for ESM. For CommonJS we omit it so that babel
-  // down-transpiles `import`/`export` to `require`/`exports`.
-  const transformed = transformHook(code, filename, format === 'module' ? moduleUrl : undefined);
+  // Pass `moduleUrl` only for ESM. For CommonJS the transformer routes through
+  // esbuild (ESM→CJS module conversion) using the explicit format hint.
+  const transformed = transformHook(code, filename, format === 'module' ? moduleUrl : undefined, format);
 
   // shortCircuit is required to designate no more loaders should be called.
   return {

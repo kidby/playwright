@@ -14,25 +14,102 @@
   limitations under the License.
 */
 
-// @ts-ignore
-import codemirror from 'codemirror';
-import type codemirrorType from 'codemirror';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/mode/css/css';
-import 'codemirror/mode/htmlmixed/htmlmixed';
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/mode/python/python';
-import 'codemirror/mode/clike/clike';
-import 'codemirror/mode/markdown/markdown';
-import 'codemirror/addon/display/placeholder';
-import 'codemirror/addon/mode/simple';
-import 'codemirror/addon/edit/matchbrackets';
-import 'codemirror/addon/edit/closebrackets';
-import 'codemirror/addon/search/search';
-import 'codemirror/addon/search/searchcursor';
-import 'codemirror/addon/search/jump-to-line';
-import 'codemirror/addon/dialog/dialog';
-import 'codemirror/addon/dialog/dialog.css';
+import { Annotation, EditorState, StateEffect, StateField } from '@codemirror/state';
+import type { Extension } from '@codemirror/state';
+import { Decoration, EditorView, ViewPlugin, WidgetType, keymap, lineNumbers, placeholder } from '@codemirror/view';
+import type { DecorationSet, ViewUpdate } from '@codemirror/view';
+import { HighlightStyle, StreamLanguage, bracketMatching, syntaxHighlighting } from '@codemirror/language';
+import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+import { search, searchKeymap } from '@codemirror/search';
+import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
+import { tags as t } from '@lezer/highlight';
+import { javascript } from '@codemirror/lang-javascript';
+import { python } from '@codemirror/lang-python';
+import { java } from '@codemirror/lang-java';
+import { html } from '@codemirror/lang-html';
+import { css } from '@codemirror/lang-css';
+import { markdown } from '@codemirror/lang-markdown';
+import { yaml } from '@codemirror/lang-yaml';
+import { csharp } from '@codemirror/legacy-modes/mode/clike';
 
-export type CodeMirror = typeof codemirrorType;
-export default codemirror;
+// Map syntax-highlight tags onto stable `tok-*` classes; colors live in
+// codeMirrorWrapper.css so the existing light/dark VS Code theming is preserved.
+const highlightStyle = HighlightStyle.define([
+  { tag: [t.keyword, t.standard(t.name), t.operatorKeyword, t.modifier], class: 'tok-keyword' },
+  { tag: [t.number, t.bool, t.integer, t.float], class: 'tok-number' },
+  { tag: [t.string, t.special(t.string), t.regexp], class: 'tok-string' },
+  { tag: [t.comment, t.lineComment, t.blockComment], class: 'tok-comment' },
+  { tag: [t.invalid], class: 'tok-error' },
+  { tag: [t.definition(t.name), t.tagName, t.heading], class: 'tok-def' },
+  { tag: [t.variableName, t.atom, t.labelName], class: 'tok-variable' },
+  { tag: [t.propertyName, t.function(t.variableName), t.function(t.propertyName)], class: 'tok-property' },
+  { tag: [t.attributeName], class: 'tok-attribute' },
+  { tag: [t.typeName, t.className, t.namespace], class: 'tok-type' },
+  { tag: [t.operator, t.meta], class: 'tok-operator' },
+  { tag: [t.bracket, t.brace, t.paren, t.punctuation], class: 'tok-bracket' },
+  { tag: [t.link, t.url], class: 'tok-link' },
+]);
+
+/**
+ * Resolve a legacy CodeMirror 5 mode string (kept by the wrapper) to a CM6
+ * language extension. Returns undefined for plain text / linkified content.
+ */
+function languageExtension(mode: string | undefined): Extension | undefined {
+  switch (mode) {
+    case 'javascript': return javascript();
+    case 'python': return python();
+    case 'text/x-java': return java();
+    case 'text/x-csharp': return StreamLanguage.define(csharp);
+    case 'markdown': return markdown();
+    case 'htmlmixed': return html();
+    case 'css': return css();
+    case 'yaml': return yaml();
+    default: return undefined;
+  }
+}
+
+// Wraps a pre-rendered DOM node as a block widget (used for inline error messages).
+class HtmlWidget extends WidgetType {
+  constructor(private _dom: HTMLElement) {
+    super();
+  }
+  override eq(other: HtmlWidget) {
+    return other._dom === this._dom;
+  }
+  override toDOM() {
+    return this._dom;
+  }
+}
+
+function htmlWidget(dom: HTMLElement): WidgetType {
+  return new HtmlWidget(dom);
+}
+
+const cmModule = {
+  Annotation,
+  EditorState,
+  EditorView,
+  StateEffect,
+  StateField,
+  Decoration,
+  ViewPlugin,
+  keymap,
+  lineNumbers,
+  placeholder,
+  bracketMatching,
+  syntaxHighlighting,
+  closeBrackets,
+  closeBracketsKeymap,
+  defaultKeymap,
+  history,
+  historyKeymap,
+  search,
+  searchKeymap,
+  highlightStyle,
+  languageExtension,
+  htmlWidget,
+};
+
+export type CodeMirror = typeof cmModule;
+export type { DecorationSet, ViewUpdate };
+export default cmModule;

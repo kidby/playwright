@@ -20,172 +20,157 @@
   line-height: 18px;
 }
 
-.cm-wrapper, .cm-wrapper > div {
+.cm-wrapper, .cm-wrapper > .cm-editor {
   width: 100%;
   height: 100%;
 }
 
-.CodeMirror span.cm-meta {
+.cm-editor {
+  font-family: var(--vscode-editor-font-family);
   color: var(--vscode-editor-foreground);
+  background-color: var(--vscode-editor-background);
+  font-weight: var(--vscode-editor-font-weight);
+  font-size: var(--vscode-editor-font-size);
 }
 
-.CodeMirror span.cm-number {
+.cm-editor.cm-focused {
+  outline: none;
+}
+
+.cm-editor .cm-scroller {
+  font-family: inherit;
+}
+
+/* Syntax highlighting (tags mapped to tok-* classes in codeMirrorModule). */
+.cm-editor .tok-number {
   color: var(--vscode-debugTokenExpression-number);
 }
 
-.CodeMirror span.cm-keyword,
-.CodeMirror span.cm-builtin {
+.cm-editor .tok-keyword {
   color: var(--vscode-debugTokenExpression-name);
 }
 
-.CodeMirror span.cm-operator {
+.cm-editor .tok-operator {
   color: var(--vscode-editor-foreground);
 }
 
-.CodeMirror span.cm-string {
+.cm-editor .tok-string {
   color: var(--vscode-debugTokenExpression-string);
 }
 
-.CodeMirror span.cm-string-2 {
-  color: var(--vscode-debugTokenExpression-string);
-}
-
-.CodeMirror span.cm-error {
+.cm-editor .tok-error {
   color: var(--vscode-errorForeground);
 }
 
-.CodeMirror span.cm-def, .CodeMirror span.cm-tag {
+.cm-editor .tok-def {
   color: #0070c1;
 }
 
-.CodeMirror span.cm-comment, .CodeMirror span.cm-link {
+.cm-editor .tok-comment {
   color: #008000;
 }
 
-.CodeMirror span.cm-variable, .CodeMirror span.cm-variable-2, .CodeMirror span.cm-atom {
+.cm-editor .tok-variable {
   color: #0070c1;
 }
 
-.CodeMirror span.cm-property {
+.cm-editor .tok-property {
   color: #795e26;
 }
 
-.CodeMirror span.cm-qualifier, .CodeMirror span.cm-attribute {
+.cm-editor .tok-attribute {
   color: #001080;
 }
 
-.CodeMirror span.cm-variable-3,
-.CodeMirror span.cm-type {
+.cm-editor .tok-type {
   color: #267f99;
 }
 
-:root.dark-mode .CodeMirror span.cm-def,
-:root.dark-mode .CodeMirror span.cm-tag {
-  color: var(--vscode-debugView-valueChangedHighlight);
-}
-
-:root.dark-mode .CodeMirror span.cm-comment,
-:root.dark-mode .CodeMirror span.cm-link {
-  color: #6a9955;
-}
-
-:root.dark-mode .CodeMirror span.cm-variable,
-:root.dark-mode .CodeMirror span.cm-variable-2,
-:root.dark-mode .CodeMirror span.cm-atom {
-  color: #4fc1ff;
-}
-
-:root.dark-mode .CodeMirror span.cm-property {
-  color: #dcdcaa;
-}
-
-:root.dark-mode .CodeMirror span.cm-qualifier,
-:root.dark-mode .CodeMirror span.cm-attribute {
-  color: #9cdcfe;
-}
-
-:root.dark-mode .CodeMirror span.cm-variable-3,
-:root.dark-mode .CodeMirror span.cm-type {
-  color: #4ec9b0;
-}
-
-.CodeMirror span.cm-bracket {
+.cm-editor .tok-bracket {
   color: var(--vscode-editorBracketHighlight-foreground3);
 }
 
-.CodeMirror-cursor {
-  border-left: 1px solid var(--vscode-editor-foreground) !important;
+:root.dark-mode .cm-editor .tok-def {
+  color: var(--vscode-debugView-valueChangedHighlight);
 }
 
-.CodeMirror div.CodeMirror-selected {
+:root.dark-mode .cm-editor .tok-comment {
+  color: #6a9955;
+}
+
+:root.dark-mode .cm-editor .tok-variable {
+  color: #4fc1ff;
+}
+
+:root.dark-mode .cm-editor .tok-property {
+  color: #dcdcaa;
+}
+
+:root.dark-mode .cm-editor .tok-attribute {
+  color: #9cdcfe;
+}
+
+:root.dark-mode .cm-editor .tok-type {
+  color: #4ec9b0;
+}
+
+.cm-editor .cm-cursor {
+  border-left: 1px solid var(--vscode-editor-foreground);
+}
+
+.cm-editor .cm-selectionBackground,
+.cm-editor.cm-focused .cm-selectionBackground {
   background: var(--vscode-terminal-inactiveSelectionBackground);
 }
 
-.CodeMirror .CodeMirror-gutters {
+.cm-editor .cm-gutters {
   z-index: 0;
-  background: 1px solid var(--vscode-editorGroup-border);
-  border-right: none;
-}
-
-.CodeMirror .CodeMirror-gutter-elt {
   background-color: var(--vscode-editorGutter-background);
-}
-
-.CodeMirror .CodeMirror-gutterwrapper {
-  border-right: 1px solid var(--vscode-editorGroup-border);
   color: var(--vscode-editorLineNumber-foreground);
+  border-right: 1px solid var(--vscode-editorGroup-border);
 }
 
-.CodeMirror .CodeMirror-matchingbracket {
+.cm-editor .cm-matchingBracket {
   background-color: var(--vscode-editorBracketPairGuide-background1);
   color: var(--vscode-editorBracketHighlight-foreground1) !important;
 }
 
-.CodeMirror {
-  font-family: var(--vscode-editor-font-family) !important;
-  color: var(--vscode-editor-foreground) !important;
-  background-color: var(--vscode-editor-background) !important;
-  font-weight: var(--vscode-editor-font-weight) !important;
-  font-size: var(--vscode-editor-font-size) !important;
-}
-
-.CodeMirror .source-line-running {
+.cm-editor .cm-line.source-line-running {
   background-color: var(--vscode-editor-selectionBackground);
-  z-index: 2;
 }
 
-.CodeMirror .source-line-paused {
+.cm-editor .cm-line.source-line-paused {
   background-color: var(--vscode-editor-selectionHighlightBackground);
-  z-index: 2;
 }
 
-.CodeMirror .source-line-error {
+.cm-editor .cm-line.source-line-error {
   /* Intentionally empty. */
 }
 
-.CodeMirror .source-line-error-widget {
+.source-line-error-widget {
   background-color: var(--vscode-inputValidation-errorBackground);
   white-space: pre-wrap;
   margin: 3px 10px;
   padding: 5px;
 }
 
-.CodeMirror span.cm-link, span.cm-linkified {
+.cm-editor .tok-link,
+.cm-editor .cm-linkified {
   color: var(--vscode-textLink-foreground);
   text-decoration: underline;
   cursor: pointer;
 }
 
-.CodeMirror .source-line-error-underline {
+.cm-editor .source-line-error-underline {
   text-decoration: underline;
   text-decoration-color: var(--vscode-errorForeground);
   text-decoration-style: wavy;
 }
 
-.CodeMirror-placeholder {
-  color: var(--vscode-input-placeholderForeground) !important;
+.cm-editor .cm-placeholder {
+  color: var(--vscode-input-placeholderForeground);
 }
 
-.CodeMirror-dialog-top {
-  padding-top: 8px !important;
+.cm-editor .cm-panels.cm-panels-top {
+  padding-top: 8px;
 }

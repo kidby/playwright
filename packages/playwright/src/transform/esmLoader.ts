@@ -125,18 +125,12 @@ async function load(moduleUrl: string, context: { format?: string }, defaultLoad
   const originalModuleUrl = isPreflight ? moduleUrl.slice(0, -esmPreflightExtension.length) : moduleUrl;
   const originalFilename = isPreflight ? url.fileURLToPath(originalModuleUrl) : filename;
 
-  const code = fs.readFileSync(originalFilename, 'utf-8');
-  const transformed = transformHook(code, originalFilename, originalModuleUrl);
-
-  // Flush the source maps to the main thread, so that errors after import() are source-mapped.
-  if (transformed.serializedCache)
-    transport?.post('pushToCompilationCache', { cache: transformed.serializedCache });
-
   // `.cts` / `.cjs` files are always CommonJS, and `.mts` / `.mjs` are always
   // ESM. For ambiguous `.ts` / `.tsx` / `.js` / `.jsx`, fall back to whatever
   // Node detected from the nearest package.json (`commonjs-typescript` /
-  // `commonjs` → CJS, else ESM). The transformer (`oxcBundle.ts`) skips the
-  // ESM-only banner for `.cts`/`.cjs` so the emitted code is legal CJS.
+  // `commonjs` → CJS, else ESM). The transformer routes CJS through esbuild
+  // (ESM→CJS module conversion) and ESM through oxc (TS-strip + JSX). The
+  // oxcBundle banner is skipped for `.cts`/`.cjs` so emitted code is legal CJS.
   let format: 'commonjs' | 'module' = 'module';
   if (originalFilename.endsWith('.cjs') || originalFilename.endsWith('.cts'))
     format = 'commonjs';
@@ -144,6 +138,13 @@ async function load(moduleUrl: string, context: { format?: string }, defaultLoad
     format = 'module';
   else if (context.format === 'commonjs' || context.format === 'commonjs-typescript')
     format = 'commonjs';
+
+  const code = fs.readFileSync(originalFilename, 'utf-8');
+  const transformed = transformHook(code, originalFilename, originalModuleUrl, format);
+
+  // Flush the source maps to the main thread, so that errors after import() are source-mapped.
+  if (transformed.serializedCache)
+    transport?.post('pushToCompilationCache', { cache: transformed.serializedCache });
 
   return {
     format,

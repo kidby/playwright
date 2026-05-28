@@ -29,6 +29,7 @@ import * as esmLoaderSync from './esmLoaderSync.js';
 import { PortTransport } from './portTransport.js';
 
 import type { BabelPlugin, BabelTransformFunction } from './babelBundle.js';
+import type { EsbuildTransformFunction } from './esbuildBundle.js';
 import type { OxcTransformFunction } from './oxcBundle.js';
 import type { Location } from '../../types/testReporter';
 import type { LoadedTsConfig } from './tsconfig-loader.js';
@@ -318,7 +319,7 @@ export function transformHook(originalCode: string, filename: string, moduleUrl?
     name,
     { ...(opts || {}), setTransformData: setTransformDataForPlugin },
   ]);
-  const babelResult = babelTransform(originalCode, filename, !!moduleUrl, wrappedPrologue, pluginsEpilogue, _transformConfig.jsxImportSource);
+  const babelResult = babelTransform(originalCode, filename, effectiveFormat === 'module', wrappedPrologue, pluginsEpilogue, _transformConfig.jsxImportSource);
   if (!babelResult?.code)
     return { code: originalCode, serializedCache };
   const { code, map } = babelResult;
@@ -326,9 +327,9 @@ export function transformHook(originalCode: string, filename: string, moduleUrl?
   return { code, serializedCache: added.serializedCache };
 }
 
-function calculateHash(content: string, filePath: string, isModule: boolean, pluginsPrologue: BabelPlugin[], pluginsEpilogue: BabelPlugin[]): string {
+function calculateHash(content: string, filePath: string, format: 'commonjs' | 'module', pluginsPrologue: BabelPlugin[], pluginsEpilogue: BabelPlugin[]): string {
   const hash = crypto.createHash('sha1')
-      .update(isModule ? 'esm' : 'no_esm')
+      .update(format === 'module' ? 'esm' : 'cjs')
       .update(content)
       .update(filePath)
       .update(version)

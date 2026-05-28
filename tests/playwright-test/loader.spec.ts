@@ -1313,3 +1313,31 @@ test('preflight should survive faulty ESM loader ahead of playwright', {
   expect(result.output).toContain('Failed to load preflight');
   expect(result.output).toContain('what the heck is preflight');
 });
+
+test('should transpile ESM-syntax .ts specs in a "type":"commonjs" project', async ({ runInlineTest }) => {
+  // Regression for the ESM-only conversion. Users with `"type":"commonjs"`
+  // can write `.ts` specs using `import` syntax; the loader classifies the
+  // file as commonjs and routes through esbuild (TS-strip + ESM→CJS) instead
+  // of oxc (TS-strip only, which would leave `import` statements intact and
+  // crash Node with `Cannot use import statement outside a module`).
+  const result = await runInlineTest({
+    'package.json': JSON.stringify({ type: 'commonjs' }),
+    'playwright.config.ts': `
+      module.exports = { projects: [{ name: 'cjs' }] };
+    `,
+    'cjs-import.spec.ts': `
+      import { test, expect } from '@playwright/test';
+
+      const sum = (a: number, b: number) => a + b;
+
+      test('runs in a cjs project with esm-syntax ts', () => {
+        expect(sum(1, 2)).toBe(3);
+      });
+    `,
+  });
+
+  expect(result.exitCode).toBe(0);
+  expect(result.passed).toBe(1);
+  expect(result.output).not.toContain('Cannot use import statement outside a module');
+  expect(result.output).not.toContain('SyntaxError');
+});

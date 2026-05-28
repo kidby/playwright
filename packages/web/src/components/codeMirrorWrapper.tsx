@@ -17,6 +17,8 @@
 import './codeMirrorWrapper.css';
 import * as React from 'react';
 import type { CodeMirror } from './codeMirrorModule';
+import type { EditorState, Extension, StateEffectType } from '@codemirror/state';
+import type { DecorationSet, EditorView } from '@codemirror/view';
 import { ansi2html } from '../ansi2html';
 import { useMeasure, kWebLinkRe } from '../uiUtils';
 
@@ -49,6 +51,19 @@ export interface SourceProps {
   placeholder?: string;
 }
 
+type EditorRef = {
+  view: EditorView;
+  cm: CodeMirror;
+  mode: string;
+  readOnly: boolean;
+  lineNumbers?: boolean;
+  wrapLines?: boolean;
+  placeholder?: string;
+  setHighlight: StateEffectType<SourceHighlight[]>;
+  external: ReturnType<CodeMirror['Annotation']['define']>;
+  highlight?: SourceHighlight[];
+};
+
 export const CodeMirrorWrapper: React.FC<SourceProps> = ({
   text,
   highlighter,
@@ -67,19 +82,15 @@ export const CodeMirrorWrapper: React.FC<SourceProps> = ({
 }) => {
   const [measure, codemirrorElement] = useMeasure<HTMLDivElement>();
   const [modulePromise] = React.useState<Promise<CodeMirror>>(import('./codeMirrorModule').then(m => m.default));
-  const codemirrorRef = React.useRef<{
-    cm: CodeMirror.Editor,
-    highlight?: SourceHighlight[],
-    widgets?: CodeMirror.LineWidget[],
-    markers?: CodeMirror.TextMarker[],
-  } | null>(null);
-  const [codemirror, setCodemirror] = React.useState<CodeMirror.Editor>();
+  const editorRef = React.useRef<EditorRef | null>(null);
+  const [editorView, setEditorView] = React.useState<EditorView>();
+  // Keep the latest onChange in a ref so the editor's updateListener never goes stale.
+  const onChangeRef = React.useRef(onChange);
+  onChangeRef.current = onChange;
 
   React.useEffect(() => {
     (async () => {
-      // Always load the module first.
-      const CodeMirror = await modulePromise;
-      defineCustomMode(CodeMirror);
+      const CM = await modulePromise;
 
       const element = codemirrorElement.current;
       if (!element)
@@ -87,148 +98,177 @@ export const CodeMirrorWrapper: React.FC<SourceProps> = ({
 
       const mode = highlighterToMode(highlighter) || mimeTypeToMode(mimeType) || (linkify ? 'text/linkified' : '');
 
-      if (codemirrorRef.current
-        && mode === codemirrorRef.current.cm.getOption('mode')
-        && !!readOnly === codemirrorRef.current.cm.getOption('readOnly')
-        && lineNumbers === codemirrorRef.current.cm.getOption('lineNumbers')
-        && wrapLines === codemirrorRef.current.cm.getOption('lineWrapping')
-        && placeholder === codemirrorRef.current.cm.getOption('placeholder')) {
-        // No need to re-create codemirror.
+      if (editorRef.current
+        && mode === editorRef.current.mode
+        && !!readOnly === editorRef.current.readOnly
+        && lineNumbers === editorRef.current.lineNumbers
+        && wrapLines === editorRef.current.wrapLines
+        && placeholder === editorRef.current.placeholder) {
+        // No need to re-create the editor.
         return;
       }
 
-      // Either configuration is different or we don't have a codemirror yet.
-      codemirrorRef.current?.cm?.getWrapperElement().remove();
-      const cm = CodeMirror(element, {
-        value: '',
-        mode,
-        readOnly: !!readOnly,
-        lineNumbers,
-        lineWrapping: wrapLines,
-        placeholder,
-        matchBrackets: true,
-        autoCloseBrackets: true,
-        extraKeys: {
-          'Ctrl-F': 'findPersistent',
-          'Cmd-F': 'findPersistent'
-        }
+      // Either configuration is different or we don't have an editor yet.
+      editorRef.current?.view.destroy();
+      element.textContent = '';
+
+      const setHighlight = CM.StateEffect.define<SourceHighlight[]>();
+      const external = CM.Annotation.define<boolean>();
+      const highlightField = CM.StateField.define<DecorationSet>({
+        create: () => CM.Decoration.none,
+        update(decorations, tr) {
+          decorations = decorations.map(tr.changes);
+          for (const effect of tr.effects) {
+            if (effect.is(setHighlight))
+              decorations = buildHighlightDecorations(CM, tr.state, effect.value);
+          }
+          return decorations;
+        },
+        provide: field => CM.EditorView.decorations.from(field),
       });
-      codemirrorRef.current = { cm };
+
+      const extensions: Extension[] = [
+        CM.syntaxHighlighting(CM.highlightStyle),
+        CM.bracketMatching(),
+        CM.closeBrackets(),
+        CM.history(),
+        CM.search({ top: true }),
+        CM.keymap.of([...CM.closeBracketsKeymap, ...CM.defaultKeymap, ...CM.historyKeymap, ...CM.searchKeymap]),
+        highlightField,
+        CM.EditorView.updateListener.of(update => {
+          if (update.docChanged && !update.transactions.some(tr => tr.annotation(external)))
+            onChangeRef.current?.(update.state.doc.toString());
+        }),
+      ];
+      if (lineNumbers)
+        extensions.push(CM.lineNumbers());
+      if (wrapLines)
+        extensions.push(CM.EditorView.lineWrapping);
+      if (readOnly)
+        extensions.push(CM.EditorState.readOnly.of(true), CM.EditorView.editable.of(false));
+      if (placeholder)
+        extensions.push(CM.placeholder(placeholder));
+      const language = CM.languageExtension(mode);
+      if (language)
+        extensions.push(language);
+      if (linkify || mode === 'markdown' || mode === 'text/linkified')
+        extensions.push(linkifyPlugin(CM));
+
+      const view = new CM.EditorView({
+        state: CM.EditorState.create({ doc: '', extensions }),
+        parent: element,
+      });
+      editorRef.current = { view, cm: CM, mode, readOnly: !!readOnly, lineNumbers, wrapLines, placeholder, setHighlight, external };
       if (isFocused)
-        cm.focus();
-      setCodemirror(cm);
-      return cm;
+        view.focus();
+      setEditorView(view);
     })();
-  }, [modulePromise, codemirror, codemirrorElement, highlighter, mimeType, linkify, lineNumbers, wrapLines, readOnly, isFocused, placeholder]);
+  }, [modulePromise, codemirrorElement, highlighter, mimeType, linkify, lineNumbers, wrapLines, readOnly, isFocused, placeholder]);
 
   React.useEffect(() => {
-    if (codemirrorRef.current)
-      codemirrorRef.current.cm.setSize(measure.width, measure.height);
+    editorRef.current?.view.requestMeasure();
   }, [measure]);
 
   React.useLayoutEffect(() => {
-    if (!codemirror)
+    const ref = editorRef.current;
+    if (!editorView || !ref)
       return;
+    const { view, cm: CM } = ref;
 
     let valueChanged = false;
-    if (codemirror.getValue() !== text) {
-      codemirror.setValue(text);
+    if (view.state.doc.toString() !== text) {
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: text },
+        annotations: ref.external.of(true),
+      });
       valueChanged = true;
       if (focusOnChange) {
-        codemirror.execCommand('selectAll');
-        codemirror.focus();
+        view.dispatch({ selection: { anchor: 0, head: view.state.doc.length } });
+        view.focus();
       }
     }
 
-    if (valueChanged || JSON.stringify(highlight) !== JSON.stringify(codemirrorRef.current!.highlight)) {
-      // Line highlight.
-      for (const h of codemirrorRef.current!.highlight || [])
-        codemirror.removeLineClass(h.line - 1, 'wrap');
-      for (const h of highlight || [])
-        codemirror.addLineClass(h.line - 1, 'wrap', `source-line-${h.type}`);
-
-      // Error widgets.
-      for (const w of codemirrorRef.current!.widgets || [])
-        codemirror.removeLineWidget(w);
-      for (const m of codemirrorRef.current!.markers || [])
-        m.clear();
-      const widgets: CodeMirror.LineWidget[] = [];
-      const markers: CodeMirror.TextMarker[] = [];
-      for (const h of highlight || []) {
-        if (h.type !== 'subtle-error' && h.type !== 'error')
-          continue;
-
-        const line = codemirrorRef.current?.cm.getLine(h.line - 1);
-        if (line) {
-          const attributes: Record<string, string> = {};
-          attributes['title'] = h.message || '';
-          markers.push(codemirror.markText(
-              { line: h.line - 1, ch: 0 },
-              { line: h.line - 1, ch: h.column || line.length },
-              { className: 'source-line-error-underline', attributes }));
-        }
-
-        if (h.type === 'error') {
-          const errorWidgetElement = document.createElement('div');
-          errorWidgetElement.innerHTML = ansi2html(h.message || '', { bg: 'var(--vscode-inputValidation-errorBackground)', fg: 'var(--vscode-editor-foreground)' });
-          errorWidgetElement.className = 'source-line-error-widget';
-          widgets.push(codemirror.addLineWidget(h.line, errorWidgetElement, { above: true, coverGutter: false }));
-        }
-      }
-
-      // Error markers.
-      codemirrorRef.current!.highlight = highlight;
-      codemirrorRef.current!.widgets = widgets;
-      codemirrorRef.current!.markers = markers;
+    if (valueChanged || JSON.stringify(highlight) !== JSON.stringify(ref.highlight)) {
+      view.dispatch({ effects: ref.setHighlight.of(highlight || []) });
+      ref.highlight = highlight;
     }
 
     // Line-less locations have line = 0, but they mean to reveal the file.
-    if (typeof revealLine === 'number' && codemirrorRef.current!.cm.lineCount() >= revealLine)
-      codemirror.scrollIntoView({ line: Math.max(0, revealLine - 1), ch: 0 }, 50);
-
-    let changeListener: () => void | undefined;
-    if (onChange) {
-      changeListener = () => onChange(codemirror.getValue());
-      codemirror.on('change', changeListener);
+    if (typeof revealLine === 'number' && view.state.doc.lines >= revealLine) {
+      const pos = view.state.doc.line(Math.max(1, revealLine)).from;
+      view.dispatch({ effects: CM.EditorView.scrollIntoView(pos, { y: 'center' }) });
     }
-
-    return () => {
-      if (changeListener)
-        codemirror.off('change', changeListener);
-    };
-  }, [codemirror, text, highlight, revealLine, focusOnChange, onChange]);
+  }, [editorView, text, highlight, revealLine, focusOnChange]);
 
   return <div data-testid={dataTestId} className='cm-wrapper' ref={codemirrorElement} onClick={onCodeMirrorClick}></div>;
 };
 
+function buildHighlightDecorations(CM: CodeMirror, state: EditorState, highlights: SourceHighlight[]): DecorationSet {
+  const doc = state.doc;
+  const ranges = [];
+  for (const h of highlights) {
+    if (h.line < 1 || h.line > doc.lines)
+      continue;
+    const line = doc.line(h.line);
+    ranges.push(CM.Decoration.line({ class: `source-line-${h.type}` }).range(line.from));
+
+    if ((h.type === 'error' || h.type === 'subtle-error') && line.length) {
+      const to = h.column ? Math.min(line.from + h.column, line.to) : line.to;
+      ranges.push(CM.Decoration.mark({
+        class: 'source-line-error-underline',
+        attributes: { title: h.message || '' },
+      }).range(line.from, to));
+    }
+
+    if (h.type === 'error') {
+      const dom = document.createElement('div');
+      dom.innerHTML = ansi2html(h.message || '', { bg: 'var(--vscode-inputValidation-errorBackground)', fg: 'var(--vscode-editor-foreground)' });
+      dom.className = 'source-line-error-widget';
+      ranges.push(CM.Decoration.widget({ widget: CM.htmlWidget(dom), block: true, side: 1 }).range(line.to));
+    }
+  }
+  return CM.Decoration.set(ranges, true);
+}
+
+function linkifyPlugin(CM: CodeMirror): Extension {
+  return CM.ViewPlugin.fromClass(class {
+    decorations: DecorationSet;
+    constructor(view: EditorView) {
+      this.decorations = this._build(CM, view);
+    }
+    update(update: import('./codeMirrorModule').ViewUpdate) {
+      if (update.docChanged || update.viewportChanged)
+        this.decorations = this._build(CM, update.view);
+    }
+    _build(CM: CodeMirror, view: EditorView): DecorationSet {
+      const ranges = [];
+      const re = new RegExp(kWebLinkRe.source, kWebLinkRe.flags);
+      for (const { from, to } of view.visibleRanges) {
+        const text = view.state.doc.sliceString(from, to);
+        re.lastIndex = 0;
+        let match: RegExpExecArray | null;
+        while ((match = re.exec(text))) {
+          ranges.push(CM.Decoration.mark({ class: 'cm-linkified' }).range(from + match.index, from + match.index + match[0].length));
+          if (match.index === re.lastIndex)
+            re.lastIndex++;
+        }
+      }
+      return CM.Decoration.set(ranges, true);
+    }
+  }, { decorations: plugin => plugin.decorations });
+}
+
 function onCodeMirrorClick(event: React.MouseEvent) {
   if (!(event.target instanceof HTMLElement))
     return;
-  let url: string | undefined;
+  // URLs are decorated with the 'cm-linkified' class by linkifyPlugin (covers
+  // both linkified plain text and raw URLs in markdown source).
   if (event.target.classList.contains('cm-linkified')) {
-    // 'text/linkified' custom mode
-    url = event.target.textContent!;
-  } else if (event.target.classList.contains('cm-link') && event.target.nextElementSibling?.classList.contains('cm-url')) {
-    // 'markdown' mode
-    url = event.target.nextElementSibling.textContent!.slice(1, -1);
-  }
-  if (url) {
+    const url = event.target.textContent!;
     event.preventDefault();
     event.stopPropagation();
     window.open(url, '_blank');
   }
-}
-
-let customModeDefined = false;
-function defineCustomMode(cm: CodeMirror) {
-  if (customModeDefined)
-    return;
-  customModeDefined = true;
-  (cm as any).defineSimpleMode('text/linkified', {
-    start: [
-      { regex: kWebLinkRe, token: 'linkified' },
-    ],
-  });
 }
 
 function mimeTypeToMode(mimeType: string | undefined): string | undefined {

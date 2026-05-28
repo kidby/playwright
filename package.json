@@ -73,7 +73,6 @@
     "@types/babel__helper-plugin-utils": "^7.10.3",
     "@types/babel__traverse": "^7.28.0",
     "@types/chrome": "^0.0.315",
-    "@types/codemirror": "^5.60.7",
     "@types/debug": "^4.1.7",
     "@types/diff": "^5.2.3",
     "@types/formidable": "^2.0.4",
