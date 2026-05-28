@@ -62,6 +62,13 @@ async function resolve(originalSpecifier: string, context: { parentURL?: string 
   if (result?.url && result.url.startsWith('file://'))
     currentFileDepsCollector()?.add(url.fileURLToPath(result.url));
 
+  // JSON imports under Node 22+ require an explicit `with { type: 'json' }`
+  // attribute. Inject it transparently for `.json` URLs so existing
+  // `import x from './foo.json'` statements keep working — the load hook
+  // below then synthesizes named exports for the top-level keys.
+  if (result?.url?.endsWith('.json'))
+    result.importAttributes = { ...(result.importAttributes ?? {}), type: 'json' };
+
   if (originalSpecifier.endsWith(esmPreflightExtension))
     result.url = result.url + esmPreflightExtension;
   return result;
@@ -79,7 +86,22 @@ const kSupportedFormats = new Set([
 ]);
 
 async function load(moduleUrl: string, context: { format?: string }, defaultLoad: Function) {
-  // Bail out for wasm, json, etc.
+  // JSON: synthesize an ESM wrapper that exposes a `default` export plus a
+  // named export for every top-level key. Lets `import { key } from
+  // './foo.json'` work — Node's native JSON loader only exposes `default`.
+  if (context.format === 'json' && moduleUrl.startsWith('file://')) {
+    const filename = url.fileURLToPath(moduleUrl);
+    try {
+      const raw = fs.readFileSync(filename, 'utf-8');
+      const parsed = JSON.parse(raw);
+      return { format: 'module', source: synthesizeJsonModule(parsed), shortCircuit: true };
+    } catch {
+      // Fall through to default loader if read/parse fails — Node's own
+      // error message is better for genuinely malformed JSON.
+    }
+  }
+
+  // Bail out for wasm, etc.
   if (!kSupportedFormats.has(context.format as any))
     return defaultLoad(moduleUrl, context, defaultLoad);
 
@@ -128,6 +150,32 @@ async function load(moduleUrl: string, context: { format?: string }, defaultLoad
     source: isPreflight ? (format === 'commonjs' ? '' : 'void 0;') : transformed.code,
     shortCircuit: true,
   };
+}
+
+// Reserved words and other identifiers we shouldn't emit as `export const X`.
+const kReservedIdentifiers = new Set([
+  'default', 'true', 'false', 'null', 'undefined',
+  'break', 'case', 'catch', 'class', 'const', 'continue', 'debugger',
+  'do', 'else', 'export', 'extends', 'finally', 'for', 'function',
+  'if', 'import', 'in', 'instanceof', 'let', 'new', 'return', 'super',
+  'switch', 'this', 'throw', 'try', 'typeof', 'var', 'void', 'while',
+  'with', 'yield', 'await', 'enum', 'implements', 'interface', 'package',
+  'private', 'protected', 'public', 'static',
+]);
+
+function synthesizeJsonModule(parsed: unknown): string {
+  const payload = JSON.stringify(parsed);
+  let source = `const _data = ${payload};\nexport default _data;\n`;
+  // Only top-level objects can carry named exports; arrays / primitives just
+  // get the default export.
+  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+    for (const key of Object.keys(parsed as Record<string, unknown>)) {
+      if (!/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(key) || kReservedIdentifiers.has(key))
+        continue;
+      source += `export const ${key} = _data[${JSON.stringify(key)}];\n`;
+    }
+  }
+  return source;
 }
 
 let transport: PortTransport | undefined;

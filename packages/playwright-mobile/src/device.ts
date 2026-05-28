@@ -71,7 +71,7 @@ export class Device {
 
   private constructor(client: AppiumClient) {
     this.client = client;
-    this.app = new AppLocator(client, []);
+    this.app = new AppLocator(client, [], { actionTimeoutMs: this.defaultActionTimeoutMs });
     this.gestures = gestures(client);
   }
 
@@ -259,7 +259,88 @@ export class Device {
   async findElementRaw(using: LocatorStrategy, value: string) {
     return await this.client.findElement(using, value);
   }
+
+  // ── Convenience wrappers that one-automation reaches for ───────────────
+
+  /** Sleep for `ms` milliseconds. Prefer `waitUntil` for condition polling. */
+  async wait(ms: number): Promise<void> {
+    await sleep(ms);
+  }
+
+  /**
+   * Poll `predicate` until it returns truthy or the timeout elapses. Throws
+   * with `message` (default: a generic timeout error) on timeout.
+   */
+  async waitUntil<T>(predicate: () => Promise<T> | T, opts: WaitOptions & { message?: string } = {}): Promise<T> {
+    const timeout = opts.timeoutMs ?? this.defaultActionTimeoutMs;
+    const poll = opts.pollMs ?? DEFAULT_WAIT_POLL_MS;
+    const deadline = Date.now() + timeout;
+    let lastErr: unknown;
+    while (Date.now() <= deadline) {
+      try {
+        const result = await predicate();
+        if (result)
+          return result;
+      } catch (err) {
+        lastErr = err;
+      }
+      await sleep(poll);
+    }
+    const reason = lastErr instanceof Error ? `: ${lastErr.message}` : '';
+    throw new Error(opts.message ?? `waitUntil: predicate not satisfied within ${timeout}ms${reason}`);
+  }
+
+  /** True iff the on-screen keyboard is currently shown. */
+  async isKeyboardShown(): Promise<boolean> {
+    try {
+      const result = await this.client.executeScript<unknown>('mobile: isKeyboardShown', []);
+      return !!result;
+    } catch {
+      return false;
+    }
+  }
+
+  /** Android-only: the package name of the foreground activity. */
+  async currentPackage(): Promise<string> {
+    if (!this.isAndroid)
+      throw new Error(`currentPackage is Android-only (current platform: ${this.platform ?? 'unknown'})`);
+    const result = await this.client.executeScript<unknown>('mobile: getCurrentPackage', []);
+    return typeof result === 'string' ? result : String(result ?? '');
+  }
+
+  /** Set the device locale (e.g. `en_US`). Appium driver handles the platform difference. */
+  async setLocale(locale: string): Promise<void> {
+    await this.client.executeScript('mobile: setLocale', [{ locale }]);
+  }
+
+  /** Begin recording the device screen. Returns immediately; call `stopScreenRecording` to retrieve the video. */
+  async startScreenRecording(opts: ScreenRecordingOptions = {}): Promise<void> {
+    const args: Record<string, unknown> = {};
+    if (opts.timeLimitSec !== undefined) args.timeLimit = String(opts.timeLimitSec);
+    if (opts.videoQuality) args.videoQuality = opts.videoQuality;
+    if (opts.videoFps !== undefined) args.videoFps = opts.videoFps;
+    if (opts.bitRate !== undefined) args.bitRate = opts.bitRate;
+    await this.client.executeScript('mobile: startRecordingScreen', [args]);
+  }
+
+  /**
+   * Stop screen recording and return the captured video. Format defaults to
+   * MP4 per Appium driver defaults.
+   */
+  async stopScreenRecording(): Promise<Buffer> {
+    const out = await this.client.executeScript<unknown>('mobile: stopRecordingScreen', []);
+    if (typeof out !== 'string')
+      throw new Error(`stopScreenRecording: expected base64 string, got ${typeof out}`);
+    return Buffer.from(out, 'base64');
+  }
 }
+
+export type ScreenRecordingOptions = {
+  timeLimitSec?: number;
+  videoQuality?: 'low' | 'medium' | 'high' | 'photo';  // iOS
+  videoFps?: number;                                    // Android
+  bitRate?: number;                                     // Android
+};
 
 function describeChain(loc: AppLocator): string {
   return loc.chain().map(p => `${p.using}=${p.value}`).join(' >> ');

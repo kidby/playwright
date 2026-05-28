@@ -18,6 +18,8 @@ import path from 'path';
 
 import { stripAnsiEscapes } from '@isomorphic/stringUtils';
 
+import { terminalScreen } from './base.js';
+
 import type { ReporterV2 } from './reporterV2.js';
 import type { FullConfig, FullResult, Suite, TestCase, TestResult } from '../../types/testReporter';
 
@@ -70,22 +72,31 @@ class CatalogReporter implements ReporterV2 {
   }
 
   async onEnd(result: FullResult) {
+    const { colors, stdout } = terminalScreen;
     if (this._printedLine)
-      // eslint-disable-next-line no-restricted-properties
-      process.stdout.write('\n');
-    // eslint-disable-next-line no-restricted-properties
-    process.stdout.write('Catalog summary\n');
-    // eslint-disable-next-line no-restricted-properties
-    process.stdout.write('═══════════════\n');
+      stdout.write('\n');
+    stdout.write(colors.bold('Catalog summary') + '\n');
+    stdout.write(colors.dim('═══════════════') + '\n');
     const buckets = [...this._byArea.values()].sort((a, b) => a.area.localeCompare(b.area));
     for (const b of buckets) {
-      const totals = `${b.passed}P ${b.failed}F ${b.flaky}Fk ${b.skipped}S`;
+      const totals = [
+        b.passed > 0 ? colors.green(`${b.passed}P`) : colors.dim(`${b.passed}P`),
+        b.failed > 0 ? colors.red(`${b.failed}F`) : colors.dim(`${b.failed}F`),
+        b.flaky > 0 ? colors.yellow(`${b.flaky}Fk`) : colors.dim(`${b.flaky}Fk`),
+        b.skipped > 0 ? colors.cyan(`${b.skipped}S`) : colors.dim(`${b.skipped}S`),
+      ].join(' ');
       const stats = computeStats(b.durations);
-      // eslint-disable-next-line no-restricted-properties
-      process.stdout.write(`  ${b.area.padEnd(AREA_COLUMN_WIDTH)} ${totals.padEnd(TOTALS_COLUMN_WIDTH)} p50=${stats.p50}ms  p90=${stats.p90}ms  p95=${stats.p95}ms\n`);
+      stdout.write(
+          `  ${colors.bold(b.area).padEnd(AREA_COLUMN_WIDTH + ansiOverhead(colors.bold(b.area)))} ` +
+          `${totals.padEnd(TOTALS_COLUMN_WIDTH + ansiOverhead(totals))} ` +
+          colors.dim(`p50=${stats.p50}ms  p90=${stats.p90}ms  p95=${stats.p95}ms`) +
+          '\n',
+      );
     }
-    // eslint-disable-next-line no-restricted-properties
-    process.stdout.write(`\nstatus: ${result.status}\n`);
+    const statusColor = result.status === 'passed' ? colors.green
+      : result.status === 'failed' || result.status === 'timedout' ? colors.red
+        : colors.yellow;
+    stdout.write(`\nstatus: ${statusColor(result.status)}\n`);
   }
 
   private _bucketFor(test: TestCase): Bucket {
@@ -112,21 +123,31 @@ class CatalogReporter implements ReporterV2 {
   }
 
   private _printTestLine(test: TestCase, result: TestResult) {
-    const icon = result.status === 'passed' ? '✓'
-      : result.status === 'skipped' ? '−'
-        : test.outcome() === 'flaky' ? '⚠'
-          : '✗';
+    const { colors, stdout } = terminalScreen;
+    const isFlaky = test.outcome() === 'flaky';
+    const icon = result.status === 'passed' ? colors.green('✓')
+      : result.status === 'skipped' ? colors.cyan('−')
+        : isFlaky ? colors.yellow('⚠')
+          : colors.red('✗');
     const title = test.titlePath().slice(1).join(' › ');
     const file = test.location?.file || '';
     const rel = file ? path.relative(this._config.rootDir, file) : '';
-    const retryNote = result.retry > 0 ? ` (retry ${result.retry})` : '';
+    const retryNote = result.retry > 0 ? colors.yellow(` (retry ${result.retry})`) : '';
     const errorTag = result.error
-      ? `\n     ${stripAnsiEscapes(result.error.message || '').split('\n').find(l => l.trim()) || ''}`
+      ? '\n     ' + colors.red(stripAnsiEscapes(result.error.message || '').split('\n').find(l => l.trim()) || '')
       : '';
-    // eslint-disable-next-line no-restricted-properties
-    process.stdout.write(`  ${icon}  ${title}  [${rel}]  ${result.duration}ms${retryNote}${errorTag}\n`);
+    stdout.write(
+        `  ${icon}  ${title}  ${colors.dim(`[${rel}]`)}  ${colors.dim(`${result.duration}ms`)}${retryNote}${errorTag}\n`,
+    );
     this._printedLine = true;
   }
+}
+
+// `String.padEnd` counts ANSI escape bytes as characters and over-pads. Offset
+// the target width by the escape overhead so columns line up visually.
+function ansiOverhead(s: string): number {
+  // eslint-disable-next-line no-control-regex
+  return s.length - s.replace(/\[[0-9;]*m/g, '').length;
 }
 
 function computeStats(durations: number[]): Stats {

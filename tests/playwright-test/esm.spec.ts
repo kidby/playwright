@@ -35,6 +35,52 @@ test('should load nested as esm when package.json has type module', async ({ run
   expect(result.passed).toBe(1);
 });
 
+test('should auto-inject json import attribute', async ({ runInlineTest }) => {
+  // Node 22+ requires `with { type: 'json' }` for JSON imports under ESM,
+  // but many existing tests / configs were written before that. The loader
+  // injects the attribute transparently so bare `import x from './foo.json'`
+  // keeps working.
+  const result = await runInlineTest({
+    'playwright.config.ts': `
+      import packageJSON from './package.json';
+      console.log('imported value (config): ' + packageJSON.foo);
+      export default { };
+    `,
+    'package.json': JSON.stringify({ type: 'module', foo: 'baz' }),
+    'a.test.ts': `
+      import config from './package.json';
+      import { test, expect } from '@playwright/test';
+      console.log('imported value (test): ' + config.foo);
+      test('pass', () => { expect(config.foo).toBe('baz'); });
+    `,
+  });
+  expect(result.exitCode).toBe(0);
+  expect(result.passed).toBe(1);
+  expect(result.stdout).toContain('imported value (config): baz');
+  expect(result.stdout).toContain('imported value (test): baz');
+});
+
+test('should support named imports from json', async ({ runInlineTest }) => {
+  // Node's native JSON ESM only exposes `default` — but historical CJS code
+  // used `import { key } from './foo.json'`. The loader synthesizes a named
+  // export for every top-level key so both spellings keep working.
+  const result = await runInlineTest({
+    'playwright.config.ts': `export default {};`,
+    'data.json': JSON.stringify({ apiKey: 'abc123', endpoint: 'https://example.com', count: 7 }),
+    'a.test.ts': `
+      import { apiKey, endpoint, count } from './data.json';
+      import { test, expect } from '@playwright/test';
+      test('named imports work', () => {
+        expect(apiKey).toBe('abc123');
+        expect(endpoint).toBe('https://example.com');
+        expect(count).toBe(7);
+      });
+    `,
+  });
+  expect(result.exitCode).toBe(0);
+  expect(result.passed).toBe(1);
+});
+
 test('should support import attributes', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `

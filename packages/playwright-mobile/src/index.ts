@@ -16,10 +16,10 @@
 
 export { AppiumClient } from './appiumClient.js';
 export type { AppiumCapabilities, ElementHandle, LocatorStrategy } from './appiumClient.js';
-export { AppLocator } from './appLocator.js';
-export type { LocatorChainPart } from './appLocator.js';
+export { AppLocator, AppLocator as Locator } from './appLocator.js';
+export type { LocatorChainPart, LocatorFilter } from './appLocator.js';
 export { Device } from './device.js';
-export type { AndroidKey } from './device.js';
+export type { AndroidKey, ScreenRecordingOptions, WaitOptions } from './device.js';
 export { listWebViewContexts, switchToWebViewContext, waitForWebViewContext, NATIVE_APP_CONTEXT } from './webview.js';
 export type { WebViewContextDescriptor, WebViewSelector } from './webview.js';
 export { convertPageSourceToSnapshot, parsePageSource } from './snapshot.js';

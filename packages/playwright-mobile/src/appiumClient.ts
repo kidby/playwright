@@ -129,6 +129,11 @@ export class AppiumClient {
     return !!res.value;
   }
 
+  async isEnabled(element: ElementHandle): Promise<boolean> {
+    const res = await this._send('GET', `/session/${this._requireSession()}/element/${element.ELEMENT}/enabled`);
+    return !!res.value;
+  }
+
   async elementRect(element: ElementHandle): Promise<Rect> {
     const res = await this._send('GET', `/session/${this._requireSession()}/element/${element.ELEMENT}/rect`);
     return res.value as Rect;

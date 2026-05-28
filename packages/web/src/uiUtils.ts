@@ -31,7 +31,6 @@ export function useAsyncMemo<T>(fn: () => Promise<T>, deps: React.DependencyList
     return () => {
       canceled = true;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
   return value;
 }
