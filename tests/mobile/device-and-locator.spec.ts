@@ -16,13 +16,13 @@
 
 import { test, expect } from '@playwright/test';
 
-import { Device } from '../../packages/playwright-mobile/src/device.js';
+import { NativeDevice } from '../../packages/playwright-mobile/src/nativeDevice.js';
 import { startMockAppium } from './mockAppium.js';
 
-test('Device.start ↔ stop opens and closes a session', async () => {
+test('NativeDevice.start ↔ stop opens and closes a session', async () => {
   const server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, {
+    const device = await NativeDevice.start(server.url, {
       'platformName': 'Android', 'appium:automationName': 'UiAutomator2', 'appium:deviceName': 'Pixel 6',
     });
     expect(device.client.sessionId).toBe('mock-session-1');
@@ -41,7 +41,7 @@ test('Device.start ↔ stop opens and closes a session', async () => {
 test('AppLocator click sends right strategy + value', async () => {
   const server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, { 'platformName': 'Android', 'appium:automationName': 'UiAutomator2' });
+    const device = await NativeDevice.start(server.url, { 'platformName': 'Android', 'appium:automationName': 'UiAutomator2' });
     await device.app.byAccessibilityId('login').click();
 
     const findReq = server.requests.find(r => r.method === 'POST' && r.path === '/session/mock-session-1/element')!;
@@ -57,7 +57,7 @@ test('AppLocator click sends right strategy + value', async () => {
 test('AppLocator chain resolves via /element/.../element', async () => {
   const server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, { 'platformName': 'iOS', 'appium:automationName': 'XCUITest' });
+    const device = await NativeDevice.start(server.url, { 'platformName': 'iOS', 'appium:automationName': 'XCUITest' });
     server.setNextElementId('parent-1');
     await device.app
         .byIosClassChain('**/XCUIElementTypeCell[1]')
@@ -77,7 +77,7 @@ test('AppLocator chain resolves via /element/.../element', async () => {
 test('AppLocator.fill clears then sends keys', async () => {
   const server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, { 'platformName': 'Android', 'appium:automationName': 'UiAutomator2' });
+    const device = await NativeDevice.start(server.url, { 'platformName': 'Android', 'appium:automationName': 'UiAutomator2' });
     await device.app.byId('com.example:id/email').fill('a@b.c');
     const ops = server.requests
         .filter(r => /\/(clear|value|element)$/.test(r.path))
@@ -99,17 +99,17 @@ test('AppLocator.isDisplayed returns false when element resolution throws', asyn
         return { status: 404, body: { value: { error: 'no such element' } } };
       return undefined;
     });
-    const device = await Device.start(server.url, { 'platformName': 'Android', 'appium:automationName': 'UiAutomator2' });
+    const device = await NativeDevice.start(server.url, { 'platformName': 'Android', 'appium:automationName': 'UiAutomator2' });
     expect(await device.app.byAccessibilityId('missing').isDisplayed()).toBe(false);
   } finally {
     await server.close();
   }
 });
 
-test('Device.switchToContext sends spec name (or NATIVE_APP for undefined)', async () => {
+test('NativeDevice.switchToContext sends spec name (or NATIVE_APP for undefined)', async () => {
   const server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, { 'platformName': 'Android', 'appium:automationName': 'UiAutomator2' });
+    const device = await NativeDevice.start(server.url, { 'platformName': 'Android', 'appium:automationName': 'UiAutomator2' });
     await device.switchToContext('WEBVIEW_chrome');
     await device.switchToContext(undefined);
     const ctxReqs = server.requests.filter(r => r.method === 'POST' && /\/context$/.test(r.path));

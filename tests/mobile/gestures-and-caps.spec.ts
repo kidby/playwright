@@ -16,7 +16,7 @@
 
 import { test, expect } from '@playwright/test';
 
-import { Device } from '../../packages/playwright-mobile/src/device.js';
+import { NativeDevice } from '../../packages/playwright-mobile/src/nativeDevice.js';
 import { androidCapabilities, iosCapabilities } from '../../packages/playwright-mobile/src/capabilities.js';
 import { startMockAppium } from './mockAppium.js';
 
@@ -41,7 +41,7 @@ test('iosCapabilities builder', () => {
 test('gestures.swipe → Android uses mobile: swipeGesture with window rect', async () => {
   const server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, androidCapabilities({ app: 'x.apk' }));
+    const device = await NativeDevice.start(server.url, androidCapabilities({ app: 'x.apk' }));
     await device.gestures.swipe({ direction: 'up' });
     const exec = server.requests.find(r => r.method === 'POST' && /\/execute\/sync$/.test(r.path))!;
     expect(exec.body.script).toBe('mobile: swipeGesture');
@@ -57,7 +57,7 @@ test('gestures.swipe → Android uses mobile: swipeGesture with window rect', as
 test('gestures.swipe → iOS uses mobile: swipe and includes elementId when target given', async () => {
   const server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, iosCapabilities({ bundleId: 'a.b' }));
+    const device = await NativeDevice.start(server.url, iosCapabilities({ bundleId: 'a.b' }));
     server.setNextElementId('scroll-1');
     const target = device.app.byAccessibilityId('list');
     await device.gestures.swipe({ direction: 'down', target });
@@ -73,7 +73,7 @@ test('gestures.swipe → iOS uses mobile: swipe and includes elementId when targ
 test('gestures.tap with target → standard element click', async () => {
   const server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, androidCapabilities());
+    const device = await NativeDevice.start(server.url, androidCapabilities());
     await device.gestures.tap({ target: device.app.byAccessibilityId('btn') });
     const clickReq = server.requests.find(r => /\/click$/.test(r.path));
     expect(clickReq).toBeTruthy();
@@ -85,7 +85,7 @@ test('gestures.tap with target → standard element click', async () => {
 test('gestures.tap with x/y → mobile: clickGesture on Android', async () => {
   const server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, androidCapabilities());
+    const device = await NativeDevice.start(server.url, androidCapabilities());
     await device.gestures.tap({ x: 100, y: 200 });
     const exec = server.requests.find(r => /\/execute\/sync$/.test(r.path))!;
     expect(exec.body.script).toBe('mobile: clickGesture');
@@ -98,7 +98,7 @@ test('gestures.tap with x/y → mobile: clickGesture on Android', async () => {
 test('gestures.tap with x/y → mobile: tap on iOS', async () => {
   const server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, iosCapabilities());
+    const device = await NativeDevice.start(server.url, iosCapabilities());
     await device.gestures.tap({ x: 10, y: 20 });
     const exec = server.requests.find(r => /\/execute\/sync$/.test(r.path))!;
     expect(exec.body.script).toBe('mobile: tap');
@@ -111,7 +111,7 @@ test('gestures.longPress → iOS uses touchAndHold with SECONDS, Android uses lo
   // iOS leg
   let server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, iosCapabilities());
+    const device = await NativeDevice.start(server.url, iosCapabilities());
     server.setNextElementId('btn-ios');
     await device.gestures.longPress({ target: device.app.byAccessibilityId('btn'), durationMs: 3000 });
     const exec = server.requests.find(r => /\/execute\/sync$/.test(r.path))!;
@@ -123,7 +123,7 @@ test('gestures.longPress → iOS uses touchAndHold with SECONDS, Android uses lo
   // Android leg
   server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, androidCapabilities());
+    const device = await NativeDevice.start(server.url, androidCapabilities());
     server.setNextElementId('btn-android');
     await device.gestures.longPress({ target: device.app.byAccessibilityId('btn'), durationMs: 3000 });
     const exec = server.requests.find(r => /\/execute\/sync$/.test(r.path))!;
@@ -138,7 +138,7 @@ test('gestures.doubleTap → mobile: doubleTap (iOS) vs mobile: doubleClickGestu
   // iOS — element-targeted
   let server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, iosCapabilities());
+    const device = await NativeDevice.start(server.url, iosCapabilities());
     server.setNextElementId('cell-1');
     await device.gestures.doubleTap({ target: device.app.byAccessibilityId('cell') });
     const exec = server.requests.find(r => /\/execute\/sync$/.test(r.path))!;
@@ -150,7 +150,7 @@ test('gestures.doubleTap → mobile: doubleTap (iOS) vs mobile: doubleClickGestu
   // Android — coord-targeted
   server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, androidCapabilities());
+    const device = await NativeDevice.start(server.url, androidCapabilities());
     await device.gestures.doubleTap({ x: 50, y: 75 });
     const exec = server.requests.find(r => /\/execute\/sync$/.test(r.path))!;
     expect(exec.body.script).toBe('mobile: doubleClickGesture');
@@ -163,7 +163,7 @@ test('gestures.doubleTap → mobile: doubleTap (iOS) vs mobile: doubleClickGestu
 test('gestures.doubleTap throws when neither target nor x/y provided', async () => {
   const server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, androidCapabilities());
+    const device = await NativeDevice.start(server.url, androidCapabilities());
     await expect(device.gestures.doubleTap({} as any)).rejects.toThrow(/target.*or.*x.*y/);
   } finally {
     await server.close();
@@ -174,7 +174,7 @@ test('gestures.scrollToElement → iOS scrolls by element, Android scrolls by di
   // iOS — direction is irrelevant
   let server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, iosCapabilities());
+    const device = await NativeDevice.start(server.url, iosCapabilities());
     server.setNextElementId('row-7');
     await device.gestures.scrollToElement({ target: device.app.byAccessibilityId('row') });
     const exec = server.requests.find(r => /\/execute\/sync$/.test(r.path))!;
@@ -186,7 +186,7 @@ test('gestures.scrollToElement → iOS scrolls by element, Android scrolls by di
   // Android — direction defaults to 'down'
   server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, androidCapabilities());
+    const device = await NativeDevice.start(server.url, androidCapabilities());
     server.setNextElementId('row-9');
     await device.gestures.scrollToElement({ target: device.app.byAccessibilityId('row'), direction: 'up', percent: 0.5 });
     const exec = server.requests.find(r => /\/execute\/sync$/.test(r.path))!;
@@ -201,7 +201,7 @@ test('gestures.pullToRefresh → iOS dragFromToForDuration (sec) vs Android drag
   // iOS — window 390x844; defaults fromYFraction=0.15 toYFraction=0.85.
   let server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, iosCapabilities());
+    const device = await NativeDevice.start(server.url, iosCapabilities());
     await device.gestures.pullToRefresh();
     const exec = server.requests.find(r => /\/execute\/sync$/.test(r.path))!;
     expect(exec.body.script).toBe('mobile: dragFromToForDuration');
@@ -218,7 +218,7 @@ test('gestures.pullToRefresh → iOS dragFromToForDuration (sec) vs Android drag
   // Android — same geometry, speed = distance / seconds.
   server = await startMockAppium();
   try {
-    const device = await Device.start(server.url, androidCapabilities());
+    const device = await NativeDevice.start(server.url, androidCapabilities());
     await device.gestures.pullToRefresh({ durationMs: 1000 });
     const exec = server.requests.find(r => /\/execute\/sync$/.test(r.path))!;
     expect(exec.body.script).toBe('mobile: dragGesture');

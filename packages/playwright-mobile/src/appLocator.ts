@@ -24,8 +24,51 @@ export type LocatorFilter = {
   hasNot?: AppLocator;
 };
 
+// ── Action option types ─────────────────────────────────────────────────────
+// Shape mirrors Playwright web (`page.locator(...).click({ timeout, trial })`).
+// Each action that polls the device honors a per-call `timeout` override; the
+// default falls back to the device's `defaultActionTimeoutMs`. Options that
+// don't apply to mobile (e.g. `force`, `noWaitAfter`) are intentionally
+// omitted rather than no-op'd, so the surface is honest.
+
+export type TimeoutOptions = { timeout?: number };
+
+export type LocatorState = 'visible' | 'hidden' | 'attached' | 'detached';
+
+export type LocatorClickOptions = TimeoutOptions & {
+  // When true, runs the actionability wait without performing the click.
+  // Useful for "would-be-clickable" preflight checks. Mirrors Playwright web.
+  trial?: boolean;
+};
+
+export type LocatorFillOptions = TimeoutOptions;
+
+export type LocatorTypeOptions = TimeoutOptions & {
+  // Per-character delay, in ms. Passed through to the Appium driver if
+  // supported; otherwise applied client-side between sendKeys batches.
+  delay?: number;
+};
+
+export type LocatorReadOptions = TimeoutOptions;
+
+export type LocatorWaitForOptions = TimeoutOptions & {
+  // 'visible' (default) waits for `isDisplayed === true`;
+  // 'hidden' waits for `isDisplayed === false` (or detached);
+  // 'attached' waits for the element to resolve at all;
+  // 'detached' waits for it to stop resolving.
+  state?: LocatorState;
+};
+
+export type LocatorBoundingBox = { x: number; y: number; width: number; height: number };
+
+export type LocatorScreenshotOptions = TimeoutOptions & {
+  // When set, writes the captured PNG to disk in addition to returning it.
+  path?: string;
+};
+
+export type LocatorTimeoutSource = number | (() => number);
 type LocatorOptions = {
-  actionTimeoutMs: number;
+  actionTimeoutMs: LocatorTimeoutSource;
   pollMs: number;
 };
 
@@ -85,6 +128,48 @@ export class AppLocator {
     return this._chained({ using: 'id', value: id });
   }
 
+  // Platform-aware semantic getters — pick the appropriate iOS/Android
+  // strategy so a single test reads the same on both platforms. Mirrors
+  // Playwright's web getByText / getByLabel / getByTestId.
+
+  // Matches visible text; substring by default, RegExp via MATCHES. iOS uses
+  // an NSPredicate; Android uses UiAutomator's textContains/textMatches.
+  getByText(text: string | RegExp): AppLocator {
+    if (this._platform() === 'iOS')
+      return this._chained({ using: '-ios predicate string', value: iosTextPredicate('label', text) });
+    return this._chained({ using: '-android uiautomator', value: androidUiSelector('text', text) });
+  }
+
+  // Matches the accessibility label / content-description. On iOS that's
+  // the accessibility id (which native apps populate from the label by
+  // convention); on Android it's content-desc.
+  getByLabel(text: string | RegExp): AppLocator {
+    if (this._platform() === 'iOS') {
+      if (text instanceof RegExp)
+        return this._chained({ using: '-ios predicate string', value: iosTextPredicate('label', text) });
+      return this._chained({ using: 'accessibility id', value: text });
+    }
+    return this._chained({ using: '-android uiautomator', value: androidUiSelector('description', text) });
+  }
+
+  // Both platforms expose `accessibility id` and downstream apps typically
+  // wire React Native's `testID` (or equivalent) to it. Uniform on purpose
+  // — `getByTestId('save')` works the same on iOS and Android.
+  getByTestId(id: string): AppLocator {
+    return this._chained({ using: 'accessibility id', value: id });
+  }
+
+  // Element type — iOS XCUIElementType*** or Android android.widget.***.
+  // Pass either the short name (`'Button'`) — we'll prefix correctly per
+  // platform — or the full class name (`'XCUIElementTypeButton'`), passed
+  // through unchanged.
+  getByType(type: string): AppLocator {
+    const fullClass = type.includes('.') || type.startsWith('XCUIElementType')
+      ? type
+      : (this._platform() === 'iOS' ? `XCUIElementType${type}` : `android.widget.${type}`);
+    return this._chained({ using: 'class name', value: fullClass });
+  }
+
   // Position selectors — mirror Playwright's Locator.first()/.nth()/.last().
   first(): AppLocator {
     return this._derived({ position: 0 });
@@ -122,28 +207,40 @@ export class AppLocator {
     return this._resolveCandidates();
   }
 
-  async click(): Promise<void> {
-    await this._actAction(async handle => this._client.click(handle));
+  async click(options: LocatorClickOptions = {}): Promise<void> {
+    const handle = await this._waitForActionable({ requireEnabled: true, timeoutMs: options.timeout });
+    if (options.trial)
+      return;
+    await this._client.click(handle);
   }
 
-  async fill(text: string): Promise<void> {
+  async fill(text: string, options: LocatorFillOptions = {}): Promise<void> {
     await this._actAction(async handle => {
       await this._client.clear(handle);
       await this._client.sendKeys(handle, text);
-    });
+    }, options.timeout);
   }
 
-  async type(text: string): Promise<void> {
-    await this._actAction(async handle => this._client.sendKeys(handle, text));
+  async type(text: string, options: LocatorTypeOptions = {}): Promise<void> {
+    await this._actAction(async handle => {
+      if (options.delay && options.delay > 0) {
+        for (const ch of text) {
+          await this._client.sendKeys(handle, ch);
+          await sleep(options.delay);
+        }
+      } else {
+        await this._client.sendKeys(handle, text);
+      }
+    }, options.timeout);
   }
 
-  async text(): Promise<string> {
-    const handle = await this._waitForActionable({ requireEnabled: false });
+  async text(options: LocatorReadOptions = {}): Promise<string> {
+    const handle = await this._waitForActionable({ requireEnabled: false, timeoutMs: options.timeout });
     return this._client.getText(handle);
   }
 
-  async getAttribute(name: string): Promise<string | null> {
-    const handle = await this._waitForActionable({ requireEnabled: false });
+  async getAttribute(name: string, options: LocatorReadOptions = {}): Promise<string | null> {
+    const handle = await this._waitForActionable({ requireEnabled: false, timeoutMs: options.timeout });
     return this._client.getAttribute(handle, name);
   }
 
@@ -176,6 +273,25 @@ export class AppLocator {
   }
 
   chain(): LocatorChainPart[] { return [...this._chain]; }
+
+  get client(): AppiumClient { return this._client; }
+  get actionTimeoutMs(): number {
+    const v = this._options.actionTimeoutMs;
+    return typeof v === 'function' ? v() : v;
+  }
+  get pollMs(): number { return this._options.pollMs; }
+  describe(): string { return this._describe(); }
+
+  // Public polling primitive — used by `expect` matchers to share the same
+  // timeout/poll cadence as actions. Returns `value` from the first
+  // `{ matched: true }` result; throws on timeout with the locator's
+  // description embedded.
+  async pollUntil<T>(
+    check: () => Promise<{ matched: boolean; value?: T }>,
+    opts: { timeoutMs?: number; pollMs?: number; what: string } = { what: 'condition' },
+  ): Promise<T> {
+    return this._pollUntil(check, opts);
+  }
 
   // ── internals ────────────────────────────────────────────────────────────
 
@@ -253,30 +369,55 @@ export class AppLocator {
 
   // Polls until the resolved element is actionable, then runs `action`.
   // `actionable` = displayed (always) + enabled (for write actions).
-  private async _waitForActionable(opts: { requireEnabled: boolean }): Promise<ElementHandle> {
-    const deadline = Date.now() + this._options.actionTimeoutMs;
+  // Optional `timeoutMs` overrides the locator's default action timeout.
+  private async _waitForActionable(opts: { requireEnabled: boolean; timeoutMs?: number }): Promise<ElementHandle> {
+    return this._pollUntil<ElementHandle>(async () => {
+      const handle = await this.resolve();
+      if (!(await this._client.isDisplayed(handle)))
+        return { matched: false, value: undefined };
+      if (opts.requireEnabled && !(await this._client.isEnabled(handle)))
+        return { matched: false, value: undefined };
+      return { matched: true, value: handle };
+    }, { what: `${this._describe()} to be actionable`, timeoutMs: opts.timeoutMs });
+  }
+
+  // Shared timeout/poll loop. Every poll calls `check()`. Returns the first
+  // `{ matched: true }` value; on deadline, throws with the last underlying
+  // error (if any) or a generic message.
+  private async _pollUntil<T>(
+    check: () => Promise<{ matched: boolean; value?: T }>,
+    opts: { timeoutMs?: number; pollMs?: number; what: string },
+  ): Promise<T> {
+    const timeoutMs = opts.timeoutMs ?? this.actionTimeoutMs;
+    const pollMs = opts.pollMs ?? this._options.pollMs;
+    const deadline = Date.now() + timeoutMs;
     let lastErr: unknown;
-    while (Date.now() <= deadline) {
+    // Always try at least once even with timeoutMs=0.
+    let firstAttempt = true;
+    while (firstAttempt || Date.now() <= deadline) {
+      firstAttempt = false;
       try {
-        const handle = await this.resolve();
-        if (!(await this._client.isDisplayed(handle)))
-          lastErr = new Error('not displayed');
-        else if (opts.requireEnabled && !(await this._client.isEnabled(handle)))
-          lastErr = new Error('not enabled');
-        else
-          return handle;
+        const result = await check();
+        if (result.matched)
+          return result.value as T;
+        lastErr = undefined;
       } catch (err) {
         lastErr = err;
       }
-      await sleep(this._options.pollMs);
+      if (Date.now() > deadline)
+        break;
+      await sleep(pollMs);
     }
-    throw new Error(
-      `Timed out ${this._options.actionTimeoutMs}ms waiting for ${this._describe()} to be actionable (${describeError(lastErr)})`,
-    );
+    const tail = lastErr !== undefined ? ` (${describeError(lastErr)})` : '';
+    throw new Error(`Timed out ${timeoutMs}ms waiting for ${opts.what}${tail}`);
   }
 
-  private async _actAction(action: (handle: ElementHandle) => Promise<void>): Promise<void> {
-    const handle = await this._waitForActionable({ requireEnabled: true });
+  private _platform(): 'iOS' | 'Android' | undefined {
+    return this._client.platform;
+  }
+
+  private async _actAction(action: (handle: ElementHandle) => Promise<void>, timeoutMs?: number): Promise<void> {
+    const handle = await this._waitForActionable({ requireEnabled: true, timeoutMs });
     await action(handle);
   }
 
@@ -295,4 +436,25 @@ function sleep(ms: number): Promise<void> {
 function describeError(err: unknown): string {
   if (err instanceof Error) return err.message;
   return String(err);
+}
+
+function escapeQuotes(v: string): string {
+  return v.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+// Builds an iOS NSPredicate. RegExp → `MATCHES` with the source as the
+// pattern; string → case-insensitive CONTAINS. `attribute` is typically
+// `label`, `name`, or `value`.
+function iosTextPredicate(attribute: 'label' | 'name' | 'value', text: string | RegExp): string {
+  if (text instanceof RegExp)
+    return `${attribute} MATCHES "${escapeQuotes(text.source)}"`;
+  return `${attribute} CONTAINS[c] "${escapeQuotes(text)}"`;
+}
+
+// Builds an Android UiAutomator selector for text or content-description.
+// String → ${attr}Contains; RegExp → ${attr}Matches with the source.
+function androidUiSelector(attribute: 'text' | 'description', text: string | RegExp): string {
+  if (text instanceof RegExp)
+    return `new UiSelector().${attribute}Matches("${escapeQuotes(text.source)}")`;
+  return `new UiSelector().${attribute}Contains("${escapeQuotes(text)}")`;
 }

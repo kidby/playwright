@@ -16,7 +16,7 @@
 
 import { test, expect } from '@playwright/test';
 
-import { Device, androidCapabilities, iosCapabilities } from '../../packages/playwright-mobile/src/index.js';
+import { NativeDevice, androidCapabilities, iosCapabilities } from '../../packages/playwright-mobile/src/index.js';
 import { startMockAppium } from './mockAppium.js';
 
 import type { MockAppium } from './mockAppium.js';
@@ -34,7 +34,7 @@ test('iOS: lists webview contexts from mobile: getContexts', async () => {
       ] } };
     }
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   const contexts = await device.webViewContexts();
   expect(contexts).toEqual([
     { id: 'WEBVIEW_1.0', title: 'Login', url: 'https://example.com/login', packageOrBundleId: 'com.example.app' },
@@ -59,7 +59,7 @@ test('Android: multi-page webview produces one descriptor per page', async () =>
       ] } };
     }
   });
-  const device = await Device.start(mock.url, androidCapabilities({ appPackage: 'com.foo.bar' }));
+  const device = await NativeDevice.start(mock.url, androidCapabilities({ appPackage: 'com.foo.bar' }));
   const contexts = await device.webViewContexts();
   expect(contexts).toEqual([
     { id: 'NATIVE_APP' },
@@ -81,7 +81,7 @@ test('waitForWebViewContext returns once a matching context appears', async () =
       ] } };
     }
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   const match = await device.waitForWebViewContext({ title: 'Sign in', pollMs: 50, timeoutMs: 5_000 });
   expect(match.id).toBe('WEBVIEW_1');
   expect(attempts).toBe(3);
@@ -93,7 +93,7 @@ test('waitForWebViewContext throws after timeout when nothing matches', async ()
     if (req.method === 'POST' && req.path.endsWith('/execute/sync') && req.body?.script === 'mobile: getContexts')
       return { body: { value: [{ id: 'NATIVE_APP' }] } };
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   const error: Error = await device.waitForWebViewContext({ title: /Never/, pollMs: 25, timeoutMs: 100 }).then(() => new Error('expected failure'), e => e as Error);
   expect(error.message).toContain('no context matched');
   expect(error.message).toContain('Never');
@@ -108,7 +108,7 @@ test('switchToWebViewContext calls setContext with the matched id', async () => 
       ] } };
     }
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   await device.switchToWebViewContext({ url: /\/cart/ });
   const setContextCall = mock.requests.find(r => r.method === 'POST' && r.path.endsWith('/context'));
   expect(setContextCall?.body).toEqual({ name: 'WEBVIEW_1' });
@@ -130,7 +130,7 @@ test('attached=false or visible=false pages are skipped', async () => {
       ] } };
     }
   });
-  const device = await Device.start(mock.url, androidCapabilities({ appPackage: 'com.app' }));
+  const device = await NativeDevice.start(mock.url, androidCapabilities({ appPackage: 'com.app' }));
   const error: Error = await device.waitForWebViewContext({ title: 'Background', pollMs: 25, timeoutMs: 100 }).then(() => new Error('expected failure'), e => e as Error);
   expect(error.message).toContain('no context matched');
   const ok = await device.waitForWebViewContext({ title: 'Foreground', pollMs: 25, timeoutMs: 500 });

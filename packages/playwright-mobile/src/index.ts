@@ -18,8 +18,8 @@ export { AppiumClient } from './appiumClient.js';
 export type { AppiumCapabilities, ElementHandle, LocatorStrategy } from './appiumClient.js';
 export { AppLocator, AppLocator as Locator } from './appLocator.js';
 export type { LocatorChainPart, LocatorFilter } from './appLocator.js';
-export { Device } from './device.js';
-export type { AndroidKey, ScreenRecordingOptions, WaitOptions } from './device.js';
+export { NativeDevice } from "./nativeDevice.js";
+export type { AndroidKey, DeviceDescriptor, ScreenRecordingOptions, Viewport, WaitOptions } from "./nativeDevice.js";
 export { listWebViewContexts, switchToWebViewContext, waitForWebViewContext, NATIVE_APP_CONTEXT } from './webview.js';
 export type { WebViewContextDescriptor, WebViewSelector } from './webview.js';
 export { convertPageSourceToSnapshot, parsePageSource } from './snapshot.js';
@@ -29,4 +29,11 @@ export type { GestureApi, SwipeDirection, SwipeOptions, TapOptions, LongPressOpt
 export { androidCapabilities, iosCapabilities } from './capabilities.js';
 export type { AndroidCapabilityOptions, IosCapabilityOptions } from './capabilities.js';
 export { mobileTest, expect, captureFailureArtifacts } from './mobileTest.js';
-export type { MobileFixtures, AttachableTestInfo } from './mobileTest.js';
+export type { AttachableTestInfo, MobileFixtures, MobileTestArgs, MobileTestOptions } from './mobileTest.js';
+export { mobileMatchers } from './mobileMatchers.js';
+export type { MobileScreenshotOptions } from './screenshotComparator.js';
+
+// `matchers.d.ts` (adjacent) declares global type augmentations for
+// `PlaywrightTest.Matchers`. No runtime import needed — TypeScript merges
+// declarations from any `.d.ts` in the package, and the runtime side is
+// installed by `mobileTest.ts` via `expect.extend(mobileMatchers)`.

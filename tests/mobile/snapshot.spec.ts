@@ -20,7 +20,7 @@ import path from 'path';
 import { test, expect } from '@playwright/test';
 
 import { convertPageSourceToSnapshot, parsePageSource } from '../../packages/playwright-mobile/src/snapshot.js';
-import { Device, iosCapabilities } from '../../packages/playwright-mobile/src/index.js';
+import { NativeDevice, iosCapabilities } from '../../packages/playwright-mobile/src/index.js';
 import { startMockAppium } from './mockAppium.js';
 
 import type { MockAppium } from './mockAppium.js';
@@ -92,7 +92,7 @@ test('device.pageSource() fetches /source and device.snapshot() converts', async
     if (req.method === 'GET' && req.path.endsWith('/source'))
       return { body: { value: iosFixture } };
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   expect(await device.pageSource()).toContain('XCUIElementTypeButton');
   const yaml = await device.snapshot();
   expect(yaml).toContain('- button');

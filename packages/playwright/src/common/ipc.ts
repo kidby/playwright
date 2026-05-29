@@ -37,6 +37,7 @@ export type ConfigCLIOverrides = {
   retries?: number;
   reporter?: ReporterDescription[];
   shard?: { current: number, total: number };
+  shardingMode?: 'partition' | 'round-robin' | 'duration-round-robin';
   timeout?: number;
   tsconfig?: string;
   ignoreSnapshots?: boolean;

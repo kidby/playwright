@@ -16,9 +16,11 @@ This repository tracks upstream `microsoft/playwright` and adds a small set of o
 
 **Node 24 baseline.** The fork requires Node `>=24`. `@types/node` is bumped to match.
 
-**Modernized build toolchain.** `oxc-transform` is the sole TypeScript transformer (16 Babel plugins removed); ESM-only output with an `esbuild`-based CJS-compat path so downstream `"type":"commonjs"` projects keep working unchanged. `tsgo` replaces `tsc` for type-checking; `oxlint` replaces `eslint`.
+**Upgraded dependencies.** `oxc-transform` is the sole TypeScript transformer (16 Babel plugins removed); ESM-only output with an `esbuild`-based CJS-compat path so downstream `"type":"commonjs"` projects keep working unchanged. `tsgo` replaces `tsc` for type-checking; `oxlint` replaces `eslint`. Dependencies are updated to current majors — CodeMirror 5→6, `@xterm/xterm` 5→6, `chokidar` 3→5, `mime` 4, `commander` 14, `pngjs` 7, `ini` 7 — and `lodash`→`es-toolkit`, `get-stream`→`node:stream/consumers`.
 
 **Additional reporters.** A new [`catalog`](packages/playwright/src/reporters/catalog.ts) terminal reporter adds status icons, inline failure blocks, performance insights, and optional Jira / source-URL deep-links — all driven by reporter options, with a callback escape hatch.
+
+**Smarter sharding.** A new [`shardingMode`](docs/src/test-api/class-testconfig.md#testconfigshardingmode) config (and matching `--sharding-mode` CLI flag) supports `partition` (default, contiguous slices — current behavior), `round-robin` (balanced by test count), and `duration-round-robin`. Ports closed PR [microsoft/playwright#30962](https://github.com/microsoft/playwright/pull/30962) onto the fork as a permanent local feature.
 
 ## Get Started
 

@@ -24,6 +24,20 @@ import type { AppiumCapabilities, LocatorStrategy } from './appiumClient.js';
 import type { GestureApi, SwipeDirection } from './gestures.js';
 import type { WebViewContextDescriptor, WebViewSelector } from './webview.js';
 
+// Subset of Playwright's `devices['…']` shape that the mobile session can
+// meaningfully expose. We don't redefine it — we structurally accept any
+// value matching the shape, so users pass `devices['iPhone 15']` directly.
+export type DeviceDescriptor = {
+  viewport: { width: number; height: number };
+  userAgent?: string;
+  deviceScaleFactor?: number;
+  isMobile?: boolean;
+  hasTouch?: boolean;
+  defaultBrowserType?: 'chromium' | 'firefox' | 'webkit';
+};
+
+export type Viewport = { width: number; height: number };
+
 export type AndroidKey = 'BACK' | 'HOME' | 'ENTER' | 'TAB' | 'DELETE' | 'SEARCH';
 
 export type AlertAction = 'accept' | 'dismiss';
@@ -63,28 +77,32 @@ export type TapUntilVisibleOptions = {
   pollMs?: number;
 };
 
-export class Device {
+export class NativeDevice {
   readonly client: AppiumClient;
   readonly gestures: GestureApi;
   readonly app: AppLocator;
+  readonly descriptor: DeviceDescriptor | undefined;
   defaultActionTimeoutMs = DEFAULT_WAIT_TIMEOUT_MS;
 
-  private constructor(client: AppiumClient) {
+  private constructor(client: AppiumClient, descriptor?: DeviceDescriptor) {
     this.client = client;
-    this.app = new AppLocator(client, [], { actionTimeoutMs: this.defaultActionTimeoutMs });
+    this.descriptor = descriptor;
+    // Pass a getter — mutations to `defaultActionTimeoutMs` propagate live
+    // to the locator timing without recreating `app`.
+    this.app = new AppLocator(client, [], { actionTimeoutMs: () => this.defaultActionTimeoutMs });
     this.gestures = gestures(client);
   }
 
-  static async start(serverUrl: string, capabilities: AppiumCapabilities): Promise<Device> {
+  static async start(serverUrl: string, capabilities: AppiumCapabilities, options: { descriptor?: DeviceDescriptor } = {}): Promise<NativeDevice> {
     const client = new AppiumClient(serverUrl);
     await client.createSession(capabilities);
-    return new Device(client);
+    return new NativeDevice(client, options.descriptor);
   }
 
-  static attach(serverUrl: string, sessionId: string): Device {
+  static attach(serverUrl: string, sessionId: string, options: { descriptor?: DeviceDescriptor } = {}): NativeDevice {
     const client = new AppiumClient(serverUrl);
     client.attachSession(sessionId);
-    return new Device(client);
+    return new NativeDevice(client, options.descriptor);
   }
 
   get platform(): 'iOS' | 'Android' | undefined {
@@ -93,6 +111,37 @@ export class Device {
 
   get isAndroid() { return this.platform === 'Android'; }
   get isIos() { return this.platform === 'iOS'; }
+
+  // Pixel-density ratio used for screenshot baseline naming. Resolution
+  // chain: descriptor (Playwright `devices['…']`) → Appium capability
+  // (`appium:pixelRatio`) → undefined. Callers that need a value should
+  // default to 1 themselves; we don't fabricate one.
+  get deviceScaleFactor(): number | undefined {
+    if (this.descriptor?.deviceScaleFactor !== undefined)
+      return this.descriptor.deviceScaleFactor;
+    const cap = this.client.capabilities?.['appium:pixelRatio'];
+    if (typeof cap === 'number')
+      return cap;
+    if (typeof cap === 'string') {
+      const n = Number(cap);
+      return Number.isFinite(n) ? n : undefined;
+    }
+    return undefined;
+  }
+
+  // Viewport in CSS-style logical pixels. From the descriptor when present;
+  // otherwise queried live from Appium via `client.getWindowRect()`. The
+  // live path returns physical pixels — convert if a `deviceScaleFactor`
+  // is known.
+  async viewport(): Promise<Viewport> {
+    if (this.descriptor?.viewport)
+      return { width: this.descriptor.viewport.width, height: this.descriptor.viewport.height };
+    const rect = await this.client.getWindowRect();
+    const dpr = this.deviceScaleFactor;
+    if (dpr && dpr > 0)
+      return { width: Math.round(rect.width / dpr), height: Math.round(rect.height / dpr) };
+    return { width: rect.width, height: rect.height };
+  }
 
   async stop() {
     await this.client.deleteSession();

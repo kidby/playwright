@@ -16,7 +16,7 @@
 
 import { test, expect } from '@playwright/test';
 
-import { Device, iosCapabilities } from '../../packages/playwright-mobile/src/index.js';
+import { NativeDevice, iosCapabilities } from '../../packages/playwright-mobile/src/index.js';
 import { startMockAppium } from './mockAppium.js';
 
 import type { MockAppium } from './mockAppium.js';
@@ -38,7 +38,7 @@ test('accepts alert on first try when present', async () => {
     if (req.method === 'POST' && req.path.endsWith('/execute/sync') && req.body?.script === 'mobile: alert')
       return { body: { value: null } };
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   await device.handleAlert({ action: 'accept' });
   const calls = alertCalls(mock);
   expect(calls.length).toBe(1);
@@ -51,7 +51,7 @@ test('passes buttonName through as buttonLabel', async () => {
     if (req.method === 'POST' && req.path.endsWith('/execute/sync') && req.body?.script === 'mobile: alert')
       return { body: { value: null } };
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   await device.handleAlert({ action: 'accept', buttonName: 'Allow' });
   expect(alertCalls(mock)[0].body.args).toEqual([{ action: 'accept', buttonLabel: 'Allow' }]);
   await device.stop();
@@ -67,7 +67,7 @@ test('retries on failure and succeeds when alert eventually appears', async () =
       return { body: { value: null } };
     }
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   await device.handleAlert({ action: 'dismiss', retries: 5, pollMs: 25 });
   expect(attempts).toBe(3);
   await device.stop();
@@ -81,7 +81,7 @@ test('returns silently after exhausting retries (no alert appeared)', async () =
       return { status: 500, body: { value: { error: 'no such alert' } } };
     }
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   await device.handleAlert({ action: 'accept', retries: 2, pollMs: 10 });
   expect(attempts).toBe(3);
   await device.stop();

@@ -21,9 +21,12 @@ import type { FullResult, Suite } from '../../types/testReporter';
 import type { config as commonConfig } from '../common/index.js';
 import type { ReporterV2 } from '../reporters/reporterV2.js';
 
-type LastRunInfo = {
+export type LastRunInfo = {
   status: FullResult['status'];
   failedTests: string[];
+  // Per-test wall-clock duration in ms, summed across attempts. Used by
+  // the `duration-round-robin` sharding mode to balance shards by cost.
+  testDurations?: { [testId: string]: number };
 };
 
 export class LastRunReporter implements ReporterV2 {
@@ -43,15 +46,30 @@ export class LastRunReporter implements ReporterV2 {
     }
   }
 
-  async filterLastFailed(): Promise<string[]> {
+  // The resolved path of the `.last-run.json` file used for this run, or
+  // `undefined` if no project / override was supplied. Exposed so the
+  // sharding layer can read the same file without re-implementing the
+  // resolution logic.
+  get lastRunFile(): string | undefined {
+    return this._lastRunFile;
+  }
+
+  // Reads and parses the `.last-run.json`. Returns undefined when missing
+  // or unreadable. Used by `duration-round-robin` sharding to weigh test
+  // groups by previous-run duration.
+  async lastRunInfo(): Promise<LastRunInfo | undefined> {
     if (!this._lastRunFile)
-      return [];
+      return undefined;
     try {
-      const lastRunInfo = JSON.parse(await fs.promises.readFile(this._lastRunFile, 'utf8')) as LastRunInfo;
-      return lastRunInfo.failedTests;
+      return JSON.parse(await fs.promises.readFile(this._lastRunFile, 'utf8')) as LastRunInfo;
     } catch {
-      return [];
+      return undefined;
     }
+  }
+
+  async filterLastFailed(): Promise<string[]> {
+    const info = await this.lastRunInfo();
+    return info?.failedTests ?? [];
   }
 
   version(): 'v2' {
@@ -69,9 +87,14 @@ export class LastRunReporter implements ReporterV2 {
   async onEnd(result: FullResult) {
     if (!this._lastRunFile || this._listMode)
       return;
+    const allTests = this._suite?.allTests() ?? [];
+    const testDurations: { [testId: string]: number } = {};
+    for (const t of allTests)
+      testDurations[t.id] = t.results.reduce((sum, r) => sum + r.duration, 0);
     const lastRunInfo: LastRunInfo = {
       status: result.status,
-      failedTests: this._suite?.allTests().filter(t => !t.ok()).map(t => t.id) || [],
+      failedTests: allTests.filter(t => !t.ok()).map(t => t.id),
+      testDurations,
     };
     await fs.promises.mkdir(path.dirname(this._lastRunFile), { recursive: true });
     await fs.promises.writeFile(this._lastRunFile, JSON.stringify(lastRunInfo, undefined, 2));

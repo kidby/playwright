@@ -58,6 +58,7 @@ export class AppiumClient {
 
   get sessionId() { return this._sessionId; }
   get capabilities() { return this._capabilities; }
+  get platform(): 'iOS' | 'Android' | undefined { return this._capabilities?.platformName; }
 
   attachSession(sessionId: string) {
     this._sessionId = sessionId;
@@ -141,6 +142,11 @@ export class AppiumClient {
 
   async screenshot(): Promise<Buffer> {
     const res = await this._send('GET', `/session/${this._requireSession()}/screenshot`);
+    return Buffer.from(String(res.value), 'base64');
+  }
+
+  async elementScreenshot(element: ElementHandle): Promise<Buffer> {
+    const res = await this._send('GET', `/session/${this._requireSession()}/element/${element.ELEMENT}/screenshot`);
     return Buffer.from(String(res.value), 'base64');
   }
 

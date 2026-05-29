@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
+import fs from 'fs';
+
+import { LastRunReporter } from './lastRun.js';
+import { filterProjects } from './projectUtils.js';
+
+import type { FullConfigInternal } from '../common/config.js';
 import type { test } from '../common/index.js';
+import type { LastRunInfo } from './lastRun.js';
 
 export type TestGroup = {
   workerHash: string;
@@ -130,7 +137,33 @@ export function createTestGroups(projectSuite: test.Suite, expectedParallelism: 
   return result;
 }
 
-export function filterForShard(shard: { total: number, current: number }, weights: number[] | undefined, testGroups: TestGroup[]): Set<TestGroup> {
+export async function filterForShard(config: FullConfigInternal, weights: number[] | undefined, testGroups: TestGroup[], options: { lastFailedFile?: string } = {}): Promise<Set<TestGroup>> {
+  const shard = config.config.shard!;
+  const mode = config.shardingMode;
+  if (mode === 'round-robin')
+    return filterForShardRoundRobin(shard, testGroups);
+  if (mode === 'duration-round-robin') {
+    const reporter = new LastRunReporter(filterProjects(config.projects, config.configCLIOverrides.projects?.map(p => p.name)), false, options.lastFailedFile);
+    const lastRunInfo = await reporter.lastRunInfo();
+    return filterForShardRoundRobin(shard, testGroups, lastRunInfo);
+  }
+  return filterForShardPartition(shard, weights, testGroups);
+}
+
+/**
+ * Default (legacy) sharding: contiguous slice of ordered tests per shard,
+ * optionally weighted via `PWTEST_SHARD_WEIGHTS`. Preserves the fork's
+ * previous behavior exactly.
+ *
+ * ```
+ *          [  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12]
+ * Shard 1:  ^---------^                                      : [  1, 2, 3 ]
+ * Shard 2:              ^---------^                          : [  4, 5, 6 ]
+ * Shard 3:                          ^---------^              : [  7, 8, 9 ]
+ * Shard 4:                                      ^---------^  : [ 10,11,12 ]
+ * ```
+ */
+function filterForShardPartition(shard: { total: number, current: number }, weights: number[] | undefined, testGroups: TestGroup[]): Set<TestGroup> {
   weights ??= Array.from({ length: shard.total }, () => 1);
   if (weights.length !== shard.total)
     throw new Error(`PWTEST_SHARD_WEIGHTS number of weights must match the shard total of ${shard.total}`);
@@ -170,4 +203,66 @@ export function filterForShard(shard: { total: number, current: number }, weight
     current += group.tests.length;
   }
   return result;
+}
+
+/**
+ * Greedy round-robin: sort groups by descending weight (test count, or
+ * sum of previous-run durations when `lastRunInfo` is supplied), then
+ * assign each group to the shard with the lowest accumulated weight.
+ *
+ * ```
+ *          [  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12]
+ * Shard 1:    ^               ^               ^              : [  1, 5, 9 ]
+ * Shard 2:        ^               ^               ^          : [  2, 6,10 ]
+ * Shard 3:            ^               ^               ^      : [  3, 7,11 ]
+ * Shard 4:                ^               ^               ^  : [  4, 8,12 ]
+ * ```
+ */
+function filterForShardRoundRobin(shard: { total: number, current: number }, testGroups: TestGroup[], lastRunInfo?: LastRunInfo): Set<TestGroup> {
+  // Weight resolution per test:
+  //   1. Known duration from `.last-run.json` if available — best signal.
+  //   2. File size (bytes) as a proxy for LOC — heavier files tend to host
+  //      heavier tests. Cached per file so we stat each spec at most once.
+  // For pure `round-robin` (no last-run info), every test falls through to
+  // the file-size fallback, which is still strictly better than counting
+  // 1 per test.
+  const fileSizeCache = new Map<string, number>();
+  const fileSize = (file: string): number => {
+    if (!file)
+      return 1;
+    let size = fileSizeCache.get(file);
+    if (size === undefined) {
+      try {
+        size = fs.statSync(file).size;
+      } catch {
+        size = 1;
+      }
+      fileSizeCache.set(file, size);
+    }
+    return Math.max(1, size);
+  };
+  const testWeight = (t: test.TestCase): number => {
+    const known = lastRunInfo?.testDurations?.[t.id];
+    if (known && known > 0)
+      return known;
+    return fileSize(t.location.file);
+  };
+  const weight = (group: TestGroup): number => group.tests.reduce((sum, t) => sum + testWeight(t), 0);
+
+  const shardWeights = new Array<number>(shard.total).fill(0);
+  const shardSets = Array.from({ length: shard.total }, () => new Set<TestGroup>());
+
+  const sortedGroups = testGroups.slice().sort((a, b) => weight(b) - weight(a));
+  for (const group of sortedGroups) {
+    // Greedy: append to the currently lightest shard.
+    let minIndex = 0;
+    for (let i = 1; i < shardWeights.length; i++) {
+      if (shardWeights[i] < shardWeights[minIndex])
+        minIndex = i;
+    }
+    shardWeights[minIndex] += weight(group);
+    shardSets[minIndex].add(group);
+  }
+
+  return shardSets[shard.current - 1];
 }

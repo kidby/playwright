@@ -16,7 +16,7 @@
 
 import { test, expect } from '@playwright/test';
 
-import { Device, captureFailureArtifacts, iosCapabilities } from '../../packages/playwright-mobile/src/index.js';
+import { NativeDevice, captureFailureArtifacts, iosCapabilities } from '../../packages/playwright-mobile/src/index.js';
 import { startMockAppium } from './mockAppium.js';
 
 import type { AttachableTestInfo } from '../../packages/playwright-mobile/src/index.js';
@@ -45,7 +45,7 @@ test('captureFailureArtifacts attaches mobile-snapshot + mobile-screenshot', asy
     if (req.method === 'GET' && req.path.endsWith('/source'))
       return { body: { value: '<?xml version="1.0"?><AppiumAUT><XCUIElementTypeButton name="OK"/></AppiumAUT>' } };
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example' }));
   const { info, calls } = stubTestInfo();
   await captureFailureArtifacts(device, info);
   expect(calls.map(c => c.name).sort()).toEqual(['mobile-screenshot', 'mobile-snapshot']);
@@ -63,7 +63,7 @@ test('captureFailureArtifacts still attaches screenshot when snapshot throws', a
     if (req.method === 'GET' && req.path.endsWith('/source'))
       return { status: 500, body: { value: { error: 'no such window' } } };
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example' }));
   const { info, calls } = stubTestInfo();
   await captureFailureArtifacts(device, info);
   expect(calls.map(c => c.name)).toEqual(['mobile-screenshot']);
@@ -77,7 +77,7 @@ test('captureFailureArtifacts attaches snapshot when screenshot throws', async (
     if (req.method === 'GET' && req.path.endsWith('/screenshot'))
       return { status: 500, body: { value: { error: 'screenshot failed' } } };
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example' }));
   const { info, calls } = stubTestInfo();
   await captureFailureArtifacts(device, info);
   expect(calls.map(c => c.name)).toEqual(['mobile-snapshot']);
@@ -85,7 +85,7 @@ test('captureFailureArtifacts attaches snapshot when screenshot throws', async (
 });
 
 test('captureFailureArtifacts swallows total failure (no session)', async () => {
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example' }));
   await device.stop();
   const { info, calls } = stubTestInfo();
   await expect(captureFailureArtifacts(device, info)).resolves.toBeUndefined();

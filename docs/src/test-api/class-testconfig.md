@@ -535,6 +535,23 @@ export default defineConfig({
 });
 ```
 
+## property: TestConfig.shardingMode
+* since: v1.46
+- type: ?<[ShardingMode]<"partition"|"round-robin"|"duration-round-robin">>
+
+The algorithm used to assign tests to shards when [`property: TestConfig.shard`] is set. Defaults to `'partition'`.
+* `'partition'` - Each shard receives a contiguous slice of the ordered test list.
+* `'round-robin'` - Distributes test groups in a balanced way by test count.
+* `'duration-round-robin'` - Same as `'round-robin'` but weights groups by previous-run durations read from `.last-run.json`. Falls back to per-test file size when no last-run info is available for a given test.
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  shardingMode: 'duration-round-robin',
+});
+```
+
 
 ## property: TestConfig.tag
 * since: v1.57

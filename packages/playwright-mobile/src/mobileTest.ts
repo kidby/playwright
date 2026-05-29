@@ -14,18 +14,40 @@
  * limitations under the License.
  */
 
-import { test as base } from 'playwright/test';
+import { expect as baseExpect, test as base } from 'playwright/test';
 
-import { Device } from './device.js';
+import { NativeDevice } from "./nativeDevice.js";
+import { mobileMatchers } from './mobileMatchers.js';
 
 import type { AppiumCapabilities } from './appiumClient.js';
+import type { DeviceDescriptor } from './nativeDevice.js';
 import type { TestFixture } from 'playwright/test';
+
+// Install web-first assertion matchers on Playwright's `expect`. The `extend`
+// call mutates the singleton at runtime *and* returns a `MoreMatchers`-aware
+// Expect — we re-export the typed one so consumers get autocomplete.
+const extendedExpect = baseExpect.extend(mobileMatchers);
 
 export type MobileFixtures = {
   appiumServerUrl: string;
   capabilities: AppiumCapabilities;
+  // Optional Playwright device descriptor — pass `devices['iPhone 15']`
+  // to give the session metadata for screenshot baseline naming and
+  // viewport queries. Does NOT auto-derive Appium caps.
+  descriptor: DeviceDescriptor | undefined;
   defaultActionTimeoutMs: number;
-  device: Device;
+  device: NativeDevice;
+};
+
+// Playwright-style aliases. `MobileTestArgs` is what consumers extend
+// (`test.extend<MyArgs & MobileTestArgs>(…)`); `MobileTestOptions` is the
+// option-only subset users pass to `test.use({…})`.
+export type MobileTestArgs = MobileFixtures;
+export type MobileTestOptions = {
+  appiumServerUrl?: string;
+  capabilities?: AppiumCapabilities;
+  descriptor?: DeviceDescriptor;
+  defaultActionTimeoutMs?: number;
 };
 
 const DEFAULT_ACTION_TIMEOUT_LOCAL_MS = 20_000;
@@ -42,7 +64,7 @@ export type AttachableTestInfo = {
   attach(name: string, opts: { body: Buffer | string; contentType: string }): Promise<void>;
 };
 
-export async function captureFailureArtifacts(device: Device, testInfo: AttachableTestInfo): Promise<void> {
+export async function captureFailureArtifacts(device: NativeDevice, testInfo: AttachableTestInfo): Promise<void> {
   try {
     const yaml = await device.snapshot();
     if (yaml)
@@ -62,9 +84,10 @@ export async function captureFailureArtifacts(device: Device, testInfo: Attachab
 export const mobileTest = base.extend<MobileFixtures>({
   appiumServerUrl: [process.env.APPIUM_URL || 'http://127.0.0.1:4723', { option: true }],
   capabilities: [requireCapabilitiesFixture, { option: true }],
+  descriptor: [undefined, { option: true }],
   defaultActionTimeoutMs: [process.env.CI ? DEFAULT_ACTION_TIMEOUT_CI_MS : DEFAULT_ACTION_TIMEOUT_LOCAL_MS, { option: true }],
-  device: async ({ appiumServerUrl, capabilities, defaultActionTimeoutMs }, use, testInfo) => {
-    const device = await Device.start(appiumServerUrl, capabilities);
+  device: async ({ appiumServerUrl, capabilities, descriptor, defaultActionTimeoutMs }, use, testInfo) => {
+    const device = await NativeDevice.start(appiumServerUrl, capabilities, { descriptor });
     device.defaultActionTimeoutMs = defaultActionTimeoutMs;
     try {
       await use(device);
@@ -76,4 +99,4 @@ export const mobileTest = base.extend<MobileFixtures>({
   },
 });
 
-export { expect } from 'playwright/test';
+export const expect = extendedExpect;

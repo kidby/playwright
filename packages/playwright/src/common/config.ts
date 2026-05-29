@@ -39,6 +39,9 @@ export type FixturesWithLocation = {
 
 export const defaultTimeout = 30000;
 
+export type ShardingMode = 'partition' | 'round-robin' | 'duration-round-robin';
+export const shardingModes: ShardingMode[] = ['partition', 'round-robin', 'duration-round-robin'];
+
 export class FullConfigInternal {
   readonly config: FullConfig;
   readonly configDir: string;
@@ -48,6 +51,7 @@ export class FullConfigInternal {
   readonly projects: FullProjectInternal[] = [];
   readonly singleTSConfigPath?: string;
   readonly captureGitInfo: Config['captureGitInfo'];
+  readonly shardingMode: ShardingMode;
   defineConfigWasUsed = false;
 
   globalSetups: string[] = [];
@@ -67,6 +71,7 @@ export class FullConfigInternal {
     this.plugins = (privateConfiguration?.plugins || []).map((p: any) => ({ factory: p }));
     this.singleTSConfigPath = pathResolve(configDir, userConfig.tsconfig);
     this.captureGitInfo = userConfig.captureGitInfo;
+    this.shardingMode = takeFirst(configCLIOverrides.shardingMode, userConfig.shardingMode, 'partition');
 
     this.globalSetups = (Array.isArray(userConfig.globalSetup) ? userConfig.globalSetup : [userConfig.globalSetup]).map(s => resolveScript(s, configDir)).filter(script => script !== undefined);
     this.globalTeardowns = (Array.isArray(userConfig.globalTeardown) ? userConfig.globalTeardown : [userConfig.globalTeardown]).map(s => resolveScript(s, configDir)).filter(script => script !== undefined);

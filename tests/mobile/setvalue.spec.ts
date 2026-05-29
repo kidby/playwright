@@ -16,7 +16,7 @@
 
 import { test, expect } from '@playwright/test';
 
-import { Device, iosCapabilities, androidCapabilities } from '../../packages/playwright-mobile/src/index.js';
+import { NativeDevice, iosCapabilities, androidCapabilities } from '../../packages/playwright-mobile/src/index.js';
 import { startMockAppium } from './mockAppium.js';
 
 import type { MockAppium, RecordedRequest } from './mockAppium.js';
@@ -30,7 +30,7 @@ function elementCalls(reqs: RecordedRequest[], suffix: string): RecordedRequest[
 }
 
 test('default setValue: click → clear → sendKeys', async () => {
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   await device.setValue(device.app.byAccessibilityId('email'), 'foo@bar.com');
   const clicks = elementCalls(mock.requests, 'el-1/click');
   const clears = elementCalls(mock.requests, 'el-1/clear');
@@ -43,7 +43,7 @@ test('default setValue: click → clear → sendKeys', async () => {
 });
 
 test('clearBefore: false skips the clear call', async () => {
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   await device.setValue(device.app.byAccessibilityId('search'), 'query', { clearBefore: false });
   const clears = elementCalls(mock.requests, 'el-1/clear');
   const sendKeys = elementCalls(mock.requests, 'el-1/value');
@@ -66,7 +66,7 @@ test('Android: falls back to mobile: longClickGesture when /clear errors', async
       return { body: { value: null } };
     }
   });
-  const device = await Device.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
+  const device = await NativeDevice.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
   await device.setValue(device.app.byAccessibilityId('field'), 'replacement');
   expect(clearAttempted).toBe(true);
   expect(longClickCalls).toBe(1);

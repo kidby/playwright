@@ -892,6 +892,8 @@ export interface FullProject<TestArgs = {}, WorkerArgs = {}> {
 
 type LiteralUnion<T extends U, U = string> = T | (U & { zz_IGNORE_ME?: never });
 
+export type ShardingMode = 'partition' | 'round-robin' | 'duration-round-robin';
+
 /**
  * Playwright Test provides many options to configure how your tests are collected and executed, for example `timeout`
  * or `testDir`. These options are described in the [TestConfig](https://playwright.dev/docs/api/class-testconfig)
@@ -962,6 +964,26 @@ interface TestConfig<TestArgs = {}, WorkerArgs = {}> {
    *
    */
   reporter?: LiteralUnion<'list'|'dot'|'line'|'github'|'json'|'junit'|'null'|'html', string> | ReporterDescription[];
+  /**
+   * The algorithm used to assign tests to shards when
+   * [testConfig.shard](https://playwright.dev/docs/api/class-testconfig#test-config-shard) is set. Defaults to
+   * `'partition'`.
+   * - `'partition'` - Each shard receives a contiguous slice of the ordered test list.
+   * - `'round-robin'` - Distributes test groups in a balanced way by test count.
+   * - `'duration-round-robin'` - Same as `'round-robin'` but weights groups by previous-run durations read from
+   *   `.last-run.json`. Falls back to per-test file size when no last-run info is available for a given test.
+   *
+   * ```js
+   * // playwright.config.ts
+   * import { defineConfig } from '@playwright/test';
+   *
+   * export default defineConfig({
+   *   shardingMode: 'duration-round-robin',
+   * });
+   * ```
+   *
+   */
+  shardingMode?: ShardingMode;
   /**
    * Global options for all tests, for example
    * [testOptions.browserName](https://playwright.dev/docs/api/class-testoptions#test-options-browser-name). Learn more

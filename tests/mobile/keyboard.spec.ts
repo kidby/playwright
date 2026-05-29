@@ -16,7 +16,7 @@
 
 import { test, expect } from '@playwright/test';
 
-import { Device, androidCapabilities, iosCapabilities } from '../../packages/playwright-mobile/src/index.js';
+import { NativeDevice, androidCapabilities, iosCapabilities } from '../../packages/playwright-mobile/src/index.js';
 import { startMockAppium } from './mockAppium.js';
 
 import type { MockAppium } from './mockAppium.js';
@@ -35,14 +35,14 @@ function lastScriptCall(mock: MockAppium) {
 }
 
 test('pressBack sends keycode 4 on Android', async () => {
-  const device = await Device.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
+  const device = await NativeDevice.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
   await device.pressBack();
   expect(lastScriptCall(mock)?.body).toEqual({ script: 'mobile: pressKey', args: [{ keycode: 4 }] });
   await device.stop();
 });
 
 test('pressEnter / pressDelete / pressTab map to expected keycodes', async () => {
-  const device = await Device.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
+  const device = await NativeDevice.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
   await device.pressEnter();
   expect(lastScriptCall(mock)?.body.args).toEqual([{ keycode: 66 }]);
   await device.pressDelete();
@@ -53,7 +53,7 @@ test('pressEnter / pressDelete / pressTab map to expected keycodes', async () =>
 });
 
 test('pressAndroidKey HOME and SEARCH use 3 and 84', async () => {
-  const device = await Device.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
+  const device = await NativeDevice.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
   await device.pressAndroidKey('HOME');
   expect(lastScriptCall(mock)?.body.args).toEqual([{ keycode: 3 }]);
   await device.pressAndroidKey('SEARCH');
@@ -62,7 +62,7 @@ test('pressAndroidKey HOME and SEARCH use 3 and 84', async () => {
 });
 
 test('pressBack throws on iOS', async () => {
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   const error: Error = await device.pressBack().then(() => new Error('expected failure'), e => e as Error);
   expect(error.message).toContain('Android-only');
   await device.stop();
@@ -77,7 +77,7 @@ test('hideKeyboard issues mobile: hideKeyboard script and swallows failures', as
       return { status: 500, body: { value: { error: 'no such element', message: 'no keyboard' } } };
     }
   });
-  const device = await Device.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
+  const device = await NativeDevice.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
   await expect(device.hideKeyboard()).resolves.toBeUndefined();
   expect(scriptHits).toBe(1);
   await device.stop();

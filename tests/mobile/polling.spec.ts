@@ -16,7 +16,7 @@
 
 import { test, expect } from '@playwright/test';
 
-import { Device, iosCapabilities, androidCapabilities } from '../../packages/playwright-mobile/src/index.js';
+import { NativeDevice, iosCapabilities, androidCapabilities } from '../../packages/playwright-mobile/src/index.js';
 import { startMockAppium } from './mockAppium.js';
 
 import type { MockAppium } from './mockAppium.js';
@@ -33,7 +33,7 @@ test('waitForVisible returns once the target is displayed', async () => {
       return { body: { value: checks >= 3 } };
     }
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   await device.waitForVisible(device.app.byAccessibilityId('submit'), { timeoutMs: 5_000, pollMs: 25 });
   expect(checks).toBe(3);
   await device.stop();
@@ -44,7 +44,7 @@ test('waitForVisible throws after timeout when target stays hidden', async () =>
     if (req.method === 'GET' && /\/displayed$/.test(req.path))
       return { body: { value: false } };
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   const error: Error = await device.waitForVisible(device.app.byAccessibilityId('missing'), { timeoutMs: 100, pollMs: 25 }).then(() => new Error('expected failure'), e => e as Error);
   expect(error.message).toContain('not visible within 100ms');
   expect(error.message).toContain('accessibility id=missing');
@@ -64,7 +64,7 @@ test('tapUntilVisible swipes the scroll target until the goal becomes visible', 
       return { body: { value: null } };
     }
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   await device.tapUntilVisible(device.app.byAccessibilityId('goal'), {
     scrollTarget: device.app.byAccessibilityId('list'),
     maxTaps: 5,
@@ -82,7 +82,7 @@ test('tapUntilVisible throws after exhausting maxTaps without visibility', async
     if (req.method === 'POST' && req.path.endsWith('/execute/sync') && req.body?.script === 'mobile: swipe')
       return { body: { value: null } };
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   const error: Error = await device.tapUntilVisible(device.app.byAccessibilityId('never'), {
     scrollTarget: device.app.byAccessibilityId('list'),
     maxTaps: 3,
@@ -102,7 +102,7 @@ test('tapUntilVisible honors timeoutMs as a separate cap from maxTaps', async ()
       return { body: { value: null } };
     }
   });
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   const error: Error = await device.tapUntilVisible(device.app.byAccessibilityId('never'), {
     scrollTarget: device.app.byAccessibilityId('list'),
     maxTaps: 1000,
@@ -129,7 +129,7 @@ test('Android tapUntilVisible uses mobile: swipeGesture', async () => {
       return { body: { value: null } };
     }
   });
-  const device = await Device.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
+  const device = await NativeDevice.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
   await device.tapUntilVisible(device.app.byAccessibilityId('goal'), {
     scrollTarget: device.app.byAccessibilityId('list'),
     maxTaps: 5,

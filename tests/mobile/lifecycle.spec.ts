@@ -16,7 +16,7 @@
 
 import { test, expect } from '@playwright/test';
 
-import { Device, androidCapabilities, iosCapabilities } from '../../packages/playwright-mobile/src/index.js';
+import { NativeDevice, androidCapabilities, iosCapabilities } from '../../packages/playwright-mobile/src/index.js';
 import { startMockAppium } from './mockAppium.js';
 
 import type { MockAppium } from './mockAppium.js';
@@ -39,7 +39,7 @@ test('shell on Android sends mobile: shell with command + args', async () => {
     if (req.method === 'POST' && req.path.endsWith('/execute/sync') && req.body?.script === 'mobile: shell')
       return { body: { value: 'file1\nfile2\nfile3' } };
   });
-  const device = await Device.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
+  const device = await NativeDevice.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
   const out = await device.shell('ls', ['/data/local/tmp']);
   expect(out).toBe('file1\nfile2\nfile3');
   expect(captureScript(mock, 'mobile: shell')?.args).toEqual([{ command: 'ls', args: ['/data/local/tmp'] }]);
@@ -47,14 +47,14 @@ test('shell on Android sends mobile: shell with command + args', async () => {
 });
 
 test('shell throws on iOS', async () => {
-  const device = await Device.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
+  const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example.app' }));
   const error: Error = await device.shell('ls').then(() => new Error('expected failure'), e => e as Error);
   expect(error.message).toContain('Android-only');
   await device.stop();
 });
 
 test('activateApp / terminateApp pass the id under both bundleId and appId', async () => {
-  const device = await Device.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
+  const device = await NativeDevice.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
   await device.activateApp('com.example');
   expect(captureScript(mock, 'mobile: activateApp')?.args).toEqual([{ bundleId: 'com.example', appId: 'com.example' }]);
   await device.terminateApp('com.example');
@@ -63,7 +63,7 @@ test('activateApp / terminateApp pass the id under both bundleId and appId', asy
 });
 
 test('pushFile base64-encodes string content', async () => {
-  const device = await Device.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
+  const device = await NativeDevice.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
   await device.pushFile('/sdcard/hello.txt', 'hello world');
   const args = captureScript(mock, 'mobile: pushFile')?.args as Array<{ remotePath: string; payload: string }>;
   expect(args[0].remotePath).toBe('/sdcard/hello.txt');
@@ -72,7 +72,7 @@ test('pushFile base64-encodes string content', async () => {
 });
 
 test('pushFile base64-encodes Buffer content', async () => {
-  const device = await Device.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
+  const device = await NativeDevice.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
   await device.pushFile('/sdcard/bin.dat', Buffer.from([0x01, 0x02, 0x03, 0xff]));
   const args = captureScript(mock, 'mobile: pushFile')?.args as Array<{ payload: string }>;
   expect(Buffer.from(args[0].payload, 'base64')).toEqual(Buffer.from([0x01, 0x02, 0x03, 0xff]));
@@ -84,7 +84,7 @@ test('pullFile decodes the returned base64 payload', async () => {
     if (req.method === 'POST' && req.path.endsWith('/execute/sync') && req.body?.script === 'mobile: pullFile')
       return { body: { value: Buffer.from('pulled bytes').toString('base64') } };
   });
-  const device = await Device.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
+  const device = await NativeDevice.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
   const buf = await device.pullFile('/sdcard/x');
   expect(buf.toString('utf-8')).toBe('pulled bytes');
   await device.stop();
@@ -95,7 +95,7 @@ test('filesCount runs ls and counts grep matches', async () => {
     if (req.method === 'POST' && req.path.endsWith('/execute/sync') && req.body?.script === 'mobile: shell')
       return { body: { value: 'cache.txt\ndata-001.log\ndata-002.log\nignore.png' } };
   });
-  const device = await Device.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
+  const device = await NativeDevice.start(mock.url, androidCapabilities({ appPackage: 'com.example' }));
   expect(await device.filesCount('/sdcard/foo')).toBe(4);
   expect(await device.filesCount('/sdcard/foo', 'data-')).toBe(2);
   await device.stop();
