@@ -616,7 +616,7 @@ for (const useIntermediateMergeReport of [true, false] as const) {
       await page.click('.action-title >> text=EVALUATE');
       await page.getByRole('tab', { name: 'Source' }).click();
 
-      await expect(page.locator('.CodeMirror-line')).toContainText([
+      await expect(page.locator('.cm-line')).toContainText([
         /import.*test/,
         /page\.evaluate/
       ]);
@@ -649,7 +649,7 @@ for (const useIntermediateMergeReport of [true, false] as const) {
       await page.click('.action-title >> text=EVALUATE');
       await page.click('text=Source');
 
-      await expect(page.locator('.CodeMirror-line')).toContainText([
+      await expect(page.locator('.cm-line')).toContainText([
         /import.*test/,
         /page\.evaluate/
       ]);

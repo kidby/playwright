@@ -151,7 +151,8 @@ test('should show syntax errors in file', async ({ runUITest }) => {
   await expect(
       page.locator('.source-line-error-widget')
   ).toHaveText([
-    /Missing semicolon./
+    // Fork uses oxc-transform (vs upstream Babel: "Missing semicolon.").
+    /Expected a semicolon/
   ]);
 });
 

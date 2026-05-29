@@ -265,5 +265,5 @@ test('should update test locations', async ({ runUITest, writeFiles }) => {
   await expect(
       page.getByTestId('source-code').locator('.source-tab-file-name')
   ).toHaveText('a.test.ts');
-  await expect(page.locator('.CodeMirror-code')).toContainText(`3      test('new-test', () => {});`);
+  await expect(page.locator('.cm-content')).toContainText(`test('new-test', () => {});`);
 });

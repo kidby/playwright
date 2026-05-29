@@ -98,6 +98,7 @@ export function stripTypeImports(source: string): string {
       .replace(/\bimport\s+type\s+\w+\s+from\s*['"][^'"]+['"]\s*;?/g, '')
       .replace(/\bimport\s*\{([^}]*)\}\s*from/g, (_match, braced: string) => {
         const kept = braced
+            .replace(/\/\*[\s\S]*?\*\//g, '')
             .replace(/\/\/[^\n]*/g, '')
             .split(',')
             .map(s => s.trim())

@@ -458,7 +458,7 @@ it.describe('pause', () => {
 
     const box1Promise = waitForTestLog<BoundingBox>(page, 'Highlight box for test: ');
     await recorderPage.getByText('Locator', { exact: true }).click();
-    await recorderPage.locator('.tabbed-pane .CodeMirror').click();
+    await recorderPage.locator('.tabbed-pane .cm-content').click();
     await recorderPage.keyboard.press('ControlOrMeta+A');
     await recorderPage.keyboard.press('Backspace');
     await recorderPage.keyboard.type('getByText(\'Submit\')');
@@ -479,7 +479,7 @@ it.describe('pause', () => {
 
       const box1Promise = waitForTestLog<BoundingBox>(page, 'Highlight box for test: ');
       await recorder.recorderPage.getByText('Locator', { exact: true }).click();
-      await recorder.recorderPage.locator('.tabbed-pane .CodeMirror').click();
+      await recorder.recorderPage.locator('.tabbed-pane .cm-content').click();
       await recorder.recorderPage.keyboard.press('ControlOrMeta+A');
       await recorder.recorderPage.keyboard.press('Backspace');
       await recorder.recorderPage.keyboard.type('GetByText("Submit")');

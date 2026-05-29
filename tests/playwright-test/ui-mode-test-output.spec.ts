@@ -29,7 +29,8 @@ test('should print load errors', async ({ runUITest }) => {
     `,
   });
   await page.getByTitle('Toggle output').click();
-  await expect(page.getByTestId('output')).toContainText(`Unexpected reserved word 'await'`);
+  // Fork uses oxc-transform (vs upstream Babel: "Unexpected reserved word 'await'").
+  await expect(page.getByTestId('output')).toContainText('`await` is only allowed within async functions');
 });
 
 test('should work after theme switch', async ({ runUITest, writeFiles }) => {

@@ -26,12 +26,10 @@ import { createExtensionBrowser } from './extensionContextFactory.js';
 import { connectToBrowserAcrossVersions } from '../utils/connect.js';
 import { serverRegistry } from '../../serverRegistry.js';
 import { resolveExtensionOptions } from './config.js';
-// eslint-disable-next-line no-restricted-imports
 import { connectToBrowser } from '../../client/connect.js';
 
 import type { CLIOptions, FullConfig } from './config.js';
 import type { ClientInfo } from '../utils/mcp/server.js';
-// eslint-disable-next-line no-restricted-imports
 import type { Playwright } from '../../client/playwright.js';
 import type * as playwrightTypes from '../../../index.js';
 import type { BrowserInfo } from '../../serverRegistry.js';
@@ -78,7 +76,6 @@ export interface BrowserContextFactory {
 
 function browserInfo(browser: playwrightTypes.Browser, config: FullConfig): BrowserInfo {
   return {
-    // eslint-disable-next-line no-restricted-syntax
     guid: (browser as any)._guid,
     browserName: config.browser.browserName,
     launchOptions: config.browser.launchOptions,

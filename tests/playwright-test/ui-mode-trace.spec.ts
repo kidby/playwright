@@ -145,9 +145,9 @@ test('should locate sync assertions in source', async ({ runUITest }) => {
   await page.getByText('Expect "toBe"').click();
 
   await expect(
-      page.locator('.CodeMirror .source-line-running'),
+      page.locator('.cm-editor .source-line-running'),
       'check source tab',
-  ).toHaveText('4        expect(1).toBe(1);');
+  ).toHaveText('expect(1).toBe(1);');
 });
 
 test('should show snapshots for sync assertions', async ({ runUITest }) => {
@@ -341,7 +341,7 @@ test('should not show caught errors in the errors tab', async ({ runUITest }, te
 
   await page.getByText('Source', { exact: true }).click();
   await expect(page.locator('.source-line-running')).toContainText('toBeChecked');
-  await expect(page.locator('.CodeMirror-linewidget')).toHaveCount(0);
+  await expect(page.locator('.source-line-error-widget')).toHaveCount(0);
 
   await page.getByText('Errors', { exact: true }).click();
   await expect(page.locator('.tab-errors')).toHaveText('No errors');

@@ -78,10 +78,7 @@ test.describe(() => {
     await recorder.page.hover('button');
     await recorder.trustedClick();
     await recorder.recorderPage.getByRole('tab', { name: 'Aria' }).click();
-    await expect(recorder.recorderPage.locator('.tab-aria .CodeMirror')).toMatchAriaSnapshot(`
-      - textbox
-      - text: '- button "Submit"'
-    `);
+    await expect(recorder.recorderPage.locator('.tab-aria .cm-content')).toContainText(`- button "Submit"`);
   });
 
   test('should update aria snapshot highlight', async ({ openRecorder }) => {
@@ -99,11 +96,9 @@ test.describe(() => {
     await submitButton.hover();
     await recorder.trustedClick();
     await recorder.recorderPage.getByRole('tab', { name: 'Aria' }).click();
-    await expect(recorder.recorderPage.locator('.tab-aria .CodeMirror')).toMatchAriaSnapshot(`
-      - text: '- button "Submit"'
-    `);
+    await expect(recorder.recorderPage.locator('.tab-aria .cm-content')).toContainText(`- button "Submit"`);
 
-    await recorder.recorderPage.locator('.tab-aria .CodeMirror').click();
+    await recorder.recorderPage.locator('.tab-aria .cm-content').click();
     for (let i = 0; i < '"Submit"'.length; i++)
       await recorder.recorderPage.keyboard.press('Backspace');
 
@@ -120,7 +115,7 @@ test.describe(() => {
 
     {
       // Different button.
-      await recorder.recorderPage.locator('.tab-aria .CodeMirror').pressSequentially('"Cancel"');
+      await recorder.recorderPage.locator('.tab-aria .cm-content').pressSequentially('"Cancel"');
       await expect(recorder.page.locator('x-pw-highlight')).toBeVisible();
       const box1 = roundBox(await cancelButton.boundingBox());
       const box2 = roundBox(await recorder.page.locator('x-pw-highlight').boundingBox());
@@ -142,11 +137,9 @@ test.describe(() => {
     await recorder.trustedClick();
 
     await recorder.recorderPage.getByRole('tab', { name: 'Aria' }).click();
-    await expect(recorder.recorderPage.locator('.tab-aria .CodeMirror')).toMatchAriaSnapshot(`
-      - text: '- button "Submit"'
-    `);
+    await expect(recorder.recorderPage.locator('.tab-aria .cm-content')).toContainText(`- button "Submit"`);
 
-    await recorder.recorderPage.locator('.tab-aria .CodeMirror').click();
+    await recorder.recorderPage.locator('.tab-aria .cm-content').click();
     await recorder.recorderPage.keyboard.press('Backspace');
     // 1 highlighted token
     await expect(recorder.recorderPage.locator('.source-line-error-underline')).toHaveCount(1);

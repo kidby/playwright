@@ -25,9 +25,7 @@ test.describe(() => {
     await recorder.page.hover('button');
     await recorder.trustedClick();
     await recorder.recorderPage.getByRole('tab', { name: 'Locator' }).click();
-    await expect(recorder.recorderPage.locator('.tab-locator .CodeMirror')).toMatchAriaSnapshot(`
-      - text: "getByRole('button', { name: 'Submit' })"
-    `);
+    await expect(recorder.recorderPage.locator('.tab-locator .cm-content')).toContainText(`getByRole('button', { name: 'Submit' })`);
   });
 
   test('should update locator highlight', async ({ openRecorder }) => {
@@ -46,17 +44,15 @@ test.describe(() => {
     await submitButton.hover();
     await recorder.trustedClick();
     await recorder.recorderPage.getByRole('tab', { name: 'Locator' }).click();
-    await expect(recorder.recorderPage.locator('.tab-locator .CodeMirror')).toMatchAriaSnapshot(`
-      - text: "getByRole('button', { name: 'Submit' })"
-    `);
+    await expect(recorder.recorderPage.locator('.tab-locator .cm-content')).toContainText(`getByRole('button', { name: 'Submit' })`);
 
-    await recorder.recorderPage.locator('.tab-locator .CodeMirror').click();
+    await recorder.recorderPage.locator('.tab-locator .cm-content').click();
     for (let i = 0; i < `Submit' })`.length; i++)
       await recorder.recorderPage.keyboard.press('Backspace');
 
     {
       // Different button.
-      await recorder.recorderPage.locator('.tab-locator .CodeMirror').pressSequentially(`Cancel' })`);
+      await recorder.recorderPage.locator('.tab-locator .cm-content').pressSequentially(`Cancel' })`);
       await expect(recorder.page.locator('x-pw-highlight')).toBeVisible();
       const box1 = roundBox(await cancelButton.boundingBox());
       const box2 = roundBox(await recorder.page.locator('x-pw-highlight').boundingBox());

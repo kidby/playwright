@@ -162,7 +162,7 @@ test('should pretty-print JSON request body', async ({ runUITest, server }) => {
   await page.getByText('post-data-1').click();
   await page.getByRole('tabpanel', { name: 'Network' }).getByRole('tab', { name: 'Payload' }).click();
   const payloadPanel = page.getByRole('tabpanel', { name: 'Payload' });
-  await expect(payloadPanel.locator('.CodeMirror-code .CodeMirror-line')).toHaveText([
+  await expect(payloadPanel.locator('.cm-content .cm-line')).toHaveText([
     '{',
     '  "data": {',
     '    "key": "value",',
@@ -176,7 +176,7 @@ test('should pretty-print JSON request body', async ({ runUITest, server }) => {
 
   await page.getByText('post-data-2').click();
 
-  await expect(payloadPanel.locator('.CodeMirror-code .CodeMirror-line')).toHaveText([
+  await expect(payloadPanel.locator('.cm-content .cm-line')).toHaveText([
     '{',
     '  "data": {',
     '    "key": "value",',
@@ -190,7 +190,7 @@ test('should pretty-print JSON request body', async ({ runUITest, server }) => {
 
   // Toggle off pretty print to see original request body
   await payloadPanel.getByRole('button', { name: 'Pretty print', exact: true }).click();
-  await expect(payloadPanel.locator('.CodeMirror-code .CodeMirror-line')).toHaveText([
+  await expect(payloadPanel.locator('.cm-content .cm-line')).toHaveText([
     '{"data":{"key":"value","array":["value-1","value-2"]}}'
   ], { useInnerText: true });
 });
@@ -213,7 +213,7 @@ test('should pretty-print XML request body', async ({ runUITest, server }) => {
   await page.getByText('post-xml-data').click();
   await page.getByRole('tabpanel', { name: 'Network' }).getByRole('tab', { name: 'Payload' }).click();
   const payloadPanel = page.getByRole('tabpanel', { name: 'Payload' });
-  await expect(payloadPanel.locator('.CodeMirror-code .CodeMirror-line')).toHaveText([
+  await expect(payloadPanel.locator('.cm-content .cm-line')).toHaveText([
     '<?xml version="1.0"?>',
     '<note to="Alice" from="Bob">',
     '    <body>Hello &amp; welcome!</body>',
@@ -222,7 +222,7 @@ test('should pretty-print XML request body', async ({ runUITest, server }) => {
 
   // Toggle off pretty print to see original request body
   await payloadPanel.getByRole('button', { name: 'Pretty print', exact: true }).click();
-  await expect(payloadPanel.locator('.CodeMirror-code .CodeMirror-line')).toHaveText([
+  await expect(payloadPanel.locator('.cm-content .cm-line')).toHaveText([
     '<?xml version="1.0"?><note to="Alice" from="Bob"><body>Hello &amp; welcome!</body></note>'
   ], { useInnerText: true });
 });
@@ -253,7 +253,7 @@ test('should pretty-print response bodies and show formatting errors', async ({ 
   // Pretty printed by default
   await networkList.filter({ hasText: 'response-json-good' }).click();
   await page.getByRole('tabpanel', { name: 'Network' }).getByRole('tab', { name: 'Response' }).click();
-  await expect(responsePanel.locator('.CodeMirror-code .CodeMirror-line')).toHaveText([
+  await expect(responsePanel.locator('.cm-content .cm-line')).toHaveText([
     '{',
     '  "ok": true,',
     '  "items": [',
@@ -267,7 +267,7 @@ test('should pretty-print response bodies and show formatting errors', async ({ 
   const prettyPrint = responsePanel.getByRole('button', { name: 'Pretty print', exact: true });
   const prettyPrintError = responsePanel.getByTitle('Formatting failed');
   await prettyPrint.click();
-  await expect(responsePanel.locator('.CodeMirror-code .CodeMirror-line')).toHaveText([
+  await expect(responsePanel.locator('.cm-content .cm-line')).toHaveText([
     '{"ok":true,"items":[1,2]}',
   ], { useInnerText: true });
   await expect(prettyPrintError).toBeHidden();
@@ -277,7 +277,7 @@ test('should pretty-print response bodies and show formatting errors', async ({ 
 
   // Malformed JSON shows badge and preserves original text
   await networkList.filter({ hasText: 'response-json-bad' }).click();
-  await expect(responsePanel.locator('.CodeMirror-code .CodeMirror-line')).toHaveText([
+  await expect(responsePanel.locator('.cm-content .cm-line')).toHaveText([
     '{"ok":true,,}',
   ], { useInnerText: true });
   await expect(prettyPrintError).toBeVisible();

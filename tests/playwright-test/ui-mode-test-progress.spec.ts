@@ -68,9 +68,9 @@ test('should update trace live', async ({ runUITest, server }) => {
   ).toBeVisible();
 
   await expect(
-      page.locator('.CodeMirror .source-line-running'),
+      page.locator('.cm-editor .source-line-running'),
       'check source tab',
-  ).toHaveText(/4        await page.goto\('http:\/\/localhost:\d+\/one.html/);
+  ).toHaveText(/await page.goto\('http:\/\/localhost:\d+\/one.html/);
 
   // Unlock the navigation step.
   onePromise.resolve();
@@ -94,9 +94,9 @@ test('should update trace live', async ({ runUITest, server }) => {
   ).toBeVisible();
 
   await expect(
-      page.locator('.CodeMirror .source-line-running'),
+      page.locator('.cm-editor .source-line-running'),
       'check source tab',
-  ).toHaveText(/5        await page.goto\('http:\/\/localhost:\d+\/two.html/);
+  ).toHaveText(/await page.goto\('http:\/\/localhost:\d+\/two.html/);
 
   // Unlock the navigation step.
   twoPromise.resolve();

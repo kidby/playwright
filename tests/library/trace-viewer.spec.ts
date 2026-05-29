@@ -1353,7 +1353,7 @@ test('should update highlight when typing locator', async ({ page, runAndTrace, 
   });
   const snapshot = await traceViewer.snapshotFrame('Set content');
   await traceViewer.page.getByText('Locator').click();
-  await traceViewer.page.locator('.CodeMirror').first().click();
+  await traceViewer.page.locator('.cm-content').first().click();
   await traceViewer.page.keyboard.type('button');
 
   const buttonBox = roundBox(await snapshot.locator('button').boundingBox());
@@ -1370,7 +1370,7 @@ test('should update highlight when typing snapshot', async ({ page, runAndTrace,
   });
   const snapshot = await traceViewer.snapshotFrame('Set content');
   await traceViewer.page.getByText('Locator').click();
-  await traceViewer.page.locator('.CodeMirror').last().click();
+  await traceViewer.page.locator('.cm-content').last().click();
   await traceViewer.page.keyboard.type('- button');
   const buttonBox = roundBox(await snapshot.locator('button').boundingBox());
   await expect(snapshot.locator('x-pw-highlight')).toBeVisible();
@@ -1547,7 +1547,7 @@ test('should highlight locator in iframe while typing', async ({ page, runAndTra
 
   const snapshot = await traceViewer.snapshotFrame('Evaluate');
   await traceViewer.page.getByText('Locator').click();
-  await traceViewer.page.locator('.CodeMirror').first().click();
+  await traceViewer.page.locator('.cm-content').first().click();
 
   const locators = [{
     text: `locator('#frame1').contentFrame().getByText('Hello1')`,
@@ -1764,7 +1764,7 @@ test('should not leak recorders', {
     const frame = await traceViewer.snapshotFrame(action);
 
     await test.step(`highlighting "body" in "${action}"`, async () => {
-      await traceViewer.page.locator('.CodeMirror').first().click();
+      await traceViewer.page.locator('.cm-content').first().click();
       if (platform === 'darwin')
         await traceViewer.page.keyboard.press('Meta+a');
       else

@@ -80,10 +80,22 @@ export const oxcTransform: OxcTransformFunction = (code, filename, jsxImportSour
     // continue to scrape the position from the message. oxc renders 1-indexed
     // `[file:line:col]` in its codeframe; subtract 1 from the column.
     let suffix = '';
+    let loc: { line: number; column: number } | undefined;
     const m = err.codeframe?.match(/:(\d+):(\d+)\]/);
-    if (m)
-      suffix = ` (${m[1]}:${Number(m[2]) - 1})`;
-    throw new Error(`${filename}: ${err.message}${suffix}${err.codeframe ? '\n' + err.codeframe : ''}`);
+    if (m) {
+      const line = Number(m[1]);
+      const column = Number(m[2]) - 1;
+      suffix = ` (${line}:${column})`;
+      loc = { line, column };
+    }
+    // Attach `.loc` (babel-style) so `serializeLoadError` can build a
+    // `TestError.location`; the UI tree only synthesizes a file node for
+    // load errors that carry a location. Without this, parse-errored files
+    // disappear from the tree entirely.
+    const thrown: Error & { loc?: { line: number; column: number } } = new Error(`${filename}: ${err.message}${suffix}${err.codeframe ? '\n' + err.codeframe : ''}`);
+    if (loc)
+      thrown.loc = loc;
+    throw thrown;
   }
 
   let finalCode = result.code;
