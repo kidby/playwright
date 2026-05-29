@@ -56,14 +56,11 @@ test('should show selected test in sources', async ({ runUITest }) => {
       page.getByTestId('source-code').locator('.source-tab-file-name')
   ).toHaveText('a.test.ts');
   await expect(
-      page.locator('.CodeMirror .source-line-running'),
-  ).toHaveText(`3    test('first', () => {});`);
+      page.locator('.cm-editor .source-line-running'),
+  ).toHaveText(`test('first', () => {});`);
 
   await expect(page.getByTestId('source-code-mirror')).toMatchAriaSnapshot(`
-    - text: |
-        import { test } from '@playwright/test';
-        test('first', () => {});
-        test('second', () => {});
+    - textbox
   `);
 
   await page.getByTestId('test-tree').getByText('second').click();
@@ -71,16 +68,16 @@ test('should show selected test in sources', async ({ runUITest }) => {
       page.getByTestId('source-code').locator('.source-tab-file-name')
   ).toHaveText('a.test.ts');
   await expect(
-      page.locator('.CodeMirror .source-line-running'),
-  ).toHaveText(`4    test('second', () => {});`);
+      page.locator('.cm-editor .source-line-running'),
+  ).toHaveText(`test('second', () => {});`);
 
   await page.getByTestId('test-tree').getByText('third').click();
   await expect(
       page.getByTestId('source-code').locator('.source-tab-file-name')
   ).toHaveText('b.test.ts');
   await expect(
-      page.locator('.CodeMirror .source-line-running'),
-  ).toHaveText(`3    test('third', () => {});`);
+      page.locator('.cm-editor .source-line-running'),
+  ).toHaveText(`test('third', () => {});`);
 });
 
 test('should show top-level errors in file', async ({ runUITest }) => {
@@ -116,11 +113,11 @@ test('should show top-level errors in file', async ({ runUITest }) => {
       page.getByTestId('source-code').locator('.source-tab-file-name')
   ).toHaveText('a.test.ts');
   await expect(
-      page.locator('.CodeMirror .source-line-running'),
-  ).toHaveText(`4      a = 2;`);
+      page.locator('.cm-editor .source-line-running'),
+  ).toHaveText(`a = 2;`);
 
   await expect(
-      page.locator('.CodeMirror-linewidget')
+      page.locator('.source-line-error-widget')
   ).toHaveText([
     'TypeError: Assignment to constant variable.'
   ]);
@@ -148,11 +145,11 @@ test('should show syntax errors in file', async ({ runUITest }) => {
       page.getByTestId('source-code').locator('.source-tab-file-name')
   ).toHaveText('a.test.ts');
   await expect(
-      page.locator('.CodeMirror .source-line-running'),
-  ).toHaveText(`2      import { test } from '@playwright/test'&`);
+      page.locator('.cm-editor .source-line-running'),
+  ).toHaveText(`import { test } from '@playwright/test'&`);
 
   await expect(
-      page.locator('.CodeMirror-linewidget')
+      page.locator('.source-line-error-widget')
   ).toHaveText([
     /Missing semicolon./
   ]);
@@ -175,21 +172,17 @@ test('should load error (dupe tests) indicator on sources', async ({ runUITest }
   await expect(page.getByText('Source1')).toBeVisible();
 
   await expect(
-      page.locator('.CodeMirror .source-line-running'),
-  ).toHaveText(`4      test('first', () => {});`);
+      page.locator('.cm-editor .source-line-running'),
+  ).toHaveText(`test('first', () => {});`);
 
   await expect(
-      page.locator('.CodeMirror-linewidget')
+      page.locator('.source-line-error-widget')
   ).toHaveText([
     /Error: duplicate test title "first", first declared in a.test.ts:3/
   ]);
 
   await expect(page.getByTestId('source-code-mirror')).toMatchAriaSnapshot(`
-    - text: |
-        import { test } from '@playwright/test';
-        test('first', () => {});
-        test('first', () => {});
-        Error: duplicate test title "first", first declared in a.test.ts:3
+    - textbox
   `);
 });
 
@@ -209,5 +202,5 @@ test('should keep showing source when test is pending', async ({ runUITest }, te
   await page.getByTestId('test-tree').getByText('second').click();
   await expect(page.getByTestId('status-line')).toHaveText('Running 1/3 (33%) — 1 passed');
   await expect(page.getByTestId('source-code').locator('.source-tab-file-name')).toHaveText('a.test.ts');
-  await expect(page.locator('.CodeMirror .source-line-running')).toHaveText(`7      test('second', () => {});`);
+  await expect(page.locator('.cm-editor .source-line-running')).toHaveText(`test('second', () => {});`);
 });
