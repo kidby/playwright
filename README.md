@@ -8,7 +8,7 @@ Playwright is a framework for web automation and testing. It drives Chromium, Fi
 
 ## About This Fork
 
-This repository tracks upstream `microsoft/playwright` and adds a small set of opinionated extensions for runtime portability, native mobile, and a modernized build toolchain.
+This repository tracks upstream `microsoft/playwright` and adds a small set of opinionated extensions for runtime portability, native mobile, and modernized build tools.
 
 **First-class Bun support.** The transformer pipeline is Bun-safe; `bun run` executes the CLI directly. Dedicated `ttest:bun` and `ctest:bun` scripts run the full test suite under Bun for parity verification.
 
