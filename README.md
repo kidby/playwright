@@ -12,11 +12,9 @@ This repository tracks upstream `microsoft/playwright` and adds a small set of o
 
 **First-class Bun support.** The transformer pipeline is Bun-safe; `bun run` executes the CLI directly. Dedicated `ttest:bun` and `ctest:bun` scripts run the full test suite under Bun for parity verification.
 
-**Experimental native mobile via Appium.** A new [`@playwright/experimental-mobile`](packages/playwright-mobile/README.md) package exposes a `mobileTest` fixture that speaks W3C WebDriver classic to Appium 2 — iOS (XCUITest) and Android in one API, no `selenium-webdriver` or `webdriverio` runtime dependency. Complements (does not replace) the existing native `_android` driver.
+**Native mobile via Appium.** A new [`@playwright/experimental-mobile`](packages/playwright-mobile/README.md) package exposes a `mobileTest` fixture that speaks W3C WebDriver classic to Appium 2 — iOS (XCUITest) and Android in one API, no `selenium-webdriver` or `webdriverio` runtime dependency. Complements (does not replace) the existing native `_android` driver.
 
-**Node 24 baseline.** The fork requires Node `>=24`. `@types/node` is bumped to match.
-
-**Upgraded dependencies.** `oxc-transform` is the sole TypeScript transformer (16 Babel plugins removed); ESM-only output with an `esbuild`-based CJS-compat path so downstream `"type":"commonjs"` projects keep working unchanged. `tsgo` replaces `tsc` for type-checking; `oxlint` replaces `eslint`. Dependencies are updated to current majors — CodeMirror 5→6, `@xterm/xterm` 5→6, `chokidar` 3→5, `mime` 4, `commander` 14, `pngjs` 7, `ini` 7 — and `lodash`→`es-toolkit`, `get-stream`→`node:stream/consumers`.
+**Node 24 baseline & updated deps.** The fork requires Node `>=24`. various dependencies are updated to current majors — CodeMirror 5→6, `@xterm/xterm` 5→6, `chokidar` 3→5, `mime` 4, `commander` 14, `pngjs` 7, `ini` 7 — and `lodash`→`es-toolkit`, `get-stream`→`node:stream/consumers`.
 
 **Additional reporters.** A new [`catalog`](packages/playwright/src/reporters/catalog.ts) terminal reporter adds status icons, inline failure blocks, performance insights, and optional Jira / source-URL deep-links — all driven by reporter options, with a callback escape hatch.
 
@@ -26,13 +24,13 @@ This repository tracks upstream `microsoft/playwright` and adds a small set of o
 
 Choose the path that fits your workflow:
 
-| | Best for | Install |
-|---|---|---|
-| **[Playwright Test](#playwright-test)** | End-to-end testing | `npm init playwright@latest` |
-| **[Playwright CLI](#playwright-cli)** | Coding agents (Claude Code, Copilot) | `npm i -g @playwright/cli@latest` |
-| **[Playwright MCP](#playwright-mcp)** | AI agents and LLM-driven automation | `npx @playwright/mcp@latest` |
-| **[Playwright Library](#playwright-library)** | Browser automation scripts | `npm i playwright` |
-| **[VS Code Extension](#vs-code-extension)** | Test authoring and debugging in VS Code | [Install from Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright) |
+|                                               | Best for                                | Install                                                                                                  |
+|-----------------------------------------------|-----------------------------------------|----------------------------------------------------------------------------------------------------------|
+| **[Playwright Test](#playwright-test)**       | End-to-end testing                      | `npm init playwright@latest`                                                                             |
+| **[Playwright CLI](#playwright-cli)**         | Coding agents (Claude Code, Copilot)    | `npm i -g @playwright/cli@latest`                                                                        |
+| **[Playwright MCP](#playwright-mcp)**         | AI agents and LLM-driven automation     | `npx @playwright/mcp@latest`                                                                             |
+| **[Playwright Library](#playwright-library)** | Browser automation scripts              | `npm i playwright`                                                                                       |
+| **[VS Code Extension](#vs-code-extension)**   | Test authoring and debugging in VS Code | [Install from Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright) |
 
 ---
 

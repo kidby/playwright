@@ -1,6 +1,6 @@
 {
   "name": "@playwright/mobile",
-  "version": "1.61.0-next",
+  "version": "1.61.0",
   "description": "Playwright mobile testing — slim W3C Appium client and fixtures.",
   "repository": {
     "type": "git",
@@ -23,6 +23,6 @@
     }
   },
   "dependencies": {
-    "playwright": "1.61.0-next"
+    "playwright": "1.61.0"
   }
 }
