@@ -32,6 +32,17 @@ const INSIGHTS_ENDPOINT = {
 
 type Event = Record<string, unknown>;
 
+export type NewRelicEventContext = {
+  test: TestCase;
+  result: TestResult;
+  ci: CIMetadata;
+};
+
+export type NewRelicReportProcessorContext = {
+  directory: string;
+  ci: CIMetadata;
+};
+
 export type NewRelicReporterOptions = BranchFilterOptions & {
   ingestKey?: string;
   accountId?: string;
@@ -41,11 +52,20 @@ export type NewRelicReporterOptions = BranchFilterOptions & {
   extraAttributes?: Record<string, string | number | boolean>;
   endpoint?: string;
   dryRun?: boolean;
+  eventBuilder?: (ctx: NewRelicEventContext) => Event;
+  reportProcessors?: Record<string, {
+    directory: string;
+    tag: string;
+    process: (filePath: string, ctx: NewRelicReportProcessorContext) => Promise<Event[]>;
+  }>;
+  transport?: (events: Event[]) => void | Promise<void>;
+  defaultAccountId?: string;
 };
 
 class NewRelicReporter implements ReporterV2 {
   private _options: NewRelicReporterOptions;
   private _events: Event[] = [];
+  private _tagSet = new Set<string>();
   private _ci: CIMetadata;
   private _disabled: boolean;
 
@@ -59,9 +79,10 @@ class NewRelicReporter implements ReporterV2 {
   private _endpoint(): string | undefined {
     if (this._options.endpoint)
       return this._options.endpoint;
-    if (!this._options.accountId)
+    const id = this._options.accountId ?? this._options.defaultAccountId;
+    if (!id)
       return undefined;
-    return INSIGHTS_ENDPOINT[this._options.region || 'US'](this._options.accountId);
+    return INSIGHTS_ENDPOINT[this._options.region || 'US'](id);
   }
 
   version(): 'v2' { return 'v2'; }
@@ -73,21 +94,50 @@ class NewRelicReporter implements ReporterV2 {
   onTestEnd(test: TestCase, result: TestResult) {
     if (this._disabled)
       return;
-    this._events.push(this._buildEvent(test, result));
+    for (const tag of test.tags)
+      this._tagSet.add(tag);
+    const event = this._options.eventBuilder
+      ? this._options.eventBuilder({ test, result, ci: this._ci })
+      : this._buildEvent(test, result);
+    this._events.push(event);
   }
 
   async onEnd(_result: FullResult) {
     if (this._disabled)
       return;
+
+    if (this._options.reportProcessors) {
+      for (const proc of Object.values(this._options.reportProcessors)) {
+        if (!this._tagSet.has(proc.tag))
+          continue;
+        try {
+          const files = await collectJsonFiles(proc.directory);
+          for (const filePath of files) {
+            const extra = await proc.process(filePath, { directory: proc.directory, ci: this._ci });
+            for (const e of extra)
+              this._events.push(e);
+          }
+        } catch (e) {
+          // eslint-disable-next-line no-restricted-properties
+          process.stderr.write(`[new-relic] processor ${proc.tag} failed: ${(e as Error).message}\n`);
+        }
+      }
+    }
+
+    if (this._options.transport) {
+      await this._options.transport(this._events);
+      return;
+    }
     if (this._options.dryRun) {
       // eslint-disable-next-line no-restricted-properties
       process.stderr.write(`[new-relic] dry-run payload:\n${JSON.stringify(this._events, null, 2)}\n`);
       return;
     }
-    if (!this._options.ingestKey || !this._options.accountId || !this._events.length)
+    if (!this._options.ingestKey || !this._events.length)
       return;
-    const endpoint = this._options.endpoint
-      ?? INSIGHTS_ENDPOINT[this._options.region || 'US'](this._options.accountId);
+    const endpoint = this._endpoint();
+    if (!endpoint)
+      return;
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -134,6 +184,30 @@ class NewRelicReporter implements ReporterV2 {
     }
     return event;
   }
+}
+
+async function collectJsonFiles(directory: string): Promise<string[]> {
+  const { readdir, stat } = await import('node:fs/promises');
+  const { join } = await import('node:path');
+  const out: string[] = [];
+  async function walk(dir: string): Promise<void> {
+    let entries: string[];
+    try {
+      entries = await readdir(dir);
+    } catch {
+      return;
+    }
+    for (const name of entries) {
+      const full = join(dir, name);
+      const s = await stat(full);
+      if (s.isDirectory())
+        await walk(full);
+      else if (name.endsWith('.json'))
+        out.push(full);
+    }
+  }
+  await walk(directory);
+  return out;
 }
 
 export default NewRelicReporter;

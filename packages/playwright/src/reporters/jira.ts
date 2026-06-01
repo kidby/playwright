@@ -32,13 +32,21 @@ type JiraIssueFields = {
   summary: string;
   issuetype: { name: string };
   labels: string[];
-  description: string;
+  description: unknown;
   components?: { name: string }[];
+  [k: string]: unknown;
 };
 type JiraIssuePayload = { fields: JiraIssueFields };
 type JiraIssue = { key?: string; fields?: { summary?: string } };
 type JiraSearchResponse = { issues?: JiraIssue[] };
 type JiraAuth = { email: string; token: string };
+
+export type JiraFailureContext = {
+  test: TestCase;
+  result: TestResult;
+  isFlaky: boolean;
+  ci: CIMetadata;
+};
 
 export type JiraReporterOptions = BranchFilterOptions & {
   baseUrl?: string;
@@ -50,6 +58,15 @@ export type JiraReporterOptions = BranchFilterOptions & {
   githubBaseUrl?: string;
   enabled?: boolean;
   dryRun?: boolean;
+  failedTicketPrefix?: string;
+  flakyTicketPrefix?: string;
+  summaryBuilder?: (ctx: JiraFailureContext) => string;
+  descriptionBuilder?: (ctx: JiraFailureContext) => string | Record<string, unknown>;
+  duplicateSearchStrategies?: (ctx: JiraFailureContext, summary: string) => string[];
+  componentResolver?: (filePath: string) => string | undefined;
+  areaLabelPrefix?: string;
+  sourceBaseUrl?: string;
+  transport?: (issues: JiraIssuePayload[]) => void | Promise<void>;
 };
 
 class JiraReporter implements ReporterV2 {
@@ -74,10 +91,11 @@ class JiraReporter implements ReporterV2 {
   onTestEnd(test: TestCase, result: TestResult) {
     if (this._disabled)
       return;
-    if (result.status === 'passed' || result.status === 'skipped')
+    const outcome = test.outcome();
+    if (outcome === 'expected' || outcome === 'skipped')
       return;
-    // outcome() reflects test-level resolution after retries — only act on terminal failures.
-    if (test.outcome() === 'expected')
+    const isLast = result.retry === test.retries;
+    if (!isLast && outcome !== 'unexpected')
       return;
     this._failures.push({ test, result });
   }
@@ -85,19 +103,36 @@ class JiraReporter implements ReporterV2 {
   async onEnd(_result: FullResult) {
     if (this._disabled)
       return;
+
+    const issues: JiraIssuePayload[] = [];
+    for (const { test, result } of this._failures) {
+      const isFlaky = test.outcome() === 'flaky';
+      issues.push(this._buildIssue(test, result, isFlaky));
+    }
+
+    if (this._options.transport) {
+      await this._options.transport(issues);
+      return;
+    }
+
     if (!this._options.enabled)
       return;
     if (!this._isConfigured())
       return;
 
-    for (const { test, result } of this._failures) {
-      const issue = this._buildIssue(test, result);
+    for (const issue of issues) {
       if (this._options.dryRun) {
         // eslint-disable-next-line no-restricted-properties
         process.stderr.write(`[jira] dry-run issue:\n${JSON.stringify(issue, null, 2)}\n`);
         continue;
       }
-      const exists = await this._searchExisting(issue.fields.summary).catch(() => undefined);
+      const strategies = this._duplicateStrategies(issue.fields.summary);
+      let exists: JiraIssue | undefined;
+      for (const jql of strategies) {
+        exists = await this._searchExisting(jql).catch(() => undefined);
+        if (exists)
+          break;
+      }
       if (exists)
         continue;
       await this._createIssue(issue).catch(e =>
@@ -106,28 +141,53 @@ class JiraReporter implements ReporterV2 {
     }
   }
 
+  private _duplicateStrategies(summary: string): string[] {
+    const project = this._options.projectKey!;
+    const escaped = summary.replace(/"/g, '\\"');
+    const ctx = { summary } as unknown as JiraFailureContext;
+    if (this._options.duplicateSearchStrategies)
+      return this._options.duplicateSearchStrategies(ctx, summary);
+    return [`project = "${project}" AND summary ~ "${escaped}" AND statusCategory != Done`];
+  }
+
   private _isConfigured(): boolean {
     if (this._options.dryRun)
       return true;
     return !!(this._options.baseUrl && this._options.projectKey && this._options.auth);
   }
 
-  private _buildIssue(test: TestCase, result: TestResult): JiraIssuePayload {
+  private _buildIssue(test: TestCase, result: TestResult, isFlaky: boolean): JiraIssuePayload {
     const titlePath = test.titlePath().slice(1).join(' › ');
-    // Consumer labels first so they sort first in Jira's UI.
     const labels = [...(this._options.labels || []), REPORTER_LABEL];
     const area = this._options.productAreaMapper?.(test.location?.file || '');
+    const areaPrefix = this._options.areaLabelPrefix ?? 'area:';
     if (area?.area)
-      labels.push(`area:${area.area}`);
+      labels.push(`${areaPrefix}${area.area}`);
+
+    const ctx: JiraFailureContext = { test, result, isFlaky, ci: this._ci };
+
+    const summary = this._options.summaryBuilder
+      ? this._options.summaryBuilder(ctx)
+      : `${isFlaky ? (this._options.flakyTicketPrefix ?? '[Auto-Flaky]') : (this._options.failedTicketPrefix ?? '[Auto]')} ${titlePath}`;
+
+    const description = this._options.descriptionBuilder
+      ? this._options.descriptionBuilder(ctx)
+      : this._renderDescription(test, result);
+
     const fields: JiraIssueFields = {
-      project: { key: this._options.projectKey! },
-      summary: `[Auto] ${titlePath}`,
+      project: { key: this._options.projectKey ?? '' },
+      summary,
       issuetype: { name: this._options.issueType || 'Bug' },
       labels,
-      description: this._renderDescription(test, result),
+      description,
     };
-    if (area?.component)
-      fields.components = [{ name: area.component }];
+
+    const componentName = this._options.componentResolver
+      ? this._options.componentResolver(test.location?.file || '')
+      : area?.component;
+    if (componentName)
+      fields.components = [{ name: componentName }];
+
     return { fields };
   }
 
@@ -142,9 +202,10 @@ class JiraReporter implements ReporterV2 {
       lines.push(`*Branch:* ${this._ci.branch}`);
     if (this._ci.sha)
       lines.push(`*Commit:* ${this._ci.sha}`);
-    if (this._options.githubBaseUrl && test.location?.file && this._ci.sha) {
+    const sourceBaseUrl = this._options.sourceBaseUrl ?? this._options.githubBaseUrl;
+    if (sourceBaseUrl && test.location?.file && this._ci.sha) {
       const rel = test.location.file.replace(/^.*\/(?=packages|tests|src|app|lib)/, '');
-      lines.push(`*Source:* ${this._options.githubBaseUrl}/blob/${this._ci.sha}/${rel}#L${test.location?.line ?? 1}`);
+      lines.push(`*Source:* ${sourceBaseUrl}/blob/${this._ci.sha}/${rel}#L${test.location?.line ?? 1}`);
     }
     if (err)
       lines.push('', '{code}', (err.message || '').slice(0, DESCRIPTION_BODY_CAP), '{code}');
@@ -152,9 +213,7 @@ class JiraReporter implements ReporterV2 {
     return lines.join('\n');
   }
 
-  private async _searchExisting(summary: string): Promise<JiraIssue | undefined> {
-    const escapedSummary = summary.replace(/"/g, '\\"');
-    const jql = `project = "${this._options.projectKey}" AND summary ~ "${escapedSummary}" AND statusCategory != Done`;
+  private async _searchExisting(jql: string): Promise<JiraIssue | undefined> {
     const response = await fetch(`${this._options.baseUrl}/rest/api/3/search/jql`, {
       method: 'POST',
       headers: { ...this._authHeaders(), 'content-type': 'application/json' },

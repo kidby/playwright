@@ -26,15 +26,25 @@ import type { CommonReporterOptions } from './base.js';
 import type { ReporterV2 } from './reporterV2.js';
 import type { FullConfig, FullResult, Suite, TestCase, TestResult } from '../../types/testReporter';
 
+export type CsvColumn = {
+  name: string;
+  value: (test: TestCase, result: TestResult | undefined) => string;
+};
+
 export type CsvReporterOptions = BranchFilterOptions & {
   outputFile?: string;
   outputDir?: string;
   ticketPattern?: string;
   noHeader?: boolean;
+  columns?: CsvColumn[];
+  cleanTitle?: (title: string) => string;
+  unitConverter?: { duration?: (ms: number) => string };
+  trailingNewline?: boolean;
+  escape?: boolean;
 };
 
-const HEADER = ['file', 'project', 'title', 'fullTitle', 'status', 'durationMs', 'retries', 'ticketId', 'error'] as const;
-type Column = typeof HEADER[number];
+const DEFAULT_HEADER = ['file', 'project', 'title', 'fullTitle', 'status', 'durationMs', 'retries', 'ticketId', 'error'] as const;
+type DefaultColumn = typeof DEFAULT_HEADER[number];
 
 class CSVReporter implements ReporterV2 {
   private _config!: FullConfig;
@@ -43,6 +53,12 @@ class CSVReporter implements ReporterV2 {
   private _ticketRegex: RegExp | undefined;
   private _noHeader: boolean;
   private _disabled: boolean;
+  private _columns: CsvColumn[] | undefined;
+  private _cleanTitle: ((title: string) => string) | undefined;
+  private _durationFormat: ((ms: number) => string) | undefined;
+  private _trailingNewline: boolean;
+  private _escape: boolean;
+  private _rows = new Map<string, string>();
 
   constructor(options: CsvReporterOptions & CommonReporterOptions) {
     this._disabled = !shouldRunForBranch(options);
@@ -52,6 +68,11 @@ class CSVReporter implements ReporterV2 {
     })?.outputFile;
     this._ticketRegex = options.ticketPattern ? new RegExp(options.ticketPattern) : undefined;
     this._noHeader = !!options.noHeader;
+    this._columns = options.columns;
+    this._cleanTitle = options.cleanTitle;
+    this._durationFormat = options.unitConverter?.duration;
+    this._trailingNewline = options.trailingNewline ?? true;
+    this._escape = options.escape ?? true;
   }
 
   version(): 'v2' { return 'v2'; }
@@ -60,29 +81,28 @@ class CSVReporter implements ReporterV2 {
   onConfigure(config: FullConfig) { this._config = config; }
   onBegin(suite: Suite) { this._suite = suite; }
 
+  onTestEnd(test: TestCase, result: TestResult) {
+    if (this._disabled)
+      return;
+    this._rows.set(test.id || test.titlePath().join('|'), this._renderRow(test, result));
+  }
+
   async onEnd(_result: FullResult) {
     if (this._disabled)
       return;
     const lines: string[] = [];
     if (!this._noHeader)
-      lines.push(HEADER.join(','));
+      lines.push(this._headerLine());
 
-    for (const test of this._suite.allTests()) {
-      const result = lastResult(test);
-      lines.push(serializeRow({
-        file: relativeFile(test.location?.file, this._config.rootDir),
-        project: test.parent.project()?.name || '',
-        title: test.title,
-        fullTitle: test.titlePath().slice(1).join(' › '),
-        status: result?.status ?? 'unknown',
-        durationMs: String(result?.duration ?? 0),
-        retries: String(result?.retry ?? 0),
-        ticketId: this._extractTicket(test),
-        error: result?.error ? errorOneLiner(result.error.message || '') : '',
-      }));
+    if (this._rows.size > 0) {
+      for (const row of this._rows.values())
+        lines.push(row);
+    } else {
+      for (const test of this._suite.allTests())
+        lines.push(this._renderRow(test, lastResult(test)));
     }
 
-    const output = lines.join('\n') + '\n';
+    const output = lines.join('\n') + (this._trailingNewline ? '\n' : '');
     if (!this._resolvedOutputFile) {
       // eslint-disable-next-line no-restricted-properties
       process.stdout.write(output);
@@ -94,6 +114,45 @@ class CSVReporter implements ReporterV2 {
       // eslint-disable-next-line no-restricted-properties
       process.stderr.write(`[csv] failed to write ${this._resolvedOutputFile}: ${(e as Error).message}\n`);
     }
+  }
+
+  private _headerLine(): string {
+    const names = this._columns ? this._columns.map(c => c.name) : [...DEFAULT_HEADER];
+    return names.map(n => this._escapeValue(n)).join(',');
+  }
+
+  private _renderRow(test: TestCase, result: TestResult | undefined): string {
+    if (this._columns)
+      return this._columns.map(c => this._escapeValue(c.value(test, result) ?? '')).join(',');
+    return this._serializeDefaultRow({
+      file: relativeFile(test.location?.file, this._config?.rootDir),
+      project: test.parent.project()?.name || '',
+      title: this._title(test.title),
+      fullTitle: test.titlePath().slice(1).map(t => this._title(t)).join(' › '),
+      status: result?.status ?? 'unknown',
+      durationMs: this._duration(result?.duration ?? 0),
+      retries: String(result?.retry ?? 0),
+      ticketId: this._extractTicket(test),
+      error: result?.error ? errorOneLiner(result.error.message || '') : '',
+    });
+  }
+
+  private _serializeDefaultRow(row: Record<DefaultColumn, string>): string {
+    return DEFAULT_HEADER.map(col => this._escapeValue(row[col])).join(',');
+  }
+
+  private _escapeValue(value: string): string {
+    if (!this._escape)
+      return value ?? '';
+    return csvEscape(value ?? '');
+  }
+
+  private _title(value: string): string {
+    return this._cleanTitle ? this._cleanTitle(value) : value;
+  }
+
+  private _duration(ms: number): string {
+    return this._durationFormat ? this._durationFormat(ms) : String(ms);
   }
 
   private _extractTicket(test: TestCase): string {
@@ -119,10 +178,6 @@ function relativeFile(file: string | undefined, rootDir: string | undefined): st
 
 function errorOneLiner(message: string): string {
   return stripAnsiEscapes(message).split('\n').find(l => l.trim().length > 0) ?? '';
-}
-
-function serializeRow(row: Record<Column, string>): string {
-  return HEADER.map(col => csvEscape(row[col])).join(',');
 }
 
 // RFC 4180: quote when the field contains comma, quote, CR or LF; escape embedded quotes by doubling.

@@ -21,13 +21,19 @@ import type { BranchFilterOptions } from './branchFilter.js';
 import type { ReporterV2 } from './reporterV2.js';
 import type { FullConfig, FullResult, Suite, TestCase, TestResult } from '../../types/testReporter';
 
-const DEFAULT_TEST_KEY_PATTERN = '\\[([A-Z]+-\\d+)\\]';
+const DEFAULT_TEST_KEY_PATTERN = '\\[(\\w+-\\d+)\\]';
 
 type XrayOAuthCredentials = { clientId: string; clientSecret: string };
 type XrayTokenCredentials = { token: string };
 type XrayAuth = XrayOAuthCredentials | XrayTokenCredentials;
 type XrayStatus = 'PASSED' | 'FAILED' | 'TODO' | 'EXECUTING';
-type XrayTestResult = { testKey: string; status: XrayStatus; comment?: string };
+type XrayTestEntry = { testKey: string; status: string; comment?: string; [k: string]: unknown };
+
+export type XrayTestEntryContext = {
+  testKey: string;
+  test: TestCase;
+  results: TestResult[];
+};
 
 export type XrayReporterOptions = BranchFilterOptions & {
   baseUrl?: string;
@@ -36,11 +42,18 @@ export type XrayReporterOptions = BranchFilterOptions & {
   testExecutionKey?: string;
   testKeyPattern?: string;
   dryRun?: boolean;
+  deduplicateByTestKey?: boolean;
+  executionInfoBuilder?: (config: FullConfig | undefined) => Record<string, unknown>;
+  testEntryBuilder?: (ctx: XrayTestEntryContext) => Record<string, unknown> | null;
+  writeLocalResultFile?: string;
+  authProvider?: () => Promise<Record<string, string>>;
 };
 
 class XrayReporter implements ReporterV2 {
   private _options: XrayReporterOptions;
-  private _results: XrayTestResult[] = [];
+  private _config: FullConfig | undefined;
+  private _entries: XrayTestEntry[] = [];
+  private _byKey = new Map<string, { test: TestCase; results: TestResult[] }>();
   private _keyRegex: RegExp;
   private _disabled: boolean;
 
@@ -54,7 +67,7 @@ class XrayReporter implements ReporterV2 {
   version(): 'v2' { return 'v2'; }
   printsToStdio() { return false; }
 
-  onConfigure(_config: FullConfig) {}
+  onConfigure(config: FullConfig) { this._config = config; }
   onBegin(_suite: Suite) {}
 
   onTestEnd(test: TestCase, result: TestResult) {
@@ -63,8 +76,26 @@ class XrayReporter implements ReporterV2 {
     const match = test.title.match(this._keyRegex) || test.titlePath().join(' ').match(this._keyRegex);
     if (!match)
       return;
-    this._results.push({
-      testKey: match[1] || match[0],
+    const testKey = match[1] || match[0];
+
+    if (this._options.deduplicateByTestKey) {
+      const existing = this._byKey.get(testKey);
+      if (existing)
+        existing.results.push(result);
+      else
+        this._byKey.set(testKey, { test, results: [result] });
+      return;
+    }
+
+    if (this._options.testEntryBuilder) {
+      const entry = this._options.testEntryBuilder({ testKey, test, results: [result] });
+      if (entry)
+        this._entries.push(entry as XrayTestEntry);
+      return;
+    }
+
+    this._entries.push({
+      testKey,
       status: toXrayStatus(result.status),
       comment: result.error?.message?.split('\n')[0],
     });
@@ -73,26 +104,57 @@ class XrayReporter implements ReporterV2 {
   async onEnd(_result: FullResult) {
     if (this._disabled)
       return;
-    if (!this._results.length)
+
+    if (this._options.deduplicateByTestKey) {
+      const builder = this._options.testEntryBuilder ?? defaultDedupBuilder;
+      for (const [testKey, { test, results }] of this._byKey) {
+        const entry = builder({ testKey, test, results });
+        if (entry)
+          this._entries.push(entry as XrayTestEntry);
+      }
+    }
+
+    if (!this._entries.length)
       return;
-    const payload = {
-      info: {
+
+    const info = this._options.executionInfoBuilder
+      ? this._options.executionInfoBuilder(this._config)
+      : {
         ...(this._options.testPlan && { testPlanKey: this._options.testPlan }),
         ...(this._options.testExecutionKey && { testExecutionKey: this._options.testExecutionKey }),
-      },
-      tests: this._results,
-    };
+      };
+
+    const payload: Record<string, unknown> = {};
+    if (info && Object.keys(info).length > 0)
+      payload.info = info;
+    payload.tests = this._entries;
+
+    if (this._options.writeLocalResultFile) {
+      const { writeFileAtomic } = await import('./runtimeIO.js');
+      try {
+        await writeFileAtomic(this._options.writeLocalResultFile, JSON.stringify(payload, null, 2));
+      } catch (e) {
+        // eslint-disable-next-line no-restricted-properties
+        process.stderr.write(`[xray] failed to write ${this._options.writeLocalResultFile}: ${(e as Error).message}\n`);
+      }
+    }
+
     if (this._options.dryRun) {
       // eslint-disable-next-line no-restricted-properties
       process.stderr.write(`[xray] dry-run payload:\n${JSON.stringify(payload, null, 2)}\n`);
       return;
     }
-    if (!this._options.baseUrl || !this._options.auth)
+    if (!this._options.baseUrl)
+      return;
+    if (!this._options.auth && !this._options.authProvider)
       return;
     try {
+      const headers = this._options.authProvider
+        ? await this._options.authProvider()
+        : await this._authHeaders(this._options.auth!);
       const response = await fetch(`${this._options.baseUrl}/api/v2/import/execution`, {
         method: 'POST',
-        headers: { ...(await this._authHeaders(this._options.auth)), 'content-type': 'application/json' },
+        headers: { ...headers, 'content-type': 'application/json' },
         body: JSON.stringify(payload),
       });
       if (!response.ok)
@@ -125,6 +187,15 @@ function toXrayStatus(status: TestResult['status']): XrayStatus {
   if (status === 'skipped')
     return 'TODO';
   return 'FAILED';
+}
+
+function defaultDedupBuilder(ctx: XrayTestEntryContext): XrayTestEntry {
+  const last = ctx.results[ctx.results.length - 1];
+  return {
+    testKey: ctx.testKey,
+    status: toXrayStatus(last?.status ?? 'failed'),
+    comment: last?.error?.message?.split('\n')[0],
+  };
 }
 
 export default XrayReporter;
