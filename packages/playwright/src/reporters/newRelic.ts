@@ -16,7 +16,9 @@
 
 import { preconnect } from '@utils/bunPreconnect';
 import { detectCI  } from './ciAdapter.js';
+import { shouldRunForBranch } from './branchFilter.js';
 
+import type { BranchFilterOptions } from './branchFilter.js';
 import type { CIMetadata } from './ciAdapter.js';
 
 import type { ReporterV2 } from './reporterV2.js';
@@ -30,7 +32,7 @@ const INSIGHTS_ENDPOINT = {
 
 type Event = Record<string, unknown>;
 
-export type NewRelicReporterOptions = {
+export type NewRelicReporterOptions = BranchFilterOptions & {
   ingestKey?: string;
   accountId?: string;
   region?: 'US' | 'EU';
@@ -45,9 +47,11 @@ class NewRelicReporter implements ReporterV2 {
   private _options: NewRelicReporterOptions;
   private _events: Event[] = [];
   private _ci: CIMetadata;
+  private _disabled: boolean;
 
   constructor(options: NewRelicReporterOptions = {}) {
     this._options = options;
+    this._disabled = !shouldRunForBranch(options);
     this._ci = detectCI();
     preconnect(this._endpoint());
   }
@@ -67,10 +71,14 @@ class NewRelicReporter implements ReporterV2 {
   onBegin(_suite: Suite) {}
 
   onTestEnd(test: TestCase, result: TestResult) {
+    if (this._disabled)
+      return;
     this._events.push(this._buildEvent(test, result));
   }
 
   async onEnd(_result: FullResult) {
+    if (this._disabled)
+      return;
     if (this._options.dryRun) {
       // eslint-disable-next-line no-restricted-properties
       process.stderr.write(`[new-relic] dry-run payload:\n${JSON.stringify(this._events, null, 2)}\n`);

@@ -15,7 +15,9 @@
  */
 
 import { preconnect } from '@utils/bunPreconnect';
+import { shouldRunForBranch } from './branchFilter.js';
 
+import type { BranchFilterOptions } from './branchFilter.js';
 import type { ReporterV2 } from './reporterV2.js';
 import type { FullConfig, FullResult, Suite, TestCase, TestResult } from '../../types/testReporter';
 
@@ -27,7 +29,7 @@ type XrayAuth = XrayOAuthCredentials | XrayTokenCredentials;
 type XrayStatus = 'PASSED' | 'FAILED' | 'TODO' | 'EXECUTING';
 type XrayTestResult = { testKey: string; status: XrayStatus; comment?: string };
 
-export type XrayReporterOptions = {
+export type XrayReporterOptions = BranchFilterOptions & {
   baseUrl?: string;
   auth?: XrayAuth;
   testPlan?: string;
@@ -40,9 +42,11 @@ class XrayReporter implements ReporterV2 {
   private _options: XrayReporterOptions;
   private _results: XrayTestResult[] = [];
   private _keyRegex: RegExp;
+  private _disabled: boolean;
 
   constructor(options: XrayReporterOptions = {}) {
     this._options = options;
+    this._disabled = !shouldRunForBranch(options);
     this._keyRegex = new RegExp(options.testKeyPattern || DEFAULT_TEST_KEY_PATTERN);
     preconnect(options.baseUrl);
   }
@@ -54,6 +58,8 @@ class XrayReporter implements ReporterV2 {
   onBegin(_suite: Suite) {}
 
   onTestEnd(test: TestCase, result: TestResult) {
+    if (this._disabled)
+      return;
     const match = test.title.match(this._keyRegex) || test.titlePath().join(' ').match(this._keyRegex);
     if (!match)
       return;
@@ -65,6 +71,8 @@ class XrayReporter implements ReporterV2 {
   }
 
   async onEnd(_result: FullResult) {
+    if (this._disabled)
+      return;
     if (!this._results.length)
       return;
     const payload = {

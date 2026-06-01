@@ -18,13 +18,15 @@ import path from 'path';
 
 import { stripAnsiEscapes } from '@isomorphic/stringUtils';
 import { resolveOutputFile  } from './base.js';
+import { shouldRunForBranch } from './branchFilter.js';
 import { writeFileAtomic } from './runtimeIO.js';
+import type { BranchFilterOptions } from './branchFilter.js';
 import type { CommonReporterOptions } from './base.js';
 
 import type { ReporterV2 } from './reporterV2.js';
 import type { FullConfig, FullResult, Suite, TestCase, TestResult } from '../../types/testReporter';
 
-export type CsvReporterOptions = {
+export type CsvReporterOptions = BranchFilterOptions & {
   outputFile?: string;
   outputDir?: string;
   ticketPattern?: string;
@@ -40,8 +42,10 @@ class CSVReporter implements ReporterV2 {
   private _resolvedOutputFile: string | undefined;
   private _ticketRegex: RegExp | undefined;
   private _noHeader: boolean;
+  private _disabled: boolean;
 
   constructor(options: CsvReporterOptions & CommonReporterOptions) {
+    this._disabled = !shouldRunForBranch(options);
     this._resolvedOutputFile = resolveOutputFile('CSV', {
       ...options,
       default: { fileName: 'results.csv', outputDir: 'playwright-report' },
@@ -51,12 +55,14 @@ class CSVReporter implements ReporterV2 {
   }
 
   version(): 'v2' { return 'v2'; }
-  printsToStdio() { return !this._resolvedOutputFile; }
+  printsToStdio() { return !this._disabled && !this._resolvedOutputFile; }
 
   onConfigure(config: FullConfig) { this._config = config; }
   onBegin(suite: Suite) { this._suite = suite; }
 
   async onEnd(_result: FullResult) {
+    if (this._disabled)
+      return;
     const lines: string[] = [];
     if (!this._noHeader)
       lines.push(HEADER.join(','));

@@ -45,6 +45,7 @@
     "watch": "node utils/build/build.js --watch --lint",
     "test-types": "node utils/generate_types/ && concurrently \"tsgo -p utils/generate_types/test/tsconfig.json\" \"tsgo -p ./tests/\"",
     "roll": "node utils/roll_browser.js",
+    "sync-upstream": "bash utils/sync_upstream.sh",
     "check-deps": "node utils/check_deps.js",
     "build-android-driver": "./utils/build_android_driver.sh",
     "innerloop": "playwright run-server --reuse-browser",

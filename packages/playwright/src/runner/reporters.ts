@@ -29,16 +29,7 @@ import LineReporter from '../reporters/line.js';
 import ListReporter from '../reporters/list.js';
 import ListModeReporter from '../reporters/listModeReporter.js';
 import { wrapReporterAsV2 } from '../reporters/reporterV2.js';
-// Fork additions — grouped below the upstream imports to keep the rebase
-// diff small.
-import AIReporter from '../reporters/ai.js';
 import CatalogReporter from '../reporters/catalog.js';
-import CSVReporter from '../reporters/csv.js';
-import IntellumSocialReporter from '../reporters/intellumSocial.js';
-import JiraReporter from '../reporters/jira.js';
-import NewRelicReporter from '../reporters/newRelic.js';
-import SlackReporter from '../reporters/slack.js';
-import XrayReporter from '../reporters/xray.js';
 
 import type { ReporterDescription } from '../../types/test';
 import type { TestError } from '../../types/testReporter';
@@ -58,16 +49,7 @@ export async function createReporters(config: FullConfigInternal, mode: 'list' |
     'junit': JUnitReporter,
     'null': EmptyReporter,
     'html': HtmlReporter,
-    // Fork additions — alphabetical, kept after the upstream block to
-    // minimise rebase churn against microsoft/playwright.
-    'ai': AIReporter,
     'catalog': CatalogReporter,
-    'csv': CSVReporter,
-    'intellum-social': IntellumSocialReporter,
-    'jira': JiraReporter,
-    'new-relic': NewRelicReporter,
-    'slack': SlackReporter,
-    'xray': XrayReporter,
   };
   const reporters: ReporterV2[] = [];
   descriptions ??= config.config.reporter;

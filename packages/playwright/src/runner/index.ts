@@ -29,6 +29,11 @@ export * as html from '../reporters/html.js';
 export * as merge from '../reporters/merge.js';
 export { default as ListReporter } from '../reporters/list.js';
 export { default as ListModeReporter } from '../reporters/listModeReporter.js';
+export { default as AIReporter } from '../reporters/ai.js';
+export { default as CSVReporter } from '../reporters/csv.js';
+export { default as JiraReporter } from '../reporters/jira.js';
+export { default as NewRelicReporter } from '../reporters/newRelic.js';
+export { default as XrayReporter } from '../reporters/xray.js';
 export type { ReporterV2 } from '../reporters/reporterV2.js';
 
 // Public re-export of TestServerConnection used by external test fixtures.

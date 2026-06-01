@@ -16,7 +16,9 @@
 
 import { preconnect } from '@utils/bunPreconnect';
 import { detectCI  } from './ciAdapter.js';
+import { shouldRunForBranch } from './branchFilter.js';
 
+import type { BranchFilterOptions } from './branchFilter.js';
 import type { CIMetadata } from './ciAdapter.js';
 
 import type { ReporterV2 } from './reporterV2.js';
@@ -38,7 +40,7 @@ type JiraIssue = { key?: string; fields?: { summary?: string } };
 type JiraSearchResponse = { issues?: JiraIssue[] };
 type JiraAuth = { email: string; token: string };
 
-export type JiraReporterOptions = {
+export type JiraReporterOptions = BranchFilterOptions & {
   baseUrl?: string;
   projectKey?: string;
   auth?: JiraAuth;
@@ -54,9 +56,11 @@ class JiraReporter implements ReporterV2 {
   private _options: JiraReporterOptions;
   private _ci: CIMetadata;
   private _failures: { test: TestCase; result: TestResult }[] = [];
+  private _disabled: boolean;
 
   constructor(options: JiraReporterOptions = {}) {
     this._options = options;
+    this._disabled = !shouldRunForBranch(options);
     this._ci = detectCI();
     preconnect(options.baseUrl);
   }
@@ -68,6 +72,8 @@ class JiraReporter implements ReporterV2 {
   onBegin(_suite: Suite) {}
 
   onTestEnd(test: TestCase, result: TestResult) {
+    if (this._disabled)
+      return;
     if (result.status === 'passed' || result.status === 'skipped')
       return;
     // outcome() reflects test-level resolution after retries — only act on terminal failures.
@@ -77,6 +83,8 @@ class JiraReporter implements ReporterV2 {
   }
 
   async onEnd(_result: FullResult) {
+    if (this._disabled)
+      return;
     if (!this._options.enabled)
       return;
     if (!this._isConfigured())

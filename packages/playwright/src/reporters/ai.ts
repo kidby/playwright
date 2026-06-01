@@ -19,14 +19,16 @@ import path from 'path';
 
 import { detectCI  } from './ciAdapter.js';
 import { resolveOutputFile  } from './base.js';
+import { shouldRunForBranch } from './branchFilter.js';
 import { writeFileAtomic } from './runtimeIO.js';
+import type { BranchFilterOptions } from './branchFilter.js';
 import type { CIMetadata } from './ciAdapter.js';
 import type { CommonReporterOptions } from './base.js';
 
 import type { ReporterV2 } from './reporterV2.js';
 import type { FullConfig, FullResult, Suite, TestCase, TestResult } from '../../types/testReporter';
 
-export type AIReporterOptions = {
+export type AIReporterOptions = BranchFilterOptions & {
   outputDir?: string;
   prompt?: string;
   jsonl?: boolean;
@@ -46,9 +48,11 @@ class AIReporter implements ReporterV2 {
   private _outputDir: string;
   private _ci: CIMetadata;
   private _resolvedPrompt: string | undefined;
+  private _disabled: boolean;
 
   constructor(options: AIReporterOptions & CommonReporterOptions) {
     this._options = options;
+    this._disabled = !shouldRunForBranch(options);
     const configDir = options.configDir ?? process.cwd();
     const resolved = resolveOutputFile('AI', {
       ...options,
@@ -67,6 +71,8 @@ class AIReporter implements ReporterV2 {
   onBegin(suite: Suite) { this._suite = suite; }
 
   async onEnd(_result: FullResult) {
+    if (this._disabled)
+      return;
     const failures: FailureBriefing[] = [];
     for (const test of this._suite.allTests()) {
       const result = test.results[test.results.length - 1];
