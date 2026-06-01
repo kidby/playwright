@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import './lib/bootstrap.js';
 import { inprocess } from './lib/coreBundle.js';
 
 const playwright = inprocess.playwright;

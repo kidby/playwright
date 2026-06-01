@@ -34,24 +34,41 @@ function copyExtensionAssets(): Plugin {
   };
 }
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     copyExtensionAssets(),
   ],
   root: resolve(__dirname, 'src/ui'),
-  build: {
-    outDir: resolve(__dirname, 'dist/'),
-    emptyOutDir: false,
-    minify: false,
-    rollupOptions: {
-      input: ['src/ui/connect.html', 'src/ui/status.html'],
-      output: {
-        manualChunks: undefined,
-        entryFileNames: 'lib/ui/[name].js',
-        chunkFileNames: 'lib/ui/[name].js',
-        assetFileNames: 'lib/ui/[name].[ext]'
+  builder: {},
+  environments: {
+    client: {
+      build: {
+        outDir: resolve(__dirname, 'dist/'),
+        emptyOutDir: false,
+        minify: false,
+        rollupOptions: {
+          input: ['src/ui/connect.html', 'src/ui/status.html'],
+          output: {
+            manualChunks: undefined,
+            entryFileNames: 'lib/ui/[name].js',
+            chunkFileNames: 'lib/ui/[name].js',
+            assetFileNames: 'lib/ui/[name].[ext]'
+          }
+        }
+      }
+    },
+    sw: {
+      consumer: 'client',
+      build: {
+        outDir: resolve(__dirname, 'dist/'),
+        emptyOutDir: false,
+        minify: false,
+        lib: {
+          entry: resolve(__dirname, 'src/background.ts'),
+          fileName: 'lib/background',
+          formats: ['es']
+        }
       }
     }
   }

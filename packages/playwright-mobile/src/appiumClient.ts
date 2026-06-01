@@ -108,7 +108,10 @@ export class AppiumClient {
   }
 
   async sendKeys(element: ElementHandle, text: string) {
-    await this._send('POST', `/session/${this._requireSession()}/element/${element.ELEMENT}/value`, { text });
+    await this._send('POST', `/session/${this._requireSession()}/element/${element.ELEMENT}/value`, {
+      text,
+      value: [...text],
+    });
   }
 
   async clear(element: ElementHandle) {
@@ -167,6 +170,10 @@ export class AppiumClient {
 
   async setContext(name: string) {
     await this._send('POST', `/session/${this._requireSession()}/context`, { name });
+  }
+
+  async switchToWindow(handle: string) {
+    await this._send('POST', `/session/${this._requireSession()}/window`, { handle });
   }
 
   async getWindowRect(): Promise<WindowRect> {
