@@ -6,19 +6,17 @@
 
 Playwright is a framework for web automation and testing. It drives Chromium, Firefox, and WebKit with a single API — in your tests, in your scripts, and as a tool for AI agents.
 
-## About This Fork
+## About This Playwright Clone
 
-This repository tracks upstream `microsoft/playwright` and adds a small set of opinionated extensions for runtime portability, native mobile, and modernized build tools.
+This repository tracks upstream `microsoft/playwright` and adds first-class Bun runtime support — the main reason this clone exists. Native mobile via Appium, an updated dep tree, and a handful of quality-of-life extras come along for the ride.
 
-**First-class Bun support.** The transformer pipeline is Bun-safe; `bun run` executes the CLI directly. Dedicated `ttest:bun` and `ctest:bun` scripts run the full test suite under Bun for parity verification.
+**First-class Bun support.** When running under Bun, Playwright loads TypeScript directly via `Bun.plugin` (no separate transpile step) and writes reporter outputs through `Bun.write`. The transformer pipeline (oxc-based) is Bun-safe end-to-end. Dedicated `ttest:bun` and `ctest:bun` scripts run the full test suite under Bun for parity verification with the Node path.
 
 **Native mobile via Appium.** A new [`@playwright/experimental-mobile`](packages/playwright-mobile/README.md) package exposes a `mobileTest` fixture that speaks W3C WebDriver classic to Appium 2 — iOS (XCUITest) and Android in one API, no `selenium-webdriver` or `webdriverio` runtime dependency. Complements (does not replace) the existing native `_android` driver.
 
-**Node 24 baseline & updated deps.** The fork requires Node `>=24`. various dependencies are updated to current majors — CodeMirror 5→6, `@xterm/xterm` 5→6, `chokidar` 3→5, `mime` 4, `commander` 14, `pngjs` 7, `ini` 7 — and `lodash`→`es-toolkit`, `get-stream`→`node:stream/consumers`.
+**Node 24 baseline, fewer deps.** Requires Node `>=24`. Dependencies updated or replaced with native equivalents: Vite 6→8, CodeMirror 5→6, `@xterm/xterm` 5→6, `chokidar` 3→5, `mime` 4, `commander` 14, `pngjs` 7, `ini` 7 — and `lodash`→`es-toolkit`, `get-stream`→`node:stream/consumers`.
 
-**Additional reporters.** A new [`catalog`](packages/playwright/src/reporters/catalog.ts) terminal reporter adds status icons, inline failure blocks, performance insights, and optional Jira / source-URL deep-links — all driven by reporter options, with a callback escape hatch.
-
-**Smarter sharding.** A new [`shardingMode`](docs/src/test-api/class-testconfig.md#testconfigshardingmode) config (and matching `--sharding-mode` CLI flag) supports `partition` (default, contiguous slices — current behavior), `round-robin` (balanced by test count), and `duration-round-robin`. Ports closed PR [microsoft/playwright#30962](https://github.com/microsoft/playwright/pull/30962) onto the fork as a permanent local feature.
+**Extras I found useful.** Reporters: `catalog`, `ai`, `csv`, `jira`, `new-relic`, `xray`. Plus Playwright PRs that didn't make upstream — e.g. [shardingMode #30962](https://github.com/microsoft/playwright/pull/30962) (`partition` / `round-robin` / `duration-round-robin`).
 
 ## Get Started
 
