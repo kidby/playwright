@@ -19,7 +19,7 @@ import os from 'os';
 import path from 'path';
 import { Transform } from 'stream';
 
-import colors from 'picocolors';
+import colors from '@utils/colors';
 import mime from 'mime';
 import open from 'open';
 import * as yazl from 'yazl';

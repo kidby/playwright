@@ -19,7 +19,7 @@ import os from 'os';
 import path from 'path';
 
 import { tools } from 'playwright-core/lib/coreBundle';
-import debug from 'debug';
+import debug from '@utils/debugLog';
 import { noColors } from '@isomorphic/colors';
 import { ManualPromise, signalToPromise } from '@isomorphic/manualPromise';
 import { escapeRegExp } from '@isomorphic/stringUtils';

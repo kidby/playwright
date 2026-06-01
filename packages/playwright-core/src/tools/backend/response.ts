@@ -17,7 +17,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import debug from 'debug';
+import debug from '@utils/debugLog';
 import { renderModalStates } from './tab.js';
 import { scaleImageToFitMessage } from './screenshot.js';
 

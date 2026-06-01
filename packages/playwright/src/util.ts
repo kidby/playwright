@@ -18,9 +18,9 @@ import fs from 'fs';
 import path from 'path';
 import util from 'util';
 
-import debug from 'debug';
+import debug from '@utils/debugLog';
 import mime from 'mime';
-import minimatch from 'minimatch';
+import { minimatch } from 'minimatch';
 import { calculateSha1 } from '@utils/crypto';
 import { sanitizeForFilePath } from '@utils/fileUtils';
 import { isRegExp } from '@isomorphic/rtti';

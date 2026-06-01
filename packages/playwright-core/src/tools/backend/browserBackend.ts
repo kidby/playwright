@@ -15,7 +15,7 @@
  */
 
 import * as z from 'zod';
-import debug from 'debug';
+import debug from '@utils/debugLog';
 import { Context } from './context.js';
 import { Response } from './response.js';
 import { SessionLog } from './sessionLog.js';

@@ -19,7 +19,7 @@ import net from 'net';
 import http from 'http';
 import crypto from 'crypto';
 
-import debug from 'debug';
+import debug from '@utils/debugLog';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { urlHostFromAddress } from '@utils/httpServer';

@@ -30,7 +30,7 @@ import { spawn } from 'child_process';
 import http from 'http';
 import os from 'os';
 
-import debug from 'debug';
+import debug from '@utils/debugLog';
 import ws, { WebSocketServer as wsServer } from 'ws';
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { registry } from '../../server/registry/index.js';

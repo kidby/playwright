@@ -1509,3 +1509,15 @@ deps['debian13-arm64'] = {
     ...deps['debian13-x64'].lib2package,
   },
 };
+
+// Packages safe to skip when callers opt into `install-deps --minimal`. Cross-distro;
+// `t64` (Ubuntu 24+ time_t-64 transition) and non-`t64` variants of the same package
+// are both listed so a single filter handles every supported distro.
+//
+// `--minimal` drops the printing stack. Xvfb + xfonts + locale fonts stay (they're load-bearing
+// for headless-shell rendering of non-Latin content).
+// `--no-webkit` is a separate flag that drops the entire WebKit target from the install set.
+export const minimalSkipPackages: ReadonlySet<string> = new Set([
+  'libcups2',
+  'libcups2t64',
+]);

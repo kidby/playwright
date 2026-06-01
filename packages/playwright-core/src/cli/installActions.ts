@@ -150,8 +150,11 @@ export async function uninstallBrowsers(options: { all?: boolean }) {
   });
 }
 
-export async function installDeps(args: string[], options: { dryRun?: boolean }) {
-  await registry.installDeps(registry.resolveBrowsers(args, {}), !!options.dryRun);
+export async function installDeps(args: string[], options: { dryRun?: boolean; minimal?: boolean; noWebkit?: boolean }) {
+  await registry.installDeps(registry.resolveBrowsers(args, {}), !!options.dryRun, {
+    minimal: !!options.minimal,
+    noWebkit: !!options.noWebkit,
+  });
 }
 
 export { registry };

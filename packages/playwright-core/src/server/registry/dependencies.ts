@@ -23,7 +23,7 @@ import { wrapInASCIIBox } from '@utils/ascii';
 import { hostPlatform, isOfficiallySupportedPlatform } from '@utils/hostPlatform';
 import { spawnAsync } from '@utils/spawnAsync';
 import { getPlaywrightVersion } from '../userAgent.js';
-import { deps } from './nativeDeps.js';
+import { deps, minimalSkipPackages } from './nativeDeps.js';
 
 import { packageJSON, binPath } from '../../package.js';
 import { buildPlaywrightCLICommand, registry } from '.';
@@ -89,7 +89,7 @@ export async function installDependenciesWindows(targets: Set<DependencyGroup>, 
   }
 }
 
-export async function installDependenciesLinux(targets: Set<DependencyGroup>, dryRun: boolean) {
+export async function installDependenciesLinux(targets: Set<DependencyGroup>, dryRun: boolean, options: { minimal?: boolean } = {}) {
   const libraries: string[] = [];
   const platform = hostPlatform;
   if (!isOfficiallySupportedPlatform)
@@ -102,7 +102,14 @@ export async function installDependenciesLinux(targets: Set<DependencyGroup>, dr
     }
     libraries.push(...info[target]);
   }
-  const uniqueLibraries = Array.from(new Set(libraries));
+  let uniqueLibraries = Array.from(new Set(libraries));
+  if (options.minimal) {
+    const before = uniqueLibraries.length;
+    uniqueLibraries = uniqueLibraries.filter(pkg => !minimalSkipPackages.has(pkg));
+    const dropped = before - uniqueLibraries.length;
+    if (dropped > 0)
+      console.log(`--minimal: skipped ${dropped} optional packages (printing + locale fonts).`); // eslint-disable-line no-console
+  }
   if (dryRun) {
     await reportMissingDependenciesLinux(uniqueLibraries);
     return;

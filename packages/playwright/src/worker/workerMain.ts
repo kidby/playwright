@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import colors from 'picocolors';
+import colors from '@utils/colors';
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { removeFolders } from '@utils/fileUtils';
 import { gracefullyCloseAll } from '@utils/processLauncher';

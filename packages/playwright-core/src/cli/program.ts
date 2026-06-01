@@ -108,9 +108,12 @@ export function decorateProgram(program: Command) {
       .command('install-deps [browser...]')
       .description('install dependencies necessary to run browsers (will ask for sudo permissions)')
       .option('--dry-run', 'Do not modify the system. On Linux, simulate the install via apt-get and exit with a non-zero code if any required packages are missing; on Windows, print the install command.')
-      .action(async function(args: string[], options: { dryRun?: boolean }) {
+      .option('--minimal', 'Skip optional packages (printing) and the entire WebKit dependency set. Use when your suite never drives the print dialog and never targets WebKit.')
+      .option('--no-webkit', 'Skip WebKit dependencies (the GStreamer stack and friends). Use when your suite never targets WebKit but you still need printing support.')
+      .action(async function(args: string[], options: { dryRun?: boolean; minimal?: boolean; webkit?: boolean }) {
         try {
-          await installDeps(args, options);
+          // Commander's --no-webkit flag inverts to `webkit: false` on the options bag.
+          await installDeps(args, { dryRun: options.dryRun, minimal: options.minimal, noWebkit: options.webkit === false });
         } catch (e) {
           console.log(`Failed to install browser dependencies\n${e}`);
           gracefullyProcessExitDoNotHang(1);
@@ -124,7 +127,13 @@ export function decorateProgram(program: Command) {
       Install dependencies for specific browsers, supports chromium, firefox, webkit, chromium-headless-shell.
 
     - $ install-deps --dry-run
-      Report which required system dependencies are missing without modifying the system. Exits non-zero if any are missing. Useful for non-interactive verification scripts.`);
+      Report which required system dependencies are missing without modifying the system. Exits non-zero if any are missing. Useful for non-interactive verification scripts.
+
+    - $ install-deps --minimal
+      Slimmer install: drops printing libs (libcups2/libcups2t64) and the entire WebKit dependency set. Equivalent to --no-webkit plus the printing exclusion.
+
+    - $ install-deps --no-webkit
+      Skip WebKit dependencies — the GStreamer stack alone is ~7 packages and ~100MB. Use when you don't run WebKit tests.`);
 
   const browsers = [
     { alias: 'cr', name: 'Chromium', type: 'chromium' },

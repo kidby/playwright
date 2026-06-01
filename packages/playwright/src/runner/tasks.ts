@@ -18,7 +18,7 @@ import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
 
-import debug from 'debug';
+import debug from '@utils/debugLog';
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { monotonicTime } from '@isomorphic/time';
 import { removeFolders } from '@utils/fileUtils';

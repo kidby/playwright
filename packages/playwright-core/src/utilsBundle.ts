@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import colorsLibrary from 'picocolors';
+import colorsLibrary from '@utils/colors';
 export const colors = colorsLibrary;
 
-import debugLibrary from 'debug';
+import debugLibrary from '@utils/debugLog';
 export const debug = debugLibrary;
 
 import * as iniLibrary from 'ini';
@@ -39,7 +39,7 @@ export const jpegjs = jpegLibrary;
 import mimeLibrary from 'mime';
 export const mime = mimeLibrary;
 
-import minimatchLibrary from 'minimatch';
+import { minimatch as minimatchLibrary } from 'minimatch';
 export const minimatch = minimatchLibrary;
 
 import openLibrary from 'open';
@@ -89,9 +89,7 @@ export const gracefulFs = gracefulFsLibrary;
 import retryLibrary from 'retry';
 export const retry = retryLibrary;
 
-// @ts-expect-error untyped vendored module
-import onExitLibrary from 'signal-exit';
-export const onExit = onExitLibrary;
+export { onExit } from 'signal-exit';
 
 export * as z from 'zod';
 

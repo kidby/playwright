@@ -17,7 +17,7 @@
 import { fileURLToPath } from 'url';
 
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import debug from 'debug';
+import debug from '@utils/debugLog';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { startMcpHttpServer } from './http.js';

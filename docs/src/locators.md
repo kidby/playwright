@@ -19,6 +19,8 @@ These are the recommended built-in locators.
 - [`method: Page.getByAltText`](#locate-by-alt-text) to locate an element, usually image, by its text alternative.
 - [`method: Page.getByTitle`](#locate-by-title) to locate an element by its title attribute.
 - [`method: Page.getByTestId`](#locate-by-test-id) to locate an element based on its `data-testid` attribute (other attributes can be configured).
+- [`method: Page.getById`](#locate-by-id) to locate an element by its `id` attribute (substring by default; pass `exact: true` for a full match).
+- [`method: Page.getByClassName`](#locate-by-class-name) to locate an element by its `class` attribute (substring of the class string by default; pass `exact: true` for a token match).
 
 ```js
 await page.getByLabel('User Name').fill('John');
@@ -605,6 +607,39 @@ page.get_by_test_id("directions").click()
 
 ```csharp
 await Page.GetByTestId("directions").ClickAsync();
+```
+
+### Locate by id
+
+Locate an element by its `id` attribute using [`method: Page.getById`]. The default is a substring match against the `id`, which is forgiving of generated suffixes; pass `exact: true` for a full attribute match.
+
+Consider the following DOM structure.
+
+```html card-3
+<button id="submit-btn-9a8f">Submit</button>
+```
+
+You can locate the element by its id:
+
+```js
+await page.getById('submit-btn').click();                      // substring match
+await page.getById('submit-btn-9a8f', { exact: true }).click();
+```
+
+### Locate by class name
+
+Locate an element by its `class` attribute using [`method: Page.getByClassName`]. The default is a substring match against the full class string (`[class*="foo"]`), which is forgiving of compound class names; pass `exact: true` for a token match (equivalent to `.foo`).
+
+Consider the following DOM structure.
+
+```html card-2
+<div class="card card--featured">A</div>
+<div class="card">B</div>
+```
+
+```js
+await expect(page.getByClassName('featured')).toHaveCount(1);          // substring
+await expect(page.getByClassName('card', { exact: true })).toHaveCount(2); // token
 ```
 
 ### Locate by CSS or XPath

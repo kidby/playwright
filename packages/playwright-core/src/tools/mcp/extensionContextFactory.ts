@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import debug from 'debug';
+import debug from '@utils/debugLog';
 import { createHttpServer, startHttpServer } from '@utils/network';
 import { defaultUserDataDirForChannel } from '@utils/chromiumChannels';
 import { playwright } from '../../inprocess.js';

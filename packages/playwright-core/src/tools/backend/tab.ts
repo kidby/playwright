@@ -15,7 +15,7 @@
  */
 
 import { EventEmitter } from 'events';
-import debug from 'debug';
+import debug from '@utils/debugLog';
 import { asLocator } from '@isomorphic/locatorGenerators';
 import { locatorOrSelectorAsSelector } from '@isomorphic/locatorParser';
 import { ManualPromise } from '@isomorphic/manualPromise';

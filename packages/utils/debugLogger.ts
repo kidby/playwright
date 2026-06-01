@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 
-import debug from 'debug';
+import debug, { type IDebugger } from './debugLog';
 const debugLoggerColorMap = {
   'api': 45, // cyan
   'protocol': 34, // green
@@ -35,7 +35,7 @@ const debugLoggerColorMap = {
 export type LogName = keyof typeof debugLoggerColorMap;
 
 class DebugLogger {
-  private _debuggers = new Map<string, debug.IDebugger>();
+  private _debuggers = new Map<string, IDebugger>();
 
   constructor() {
     if (process.env.DEBUG_FILE) {

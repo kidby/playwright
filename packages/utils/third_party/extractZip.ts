@@ -30,7 +30,7 @@ import stream from 'stream';
 import { text } from 'stream/consumers';
 import { promisify } from 'util';
 
-import debugPkg from 'debug';
+import debugPkg from '../debugLog';
 import yauzl from './yauzl/index.js';
 import type { Entry, Options as YauzlOptions, ZipFile } from './yauzl/index.js';
 

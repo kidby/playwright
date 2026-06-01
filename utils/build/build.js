@@ -21,7 +21,7 @@ const path = require('path');
 const chokidar = require('chokidar');
 const fs = require('fs');
 const { globSync } = require('tinyglobby');
-const minimatch = require('minimatch');
+const { minimatch } = require('minimatch');
 const { workspace } = require('../workspace');
 const { build, context } = require('esbuild');
 

@@ -17,7 +17,7 @@
 import path from 'path';
 import { Writable } from 'stream';
 
-import pc from 'picocolors';
+import pc from '@utils/colors';
 
 import { noColors } from '@isomorphic/colors';
 import { msToString } from '@isomorphic/formatUtils';

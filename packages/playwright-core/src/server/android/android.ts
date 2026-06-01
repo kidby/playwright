@@ -19,7 +19,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
-import debug from 'debug';
+import debug from '@utils/debugLog';
 import { PipeTransport } from '@utils/pipeTransport';
 import { createGuid } from '@utils/crypto';
 import { isUnderTest } from '@utils/debug';

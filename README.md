@@ -14,7 +14,31 @@ This repository tracks upstream `microsoft/playwright` and adds first-class Bun 
 
 **Native mobile via Appium.** A new [`@playwright/experimental-mobile`](packages/playwright-mobile/README.md) package exposes a `mobileTest` fixture that speaks W3C WebDriver classic to Appium 2 — iOS (XCUITest) and Android in one API, no `selenium-webdriver` or `webdriverio` runtime dependency. Complements (does not replace) the existing native `_android` driver.
 
-**Node 24 baseline, fewer deps.** Requires Node `>=24`. Dependencies updated or replaced with native equivalents: Vite 6→8, CodeMirror 5→6, `@xterm/xterm` 5→6, `chokidar` 3→5, `mime` 4, `commander` 14, `pngjs` 7, `ini` 7 — and `lodash`→`es-toolkit`, `get-stream`→`node:stream/consumers`.
+**Lighthouse audits.** A new [`@playwright/lighthouse`](packages/playwright-lighthouse/README.md) package adds a `lighthouseTest` fixture that runs Lighthouse against the same Chromium tab your test is driving — no manual `--remote-debugging-port` plumbing.
+
+```ts
+import { lighthouseTest as test, expect } from '@playwright/lighthouse';
+
+test('homepage perf budget', async ({ page, lighthouse }) => {
+  await page.goto('https://example.com');
+  const result = await lighthouse({
+    thresholds: { performance: 90, accessibility: 95 },
+    saveReport: 'html',
+  });
+  expect(result.passed, result.failures.join('\n')).toBe(true);
+});
+```
+
+**Two extra locators.** `page.getById(...)` and `page.getByClassName(...)` (plus the same on `Locator` / `Frame` / `FrameLocator`). Substring match by default — forgiving of generated id suffixes and compound class strings — pass `{ exact: true }` for a strict match.
+
+```ts
+await page.getById('submit-btn').click();              // matches "submit-btn-9a8f"
+await page.getById('submit-btn-9a8f', { exact: true }).click();
+await expect(page.getByClassName('featured')).toHaveCount(1);
+await expect(page.getByClassName('card', { exact: true })).toHaveCount(2);
+```
+
+**Node 24 baseline, fewer deps.** Requires Node `>=24`. Dependencies updated or replaced with native equivalents: Vite 6→8, CodeMirror 5→6, `@xterm/xterm` 5→6, `chokidar` 3→5, `mime` 4, `commander` 14→15, `pngjs` 7, `ini` 7, `minimatch` 3→10, `formidable` 2→3, `yazl` 2→3, `dotenv` 16→17, `signal-exit` 3→4 — and `lodash`→`es-toolkit`, `get-stream`→`node:stream/consumers`, `debug`/`picocolors`→Node `util.format`/`util.styleText`.
 
 **Extras I found useful.** Reporters: `catalog`, `ai`, `csv`, `jira`, `new-relic`, `xray`. Plus Playwright PRs that didn't make upstream — e.g. [shardingMode #30962](https://github.com/microsoft/playwright/pull/30962) (`partition` / `round-robin` / `duration-round-robin`).
 

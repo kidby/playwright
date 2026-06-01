@@ -212,7 +212,8 @@ Run tests with [UI Mode](./test-ui-mode.md) for watch mode, live step view, time
   values={[
     {label: 'npm', value: 'npm'},
     {label: 'yarn', value: 'yarn'},
-    {label: 'pnpm', value: 'pnpm'}
+    {label: 'pnpm', value: 'pnpm'},
+    {label: 'bun', value: 'bun'}
   ]
 }>
 
@@ -240,6 +241,14 @@ pnpm exec playwright test --ui
 
 </TabItem>
 
+<TabItem value="bun">
+
+```bash
+bunx playwright test --ui
+```
+
+</TabItem>
+
 </Tabs>
 
 ![UI Mode](./images/getting-started/ui-mode.png)
@@ -256,7 +265,8 @@ Update Playwright and download new browser binaries and their dependencies:
   values={[
     {label: 'npm', value: 'npm'},
     {label: 'yarn', value: 'yarn'},
-    {label: 'pnpm', value: 'pnpm'}
+    {label: 'pnpm', value: 'pnpm'},
+    {label: 'bun', value: 'bun'}
   ]
 }>
 
@@ -287,6 +297,15 @@ pnpm exec playwright install --with-deps
 
 </TabItem>
 
+<TabItem value="bun">
+
+```bash
+bun add -D @playwright/test@latest
+bunx playwright install --with-deps
+```
+
+</TabItem>
+
 </Tabs>
 
 Check your installed version:
@@ -297,7 +316,8 @@ Check your installed version:
   values={[
     {label: 'npm', value: 'npm'},
     {label: 'yarn', value: 'yarn'},
-    {label: 'pnpm', value: 'pnpm'}
+    {label: 'pnpm', value: 'pnpm'},
+    {label: 'bun', value: 'bun'}
   ]
 }>
 
@@ -321,6 +341,14 @@ yarn playwright --version
 
 ```bash
 pnpm exec playwright --version
+```
+
+</TabItem>
+
+<TabItem value="bun">
+
+```bash
+bunx playwright --version
 ```
 
 </TabItem>

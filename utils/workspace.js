@@ -219,6 +219,11 @@ const workspace = new Workspace(ROOT_PATH, [
     path: path.join(ROOT_PATH, 'packages', 'playwright-mobile'),
     files: LICENCE_FILES,
   }),
+  new PWPackage({
+    name: '@playwright/lighthouse',
+    path: path.join(ROOT_PATH, 'packages', 'playwright-lighthouse'),
+    files: LICENCE_FILES,
+  }),
 ]);
 
 if (require.main === module) {

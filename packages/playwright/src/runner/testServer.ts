@@ -15,7 +15,7 @@
  */
 
 import util from 'util';
-import debug from 'debug';
+import debug from '@utils/debugLog';
 import open from 'open';
 
 import { server as coreServer } from 'playwright-core/lib/coreBundle';

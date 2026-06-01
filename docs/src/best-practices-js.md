@@ -118,7 +118,8 @@ To pick a locator run the `codegen` command followed by the URL that you would l
   values={[
     {label: 'npm', value: 'npm'},
     {label: 'yarn', value: 'yarn'},
-    {label: 'pnpm', value: 'pnpm'}
+    {label: 'pnpm', value: 'pnpm'},
+    {label: 'bun', value: 'bun'}
   ]
 }>
 <TabItem value="npm">
@@ -141,6 +142,14 @@ yarn playwright codegen playwright.dev
 
 ```bash
 pnpm exec playwright codegen playwright.dev
+```
+
+</TabItem>
+
+<TabItem value="bun">
+
+```bash
+bunx playwright codegen playwright.dev
 ```
 
 </TabItem>
@@ -207,7 +216,8 @@ You can also debug your tests with the Playwright inspector by running your test
   values={[
     {label: 'npm', value: 'npm'},
     {label: 'yarn', value: 'yarn'},
-    {label: 'pnpm', value: 'pnpm'}
+    {label: 'pnpm', value: 'pnpm'},
+    {label: 'bun', value: 'bun'}
   ]
 }>
 <TabItem value="npm">
@@ -234,6 +244,14 @@ pnpm exec playwright test --debug
 
 </TabItem>
 
+<TabItem value="bun">
+
+```bash
+bunx playwright test --debug
+```
+
+</TabItem>
+
 </Tabs>
 
 You can then step through your test, view actionability logs and edit the locator live and see it highlighted in the browser window. This will show you which locators match, how many of them there are.
@@ -250,7 +268,8 @@ To debug a specific test add the name of the test file and the line number of th
   values={[
     {label: 'npm', value: 'npm'},
     {label: 'yarn', value: 'yarn'},
-    {label: 'pnpm', value: 'pnpm'}
+    {label: 'pnpm', value: 'pnpm'},
+    {label: 'bun', value: 'bun'}
   ]
 }>
 <TabItem value="npm">
@@ -277,6 +296,14 @@ pnpm exec playwright test example.spec.ts:9 --debug
 
 </TabItem>
 
+<TabItem value="bun">
+
+```bash
+bunx playwright test example.spec.ts:9 --debug
+```
+
+</TabItem>
+
 </Tabs>
 #### Debugging on CI
 
@@ -292,7 +319,8 @@ Traces are configured in the Playwright config file and are set to run on CI on 
   values={[
     {label: 'npm', value: 'npm'},
     {label: 'yarn', value: 'yarn'},
-    {label: 'pnpm', value: 'pnpm'}
+    {label: 'pnpm', value: 'pnpm'},
+    {label: 'bun', value: 'bun'}
   ]
 }>
 <TabItem value="npm">
@@ -319,6 +347,14 @@ pnpm exec playwright test --trace on
 
 </TabItem>
 
+<TabItem value="bun">
+
+```bash
+bunx playwright test --trace on
+```
+
+</TabItem>
+
 </Tabs>
 
 Once you run this command your traces will be recorded for each test and can be viewed directly from the HTML report.
@@ -329,7 +365,8 @@ Once you run this command your traces will be recorded for each test and can be 
   values={[
     {label: 'npm', value: 'npm'},
     {label: 'yarn', value: 'yarn'},
-    {label: 'pnpm', value: 'pnpm'}
+    {label: 'pnpm', value: 'pnpm'},
+    {label: 'bun', value: 'bun'}
   ]
 }>
 <TabItem value="npm">
@@ -352,6 +389,14 @@ yarn playwright show-report
 
 ```bash
 pnpm exec playwright show-report
+```
+
+</TabItem>
+
+<TabItem value="bun">
+
+```bash
+bunx playwright show-report
 ```
 
 </TabItem>
@@ -408,7 +453,8 @@ By keeping your Playwright version up to date you will be able to test your app 
   values={[
     {label: 'npm', value: 'npm'},
     {label: 'yarn', value: 'yarn'},
-    {label: 'pnpm', value: 'pnpm'}
+    {label: 'pnpm', value: 'pnpm'},
+    {label: 'bun', value: 'bun'}
   ]
 }>
 <TabItem value="npm">
@@ -435,6 +481,14 @@ pnpm install --save-dev @playwright/test@latest
 
 </TabItem>
 
+<TabItem value="bun">
+
+```bash
+bun add -D @playwright/test@latest
+```
+
+</TabItem>
+
 </Tabs>
 
 Check the [release notes](./release-notes.md) to see what the latest version is and what changes have been released.
@@ -447,7 +501,8 @@ You can see what version of Playwright you have by running the following command
   values={[
     {label: 'npm', value: 'npm'},
     {label: 'yarn', value: 'yarn'},
-    {label: 'pnpm', value: 'pnpm'}
+    {label: 'pnpm', value: 'pnpm'},
+    {label: 'bun', value: 'bun'}
   ]
 }>
 <TabItem value="npm">
@@ -470,6 +525,14 @@ yarn playwright --version
 
 ```bash
 pnpm exec playwright --version
+```
+
+</TabItem>
+
+<TabItem value="bun">
+
+```bash
+bunx playwright --version
 ```
 
 </TabItem>
@@ -522,7 +585,8 @@ Playwright can [shard](./test-parallel.md#shard-tests-between-multiple-machines)
   values={[
     {label: 'npm', value: 'npm'},
     {label: 'yarn', value: 'yarn'},
-    {label: 'pnpm', value: 'pnpm'}
+    {label: 'pnpm', value: 'pnpm'},
+    {label: 'bun', value: 'bun'}
   ]
 }>
 <TabItem value="npm">
@@ -545,6 +609,14 @@ yarn playwright test --shard=1/3
 
 ```bash
 pnpm exec playwright test --shard=1/3
+```
+
+</TabItem>
+
+<TabItem value="bun">
+
+```bash
+bunx playwright test --shard=1/3
 ```
 
 </TabItem>

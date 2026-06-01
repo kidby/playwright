@@ -18,7 +18,7 @@ import child_process from 'child_process';
 import { EventEmitter } from 'events';
 import url from 'url';
 
-import debug from 'debug';
+import debug from '@utils/debugLog';
 import { assert } from '@isomorphic/assert';
 import { monotonicTime, timeOrigin } from '@isomorphic/time';
 import { raceAgainstDeadline } from '@isomorphic/timeoutRunner';

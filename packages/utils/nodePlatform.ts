@@ -21,7 +21,7 @@ import * as util from 'util';
 import { Readable, Writable, pipeline } from 'stream';
 import { EventEmitter } from 'events';
 
-import pc from 'picocolors';
+import pc from './colors';
 import { debugLogger } from './debugLogger.js';
 import { currentZone, emptyZone } from './zones.js';
 import { debugMode, isUnderTest } from './debug.js';

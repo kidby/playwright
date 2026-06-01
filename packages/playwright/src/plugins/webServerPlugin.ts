@@ -16,8 +16,8 @@
 import net from 'net';
 import path from 'path';
 
-import colors from 'picocolors';
-import debug from 'debug';
+import colors from '@utils/colors';
+import debug from '@utils/debugLog';
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { monotonicTime } from '@isomorphic/time';
 import { raceAgainstDeadline } from '@isomorphic/timeoutRunner';

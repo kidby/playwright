@@ -3,7 +3,6 @@
 @utils/**
 common/
 node_modules/commander
-node_modules/debug
 node_modules/mime
 node_modules/minimatch
 

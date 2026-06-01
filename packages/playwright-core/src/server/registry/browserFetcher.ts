@@ -21,7 +21,7 @@ import os from 'os';
 import path from 'path';
 
 import ProgressBar from 'progress';
-import colors from 'picocolors';
+import colors from '@utils/colors';
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { debugLogger } from '@utils/debugLogger';
 import { existsAsync, removeFolders } from '@utils/fileUtils';

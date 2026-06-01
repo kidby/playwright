@@ -17,7 +17,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import colors from 'picocolors';
+import colors from '@utils/colors';
 import * as diff from 'diff';
 import { MultiMap } from '@isomorphic/multimap';
 

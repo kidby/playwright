@@ -17,7 +17,7 @@
 import { EventEmitter } from 'events';
 import net from 'net';
 
-import debug from 'debug';
+import debug from '@utils/debugLog';
 import { assert } from '@isomorphic/assert';
 import type { Backend, DeviceBackend, SocketBackend } from './android.js';
 import type * as channels from '@protocol/channels';

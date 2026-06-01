@@ -1080,18 +1080,20 @@ export class Registry {
       return await validateDependenciesWindows(sdkLanguage, windowsExeAndDllDirectories.map(d => path.join(browserDirectory, d)));
   }
 
-  async installDeps(executablesToInstallDeps: Executable[], dryRun: boolean) {
+  async installDeps(executablesToInstallDeps: Executable[], dryRun: boolean, options: { minimal?: boolean; noWebkit?: boolean } = {}) {
     const executables = this._dedupe(executablesToInstallDeps);
     const targets = new Set<DependencyGroup>();
     for (const executable of executables) {
       if (executable._dependencyGroup)
         targets.add(executable._dependencyGroup);
     }
+    if (options.noWebkit || options.minimal)
+      targets.delete('webkit');
     targets.add('tools');
     if (os.platform() === 'win32')
       return await installDependenciesWindows(targets, dryRun);
     if (os.platform() === 'linux')
-      return await installDependenciesLinux(targets, dryRun);
+      return await installDependenciesLinux(targets, dryRun, { minimal: options.minimal });
   }
 
   async install(executablesToInstall: Executable[], options?: { force?: boolean }) {
