@@ -2,15 +2,22 @@
 set -e
 set +x
 
-if [[ ($1 == '--help') || ($1 == '-h') || ($1 == '') || ($2 == '') ]]; then
-  echo "usage: $(basename $0) {jammy,noble} mkidby/playwright:v1.61.0 [linux/amd64,linux/arm64]"
+# Base Ubuntu codename. Override per-invocation: DISTRO=jammy ./build_multiarch.sh ...
+# The corresponding Dockerfile.${DISTRO} must exist in this directory.
+DISTRO="${DISTRO:-noble}"
+
+if [[ ($1 == '--help') || ($1 == '-h') || ($1 == '') ]]; then
+  echo "usage: $(basename $0) mkidby/playwright:v1.61.0 [linux/amd64,linux/arm64]"
   echo
-  echo "Build a multi-arch Playwright docker image and push it directly to a registry."
-  echo "Combines amd64 and arm64 into a single manifest tag in one buildx pass."
+  echo "Build a multi-arch Playwright docker image (Ubuntu ${DISTRO}) and push"
+  echo "it directly to a registry. Combines amd64 + arm64 into one manifest tag"
+  echo "in a single buildx pass. The non-native arch is QEMU-emulated."
   echo "Default platforms: linux/amd64,linux/arm64"
   echo
   echo "Example:"
-  echo "  $(basename $0) noble mkidby/playwright:v1.61.0"
+  echo "  $(basename $0) mkidby/playwright:v1.61.0"
+  echo
+  echo "Override the base distro:  DISTRO=<codename> $(basename $0) ..."
   echo
   echo "Prereqs:"
   echo "  - 'npm install' and 'npm run build' completed in the repo root"
@@ -21,9 +28,8 @@ if [[ ($1 == '--help') || ($1 == '-h') || ($1 == '') || ($2 == '') ]]; then
   exit 0
 fi
 
-DISTRO="$1"
-TAG="$2"
-PLATFORMS="${3:-linux/amd64,linux/arm64}"
+TAG="$1"
+PLATFORMS="${2:-linux/amd64,linux/arm64}"
 
 function cleanup() {
   rm -f "playwright-core.tar.gz"

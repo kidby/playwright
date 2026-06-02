@@ -2,17 +2,24 @@
 set -e
 set +x
 
+# Base Ubuntu codename. Override per-invocation: DISTRO=jammy ./build.sh ...
+# The corresponding Dockerfile.${DISTRO} must exist in this directory.
+DISTRO="${DISTRO:-noble}"
+
 if [[ ($1 == '--help') || ($1 == '-h') || ($1 == '') || ($2 == '') ]]; then
-  echo "usage: $(basename $0) {--arm64,--amd64} {jammy,noble} playwright:localbuild-noble"
+  echo "usage: $(basename $0) {--arm64,--amd64} mkidby/playwright:v1.61.0-${DISTRO}"
   echo
-  echo "Build Playwright docker image and tag it as 'playwright:localbuild-noble'."
-  echo "Once image is built, you can run it with"
-  echo ""
-  echo "  docker run --rm -it playwright:localbuild-noble /bin/bash"
-  echo ""
-  echo "NOTE: this requires on Playwright dependencies to be installed with 'npm install'"
-  echo "      and Playwright itself being built with 'npm run build'"
-  echo ""
+  echo "Build the fork's Playwright docker image (Ubuntu ${DISTRO}) and tag it."
+  echo "Once built, run it with:"
+  echo
+  echo "  docker run --rm -it mkidby/playwright:v1.61.0-${DISTRO} /bin/bash"
+  echo
+  echo "Override the base distro:  DISTRO=<codename> $(basename $0) ..."
+  echo
+  echo "Prereqs:"
+  echo "  - 'npm install' completed"
+  echo "  - 'npm run build' completed (or 'npm run watch' running)"
+  echo
   exit 0
 fi
 
@@ -23,8 +30,8 @@ function cleanup() {
 trap "cleanup; cd $(pwd -P)" EXIT
 cd "$(dirname "$0")"
 
-# We rely on `./playwright-core.tar.gz` to download browsers into the docker
-# image.
+# Bundled into the image so browsers install from fork sources, not the
+# upstream npm release.
 node ../../utils/pack_package.js playwright-core ./playwright-core.tar.gz
 
 PLATFORM=""
@@ -37,4 +44,4 @@ else
   exit 1
 fi
 
-docker build --platform "${PLATFORM}" -t "$3" -f "Dockerfile.$2" .
+docker build --platform "${PLATFORM}" -t "$2" -f "Dockerfile.${DISTRO}" .
