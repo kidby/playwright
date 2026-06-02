@@ -18,7 +18,7 @@ This Docker image is intended to be used for testing and development purposes on
 ### Pull the image
 
 ```bash js
-docker pull mcr.microsoft.com/playwright:v%%VERSION%%-noble
+docker pull mkidby/playwright:v%%VERSION%%-noble
 ```
 
 ```bash python
@@ -42,7 +42,7 @@ By default, the Docker image will use the `root` user to run the browsers. This 
 On trusted websites, you can avoid creating a separate user and use root for it since you trust the code which will run on the browsers.
 
 ```bash js
-docker run -it --rm --ipc=host mcr.microsoft.com/playwright:v%%VERSION%%-noble /bin/bash
+docker run -it --rm --ipc=host mkidby/playwright:v%%VERSION%%-noble /bin/bash
 ```
 
 ```bash python
@@ -62,7 +62,7 @@ docker run -it --rm --ipc=host mcr.microsoft.com/playwright/java:v%%VERSION%%-no
 On untrusted websites, it's recommended to use a separate user for launching the browsers in combination with the seccomp profile. Inside the container or if you are using the Docker image as a base image you have to use `adduser` for it.
 
 ```bash js
-docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_profile.json mcr.microsoft.com/playwright:v%%VERSION%%-noble /bin/bash
+docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_profile.json mkidby/playwright:v%%VERSION%%-noble /bin/bash
 ```
 
 ```bash python
@@ -117,7 +117,7 @@ You can run Playwright Server in Docker while keeping your tests running on the 
 Start the Playwright Server in Docker:
 
 ```bash
-docker run -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v%%VERSION%%-noble /bin/sh -c "npx -y playwright@%%VERSION%% run-server --port 3000 --host 0.0.0.0"
+docker run -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mkidby/playwright:v%%VERSION%%-noble /bin/sh -c "npx -y playwright@%%VERSION%% run-server --port 3000 --host 0.0.0.0"
 ```
 
 #### Connecting to the Server
@@ -181,7 +181,7 @@ public class App {
 If you need to access local servers from within the Docker container:
 
 ```bash
-docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v%%VERSION%%-noble /bin/sh -c "npx -y playwright@%%VERSION%% run-server --port 3000 --host 0.0.0.0"
+docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mkidby/playwright:v%%VERSION%%-noble /bin/sh -c "npx -y playwright@%%VERSION%% run-server --port 3000 --host 0.0.0.0"
 ```
 
 This makes `hostmachine` point to the host's localhost. Your tests should use `hostmachine` instead of `localhost` when accessing local servers.
@@ -196,7 +196,7 @@ For Docker and GitHub Codespaces environments, you can view and generate tests u
 
 ```json
 {
-  "image": "mcr.microsoft.com/playwright:v1.57.0",
+  "image": "mkidby/playwright:v1.57.0",
   "forwardPorts": [6080],
   "features": {
     "desktop-lite": {

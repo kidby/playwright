@@ -208,7 +208,7 @@ jobs:
     name: 'Playwright Tests'
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v%%VERSION%%-noble
+      image: mkidby/playwright:v%%VERSION%%-noble
       options: --user 1001
     steps:
       - uses: actions/checkout@v5
@@ -672,7 +672,7 @@ trigger:
 
 pool:
   vmImage: ubuntu-latest
-container: mcr.microsoft.com/playwright:v%%VERSION%%-noble
+container: mkidby/playwright:v%%VERSION%%-noble
 
 steps:
 - task: UseNode@1
@@ -760,7 +760,7 @@ Running Playwright on CircleCI is very similar to running on GitHub Actions. In 
 executors:
   pw-noble-development:
     docker:
-      - image: mcr.microsoft.com/playwright:v%%VERSION%%-noble
+      - image: mkidby/playwright:v%%VERSION%%-noble
 ```
 
 ```yml python
@@ -806,7 +806,7 @@ to run tests on Jenkins.
 
 ```groovy js
 pipeline {
-   agent { docker { image 'mcr.microsoft.com/playwright:v%%VERSION%%-noble' } }
+   agent { docker { image 'mkidby/playwright:v%%VERSION%%-noble' } }
    stages {
       stage('e2e-tests') {
          steps {
@@ -865,7 +865,7 @@ pipeline {
 Bitbucket Pipelines can use public [Docker images as build environments](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). To run Playwright tests on Bitbucket, use our public Docker image ([see Dockerfile](./docker.md)).
 
 ```yml js
-image: mcr.microsoft.com/playwright:v%%VERSION%%-noble
+image: mkidby/playwright:v%%VERSION%%-noble
 ```
 
 ```yml python
@@ -890,7 +890,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v%%VERSION%%-noble
+  image: mkidby/playwright:v%%VERSION%%-noble
   script:
   ...
 ```
@@ -939,7 +939,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v%%VERSION%%-noble
+  image: mkidby/playwright:v%%VERSION%%-noble
   parallel: 7
   script:
     - npm ci
@@ -954,7 +954,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v%%VERSION%%-noble
+  image: mkidby/playwright:v%%VERSION%%-noble
   parallel:
     matrix:
       - PROJECT: ['chromium', 'webkit']
@@ -970,7 +970,7 @@ To run Playwright tests on Google Cloud Build, use our public Docker image ([see
 
 ```yml
 steps:
-- name: mcr.microsoft.com/playwright:v%%VERSION%%-noble
+- name: mkidby/playwright:v%%VERSION%%-noble
   script: 
   ...
   env:
@@ -989,7 +989,7 @@ type: docker
 
 steps:
   - name: test
-    image: mcr.microsoft.com/playwright:v%%VERSION%%-noble
+    image: mkidby/playwright:v%%VERSION%%-noble
     commands:
       - npx playwright test
 ```
