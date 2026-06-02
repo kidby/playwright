@@ -578,6 +578,18 @@ const dynamicImportToRequirePlugin = {
             /import\s*\{([^}]*)\}\s*from\s*'@isomorphic\/[^']+';?/g,
             (_, names) => `const {${names}} = require('playwright-core/lib/coreBundle').iso;`
         );
+        // Default imports of the two utilsBundle-routed shims (`colors`,
+        // `debugLog`). These live in utilsBundle (not coreBundle.utils) because
+        // they're consumed via `import x from '@utils/colors'` form, and
+        // utilsBundle.ts re-exports them at runtime as `.colors` and `.debug`.
+        contents = contents.replace(
+            /import\s+(\w+)\s+from\s+'@utils\/colors';?/g,
+            (_, name) => `const ${name} = require('playwright-core/lib/utilsBundle').colors;`
+        );
+        contents = contents.replace(
+            /import\s+(\w+)\s+from\s+'@utils\/debugLog';?/g,
+            (_, name) => `const ${name} = require('playwright-core/lib/utilsBundle').debug;`
+        );
         contents = contents.replace(
             /import\s*\{([^}]*)\}\s*from\s*'@utils\/[^']+';?/g,
             (_, names) => `const {${names}} = require('playwright-core/lib/coreBundle').utils;`
@@ -683,6 +695,7 @@ steps.push(new EsbuildStep({
 // Bundling them into coreBundle is intentional and safe.
 const CORE_BUNDLE_ALLOWED_NODE_MODULES = [
   'node_modules/picocolors/',
+  'node_modules/signal-exit/',
 ];
 
 function assertCoreBundleHasNoNodeModules() {

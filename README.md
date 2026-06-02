@@ -6,15 +6,15 @@
 
 Playwright is a framework for web automation and testing. It drives Chromium, Firefox, and WebKit with a single API — in your tests, in your scripts, and as a tool for AI agents.
 
-## About This Playwright Clone
+## About This Fork
 
-This repository tracks upstream `microsoft/playwright` and adds first-class Bun runtime support — the main reason this clone exists. Native mobile via Appium, an updated dep tree, and a handful of quality-of-life extras come along for the ride.
+Tracks upstream `microsoft/playwright`. Local changes:
 
-**First-class Bun support.** When running under Bun, Playwright loads TypeScript directly via `Bun.plugin` (no separate transpile step) and writes reporter outputs through `Bun.write`. The transformer pipeline (oxc-based) is Bun-safe end-to-end. Dedicated `ttest:bun` and `ctest:bun` scripts run the full test suite under Bun for parity verification with the Node path.
+**Bun runtime.** Under Bun, TypeScript loads via `Bun.plugin` (no separate transpile step) and reporter output goes through `Bun.write`. The oxc-based transformer avoids constructs Bun's TS handler can't parse. `ttest:bun` and `ctest:bun` run the suite under Bun.
 
-**Native mobile via Appium.** A new [`@playwright/experimental-mobile`](packages/playwright-mobile/README.md) package exposes a `mobileTest` fixture that speaks W3C WebDriver classic to Appium 2 — iOS (XCUITest) and Android in one API, no `selenium-webdriver` or `webdriverio` runtime dependency. Complements (does not replace) the existing native `_android` driver.
+**Mobile package.** `@playwright/experimental-mobile` exposes a `mobileTest` fixture that drives Appium 2 over W3C WebDriver classic — iOS (XCUITest) and Android in one API. No `selenium-webdriver` or `webdriverio` at runtime. See [packages/playwright-mobile/README.md](packages/playwright-mobile/README.md).
 
-**Lighthouse audits.** A new [`@playwright/lighthouse`](packages/playwright-lighthouse/README.md) package adds a `lighthouseTest` fixture that runs Lighthouse against the same Chromium tab your test is driving — no manual `--remote-debugging-port` plumbing.
+**Lighthouse package.** `@playwright/lighthouse` runs Lighthouse against the same Chromium tab the test is driving; `--remote-debugging-port` is wired by the fixture. See [packages/playwright-lighthouse/README.md](packages/playwright-lighthouse/README.md).
 
 ```ts
 import { lighthouseTest as test, expect } from '@playwright/lighthouse';
@@ -29,7 +29,7 @@ test('homepage perf budget', async ({ page, lighthouse }) => {
 });
 ```
 
-**Two extra locators.** `page.getById(...)` and `page.getByClassName(...)` (plus the same on `Locator` / `Frame` / `FrameLocator`). Substring match by default — forgiving of generated id suffixes and compound class strings — pass `{ exact: true }` for a strict match.
+**Locators.** `getById(id, { exact? })` and `getByClassName(name, { exact? })` on `Page`, `Locator`, `Frame`, and `FrameLocator`. Substring match by default; `{ exact: true }` for strict.
 
 ```ts
 await page.getById('submit-btn').click();              // matches "submit-btn-9a8f"
@@ -38,9 +38,11 @@ await expect(page.getByClassName('featured')).toHaveCount(1);
 await expect(page.getByClassName('card', { exact: true })).toHaveCount(2);
 ```
 
-**Node 24 baseline, fewer deps.** Requires Node `>=24`. Dependencies updated or replaced with native equivalents: Vite 6→8, CodeMirror 5→6, `@xterm/xterm` 5→6, `chokidar` 3→5, `mime` 4, `commander` 14→15, `pngjs` 7, `ini` 7, `minimatch` 3→10, `formidable` 2→3, `yazl` 2→3, `dotenv` 16→17, `signal-exit` 3→4 — and `lodash`→`es-toolkit`, `get-stream`→`node:stream/consumers`, `debug`/`picocolors`→Node `util.format`/`util.styleText`.
+**Node 24 baseline.** Engine requirement: `node >=24`. Dependency bumps: Vite 6→8, CodeMirror 5→6, `@xterm/xterm` 5→6, chokidar 3→5, mime 4, commander 14→15, pngjs 7, ini 7, minimatch 3→10, formidable 2→3, yazl 2→3, dotenv 16→17, signal-exit 3→4. Replaced: `lodash`→`es-toolkit`, `get-stream`→`node:stream/consumers`, `debug`/`picocolors`→`util.format`/`util.styleText`.
 
-**Extras I found useful.** Reporters: `catalog`, `ai`, `csv`, `jira`, `new-relic`, `xray`. Plus Playwright PRs that didn't make upstream — e.g. [shardingMode #30962](https://github.com/microsoft/playwright/pull/30962) (`partition` / `round-robin` / `duration-round-robin`).
+**Reporters.** Added `catalog`, `ai`, `csv`, `jira`, `new-relic`, `xray`.
+
+**Upstream PRs carried locally.** Patches not merged upstream — e.g. [shardingMode #30962](https://github.com/microsoft/playwright/pull/30962) (`partition` / `round-robin` / `duration-round-robin`).
 
 ## Get Started
 
