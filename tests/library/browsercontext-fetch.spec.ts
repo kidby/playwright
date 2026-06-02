@@ -15,13 +15,24 @@
  */
 
 import type { LookupAddress } from 'dns';
-import formidable from 'formidable';
+import * as formidable from 'formidable';
 import fs from 'fs';
 import type { IncomingMessage } from 'http';
 import { pipeline } from 'stream';
 import zlib from 'zlib';
 import { contextTest as it, expect } from '../config/browserTest.js';
 import { suppressCertificateWarning } from '../config/utils.js';
+
+// formidable v3 always returns arrays for fields/files. Unwrap single-value
+// entries so the assertions stay v2-shaped.
+function unwrapOne<T>(record: Record<string, T[] | T> | undefined): Record<string, T> {
+  const out: Record<string, T> = {};
+  for (const key of Object.keys(record || {})) {
+    const v = (record as Record<string, T[] | T>)[key];
+    out[key] = Array.isArray(v) ? v[0] : v;
+  }
+  return out;
+}
 import { kTargetClosedErrorMessage } from '../config/errors.js';
 
 it.skip(({ mode }) => mode !== 'default');
@@ -1032,7 +1043,7 @@ it('should support multipart/form-data', async function({ context, server }) {
       const form = new formidable.IncomingForm();
       form.parse(serverRequest, (error, fields, files) => {
         server.serveFile(serverRequest, res);
-        resolve({ error, fields, files: files as Record<string, formidable.File>, serverRequest });
+        resolve({ error, fields: unwrapOne(fields) as formidable.Fields, files: unwrapOne(files) as Record<string, formidable.File>, serverRequest });
       });
     });
   });
@@ -1069,7 +1080,7 @@ it('should support multipart/form-data with ReadStream values', async function({
       const form = new formidable.IncomingForm();
       form.parse(serverRequest, (error, fields, files) => {
         server.serveFile(serverRequest, res);
-        resolve({ error, fields, files: files as Record<string, formidable.File>, serverRequest });
+        resolve({ error, fields: unwrapOne(fields) as formidable.Fields, files: unwrapOne(files) as Record<string, formidable.File>, serverRequest });
       });
     });
   });
@@ -1109,7 +1120,7 @@ it('should support multipart/form-data and keep the order', async function({ con
       const form = new formidable.IncomingForm();
       form.parse(serverRequest, (error, fields, files) => {
         server.serveFile(serverRequest, res);
-        resolve({ error, fields });
+        resolve({ error, fields: unwrapOne(fields) as formidable.Fields });
       });
     });
   });

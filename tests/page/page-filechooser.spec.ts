@@ -19,7 +19,18 @@ import { test, expect } from './pageTest.js';
 import { attachFrame } from '../config/utils.js';
 
 import fs from 'fs';
-import formidable from 'formidable';
+import * as formidable from 'formidable';
+
+// formidable v3 always returns arrays for fields/files. Unwrap single-value
+// entries so the assertions stay v2-shaped.
+function unwrapOne<T>(record: Record<string, T[] | T> | undefined): Record<string, T> {
+  const out: Record<string, T> = {};
+  for (const key of Object.keys(record || {})) {
+    const v = (record as Record<string, T[] | T>)[key];
+    out[key] = Array.isArray(v) ? v[0] : v;
+  }
+  return out;
+}
 
 test('should upload multiple large files', async ({ page, server, isAndroid, mode }, testInfo) => {
   test.skip(isAndroid);
@@ -248,7 +259,7 @@ test('should not trim big uploaded files', async ({ page, server }) => {
   server.setRoute('/upload', async (req, res) => {
     const form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, f) {
-      files = f as Record<string, formidable.File>;
+      files = unwrapOne(f) as Record<string, formidable.File>;
       res.end();
     });
   });

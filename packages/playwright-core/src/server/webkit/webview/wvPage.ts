@@ -18,7 +18,7 @@
 import { PNG } from 'pngjs';
 import jpegjs from 'jpeg-js';
 import { assert } from '@isomorphic/assert';
-import { headersArrayToObject } from '@isomorphic/headers';
+import { headersArrayToObject, headersObjectToArray } from '@isomorphic/headers';
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { splitErrorMessage } from '@isomorphic/stackTrace';
 import { debugLogger } from '@utils/debugLogger';
@@ -29,6 +29,7 @@ import { TargetClosedError } from '../../errors';
 import { helper } from '../../helper';
 import { saveGlobalsSnapshotSource } from '../../javascript';
 import * as rawWebViewInputSource from '../../../generated/webViewInputSource';
+import * as rawWebViewDialogSource from '../../../generated/webViewDialogSource';
 import * as network from '../../network';
 import { Page, PageBinding } from '../../page';
 import { WVSession } from './wvConnection';
@@ -325,10 +326,10 @@ export class WVPage implements PageDelegate {
       eventsHelper.addEventListener(session, 'Network.loadingFinished', e => this._onLoadingFinished(e)),
       eventsHelper.addEventListener(session, 'Network.loadingFailed', e => this._onLoadingFailed(session, e)),
       eventsHelper.addEventListener(session, 'Network.webSocketCreated', e => this._page.frameManager.onWebSocketCreated(e.requestId, e.url)),
-      eventsHelper.addEventListener(session, 'Network.webSocketWillSendHandshakeRequest', e => this._page.frameManager.onWebSocketRequest(e.requestId)),
-      eventsHelper.addEventListener(session, 'Network.webSocketHandshakeResponseReceived', e => this._page.frameManager.onWebSocketResponse(e.requestId, e.response.status, e.response.statusText)),
-      eventsHelper.addEventListener(session, 'Network.webSocketFrameSent', e => e.response.payloadData && this._page.frameManager.onWebSocketFrameSent(e.requestId, e.response.opcode, e.response.payloadData)),
-      eventsHelper.addEventListener(session, 'Network.webSocketFrameReceived', e => e.response.payloadData && this._page.frameManager.webSocketFrameReceived(e.requestId, e.response.opcode, e.response.payloadData)),
+      eventsHelper.addEventListener(session, 'Network.webSocketWillSendHandshakeRequest', e => this._page.frameManager.onWebSocketRequest(e.requestId, headersObjectToArray(e.request.headers), e.walltime, e.timestamp)),
+      eventsHelper.addEventListener(session, 'Network.webSocketHandshakeResponseReceived', e => this._page.frameManager.onWebSocketResponse(e.requestId, e.response.status, e.response.statusText, headersObjectToArray(e.response.headers, ','))),
+      eventsHelper.addEventListener(session, 'Network.webSocketFrameSent', e => e.response.payloadData && this._page.frameManager.onWebSocketFrameSent(e.requestId, e.response.opcode, e.response.payloadData, e.timestamp)),
+      eventsHelper.addEventListener(session, 'Network.webSocketFrameReceived', e => e.response.payloadData && this._page.frameManager.webSocketFrameReceived(e.requestId, e.response.opcode, e.response.payloadData, e.timestamp)),
       eventsHelper.addEventListener(session, 'Network.webSocketClosed', e => this._page.frameManager.webSocketClosed(e.requestId)),
       eventsHelper.addEventListener(session, 'Network.webSocketFrameError', e => this._page.frameManager.webSocketError(e.requestId, e.errorMessage)),
     ];
@@ -1015,42 +1016,10 @@ const bindingBridgeSource = `
   }
 `;
 
-// Stock WebKit RDP has no dialog API. We override window.alert/confirm/prompt
-// to tunnel calls through a synchronous XHR to our DialogBridge HTTP server,
-// which holds the response until the host-side Dialog handler resolves.
 function dialogBridgeSource(endpoint: string): string {
-  return `
-    (function() {
-      const URL = ${JSON.stringify(endpoint)};
-      function post(type, message, defaultValue) {
-        const xhr = new XMLHttpRequest();
-        try { xhr.open('POST', URL, false); } catch (e) { return null; }
-        // text/plain body keeps this a "simple" CORS request — no preflight.
-        try { xhr.send(JSON.stringify({ type: type, message: message, defaultValue: defaultValue })); }
-        catch (e) { return null; }
-        if (xhr.status !== 200) return null;
-        try { return JSON.parse(xhr.responseText); } catch (e) { return null; }
-      }
-      Object.defineProperty(window, 'alert', {
-        configurable: true, writable: false,
-        value: function(message) { post('alert', String(message == null ? '' : message), ''); },
-      });
-      Object.defineProperty(window, 'confirm', {
-        configurable: true, writable: false,
-        value: function(message) {
-          const r = post('confirm', String(message == null ? '' : message), '');
-          return !!(r && r.accept);
-        },
-      });
-      Object.defineProperty(window, 'prompt', {
-        configurable: true, writable: false,
-        value: function(message, defaultValue) {
-          const def = defaultValue == null ? '' : String(defaultValue);
-          const r = post('prompt', String(message == null ? '' : message), def);
-          if (!r || !r.accept) return null;
-          return typeof r.promptText === 'string' ? r.promptText : def;
-        },
-      });
-    })();
-  `;
+  return `(() => {
+  const module = {};
+  ${rawWebViewDialogSource.source}
+  module.exports.installDialogBridge()(window, ${JSON.stringify(endpoint)});
+})()`;
 }

@@ -19,7 +19,18 @@ import { test, expect } from './pageTest.js';
 
 import path from 'path';
 import fs from 'fs';
-import formidable from 'formidable';
+import * as formidable from 'formidable';
+
+// formidable v3 always returns arrays for fields/files. Unwrap single-value
+// entries so the assertions stay v2-shaped.
+function unwrapOne<T>(record: Record<string, T[] | T> | undefined): Record<string, T> {
+  const out: Record<string, T> = {};
+  for (const key of Object.keys(record || {})) {
+    const v = (record as Record<string, T[] | T>)[key];
+    out[key] = Array.isArray(v) ? v[0] : v;
+  }
+  return out;
+}
 
 test('should upload the file', async ({ page, server, asset }) => {
   await page.goto(server.PREFIX + '/input/fileupload.html');
@@ -178,7 +189,7 @@ test('should upload large file', async ({ page, server, isAndroid, mode }, testI
       const form = new formidable.IncomingForm({ uploadDir: testInfo.outputPath() });
       form.parse(req, function(err, fields, f) {
         res.end();
-        const files = f as Record<string, formidable.File>;
+        const files = unwrapOne(f) as Record<string, formidable.File>;
         fulfill(files.file1);
       });
     });
@@ -237,7 +248,7 @@ test('should upload large file with relative path', async ({ page, server, isAnd
       const form = new formidable.IncomingForm({ uploadDir: testInfo.outputPath() });
       form.parse(req, function(err, fields, f) {
         res.end();
-        const files = f as Record<string, formidable.File>;
+        const files = unwrapOne(f) as Record<string, formidable.File>;
         fulfill(files.file1);
       });
     });
@@ -300,7 +311,7 @@ test('should detect mime type', async ({ page, server, asset }) => {
   server.setRoute('/upload', async (req, res) => {
     const form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, f) {
-      files = f as Record<string, formidable.File>;
+      files = unwrapOne(f) as Record<string, formidable.File>;
       res.end();
     });
   });
@@ -335,7 +346,7 @@ test('should not trim big uploaded files', async ({ page, server }) => {
   server.setRoute('/upload', async (req, res) => {
     const form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, f) {
-      files = f as Record<string, formidable.File>;
+      files = unwrapOne(f) as Record<string, formidable.File>;
       res.end();
     });
   });

@@ -232,12 +232,22 @@ export class TestServer {
       else
         throw error;
     });
-    (request as any).postBody = new Promise(resolve => {
-      const chunks: Buffer[] = [];
-      request.on('data', chunk => {
-        chunks.push(chunk);
-      });
-      request.on('end', () => resolve(Buffer.concat(chunks)));
+    // Lazy: attaching a `'data'` listener flips the stream into flowing mode,
+    // which steals chunks from any later consumer (e.g. formidable v3's
+    // MultipartParser). Defer until a test actually reads `postBody`.
+    let postBodyPromise: Promise<Buffer> | undefined;
+    Object.defineProperty(request, 'postBody', {
+      configurable: true,
+      get() {
+        if (!postBodyPromise) {
+          postBodyPromise = new Promise(resolve => {
+            const chunks: Buffer[] = [];
+            request.on('data', chunk => chunks.push(chunk));
+            request.on('end', () => resolve(Buffer.concat(chunks)));
+          });
+        }
+        return postBodyPromise;
+      },
     });
     const url = new URL(request.url, 'http://localhost');
     const pathWithSearch = url.pathname + url.search;

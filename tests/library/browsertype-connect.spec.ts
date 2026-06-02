@@ -23,8 +23,19 @@ import { utils, getUserAgent, getPlaywrightVersion } from '../../packages/playwr
 import WebSocket from 'ws';
 import { expect, playwrightTest } from '../config/browserTest.js';
 import { ensureSomeFrames, parseTraceRaw, suppressCertificateWarning } from '../config/utils.js';
-import formidable from 'formidable';
+import * as formidable from 'formidable';
 import type { Browser, ConnectOptions } from 'playwright-core';
+
+// formidable v3 always returns arrays for fields/files. Unwrap single-value
+// entries so the assertions stay v2-shaped.
+function unwrapOne<T>(record: Record<string, T[] | T> | undefined): Record<string, T> {
+  const out: Record<string, T> = {};
+  for (const key of Object.keys(record || {})) {
+    const v = (record as Record<string, T[] | T>)[key];
+    out[key] = Array.isArray(v) ? v[0] : v;
+  }
+  return out;
+}
 
 const { createHttpServer } = utils;
 import { kTargetClosedErrorMessage } from '../config/errors.js';
@@ -775,7 +786,7 @@ for (const kind of ['launchServer', 'run-server'] as const) {
           const form = new formidable.IncomingForm({ uploadDir: testInfo.outputPath() });
           form.parse(req, function(err, fields, f) {
             res.end();
-            const files = f as Record<string, formidable.File>;
+            const files = unwrapOne(f) as Record<string, formidable.File>;
             fulfill(files.file1);
           });
         });
