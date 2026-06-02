@@ -21,18 +21,7 @@ import type { IncomingMessage } from 'http';
 import { pipeline } from 'stream';
 import zlib from 'zlib';
 import { contextTest as it, expect } from '../config/browserTest.js';
-import { suppressCertificateWarning } from '../config/utils.js';
-
-// formidable v3 always returns arrays for fields/files. Unwrap single-value
-// entries so the assertions stay v2-shaped.
-function unwrapOne<T>(record: Record<string, T[] | T> | undefined): Record<string, T> {
-  const out: Record<string, T> = {};
-  for (const key of Object.keys(record || {})) {
-    const v = (record as Record<string, T[] | T>)[key];
-    out[key] = Array.isArray(v) ? v[0] : v;
-  }
-  return out;
-}
+import { parseMultipart, suppressCertificateWarning } from '../config/utils.js';
 import { kTargetClosedErrorMessage } from '../config/errors.js';
 
 it.skip(({ mode }) => mode !== 'default');
@@ -1040,11 +1029,9 @@ it('should encode to application/json by default', async function({ context, pag
 it('should support multipart/form-data', async function({ context, server }) {
   const formReceived = new Promise<{error: any, fields: formidable.Fields, files: Record<string, formidable.File>, serverRequest: IncomingMessage}>(resolve => {
     server.setRoute('/empty.html', async (serverRequest, res) => {
-      const form = new formidable.IncomingForm();
-      form.parse(serverRequest, (error, fields, files) => {
-        server.serveFile(serverRequest, res);
-        resolve({ error, fields: unwrapOne(fields) as formidable.Fields, files: unwrapOne(files) as Record<string, formidable.File>, serverRequest });
-      });
+      const { error, fields, files } = await parseMultipart(serverRequest);
+      server.serveFile(serverRequest, res);
+      resolve({ error, fields, files, serverRequest });
     });
   });
 
@@ -1077,11 +1064,9 @@ it('should support multipart/form-data', async function({ context, server }) {
 it('should support multipart/form-data with ReadStream values', async function({ context, page, asset, server }) {
   const formReceived = new Promise<{error: any, fields: formidable.Fields, files: Record<string, formidable.File>, serverRequest: IncomingMessage}>(resolve => {
     server.setRoute('/empty.html', async (serverRequest, res) => {
-      const form = new formidable.IncomingForm();
-      form.parse(serverRequest, (error, fields, files) => {
-        server.serveFile(serverRequest, res);
-        resolve({ error, fields: unwrapOne(fields) as formidable.Fields, files: unwrapOne(files) as Record<string, formidable.File>, serverRequest });
-      });
+      const { error, fields, files } = await parseMultipart(serverRequest);
+      server.serveFile(serverRequest, res);
+      resolve({ error, fields, files, serverRequest });
     });
   });
   const readStream = fs.createReadStream(asset('simplezip.json'));
@@ -1117,11 +1102,9 @@ it('should support multipart/form-data and keep the order', async function({ con
   const givenKeys = Object.keys(given);
   const formReceived = new Promise<{error: any, fields: formidable.Fields}>(resolve => {
     server.setRoute('/empty.html', async (serverRequest, res) => {
-      const form = new formidable.IncomingForm();
-      form.parse(serverRequest, (error, fields, files) => {
-        server.serveFile(serverRequest, res);
-        resolve({ error, fields: unwrapOne(fields) as formidable.Fields });
-      });
+      const { error, fields } = await parseMultipart(serverRequest);
+      server.serveFile(serverRequest, res);
+      resolve({ error, fields });
     });
   });
   const [{ error, fields }, response] = await Promise.all([

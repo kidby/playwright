@@ -16,21 +16,11 @@
  */
 
 import { test, expect } from './pageTest.js';
+import { parseMultipart } from '../config/utils.js';
 
 import path from 'path';
 import fs from 'fs';
-import * as formidable from 'formidable';
-
-// formidable v3 always returns arrays for fields/files. Unwrap single-value
-// entries so the assertions stay v2-shaped.
-function unwrapOne<T>(record: Record<string, T[] | T> | undefined): Record<string, T> {
-  const out: Record<string, T> = {};
-  for (const key of Object.keys(record || {})) {
-    const v = (record as Record<string, T[] | T>)[key];
-    out[key] = Array.isArray(v) ? v[0] : v;
-  }
-  return out;
-}
+import type * as formidable from 'formidable';
 
 test('should upload the file', async ({ page, server, asset }) => {
   await page.goto(server.PREFIX + '/input/fileupload.html');
@@ -186,12 +176,9 @@ test('should upload large file', async ({ page, server, isAndroid, mode }, testI
   expect(await events.evaluate(e => e)).toEqual(['input', 'change']);
   const serverFilePromise = new Promise<formidable.File>(fulfill => {
     server.setRoute('/upload', async (req, res) => {
-      const form = new formidable.IncomingForm({ uploadDir: testInfo.outputPath() });
-      form.parse(req, function(err, fields, f) {
-        res.end();
-        const files = unwrapOne(f) as Record<string, formidable.File>;
-        fulfill(files.file1);
-      });
+      const { files } = await parseMultipart(req, { uploadDir: testInfo.outputPath() });
+      res.end();
+      fulfill(files.file1);
     });
   });
   const [file1] = await Promise.all([
@@ -245,12 +232,9 @@ test('should upload large file with relative path', async ({ page, server, isAnd
   expect(await events.evaluate(e => e)).toEqual(['input', 'change']);
   const serverFilePromise = new Promise<formidable.File>(fulfill => {
     server.setRoute('/upload', async (req, res) => {
-      const form = new formidable.IncomingForm({ uploadDir: testInfo.outputPath() });
-      form.parse(req, function(err, fields, f) {
-        res.end();
-        const files = unwrapOne(f) as Record<string, formidable.File>;
-        fulfill(files.file1);
-      });
+      const { files } = await parseMultipart(req, { uploadDir: testInfo.outputPath() });
+      res.end();
+      fulfill(files.file1);
     });
   });
   const [file1] = await Promise.all([
@@ -309,11 +293,8 @@ test('should detect mime type', async ({ page, server, asset }) => {
 
   let files: Record<string, formidable.File>;
   server.setRoute('/upload', async (req, res) => {
-    const form = new formidable.IncomingForm();
-    form.parse(req, function(err, fields, f) {
-      files = unwrapOne(f) as Record<string, formidable.File>;
-      res.end();
-    });
+    ({ files } = await parseMultipart(req));
+    res.end();
   });
   await page.goto(server.EMPTY_PAGE);
   await page.setContent(`
@@ -344,11 +325,8 @@ test('should not trim big uploaded files', async ({ page, server }) => {
 
   let files: Record<string, formidable.File>;
   server.setRoute('/upload', async (req, res) => {
-    const form = new formidable.IncomingForm();
-    form.parse(req, function(err, fields, f) {
-      files = unwrapOne(f) as Record<string, formidable.File>;
-      res.end();
-    });
+    ({ files } = await parseMultipart(req));
+    res.end();
   });
   await page.goto(server.EMPTY_PAGE);
 

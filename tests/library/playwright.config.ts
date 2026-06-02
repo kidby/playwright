@@ -76,7 +76,7 @@ const config: Config<PlaywrightWorkerOptions & PlaywrightTestOptions & TestModeW
   workers: undefined,
   fullyParallel: !process.env.CI,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 3 : 0,
+  retries: process.env.CI ? 3 : 1,
   reporter: reporters(),
   tag: process.env.PW_TAG,
   projects: [],

@@ -22,20 +22,9 @@ import * as path from 'path';
 import { utils, getUserAgent, getPlaywrightVersion } from '../../packages/playwright-core/lib/coreBundle.js';
 import WebSocket from 'ws';
 import { expect, playwrightTest } from '../config/browserTest.js';
-import { ensureSomeFrames, parseTraceRaw, suppressCertificateWarning } from '../config/utils.js';
-import * as formidable from 'formidable';
+import { ensureSomeFrames, parseMultipart, parseTraceRaw, suppressCertificateWarning } from '../config/utils.js';
+import type * as formidable from 'formidable';
 import type { Browser, ConnectOptions } from 'playwright-core';
-
-// formidable v3 always returns arrays for fields/files. Unwrap single-value
-// entries so the assertions stay v2-shaped.
-function unwrapOne<T>(record: Record<string, T[] | T> | undefined): Record<string, T> {
-  const out: Record<string, T> = {};
-  for (const key of Object.keys(record || {})) {
-    const v = (record as Record<string, T[] | T>)[key];
-    out[key] = Array.isArray(v) ? v[0] : v;
-  }
-  return out;
-}
 
 const { createHttpServer } = utils;
 import { kTargetClosedErrorMessage } from '../config/errors.js';
@@ -783,12 +772,9 @@ for (const kind of ['launchServer', 'run-server'] as const) {
       expect(await events.evaluate(e => e)).toEqual(['input', 'change']);
       const serverFilePromise = new Promise<formidable.File>(fulfill => {
         server.setRoute('/upload', async (req, res) => {
-          const form = new formidable.IncomingForm({ uploadDir: testInfo.outputPath() });
-          form.parse(req, function(err, fields, f) {
-            res.end();
-            const files = unwrapOne(f) as Record<string, formidable.File>;
-            fulfill(files.file1);
-          });
+          const { files } = await parseMultipart(req, { uploadDir: testInfo.outputPath() });
+          res.end();
+          fulfill(files.file1);
         });
       });
       const [file1] = await Promise.all([

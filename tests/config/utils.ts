@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
+import { PassThrough } from 'stream';
+import * as formidable from 'formidable';
+
 import { tools } from '../../packages/playwright-core/lib/coreBundle.js';
 import { utils, iso } from '../../packages/playwright-core/lib/coreBundle.js';
 
+import type { IncomingMessage } from 'http';
 import type { iso as isoType } from '../../packages/playwright-core/lib/coreBundle.js';
 import type { Locator, Frame, Page } from 'playwright-core';
 import type { StackFrame } from '../../packages/protocol/src/channels';
@@ -266,4 +270,42 @@ export function inheritAndCleanEnv(env: NodeJS.ProcessEnv | undefined): NodeJS.P
     NODE_OPTIONS: undefined,
     ...env,
   };
+}
+
+// formidable v3 parses the request body via `'data'` listeners, but it does so
+// AFTER `await this.writeHeaders(...)`. The testserver attaches its own
+// `postBody` listener synchronously, putting the request into flowing mode —
+// chunks emit during formidable's await and never reach formidable's listener.
+// Workaround: wait for the testserver's buffered body, then replay it through
+// a PassThrough with the headers attached, and feed THAT to formidable.
+//
+// v3 also dropped `multiples`; fields/files are always arrays. We unwrap
+// single-element ones so existing v2-shaped assertions keep working.
+type RequestWithBody = IncomingMessage & { postBody: Promise<Buffer> };
+function unwrapSingle<T>(record: Record<string, T[] | T> | undefined): Record<string, T> {
+  const out: Record<string, T> = {};
+  for (const key of Object.keys(record || {})) {
+    const v = (record as Record<string, T[] | T>)[key];
+    out[key] = Array.isArray(v) ? v[0] : v;
+  }
+  return out;
+}
+export async function parseMultipart(
+  request: RequestWithBody,
+  options?: ConstructorParameters<typeof formidable.IncomingForm>[0],
+): Promise<{ error: Error | null; fields: formidable.Fields; files: Record<string, formidable.File> }> {
+  const body = await request.postBody;
+  return new Promise(resolve => {
+    const stream = new PassThrough();
+    Object.assign(stream, { headers: request.headers, method: request.method, url: request.url });
+    const form = new formidable.IncomingForm(options);
+    form.parse(stream as unknown as IncomingMessage, (error, fields, files) => {
+      resolve({
+        error,
+        fields: unwrapSingle(fields) as formidable.Fields,
+        files: unwrapSingle(files) as Record<string, formidable.File>,
+      });
+    });
+    stream.end(body);
+  });
 }
