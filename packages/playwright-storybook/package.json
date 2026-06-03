@@ -1,0 +1,35 @@
+{
+  "name": "@playwright/storybook",
+  "version": "1.61.0-next",
+  "description": "Playwright runner-native Storybook integration: auto-discover stories from index.json, render via iframe, compose with @playwright/lighthouse and axe.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/microsoft/playwright.git"
+  },
+  "homepage": "https://playwright.dev",
+  "engines": {
+    "node": ">=24"
+  },
+  "type": "module",
+  "author": {
+    "name": "Microsoft Corporation"
+  },
+  "license": "Apache-2.0",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  },
+  "dependencies": {
+    "playwright": "1.61.0-next"
+  },
+  "peerDependencies": {
+    "@playwright/test": "1.61.0-next",
+    "storybook": ">=8.1.0"
+  },
+  "peerDependenciesMeta": {
+    "axe-core": { "optional": true }
+  }
+}
