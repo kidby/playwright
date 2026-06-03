@@ -17,6 +17,7 @@
 export * from './ariaSnapshot.js';
 export * from './expectUtils.js';
 export * from './assert.js';
+export * from './base64.js';
 export * from './colors.js';
 export * from './headers.js';
 export * from './imageUtils.js';

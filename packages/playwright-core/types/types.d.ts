@@ -24035,6 +24035,279 @@ export interface AndroidWebView {
   pkg(): string;
 }
 
+/**
+ * Playwright has **experimental** support for native iOS automation via Appium 2 (XCUITest driver). Provides a
+ * top-level `_ios` handle that mirrors the existing `_android` shape but talks to an Appium server instead of ADB.
+ *
+ * *Requirements*
+ * - macOS host with Xcode + iOS Simulator, or a real iOS device with WebDriverAgent installed.
+ * - [Appium 2](https://appium.io) running with the `xcuitest` driver installed.
+ * - For real devices, the device UDID(s) must be supplied to
+ *   [ios.devices([options])](https://playwright.dev/docs/api/class-ios#ios-devices).
+ *
+ * *Known limitations*
+ * - WebView descriptors are returned, but attaching a full Playwright `Page` to an in-app WebView is a future PR.
+ *   Use `device.executeScript('mobile: setContext', [...])` for now.
+ * - Real-device enumeration requires explicit UDIDs (no ADB-equivalent auto-discovery).
+ *
+ * *How to run*
+ *
+ * ```js
+ * const { _ios: ios } = require('playwright');
+ *
+ * (async () => {
+ *   // Connect to booted iOS Simulators (macOS) or supplied real devices.
+ *   const [device] = await ios.devices({
+ *     capabilities: {
+ *       platformName: 'iOS',
+ *       'appium:automationName': 'XCUITest',
+ *       'appium:deviceName': 'iPhone 15',
+ *       'appium:platformVersion': '17.5',
+ *       'appium:app': '/path/to/app.app',
+ *     },
+ *   });
+ *   console.log(`UDID: ${device.udid()}, OS: ${device.osVersion()}`);
+ *
+ *   await device.tap({ accessibilityId: 'login-button' });
+ *   await device.fill({ accessibilityId: 'email' }, 'user@example.com');
+ *   await device.screenshot({ path: 'screen.png' });
+ *   await device.close();
+ * })();
+ * ```
+ *
+ */
+export interface Ios {
+  /**
+   * Returns the list of iOS devices that match the provided options. On macOS with no `udids` argument, returns booted
+   * iOS Simulators discovered via `xcrun simctl list -j devices`. With `udids`, returns one device per UDID using a
+   * single Appium session per device.
+   * @param options
+   */
+  devices(options?: {
+    /**
+     * W3C Appium capabilities forwarded to the server when creating a session.
+     */
+    capabilities?: Object;
+
+    /**
+     * Appium server URL. Defaults to the URL provided via the project's `appium.serverUrl` config option, or
+     * `http://127.0.0.1:4723`.
+     */
+    serverUrl?: string;
+
+    /**
+     * Explicit list of iOS device UDIDs (real devices or simulators). When omitted on macOS, simulators are
+     * auto-discovered via `xcrun simctl`.
+     */
+    udids?: Array<string>;
+  }): Promise<Array<IosDevice>>;
+}
+
+/**
+ * [IosDevice](https://playwright.dev/docs/api/class-iosdevice) represents a connected iOS device or simulator.
+ * Returned from [ios.devices([options])](https://playwright.dev/docs/api/class-ios#ios-devices). Each device wraps
+ * one Appium session.
+ */
+export interface IosDevice {
+  /**
+   * Emitted when the device session is closed.
+   */
+  on(event: 'close', listener: () => any): this;
+
+  /**
+   * Emitted when a new in-app WebView context is detected.
+   */
+  on(event: 'webview', listener: (iosWebView: IosWebView) => any): this;
+
+  /**
+   * Emitted when a WebView context disappears. The argument is the bundle ID.
+   */
+  on(event: 'webviewremoved', listener: (string: string) => any): this;
+
+  /**
+   * Adds an event listener that will be automatically removed after it is triggered once. See `addListener` for more information about this event.
+   */
+  once(event: 'close', listener: () => any): this;
+
+  /**
+   * Adds an event listener that will be automatically removed after it is triggered once. See `addListener` for more information about this event.
+   */
+  once(event: 'webview', listener: (iosWebView: IosWebView) => any): this;
+
+  /**
+   * Adds an event listener that will be automatically removed after it is triggered once. See `addListener` for more information about this event.
+   */
+  once(event: 'webviewremoved', listener: (string: string) => any): this;
+
+  /**
+   * Emitted when the device session is closed.
+   */
+  addListener(event: 'close', listener: () => any): this;
+
+  /**
+   * Emitted when a new in-app WebView context is detected.
+   */
+  addListener(event: 'webview', listener: (iosWebView: IosWebView) => any): this;
+
+  /**
+   * Emitted when a WebView context disappears. The argument is the bundle ID.
+   */
+  addListener(event: 'webviewremoved', listener: (string: string) => any): this;
+
+  /**
+   * Removes an event listener added by `on` or `addListener`.
+   */
+  removeListener(event: 'close', listener: () => any): this;
+
+  /**
+   * Removes an event listener added by `on` or `addListener`.
+   */
+  removeListener(event: 'webview', listener: (iosWebView: IosWebView) => any): this;
+
+  /**
+   * Removes an event listener added by `on` or `addListener`.
+   */
+  removeListener(event: 'webviewremoved', listener: (string: string) => any): this;
+
+  /**
+   * Removes an event listener added by `on` or `addListener`.
+   */
+  off(event: 'close', listener: () => any): this;
+
+  /**
+   * Removes an event listener added by `on` or `addListener`.
+   */
+  off(event: 'webview', listener: (iosWebView: IosWebView) => any): this;
+
+  /**
+   * Removes an event listener added by `on` or `addListener`.
+   */
+  off(event: 'webviewremoved', listener: (string: string) => any): this;
+
+  /**
+   * Emitted when the device session is closed.
+   */
+  prependListener(event: 'close', listener: () => any): this;
+
+  /**
+   * Emitted when a new in-app WebView context is detected.
+   */
+  prependListener(event: 'webview', listener: (iosWebView: IosWebView) => any): this;
+
+  /**
+   * Emitted when a WebView context disappears. The argument is the bundle ID.
+   */
+  prependListener(event: 'webviewremoved', listener: (string: string) => any): this;
+
+  /**
+   * Closes the Appium session and tears down the underlying device connection.
+   */
+  close(): Promise<void>;
+
+  /**
+   * Escape hatch for Appium's `mobile:` script commands (e.g. `mobile: setLocale`, `mobile: deepLink`). Forwards to the
+   * Appium server's `POST /session/:id/execute/sync` endpoint.
+   * @param script The Appium command name (e.g. `mobile: setLocale`).
+   * @param options
+   */
+  executeScript(script: string, options?: {
+    /**
+     * Arguments forwarded with the script.
+     */
+    args?: any;
+  }): Promise<Serializable>;
+
+  /**
+   * Fills text into an element identified by the selector.
+   * @param selector
+   * @param text
+   * @param options
+   */
+  fill(selector: IosSelector, text: string, options?: {
+    timeout?: number;
+  }): Promise<void>;
+
+  /**
+   * `true` for simulators, `false` for real devices.
+   */
+  isSimulator(): boolean;
+
+  /**
+   * The device display name (e.g. `iPhone 15`).
+   */
+  name(): string;
+
+  /**
+   * The iOS version (e.g. `17.5`).
+   */
+  osVersion(): string;
+
+  /**
+   * Returns a PNG screenshot of the device screen.
+   * @param options
+   */
+  screenshot(options?: {
+    /**
+     * Optional path on disk where the screenshot is also saved.
+     */
+    path?: string;
+  }): Promise<Buffer>;
+
+  /**
+   * Taps an element identified by the selector.
+   * @param selector iOS element selector (accessibility ID, predicate, class chain, xpath, or class name).
+   * @param options
+   */
+  tap(selector: IosSelector, options?: {
+    /**
+     * Maximum time to wait, in milliseconds. Defaults to `30000`.
+     */
+    timeout?: number;
+  }): Promise<void>;
+
+  /**
+   * The device UDID.
+   */
+  udid(): string;
+
+  /**
+   * Returns the current list of in-app WebView descriptors. Does NOT attach a Playwright `Page` — that's a future PR.
+   */
+  webViews(): Promise<Array<IosWebView>>;
+
+  [Symbol.asyncDispose](): Promise<void>;
+}
+
+/**
+ * [IosWebView](https://playwright.dev/docs/api/class-ioswebview) represents an in-app WebView descriptor returned
+ * from [iosDevice.webViews()](https://playwright.dev/docs/api/class-iosdevice#ios-device-web-views).
+ * **Descriptor-only on day 1** — attaching a full Playwright [Page](https://playwright.dev/docs/api/class-page) to
+ * drive the WebView is a future PR. For now, switch into the WebView context via `device.executeScript('mobile:
+ * setContext', [...])` and use Appium's native selectors.
+ */
+export interface IosWebView {
+  /**
+   * The hosting app's bundle identifier (e.g. `com.example.app`).
+   */
+  bundleId(): string;
+
+  /**
+   * The Appium context name (e.g. `WEBVIEW_12345.1`). Pass this to `device.executeScript('mobile: setContext',
+   * [{ name }])` to switch into the WebView.
+   */
+  contextName(): string;
+
+  /**
+   * The current document title, if available.
+   */
+  title(): string;
+
+  /**
+   * The current URL, if available.
+   */
+  url(): string;
+}
+
 export interface LaunchOptions {
   /**
    * **NOTE** Use custom browser args at your own risk, as some of them may break Playwright functionality.

@@ -5,5 +5,4 @@
 ../common/
 ../util.ts
 ../matchers/**
-node_modules/picocolors
 node_modules/yazl

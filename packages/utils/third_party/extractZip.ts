@@ -36,7 +36,7 @@ import type { Entry, Options as YauzlOptions, ZipFile } from './yauzl/index.js';
 
 const debug = debugPkg('extract-zip');
 
-const openZip = promisify<string, YauzlOptions, ZipFile>(yauzl.open);
+const openZip = promisify<string, yauzl.Options, ZipFile>(yauzl.open);
 const pipeline = promisify(stream.pipeline);
 
 export interface Options {

@@ -403,15 +403,17 @@ export class FrameManager {
     this._webSockets.set(requestId, ws);
   }
 
-  onWebSocketRequest(requestId: string, headers: types.HeadersArray, wallTime?: number, timestamp?: number) {
+  onWebSocketRequest(requestId: string, headers: types.HeadersArray, wallTimeMs?: number) {
     const ws = this._webSockets.get(requestId);
     if (!ws)
       return;
 
+    ws.setWallTimeMs(wallTimeMs);
+
     if (ws.markAsNotified())
       this._page.emit(Page.Events.WebSocket, ws);
 
-    ws.requestSent(headers, wallTime, timestamp);
+    ws.requestSent(headers);
   }
 
   onWebSocketResponse(requestId: string, status: number, statusText: string, headers: types.HeadersArray) {
@@ -424,16 +426,16 @@ export class FrameManager {
       ws.error(`${statusText}: ${status}`);
   }
 
-  onWebSocketFrameSent(requestId: string, opcode: number, data: string, timestamp: number) {
+  onWebSocketFrameSent(requestId: string, opcode: number, data: string, wallTimeMs: number) {
     const ws = this._webSockets.get(requestId);
     if (ws)
-      ws.frameSent(opcode, data, timestamp);
+      ws.frameSent(opcode, data, wallTimeMs);
   }
 
-  webSocketFrameReceived(requestId: string, opcode: number, data: string, timestamp: number) {
+  webSocketFrameReceived(requestId: string, opcode: number, data: string, wallTimeMs: number) {
     const ws = this._webSockets.get(requestId);
     if (ws)
-      ws.frameReceived(opcode, data, timestamp);
+      ws.frameReceived(opcode, data, wallTimeMs);
   }
 
   webSocketClosed(requestId: string) {
