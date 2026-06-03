@@ -29,7 +29,7 @@ export type { GestureApi, SwipeDirection, SwipeOptions, TapOptions, LongPressOpt
 export { androidCapabilities, iosCapabilities } from './capabilities.js';
 export type { AndroidCapabilityOptions, IosCapabilityOptions } from './capabilities.js';
 export { mobileTest, expect, captureFailureArtifacts } from './mobileTest.js';
-export type { AttachableTestInfo, MobileFixtures, MobileTestArgs, MobileTestOptions } from './mobileTest.js';
+export type { AppiumConfig, AttachableTestInfo, MobileFixtures, MobileTestArgs, MobileTestOptions } from './mobileTest.js';
 export { mobileMatchers } from './mobileMatchers.js';
 export type { MobileScreenshotOptions } from './screenshotComparator.js';
 

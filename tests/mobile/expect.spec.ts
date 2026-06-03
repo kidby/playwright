@@ -267,3 +267,67 @@ test('matcher rejects non-AppLocator receivers with a clear error', async () => 
   expect(err).not.toBeNull();
   expect(err!.message).toMatch(/expected an AppLocator/);
 });
+
+test('web Locator duck-typed input falls through to web semantics', async () => {
+  let visibleCalls = 0;
+  const fakeWebLocator = {
+    waitFor: async () => {},
+    isVisible: async () => { visibleCalls++; return true; },
+    isHidden: async () => false,
+    isEnabled: async () => true,
+    isDisabled: async () => false,
+    isChecked: async () => true,
+    textContent: async () => 'hello world',
+    getAttribute: async (name: string) => name === 'data-test' ? 'value-x' : null,
+    inputValue: async () => 'typed-in',
+    count: async () => 3,
+    evaluate: async () => true,
+  };
+
+  await expect(fakeWebLocator as any).toBeVisible({ timeout: 200 });
+  expect(visibleCalls).toBeGreaterThan(0);
+  await expect(fakeWebLocator as any).not.toBeHidden({ timeout: 200 });
+  await expect(fakeWebLocator as any).toBeEnabled({ timeout: 200 });
+  await expect(fakeWebLocator as any).not.toBeDisabled({ timeout: 200 });
+  await expect(fakeWebLocator as any).toBeChecked({ timeout: 200 });
+  await expect(fakeWebLocator as any).toBeFocused({ timeout: 200 });
+  await expect(fakeWebLocator as any).toHaveText('hello world', { timeout: 200 });
+  await expect(fakeWebLocator as any).toContainText('hello', { timeout: 200 });
+  await expect(fakeWebLocator as any).toHaveAttribute('data-test', 'value-x', { timeout: 200 });
+  await expect(fakeWebLocator as any).toHaveValue('typed-in', { timeout: 200 });
+  await expect(fakeWebLocator as any).toHaveCount(3, { timeout: 200 });
+});
+
+test('web Locator polling waits and surfaces timeout details', async () => {
+  let value = 'before';
+  const fakeWebLocator = {
+    waitFor: async () => {},
+    textContent: async () => value,
+    isVisible: async () => false,
+    isHidden: async () => true,
+    isEnabled: async () => false,
+    isDisabled: async () => true,
+    isChecked: async () => false,
+    getAttribute: async () => null,
+    inputValue: async () => '',
+    count: async () => 0,
+    evaluate: async () => false,
+  };
+  setTimeout(() => { value = 'after'; }, 50);
+  await expect(fakeWebLocator as any).toContainText('after', { timeout: 400 });
+
+  const err = await expect(fakeWebLocator as any)
+      .toContainText('never', { timeout: 100 })
+      .then(() => null, (e: Error) => e);
+  expect(err).not.toBeNull();
+  expect(err!.message).toMatch(/within 100ms/);
+});
+
+test('toHaveScreenshot for non-mobile target throws an actionable error', async () => {
+  const fakePage = { waitFor: async () => {}, isVisible: async () => true } as any;
+  const err = await expect(fakePage)
+      .toHaveScreenshot()
+      .then(() => null, (e: Error) => e);
+  expect(err).not.toBeNull();
+  expect(err!.message).toMatch(/import `expect` from `@playwright\/test`/);
+});

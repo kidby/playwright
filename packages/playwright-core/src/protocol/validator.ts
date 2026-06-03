@@ -1963,6 +1963,70 @@ scheme.ElementHandleWaitForSelectorParams = tObject({
 scheme.ElementHandleWaitForSelectorResult = tObject({
   element: tOptional(tChannel(['ElementHandle'])),
 });
+scheme.IosInitializer = tOptional(tObject({}));
+scheme.IosDevicesParams = tObject({
+  serverUrl: tOptional(tString),
+  capabilities: tOptional(tAny),
+  udids: tOptional(tArray(tString)),
+});
+scheme.IosDevicesResult = tObject({
+  devices: tArray(tChannel(['IosDevice'])),
+});
+scheme.IosDeviceInitializer = tObject({
+  udid: tString,
+  name: tString,
+  osVersion: tString,
+  platform: tString,
+  isSimulator: tBoolean,
+});
+scheme.IosDeviceWebViewAddedEvent = tObject({
+  webView: tType('IosWebView'),
+});
+scheme.IosDeviceWebViewRemovedEvent = tObject({
+  bundleId: tString,
+});
+scheme.IosDeviceCloseEvent = tOptional(tObject({}));
+scheme.IosDeviceTapParams = tObject({
+  iosSelector: tType('IosSelector'),
+  timeout: tFloat,
+});
+scheme.IosDeviceTapResult = tOptional(tObject({}));
+scheme.IosDeviceFillParams = tObject({
+  iosSelector: tType('IosSelector'),
+  text: tString,
+  timeout: tFloat,
+});
+scheme.IosDeviceFillResult = tOptional(tObject({}));
+scheme.IosDeviceScreenshotParams = tOptional(tObject({}));
+scheme.IosDeviceScreenshotResult = tObject({
+  binary: tBinary,
+});
+scheme.IosDeviceWebViewsParams = tOptional(tObject({}));
+scheme.IosDeviceWebViewsResult = tObject({
+  webViews: tArray(tType('IosWebView')),
+});
+scheme.IosDeviceExecuteScriptParams = tObject({
+  script: tString,
+  args: tOptional(tAny),
+});
+scheme.IosDeviceExecuteScriptResult = tObject({
+  result: tOptional(tAny),
+});
+scheme.IosDeviceCloseParams = tOptional(tObject({}));
+scheme.IosDeviceCloseResult = tOptional(tObject({}));
+scheme.IosWebView = tObject({
+  bundleId: tString,
+  title: tOptional(tString),
+  url: tOptional(tString),
+  contextName: tString,
+});
+scheme.IosSelector = tObject({
+  accessibilityId: tOptional(tString),
+  iosPredicate: tOptional(tString),
+  iosClassChain: tOptional(tString),
+  xpath: tOptional(tString),
+  className: tOptional(tString),
+});
 scheme.LocalUtilsInitializer = tObject({
   deviceDescriptors: tArray(tObject({
     name: tString,
@@ -2710,6 +2774,7 @@ scheme.PlaywrightInitializer = tObject({
   firefox: tChannel(['BrowserType']),
   webkit: tChannel(['BrowserType']),
   android: tChannel(['Android']),
+  ios: tChannel(['Ios']),
   electron: tChannel(['Electron']),
   utils: tOptional(tChannel(['LocalUtils'])),
   preLaunchedBrowser: tOptional(tChannel(['Browser'])),

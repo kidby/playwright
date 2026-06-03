@@ -19,6 +19,7 @@ import { eventsHelper  } from '@utils/eventsHelper';
 import { GlobalAPIRequestContext } from '../fetch.js';
 import { AndroidDispatcher } from './androidDispatcher.js';
 import { AndroidDeviceDispatcher } from './androidDispatcher.js';
+import { IosDispatcher } from './iosDispatcher.js';
 import { BrowserDispatcher } from './browserDispatcher.js';
 import { BrowserTypeDispatcher } from './browserTypeDispatcher.js';
 import { Dispatcher } from './dispatcher.js';
@@ -55,11 +56,13 @@ export class PlaywrightDispatcher extends Dispatcher<Playwright, channels.Playwr
     const firefox = new BrowserTypeDispatcher(scope, playwright.firefox, denyLaunch);
     const webkit = new BrowserTypeDispatcher(scope, playwright.webkit, denyLaunch);
     const android = new AndroidDispatcher(scope, playwright.android, denyLaunch);
+    const ios = new IosDispatcher(scope, playwright.ios, denyLaunch);
     const initializer: channels.PlaywrightInitializer = {
       chromium,
       firefox,
       webkit,
       android,
+      ios,
       electron: new ElectronDispatcher(scope, playwright.electron, denyLaunch),
       utils: playwright.options.isServer ? undefined : new LocalUtilsDispatcher(scope, playwright),
       socksSupport: options.socksProxy ? new SocksSupportDispatcher(scope, playwright, options.socksProxy) : undefined,

@@ -61,6 +61,46 @@ function requireAppLocator(received: unknown, matcher: string): AppLocator {
   return received;
 }
 
+type WebLocator = {
+  waitFor: (options?: { state?: 'attached' | 'detached' | 'visible' | 'hidden'; timeout?: number }) => Promise<void>;
+  isVisible: () => Promise<boolean>;
+  isHidden: () => Promise<boolean>;
+  isEnabled: () => Promise<boolean>;
+  isDisabled: () => Promise<boolean>;
+  isChecked: () => Promise<boolean>;
+  textContent: () => Promise<string | null>;
+  getAttribute: (name: string) => Promise<string | null>;
+  inputValue: () => Promise<string>;
+  count: () => Promise<number>;
+  evaluate: <R>(fn: (el: Element) => R) => Promise<R>;
+};
+
+function isWebLocator(received: unknown): received is WebLocator {
+  return !!received && typeof received === 'object' && typeof (received as WebLocator).waitFor === 'function';
+}
+
+async function pollWeb(
+  ctx: MatcherContext,
+  options: MatcherTimeoutOptions,
+  what: string,
+  check: () => Promise<{ ok: boolean; detail?: string }>,
+): Promise<MatcherResult> {
+  const isNot = !!ctx.isNot;
+  const timeout = options.timeout ?? ctx.timeout ?? 5_000;
+  const deadline = Date.now() + timeout;
+  let last: { ok: boolean; detail?: string } = { ok: false };
+  while (Date.now() <= deadline) {
+    last = await check().catch(() => ({ ok: false }));
+    if (last.ok !== isNot)
+      return { pass: !isNot, message: () => '' };
+    await new Promise(r => setTimeout(r, 100));
+  }
+  return {
+    pass: isNot,
+    message: () => `Expected ${what} within ${timeout}ms${last.detail ? ` — last: ${last.detail}` : ''}.`,
+  };
+}
+
 function requireNativeDeviceOrLocator(received: unknown, matcher: string): AppLocator | NativeDevice {
   if (received instanceof AppLocator || received instanceof NativeDevice)
     return received;
@@ -113,93 +153,159 @@ function textContains(actual: string, expected: string | RegExp): boolean {
 
 export const mobileMatchers = {
   async toBeVisible(this: MatcherContext, received: unknown, options: MatcherTimeoutOptions = {}): Promise<MatcherResult> {
-    const locator = requireAppLocator(received, 'toBeVisible');
-    return pollAssertion(this, locator, options, 'to be visible', async () => ({ ok: await locator.isDisplayed() }));
+    if (received instanceof AppLocator)
+      return pollAssertion(this, received, options, 'to be visible', async () => ({ ok: await received.isDisplayed() }));
+    if (isWebLocator(received))
+      return pollWeb(this, options, 'to be visible', async () => ({ ok: await received.isVisible() }));
+    throw new Error(`toBeVisible() expected an AppLocator or a Playwright Locator, got ${received === null ? 'null' : typeof received}`);
   },
 
   async toBeHidden(this: MatcherContext, received: unknown, options: MatcherTimeoutOptions = {}): Promise<MatcherResult> {
-    const locator = requireAppLocator(received, 'toBeHidden');
-    return pollAssertion(this, locator, options, 'to be hidden', async () => ({ ok: !(await locator.isDisplayed()) }));
+    if (received instanceof AppLocator)
+      return pollAssertion(this, received, options, 'to be hidden', async () => ({ ok: !(await received.isDisplayed()) }));
+    if (isWebLocator(received))
+      return pollWeb(this, options, 'to be hidden', async () => ({ ok: await received.isHidden() }));
+    throw new Error(`toBeHidden() expected an AppLocator or a Playwright Locator, got ${received === null ? 'null' : typeof received}`);
   },
 
   async toBeEnabled(this: MatcherContext, received: unknown, options: MatcherTimeoutOptions = {}): Promise<MatcherResult> {
-    const locator = requireAppLocator(received, 'toBeEnabled');
-    return pollAssertion(this, locator, options, 'to be enabled', async () => ({ ok: await locator.isEnabled() }));
+    if (received instanceof AppLocator)
+      return pollAssertion(this, received, options, 'to be enabled', async () => ({ ok: await received.isEnabled() }));
+    if (isWebLocator(received))
+      return pollWeb(this, options, 'to be enabled', async () => ({ ok: await received.isEnabled() }));
+    throw new Error(`toBeEnabled() expected an AppLocator or a Playwright Locator, got ${received === null ? 'null' : typeof received}`);
   },
 
   async toBeDisabled(this: MatcherContext, received: unknown, options: MatcherTimeoutOptions = {}): Promise<MatcherResult> {
-    const locator = requireAppLocator(received, 'toBeDisabled');
-    return pollAssertion(this, locator, options, 'to be disabled', async () => ({ ok: !(await locator.isEnabled()) }));
+    if (received instanceof AppLocator)
+      return pollAssertion(this, received, options, 'to be disabled', async () => ({ ok: !(await received.isEnabled()) }));
+    if (isWebLocator(received))
+      return pollWeb(this, options, 'to be disabled', async () => ({ ok: await received.isDisabled() }));
+    throw new Error(`toBeDisabled() expected an AppLocator or a Playwright Locator, got ${received === null ? 'null' : typeof received}`);
   },
 
   async toHaveText(this: MatcherContext, received: unknown, expected: string | RegExp, options: MatcherTimeoutOptions = {}): Promise<MatcherResult> {
-    const locator = requireAppLocator(received, 'toHaveText');
-    return pollAssertion(this, locator, options, `to have text ${formatExpected(expected)}`, async () => {
-      const text = await locator.text().catch(() => '');
-      return { ok: textMatches(text, expected), detail: JSON.stringify(text) };
-    });
+    if (received instanceof AppLocator) {
+      return pollAssertion(this, received, options, `to have text ${formatExpected(expected)}`, async () => {
+        const text = await received.text().catch(() => '');
+        return { ok: textMatches(text, expected), detail: JSON.stringify(text) };
+      });
+    }
+    if (isWebLocator(received)) {
+      return pollWeb(this, options, `to have text ${formatExpected(expected)}`, async () => {
+        const text = (await received.textContent().catch(() => '')) ?? '';
+        return { ok: textMatches(text, expected), detail: JSON.stringify(text) };
+      });
+    }
+    throw new Error(`toHaveText() expected an AppLocator or a Playwright Locator, got ${received === null ? 'null' : typeof received}`);
   },
 
   async toContainText(this: MatcherContext, received: unknown, expected: string | RegExp, options: MatcherTimeoutOptions = {}): Promise<MatcherResult> {
-    const locator = requireAppLocator(received, 'toContainText');
-    return pollAssertion(this, locator, options, `to contain text ${formatExpected(expected)}`, async () => {
-      const text = await locator.text().catch(() => '');
-      return { ok: textContains(text, expected), detail: JSON.stringify(text) };
-    });
+    if (received instanceof AppLocator) {
+      return pollAssertion(this, received, options, `to contain text ${formatExpected(expected)}`, async () => {
+        const text = await received.text().catch(() => '');
+        return { ok: textContains(text, expected), detail: JSON.stringify(text) };
+      });
+    }
+    if (isWebLocator(received)) {
+      return pollWeb(this, options, `to contain text ${formatExpected(expected)}`, async () => {
+        const text = (await received.textContent().catch(() => '')) ?? '';
+        return { ok: textContains(text, expected), detail: JSON.stringify(text) };
+      });
+    }
+    throw new Error(`toContainText() expected an AppLocator or a Playwright Locator, got ${received === null ? 'null' : typeof received}`);
   },
 
   async toHaveAttribute(this: MatcherContext, received: unknown, name: string, expected: string | RegExp, options: MatcherTimeoutOptions = {}): Promise<MatcherResult> {
-    const locator = requireAppLocator(received, 'toHaveAttribute');
-    return pollAssertion(this, locator, options, `attribute "${name}" to ${expected instanceof RegExp ? 'match' : 'equal'} ${formatExpected(expected)}`, async () => {
-      const value = await locator.getAttribute(name).catch(() => null);
+    const what = `attribute "${name}" to ${expected instanceof RegExp ? 'match' : 'equal'} ${formatExpected(expected)}`;
+    const evaluate = async (value: string | null): Promise<{ ok: boolean; detail?: string }> => {
       if (value === null)
         return { ok: false, detail: 'null' };
       return { ok: textMatches(value, expected), detail: JSON.stringify(value) };
-    });
+    };
+    if (received instanceof AppLocator)
+      return pollAssertion(this, received, options, what, async () => evaluate(await received.getAttribute(name).catch(() => null)));
+    if (isWebLocator(received))
+      return pollWeb(this, options, what, async () => evaluate(await received.getAttribute(name).catch(() => null)));
+    throw new Error(`toHaveAttribute() expected an AppLocator or a Playwright Locator, got ${received === null ? 'null' : typeof received}`);
   },
 
   async toHaveValue(this: MatcherContext, received: unknown, expected: string | RegExp, options: MatcherTimeoutOptions = {}): Promise<MatcherResult> {
-    const locator = requireAppLocator(received, 'toHaveValue');
-    return pollAssertion(this, locator, options, `value to ${expected instanceof RegExp ? 'match' : 'equal'} ${formatExpected(expected)}`, async () => {
-      const value = await locator.getAttribute('value').catch(() => null);
-      if (value === null)
-        return { ok: false, detail: 'null' };
-      return { ok: textMatches(value, expected), detail: JSON.stringify(value) };
-    });
+    const what = `value to ${expected instanceof RegExp ? 'match' : 'equal'} ${formatExpected(expected)}`;
+    if (received instanceof AppLocator) {
+      return pollAssertion(this, received, options, what, async () => {
+        const value = await received.getAttribute('value').catch(() => null);
+        if (value === null)
+          return { ok: false, detail: 'null' };
+        return { ok: textMatches(value, expected), detail: JSON.stringify(value) };
+      });
+    }
+    if (isWebLocator(received)) {
+      return pollWeb(this, options, what, async () => {
+        const value = await received.inputValue().catch(() => null);
+        if (value === null)
+          return { ok: false, detail: 'null' };
+        return { ok: textMatches(value, expected), detail: JSON.stringify(value) };
+      });
+    }
+    throw new Error(`toHaveValue() expected an AppLocator or a Playwright Locator, got ${received === null ? 'null' : typeof received}`);
   },
 
   async toHaveCount(this: MatcherContext, received: unknown, expected: number, options: MatcherTimeoutOptions = {}): Promise<MatcherResult> {
-    const locator = requireAppLocator(received, 'toHaveCount');
-    return pollAssertion(this, locator, options, `count to equal ${expected}`, async () => {
-      const count = await locator.count().catch(() => -1);
-      return { ok: count === expected, detail: String(count) };
-    });
+    if (received instanceof AppLocator) {
+      return pollAssertion(this, received, options, `count to equal ${expected}`, async () => {
+        const count = await received.count().catch(() => -1);
+        return { ok: count === expected, detail: String(count) };
+      });
+    }
+    if (isWebLocator(received)) {
+      return pollWeb(this, options, `count to equal ${expected}`, async () => {
+        const count = await received.count().catch(() => -1);
+        return { ok: count === expected, detail: String(count) };
+      });
+    }
+    throw new Error(`toHaveCount() expected an AppLocator or a Playwright Locator, got ${received === null ? 'null' : typeof received}`);
   },
 
   async toBeChecked(this: MatcherContext, received: unknown, options: MatcherTimeoutOptions = {}): Promise<MatcherResult> {
-    const locator = requireAppLocator(received, 'toBeChecked');
-    return pollAssertion(this, locator, options, 'to be checked', async () => {
-      const attr = locator.client.platform === 'Android' ? 'checked' : 'value';
-      const v = await locator.getAttribute(attr).catch(() => null);
-      // iOS XCUITest reports `value` as "1" for checked switches/buttons,
-      // "0" for unchecked. Android UiAutomator2 reports `checked` as
-      // "true"/"false".
-      const ok = v === 'true' || v === '1';
-      return { ok, detail: JSON.stringify(v) };
-    });
+    if (received instanceof AppLocator) {
+      return pollAssertion(this, received, options, 'to be checked', async () => {
+        const attr = received.client.platform === 'Android' ? 'checked' : 'value';
+        const v = await received.getAttribute(attr).catch(() => null);
+        const ok = v === 'true' || v === '1';
+        return { ok, detail: JSON.stringify(v) };
+      });
+    }
+    if (isWebLocator(received))
+      return pollWeb(this, options, 'to be checked', async () => ({ ok: await received.isChecked() }));
+    throw new Error(`toBeChecked() expected an AppLocator or a Playwright Locator, got ${received === null ? 'null' : typeof received}`);
   },
 
   async toBeFocused(this: MatcherContext, received: unknown, options: MatcherTimeoutOptions = {}): Promise<MatcherResult> {
-    const locator = requireAppLocator(received, 'toBeFocused');
-    return pollAssertion(this, locator, options, 'to be focused', async () => {
-      const attr = locator.client.platform === 'Android' ? 'focused' : 'hasFocus';
-      const v = await locator.getAttribute(attr).catch(() => null);
-      const ok = v === 'true' || v === '1';
-      return { ok, detail: JSON.stringify(v) };
-    });
+    if (received instanceof AppLocator) {
+      return pollAssertion(this, received, options, 'to be focused', async () => {
+        const attr = received.client.platform === 'Android' ? 'focused' : 'hasFocus';
+        const v = await received.getAttribute(attr).catch(() => null);
+        const ok = v === 'true' || v === '1';
+        return { ok, detail: JSON.stringify(v) };
+      });
+    }
+    if (isWebLocator(received)) {
+      return pollWeb(this, options, 'to be focused', async () => {
+        const focused = await received.evaluate((el: Element) => el === el.ownerDocument.activeElement).catch(() => false);
+        return { ok: focused };
+      });
+    }
+    throw new Error(`toBeFocused() expected an AppLocator or a Playwright Locator, got ${received === null ? 'null' : typeof received}`);
   },
 
   async toHaveScreenshot(this: MatcherContext, received: unknown, nameOrOptions: string | string[] | MobileScreenshotOptions = {}, maybeOptions: MobileScreenshotOptions = {}): Promise<MatcherResult> {
+    if (!(received instanceof AppLocator) && !(received instanceof NativeDevice)) {
+      throw new Error(
+          'toHaveScreenshot(): received a non-mobile target. The @playwright/mobile screenshot matcher only handles AppLocator and NativeDevice. ' +
+          'For web Page/Locator screenshots, import `expect` from `@playwright/test` directly in the spec (avoid using the same expect both for mobile and web).',
+      );
+    }
     const target = requireNativeDeviceOrLocator(received, 'toHaveScreenshot');
     const { name, options } = splitNameAndOptions(nameOrOptions, maybeOptions);
 

@@ -224,6 +224,21 @@ type ExtraHTTPHeaders = Exclude<BrowserContextOptions['extraHTTPHeaders'], undef
 type Proxy = Exclude<BrowserContextOptions['proxy'], undefined>;
 type StorageState = Exclude<BrowserContextOptions['storageState'], undefined>;
 type ServiceWorkerPolicy = Exclude<BrowserContextOptions['serviceWorkers'], undefined>;
+
+export type AppiumConfig = {
+  serverUrl?: string;
+  capabilities?: Record<string, unknown>;
+  autoStart?: boolean;
+  command?: string;
+  args?: string[];
+  cwd?: string;
+  env?: Record<string, string>;
+  timeout?: number;
+  reuseExistingServer?: boolean;
+  stdout?: 'pipe' | 'ignore';
+  stderr?: 'pipe' | 'ignore';
+  gracefulShutdown?: { signal: 'SIGINT' | 'SIGTERM'; timeout?: number };
+};
 type ConnectOptions = {
   /**
    * A browser websocket endpoint to connect to.
@@ -299,6 +314,7 @@ export interface PlaywrightTestOptions {
   navigationTimeout: number;
   serviceWorkers: ServiceWorkerPolicy;
   testIdAttribute: string;
+  appium: AppiumConfig | undefined;
 }
 
 

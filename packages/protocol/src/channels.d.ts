@@ -42,6 +42,8 @@ export type InitializerTraits<T> =
     T extends ElectronApplicationChannel ? ElectronApplicationInitializer :
     T extends FrameChannel ? FrameInitializer :
     T extends JSHandleChannel ? JSHandleInitializer :
+    T extends IosChannel ? IosInitializer :
+    T extends IosDeviceChannel ? IosDeviceInitializer :
     T extends LocalUtilsChannel ? LocalUtilsInitializer :
     T extends RequestChannel ? RequestInitializer :
     T extends RouteChannel ? RouteInitializer :
@@ -80,6 +82,8 @@ export type EventsTraits<T> =
     T extends ElectronApplicationChannel ? ElectronApplicationEvents :
     T extends FrameChannel ? FrameEvents :
     T extends JSHandleChannel ? JSHandleEvents :
+    T extends IosChannel ? IosEvents :
+    T extends IosDeviceChannel ? IosDeviceEvents :
     T extends LocalUtilsChannel ? LocalUtilsEvents :
     T extends RequestChannel ? RequestEvents :
     T extends RouteChannel ? RouteEvents :
@@ -118,6 +122,8 @@ export type EventTargetTraits<T> =
     T extends ElectronApplicationChannel ? ElectronApplicationEventTarget :
     T extends FrameChannel ? FrameEventTarget :
     T extends JSHandleChannel ? JSHandleEventTarget :
+    T extends IosChannel ? IosEventTarget :
+    T extends IosDeviceChannel ? IosDeviceEventTarget :
     T extends LocalUtilsChannel ? LocalUtilsEventTarget :
     T extends RequestChannel ? RequestEventTarget :
     T extends RouteChannel ? RouteEventTarget :
@@ -3535,6 +3541,122 @@ export type ElementHandleWaitForSelectorResult = {
 export interface ElementHandleEvents {
 }
 
+// ----------- Ios -----------
+export type IosInitializer = {};
+export interface IosEventTarget {
+}
+export interface IosChannel extends IosEventTarget, Channel {
+  _type_Ios: boolean;
+  devices(params: IosDevicesParams, progress?: Progress): Promise<IosDevicesResult>;
+}
+export type IosDevicesParams = {
+  serverUrl?: string,
+  capabilities?: any,
+  udids?: string[],
+};
+export type IosDevicesOptions = {
+  serverUrl?: string,
+  capabilities?: any,
+  udids?: string[],
+};
+export type IosDevicesResult = {
+  devices: IosDeviceChannel[],
+};
+
+export interface IosEvents {
+}
+
+// ----------- IosDevice -----------
+export type IosDeviceInitializer = {
+  udid: string,
+  name: string,
+  osVersion: string,
+  platform: string,
+  isSimulator: boolean,
+};
+export interface IosDeviceEventTarget {
+  on(event: 'webViewAdded', callback: (params: IosDeviceWebViewAddedEvent) => void): this;
+  on(event: 'webViewRemoved', callback: (params: IosDeviceWebViewRemovedEvent) => void): this;
+  on(event: 'close', callback: (params: IosDeviceCloseEvent) => void): this;
+}
+export interface IosDeviceChannel extends IosDeviceEventTarget, Channel {
+  _type_IosDevice: boolean;
+  tap(params: IosDeviceTapParams, progress?: Progress): Promise<IosDeviceTapResult>;
+  fill(params: IosDeviceFillParams, progress?: Progress): Promise<IosDeviceFillResult>;
+  screenshot(params?: IosDeviceScreenshotParams, progress?: Progress): Promise<IosDeviceScreenshotResult>;
+  webViews(params?: IosDeviceWebViewsParams, progress?: Progress): Promise<IosDeviceWebViewsResult>;
+  executeScript(params: IosDeviceExecuteScriptParams, progress?: Progress): Promise<IosDeviceExecuteScriptResult>;
+  close(params?: IosDeviceCloseParams, progress?: Progress): Promise<IosDeviceCloseResult>;
+}
+export type IosDeviceWebViewAddedEvent = {
+  webView: IosWebView,
+};
+export type IosDeviceWebViewRemovedEvent = {
+  bundleId: string,
+};
+export type IosDeviceCloseEvent = {};
+export type IosDeviceTapParams = {
+  iosSelector: IosSelector,
+  timeout: number,
+};
+export type IosDeviceTapOptions = {
+
+};
+export type IosDeviceTapResult = void;
+export type IosDeviceFillParams = {
+  iosSelector: IosSelector,
+  text: string,
+  timeout: number,
+};
+export type IosDeviceFillOptions = {
+
+};
+export type IosDeviceFillResult = void;
+export type IosDeviceScreenshotParams = {};
+export type IosDeviceScreenshotOptions = {};
+export type IosDeviceScreenshotResult = {
+  binary: Binary,
+};
+export type IosDeviceWebViewsParams = {};
+export type IosDeviceWebViewsOptions = {};
+export type IosDeviceWebViewsResult = {
+  webViews: IosWebView[],
+};
+export type IosDeviceExecuteScriptParams = {
+  script: string,
+  args?: any,
+};
+export type IosDeviceExecuteScriptOptions = {
+  args?: any,
+};
+export type IosDeviceExecuteScriptResult = {
+  result?: any,
+};
+export type IosDeviceCloseParams = {};
+export type IosDeviceCloseOptions = {};
+export type IosDeviceCloseResult = void;
+
+export interface IosDeviceEvents {
+  'webViewAdded': IosDeviceWebViewAddedEvent;
+  'webViewRemoved': IosDeviceWebViewRemovedEvent;
+  'close': IosDeviceCloseEvent;
+}
+
+export type IosWebView = {
+  bundleId: string,
+  title?: string,
+  url?: string,
+  contextName: string,
+};
+
+export type IosSelector = {
+  accessibilityId?: string,
+  iosPredicate?: string,
+  iosClassChain?: string,
+  xpath?: string,
+  className?: string,
+};
+
 // ----------- LocalUtils -----------
 export type LocalUtilsInitializer = {
   deviceDescriptors: {
@@ -4803,6 +4925,7 @@ export type PlaywrightInitializer = {
   firefox: BrowserTypeChannel,
   webkit: BrowserTypeChannel,
   android: AndroidChannel,
+  ios: IosChannel,
   electron: ElectronChannel,
   utils?: LocalUtilsChannel,
   preLaunchedBrowser?: BrowserChannel,

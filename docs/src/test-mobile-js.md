@@ -48,10 +48,55 @@ The `mobileTest` test instance contributes these fixtures on top of standard Pla
 | Fixture | Type | Notes |
 |---|---|---|
 | `device` | `NativeDevice` | The connected Appium session. |
-| `capabilities` | `AppiumCapabilities` | Required — set per project or per test via `test.use(...)`. |
-| `appiumServerUrl` | `string` | Defaults to `http://127.0.0.1:4723`. |
+| `capabilities` | `AppiumCapabilities` | Required — set per project, per test via `test.use(...)`, or via `appium.capabilities` in `playwright.config.ts` (preferred). |
+| `appiumServerUrl` | `string` | Defaults to `appium.serverUrl` from config, then `process.env.APPIUM_URL`, then `http://127.0.0.1:4723`. |
 | `descriptor` | `DeviceDescriptor \| undefined` | Pass `devices['iPhone 15']` to give Playwright the metadata for screenshot baseline naming. |
 | `defaultActionTimeoutMs` | `number` | Per-action timeout for the `AppLocator` API. Defaults to 20s locally / 30s in CI. |
+
+## Appium server in `playwright.config.ts`
+
+You can declare the Appium server URL, capabilities, and an `autoStart` flag directly in `playwright.config.ts` via the `appium` test option. When `autoStart: true`, Playwright spawns and tears down the Appium server for you (mirrors the `webServer` config pattern).
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+import { androidCapabilities, iosCapabilities } from '@playwright/mobile';
+
+export default defineConfig({
+  projects: [
+    {
+      name: 'android-pixel7',
+      use: {
+        appium: {
+          serverUrl: 'http://localhost:4723',
+          capabilities: androidCapabilities({
+            deviceName: 'Pixel_7_API_34',
+            app: '/path/to/app.apk',
+          }),
+          autoStart: true,
+        },
+      },
+    },
+    {
+      name: 'ios-simulator',
+      use: {
+        appium: {
+          serverUrl: 'http://localhost:4724',
+          capabilities: iosCapabilities({
+            deviceName: 'iPhone 15',
+            platformVersion: '17.5',
+            app: '/path/to/app.app',
+          }),
+          autoStart: true,
+        },
+      },
+    },
+  ],
+});
+```
+
+Precedence for resolving capabilities at runtime: project `appium.capabilities` → per-test `test.use({ capabilities })` → `process.env.APPIUM_URL` / env-var fallbacks. The standalone `capabilities` fixture (legacy) still works but is superseded by the config-driven path.
+
+When two projects share a `serverUrl` and both set `autoStart: true`, the second one short-circuits via `reuseExistingServer: true` (default). Set it to `false` if you want strict ownership of the port. See [`TestOptions.appium`](./test-api/class-testoptions.mdx#test-options-appium) for the full option list.
 
 ## API surface
 

@@ -17,6 +17,7 @@
 import { rewriteErrorMessage } from '@isomorphic/stackTrace';
 import { EventEmitter } from './eventEmitter.js';
 import { Android, AndroidDevice, AndroidSocket } from './android.js';
+import { Ios, IosDevice } from './ios.js';
 import { Artifact } from './artifact.js';
 import { Browser } from './browser.js';
 import { BrowserContext } from './browserContext.js';
@@ -94,6 +95,8 @@ export class Connection extends EventEmitter {
       Android: (parent, type, guid, init) => new Android(parent, type, guid, init),
       AndroidDevice: (parent, type, guid, init) => new AndroidDevice(parent, type, guid, init),
       AndroidSocket: (parent, type, guid, init) => new AndroidSocket(parent, type, guid, init),
+      Ios: (parent, type, guid, init) => new Ios(parent, type, guid, init),
+      IosDevice: (parent, type, guid, init) => new IosDevice(parent, type, guid, init),
       APIRequestContext: (parent, type, guid, init) => new APIRequestContext(parent, type, guid, init),
       Artifact: (parent, type, guid, init) => new Artifact(parent, type, guid, init),
       BindingCall: (parent, type, guid, init) => new BindingCall(parent, type, guid, init),

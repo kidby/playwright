@@ -32,6 +32,7 @@ Playwright:
     firefox: BrowserType
     webkit: BrowserType
     android: Android
+    ios: Ios
     electron: Electron
     utils: LocalUtils?
     # Only present when connecting remotely via BrowserType.connect() method.

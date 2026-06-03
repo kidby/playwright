@@ -706,3 +706,47 @@ export default defineConfig({
   },
 });
 ```
+
+## property: TestOptions.appium
+* since: v1.61
+- type: ?<[Object]>
+  - `serverUrl` ?<[string]> Appium server URL the `@playwright/mobile` fixture and `playwright._ios` will connect to. Defaults to `http://127.0.0.1:4723`.
+  - `capabilities` ?<[Object]> W3C Appium capabilities (forwarded to the server when creating a session). Project-level value wins over per-test `test.use({ capabilities })` and over env-var fallbacks.
+  - `autoStart` ?<[boolean]> If `true`, spawn the Appium server before tests run and tear it down after. Defaults to `false`.
+  - `command` ?<[string]> Executable used when `autoStart` is `true`. Defaults to `appium`.
+  - `args` ?<[Array]<[string]>> Extra command-line arguments passed to the spawned Appium process.
+  - `cwd` ?<[string]> Working directory for the spawned process.
+  - `env` ?<[Object]<[string], [string]>> Environment variables for the spawned process.
+  - `timeout` ?<[float]> Milliseconds to wait for `GET ${serverUrl}/status` before failing. Defaults to `60000`.
+  - `reuseExistingServer` ?<[boolean]> If a server is already responding at `serverUrl`, skip spawning. Defaults to `true`.
+  - `stdout` ?<[StdioPolicy]<"pipe"|"ignore">> Pipe spawned-process stdout to the runner or ignore. Defaults to `"ignore"`.
+  - `stderr` ?<[StdioPolicy]<"pipe"|"ignore">> Pipe spawned-process stderr to the runner or ignore. Defaults to `"pipe"`.
+  - `gracefulShutdown` ?<[Object]> Signal + timeout used to gracefully terminate the spawned process before SIGKILL.
+    - `signal` <[string]<"SIGINT"|"SIGTERM">>
+    - `timeout` ?<[float]> Defaults to `500` ms.
+
+Configure the Appium server used by [`mobileTest`](https://playwright.dev/docs/api/class-mobiletest) and [`playwright._ios`](https://playwright.dev/docs/api/class-ios). Set per-project to drive different devices (Android emulator, iOS simulator, real device). When `autoStart` is `true`, the runner spawns Appium for you and tears it down at the end of the run.
+
+**Usage**
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+import { androidCapabilities } from '@playwright/mobile';
+
+export default defineConfig({
+  projects: [{
+    name: 'android-pixel7',
+    use: {
+      appium: {
+        serverUrl: 'http://localhost:4723',
+        capabilities: androidCapabilities({
+          deviceName: 'Pixel_7_API_34',
+          app: '/path/to/app.apk',
+        }),
+        autoStart: true,
+        timeout: 120_000,
+      },
+    },
+  }],
+});
+```

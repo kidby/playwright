@@ -6790,6 +6790,21 @@ type ExtraHTTPHeaders = Exclude<BrowserContextOptions['extraHTTPHeaders'], undef
 type Proxy = Exclude<BrowserContextOptions['proxy'], undefined>;
 type StorageState = Exclude<BrowserContextOptions['storageState'], undefined>;
 type ServiceWorkerPolicy = Exclude<BrowserContextOptions['serviceWorkers'], undefined>;
+
+export type AppiumConfig = {
+  serverUrl?: string;
+  capabilities?: Record<string, unknown>;
+  autoStart?: boolean;
+  command?: string;
+  args?: string[];
+  cwd?: string;
+  env?: Record<string, string>;
+  timeout?: number;
+  reuseExistingServer?: boolean;
+  stdout?: 'pipe' | 'ignore';
+  stderr?: 'pipe' | 'ignore';
+  gracefulShutdown?: { signal: 'SIGINT' | 'SIGTERM'; timeout?: number };
+};
 type ConnectOptions = {
   /**
    * A browser websocket endpoint to connect to.
@@ -7703,6 +7718,39 @@ export interface PlaywrightTestOptions {
    *
    */
   testIdAttribute: string;
+  /**
+   * Configure the Appium server used by [`mobileTest`](https://playwright.dev/docs/api/class-mobiletest) and
+   * [`playwright._ios`](https://playwright.dev/docs/api/class-ios). Set per-project to drive different devices (Android
+   * emulator, iOS simulator, real device). When `autoStart` is `true`, the runner spawns Appium for you and tears it
+   * down at the end of the run.
+   *
+   * **Usage**
+   *
+   * ```js
+   * // playwright.config.ts
+   * import { defineConfig } from '@playwright/test';
+   * import { androidCapabilities } from '@playwright/mobile';
+   *
+   * export default defineConfig({
+   *   projects: [{
+   *     name: 'android-pixel7',
+   *     use: {
+   *       appium: {
+   *         serverUrl: 'http://localhost:4723',
+   *         capabilities: androidCapabilities({
+   *           deviceName: 'Pixel_7_API_34',
+   *           app: '/path/to/app.apk',
+   *         }),
+   *         autoStart: true,
+   *         timeout: 120_000,
+   *       },
+   *     },
+   *   }],
+   * });
+   * ```
+   *
+   */
+  appium: AppiumConfig | undefined;
 }
 
 

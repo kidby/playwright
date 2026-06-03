@@ -42,6 +42,21 @@ export const defaultTimeout = 30000;
 export type ShardingMode = 'partition' | 'round-robin' | 'duration-round-robin';
 export const shardingModes: ShardingMode[] = ['partition', 'round-robin', 'duration-round-robin'];
 
+export type AppiumConfig = {
+  serverUrl?: string;
+  capabilities?: Record<string, unknown>;
+  autoStart?: boolean;
+  command?: string;
+  args?: string[];
+  cwd?: string;
+  env?: Record<string, string>;
+  timeout?: number;
+  reuseExistingServer?: boolean;
+  stdout?: 'pipe' | 'ignore';
+  stderr?: 'pipe' | 'ignore';
+  gracefulShutdown?: { signal: 'SIGINT' | 'SIGTERM'; timeout?: number };
+};
+
 export class FullConfigInternal {
   readonly config: FullConfig;
   readonly configDir: string;
@@ -167,6 +182,7 @@ export class FullProjectInternal {
   readonly snapshotPathTemplate: string | undefined;
   readonly workers: number | undefined;
   readonly webServers: NonNullable<FullConfig['webServer']>[];
+  readonly appium: AppiumConfig | undefined;
   id = '';
   deps: FullProjectInternal[] = [];
   teardown: FullProjectInternal | undefined;
@@ -177,6 +193,7 @@ export class FullProjectInternal {
     this.snapshotPathTemplate = takeFirst(projectConfig.snapshotPathTemplate, config.snapshotPathTemplate);
     const webServer = projectConfig.webServer;
     this.webServers = Array.isArray(webServer) ? webServer : webServer ? [webServer] : [];
+    this.appium = takeFirst((projectConfig.use as { appium?: AppiumConfig } | undefined)?.appium, (config.use as { appium?: AppiumConfig } | undefined)?.appium);
 
     this.project = {
       grep: takeFirst(projectConfig.grep, config.grep, defaultGrep),

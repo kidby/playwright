@@ -21,7 +21,11 @@ import { mobileMatchers } from './mobileMatchers.js';
 
 import type { AppiumCapabilities } from './appiumClient.js';
 import type { DeviceDescriptor } from './nativeDevice.js';
-import type { TestFixture } from 'playwright/test';
+import type { AppiumConfig, PlaywrightTestOptions, TestFixture } from 'playwright/test';
+
+export type { AppiumConfig };
+
+type MobileFixtureArgs = MobileFixtures & Pick<PlaywrightTestOptions, 'appium'>;
 
 // Install web-first assertion matchers on Playwright's `expect`. The `extend`
 // call mutates the singleton at runtime *and* returns a `MoreMatchers`-aware
@@ -31,17 +35,11 @@ const extendedExpect = baseExpect.extend(mobileMatchers);
 export type MobileFixtures = {
   appiumServerUrl: string;
   capabilities: AppiumCapabilities;
-  // Optional Playwright device descriptor — pass `devices['iPhone 15']`
-  // to give the session metadata for screenshot baseline naming and
-  // viewport queries. Does NOT auto-derive Appium caps.
   descriptor: DeviceDescriptor | undefined;
   defaultActionTimeoutMs: number;
   device: NativeDevice;
 };
 
-// Playwright-style aliases. `MobileTestArgs` is what consumers extend
-// (`test.extend<MyArgs & MobileTestArgs>(…)`); `MobileTestOptions` is the
-// option-only subset users pass to `test.use({…})`.
 export type MobileTestArgs = MobileFixtures;
 export type MobileTestOptions = {
   appiumServerUrl?: string;
@@ -53,10 +51,18 @@ export type MobileTestOptions = {
 const DEFAULT_ACTION_TIMEOUT_LOCAL_MS = 20_000;
 const DEFAULT_ACTION_TIMEOUT_CI_MS = 30_000;
 
-const requireCapabilitiesFixture: TestFixture<AppiumCapabilities, MobileFixtures> = async () => {
+const requireCapabilitiesFixture: TestFixture<AppiumCapabilities, MobileFixtureArgs> = async ({ appium }, use) => {
+  if (appium?.capabilities) {
+    await use(appium.capabilities as AppiumCapabilities);
+    return;
+  }
   throw new Error(
-      'mobileTest: `capabilities` fixture not provided. Call test.use({ capabilities: androidCapabilities({...}) }) or set it via a project.',
+      'mobileTest: `capabilities` fixture not provided. Set `appium.capabilities` in playwright.config.ts use, or call test.use({ capabilities: androidCapabilities({...}) }).',
   );
+};
+
+const resolveServerUrl: TestFixture<string, MobileFixtureArgs> = async ({ appium }, use) => {
+  await use(appium?.serverUrl ?? process.env.APPIUM_URL ?? 'http://127.0.0.1:4723');
 };
 
 export type AttachableTestInfo = {
@@ -82,7 +88,7 @@ export async function captureFailureArtifacts(device: NativeDevice, testInfo: At
 }
 
 export const mobileTest = base.extend<MobileFixtures>({
-  appiumServerUrl: [process.env.APPIUM_URL || 'http://127.0.0.1:4723', { option: true }],
+  appiumServerUrl: [resolveServerUrl, { option: true }],
   capabilities: [requireCapabilitiesFixture, { option: true }],
   descriptor: [undefined, { option: true }],
   defaultActionTimeoutMs: [process.env.CI ? DEFAULT_ACTION_TIMEOUT_CI_MS : DEFAULT_ACTION_TIMEOUT_LOCAL_MS, { option: true }],

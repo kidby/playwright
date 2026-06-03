@@ -28,6 +28,7 @@ import { cc, configLoader, FullConfigInternal, ipc } from '../common/index.js';
 import { FSWatcher } from './fsWatcher.js';
 import { baseFullConfig } from '../isomorphic/teleReceiver.js';
 import { addGitCommitInfoPlugin } from '../plugins/gitCommitInfoPlugin.js';
+import { appiumServerPluginsForConfig } from '../plugins/appiumServerPlugin.js';
 import { webServerPluginsForConfig } from '../plugins/webServerPlugin.js';
 import { internalScreen } from '../reporters/base.js';
 import { InternalReporter } from '../reporters/internalReporter.js';
@@ -394,6 +395,7 @@ export class TestRunner extends EventEmitter<TestRunnerEventMap> {
       // Preserve plugin instances between setup and build.
       if (!this._plugins) {
         config.plugins.push(...webServerPluginsForConfig(config));
+        config.plugins.push(...appiumServerPluginsForConfig(config));
         addGitCommitInfoPlugin(config);
         this._plugins = config.plugins || [];
       } else {
@@ -449,6 +451,7 @@ export async function runAllTestsWithConfig(config: FullConfigInternal, options:
 
   // Legacy webServer support.
   config.plugins.push(...webServerPluginsForConfig(config));
+  config.plugins.push(...appiumServerPluginsForConfig(config));
 
   const filteredProjects = filterProjects(config.projects, options.projectFilter);
   const reporters = await createReporters(config, options.listMode ? 'list' : 'test', undefined, options);
