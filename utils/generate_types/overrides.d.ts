@@ -336,6 +336,14 @@ export type AndroidSelector = {
   text?: string | RegExp,
 };
 
+export type IosSelector = {
+  accessibilityId?: string,
+  iosPredicate?: string,
+  iosClassChain?: string,
+  xpath?: string,
+  className?: string,
+};
+
 export type AndroidKey =
   'Unknown' |
   'SoftLeft' | 'SoftRight' |

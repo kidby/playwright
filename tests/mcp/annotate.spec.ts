@@ -219,7 +219,7 @@ test('user-initiated annotate downloads zip with feedback.md', async ({ connectT
   expect(names).toContain('feedback.md');
   expect(names).toContain('annotations-1.png');
 
-  const mdEntry = entries.find(e => e.filename === 'feedback.md')!;
+  const mdEntry = entries.find(e => e.filename === 'feedback.md') as zipjs.FileEntry;
   const mdText = await mdEntry.getData!(new zipjs.TextWriter());
   expect(mdText).toContain('My feedback');
   expect(mdText).toContain('Screenshot 1');

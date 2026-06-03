@@ -1,1 +1,5 @@
 [*]
+@isomorphic/**
+@utils/**
+../
+../../utilsBundle.ts

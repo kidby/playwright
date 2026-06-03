@@ -27,6 +27,7 @@ node_modules/yazl
 ./chromium/
 ./electron/
 ./firefox/
+./ios/
 ./webkit/
 
 [browser.ts]

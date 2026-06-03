@@ -72,9 +72,9 @@ class ZipReport implements LoadedReport {
   }
 
   async entry(name: string): Promise<Object> {
-    const reportEntry = this._entries.get(name);
+    const reportEntry = this._entries.get(name) as zip.FileEntry;
     const writer = new zipjs.TextWriter() as zip.TextWriter;
-    await reportEntry!.getData!(writer);
+    await reportEntry.getData!(writer);
     return JSON.parse(await writer.getData());
   }
 }

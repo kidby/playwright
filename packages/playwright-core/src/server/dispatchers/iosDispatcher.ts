@@ -83,7 +83,7 @@ export class IosDeviceDispatcher extends Dispatcher<IosDevice, channels.IosDevic
     return { result };
   }
 
-  async close(_params: channels.IosDeviceCloseParams, _progress: Progress): Promise<void> {
-    await this._object.close();
+  async close(_params: channels.IosDeviceCloseParams, progress: Progress): Promise<void> {
+    await progress.race(this._object.close());
   }
 }

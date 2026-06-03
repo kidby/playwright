@@ -96,7 +96,7 @@ export default defineConfig({
 
 Precedence for resolving capabilities at runtime: project `appium.capabilities` → per-test `test.use({ capabilities })` → `process.env.APPIUM_URL` / env-var fallbacks. The standalone `capabilities` fixture (legacy) still works but is superseded by the config-driven path.
 
-When two projects share a `serverUrl` and both set `autoStart: true`, the second one short-circuits via `reuseExistingServer: true` (default). Set it to `false` if you want strict ownership of the port. See [`TestOptions.appium`](./test-api/class-testoptions.mdx#test-options-appium) for the full option list.
+When two projects share a `serverUrl` and both set `autoStart: true`, the second one short-circuits via `reuseExistingServer: true` (default). Set it to `false` if you want strict ownership of the port. See [`TestOptions.appium`](./api/class-testoptions#test-options-appium) for the full option list.
 
 ## API surface
 
