@@ -140,6 +140,18 @@ function loadAndValidateTsconfigsForFolder(folder: string): ParsedTsConfigData[]
 }
 
 const pathSeparator = process.platform === 'win32' ? ';' : ':';
+
+// Memoized per-process. `transformHook` is on the per-file-load hot path, so
+// avoid re-splitting the env var on every call. Read once, cached forever
+// (env-var changes mid-process aren't supported elsewhere in the pipeline).
+let _cachedTransformScopePrefixes: string[] | undefined;
+function getTransformScopePrefixes(): string[] {
+  if (_cachedTransformScopePrefixes === undefined) {
+    const raw = process.env.PW_TEST_SOURCE_TRANSFORM_SCOPE;
+    _cachedTransformScopePrefixes = raw ? raw.split(pathSeparator) : [];
+  }
+  return _cachedTransformScopePrefixes;
+}
 const builtins = new Set(Module.builtinModules);
 
 export function resolveHook(filename: string, specifier: string): string | undefined {
@@ -270,8 +282,7 @@ export function logTransformFallback(transformer: string, filename: string): voi
 export function transformHook(originalCode: string, filename: string, moduleUrl?: string, format?: 'commonjs' | 'module'): { code: string, serializedCache?: any } {
   const hasPreprocessor =
     process.env.PW_TEST_SOURCE_TRANSFORM &&
-    process.env.PW_TEST_SOURCE_TRANSFORM_SCOPE &&
-    process.env.PW_TEST_SOURCE_TRANSFORM_SCOPE.split(pathSeparator).some(f => filename.startsWith(f));
+    getTransformScopePrefixes().some(f => filename.startsWith(f));
   const pluginsPrologue = _transformConfig.babelPlugins;
   const pluginsEpilogue = hasPreprocessor ? [[process.env.PW_TEST_SOURCE_TRANSFORM!]] as BabelPlugin[] : [];
   // Effective format: explicit param wins, otherwise derive from the moduleUrl

@@ -18,49 +18,20 @@ import { calculateSha1 } from '@utils/crypto';
 
 import { loadReporter } from './loadUtils.js';
 import { formatError } from '../reporters/base.js';
-import AIReporter from '../reporters/ai.js';
-import { BlobReporter } from '../reporters/blob.js';
-import CSVReporter from '../reporters/csv.js';
-import DotReporter from '../reporters/dot.js';
-import EmptyReporter from '../reporters/empty.js';
-import GitHubReporter from '../reporters/github.js';
-import HtmlReporter from '../reporters/html.js';
-import JiraReporter from '../reporters/jira.js';
-import JSONReporter from '../reporters/json.js';
-import JUnitReporter from '../reporters/junit.js';
-import LineReporter from '../reporters/line.js';
-import ListReporter from '../reporters/list.js';
-import ListModeReporter from '../reporters/listModeReporter.js';
-import NewRelicReporter from '../reporters/newRelic.js';
-import XrayReporter from '../reporters/xray.js';
+import { isBuiltInReporter, resolveBuiltInReporter } from '../reporters/registry.js';
 import { wrapReporterAsV2 } from '../reporters/reporterV2.js';
-import CatalogReporter from '../reporters/catalog.js';
+import ListModeReporter from '../reporters/listModeReporter.js';
+import LineReporter from '../reporters/line.js';
+import DotReporter from '../reporters/dot.js';
 
 import type { ReporterDescription } from '../../types/test';
 import type { TestError } from '../../types/testReporter';
-import type { config as commonConfig, FullConfigInternal } from '../common/index.js';
+import type { FullConfigInternal } from '../common/index.js';
 import type { CommonReporterOptions, Screen } from '../reporters/base.js';
 import type { ReporterV2 } from '../reporters/reporterV2.js';
 import type { TestRunOptions } from './tasks.js';
 
 export async function createReporters(config: FullConfigInternal, mode: 'list' | 'test' | 'merge', descriptions?: ReporterDescription[], runOptions?: TestRunOptions): Promise<ReporterV2[]> {
-  const defaultReporters: { [key in commonConfig.BuiltInReporter]: new(arg: any) => ReporterV2 } = {
-    'blob': BlobReporter,
-    'dot': mode === 'list' ? ListModeReporter : DotReporter,
-    'line': mode === 'list' ? ListModeReporter : LineReporter,
-    'list': mode === 'list' ? ListModeReporter : ListReporter,
-    'github': GitHubReporter,
-    'json': JSONReporter,
-    'junit': JUnitReporter,
-    'null': EmptyReporter,
-    'html': HtmlReporter,
-    'catalog': CatalogReporter,
-    'ai': AIReporter,
-    'csv': CSVReporter,
-    'jira': JiraReporter,
-    'newRelic': NewRelicReporter,
-    'xray': XrayReporter,
-  };
   const reporters: ReporterV2[] = [];
   descriptions ??= config.config.reporter;
   if (runOptions?.additionalReporters)
@@ -69,8 +40,9 @@ export async function createReporters(config: FullConfigInternal, mode: 'list' |
   for (const r of descriptions) {
     const [name, arg] = r;
     const options = { ...reportOptions, ...arg };
-    if (name in defaultReporters) {
-      reporters.push(new defaultReporters[name as keyof typeof defaultReporters](options));
+    if (isBuiltInReporter(name)) {
+      const Ctor = resolveBuiltInReporter(name, mode);
+      reporters.push(new Ctor(options));
     } else {
       const reporterConstructor = await loadReporter(config, name);
       reporters.push(wrapReporterAsV2(new reporterConstructor(options)));
@@ -78,8 +50,9 @@ export async function createReporters(config: FullConfigInternal, mode: 'list' |
   }
   if (process.env.PW_TEST_REPORTER) {
     const name = process.env.PW_TEST_REPORTER;
-    if (name in defaultReporters) {
-      reporters.push(new defaultReporters[name as keyof typeof defaultReporters](reportOptions));
+    if (isBuiltInReporter(name)) {
+      const Ctor = resolveBuiltInReporter(name, mode);
+      reporters.push(new Ctor(reportOptions));
     } else {
       const reporterConstructor = await loadReporter(config, name);
       reporters.push(wrapReporterAsV2(new reporterConstructor(reportOptions)));

@@ -6,5 +6,6 @@
 ../isomorphic
 ../globals.ts
 ../package.ts
+../reporters/registry.ts
 [testType.ts]
 ../matchers/expect.ts

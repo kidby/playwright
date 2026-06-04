@@ -741,6 +741,8 @@ steps.push(new CustomCallbackStep(assertCoreBundleHasNoNodeModules));
       'playwright-core/*',
       '../package.js',
       '../globals.js',
+      // Native node addon — must load via require at runtime, not bundled.
+      'better-sqlite3',
     ],
     plugins: [],
   }, [playwrightSrc]));
@@ -757,6 +759,22 @@ steps.push(new CustomCallbackStep(assertCoreBundleHasNoNodeModules));
     entryPoints: [filePath('packages/playwright/src/transform/bunRuntime.ts')],
     outfile: filePath('packages/playwright/lib/transform/bunRuntime.js'),
     external: [],
+    plugins: [],
+  }, [playwrightSrc]));
+}
+
+// playwright/lib/transform/cacheBackend.js — standalone build so unit tests
+// can `require()` the backend directly. The same source is also pulled into
+// the runner/common/loader/worker bundles via transform.ts → compilationCache.ts.
+// Self-contained (inlines globals.js) so CJS require() works cleanly from tests.
+// `better-sqlite3` stays external — native node addon.
+{
+  const playwrightSrc = filePath('packages/playwright/src');
+  steps.push(new EsbuildStep({
+    bundle: true,
+    entryPoints: [filePath('packages/playwright/src/transform/cacheBackend.ts')],
+    outfile: filePath('packages/playwright/lib/transform/cacheBackend.js'),
+    external: ['better-sqlite3'],
     plugins: [],
   }, [playwrightSrc]));
 }
@@ -842,6 +860,7 @@ steps.push(new EsbuildStep({
     '../utils.js',
     '../matchers/expect.js',
     '../transform/esmLoader.js',
+    'better-sqlite3',
   ],
   plugins: [dynamicImportToRequirePlugin],
 }, [filePath('packages/playwright/src')]));
@@ -863,6 +882,7 @@ steps.push(new EsbuildStep({
     '../worker/workerProcessEntry.js',
     '../transform/babelBundle.js',
     '../transform/esmLoader.js',
+    'better-sqlite3',
   ],
   // HMR: same flag as coreBundle; enables the html-reporter Vite dev server
   // in watch builds (reporters/html.ts lives in this bundle).
@@ -897,6 +917,7 @@ steps.push(new EsbuildStep({
     '../package.js',
     '../util.js',
     '../transform/esmLoader.js',
+    'better-sqlite3',
   ],
   plugins: [dynamicImportToRequirePlugin],
 }, [filePath('packages/playwright/src')]));
@@ -917,6 +938,7 @@ steps.push(new EsbuildStep({
     '../utils.js',
     '../matchers/expect.js',
     '../transform/esmLoader.js',
+    'better-sqlite3',
   ],
   plugins: [dynamicImportToRequirePlugin],
 }, [filePath('packages/playwright/src')]));

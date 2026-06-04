@@ -305,11 +305,12 @@ export function toReporters(reporters: BuiltInReporter | ReporterDescription[] |
   return reporters;
 }
 
-export const builtInReporters = [
-  'list', 'line', 'dot', 'json', 'junit', 'null', 'github', 'html', 'blob',
-  'catalog', 'ai', 'csv', 'jira', 'newRelic', 'xray',
-] as const;
-export type BuiltInReporter = typeof builtInReporters[number];
+// Re-exported from the reporter registry — `reporters/registry.ts` is the
+// single source of truth for built-in reporter names and constructors.
+import { BUILT_IN_REPORTER_NAMES as builtInReporters } from '../reporters/registry.js';
+import type { BuiltInReporterName } from '../reporters/registry.js';
+export { builtInReporters };
+export type BuiltInReporter = BuiltInReporterName;
 
 export type ContextReuseMode = 'none' | 'when-possible';
 

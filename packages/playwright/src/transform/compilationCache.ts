@@ -25,12 +25,29 @@ import { isUnderTest } from '@utils/debug';
 
 import { isWorkerProcess } from '../globals.js';
 import { packageRoot } from '../package.js';
+import {
+  closeCacheDb,
+  openCacheDb,
+  scheduleLegacyLayoutCleanup,
+  sqliteAddEntry,
+  sqliteGetEntry,
+  sqliteGetSourceMap,
+  useLegacyCache,
+} from './cacheBackend.js';
+
+// `code` is populated when the compiled output fits the per-entry cap, which
+// lets the warm-path lookup skip the disk read entirely. Larger files keep
+// only the path and re-read on hit.
+const MEMORY_CACHE_CODE_CAP = 256 * 1024;
 
 export type MemoryCache = {
   codePath: string;
   sourceMapPath: string;
   dataPath: string;
   moduleUrl?: string;
+  code?: string;
+  // Set in SQLite mode so workers can re-query the DB on memory miss.
+  contentHash?: string;
 };
 
 export type SerializedCompilationCache = {
@@ -65,6 +82,17 @@ export const cacheDir = process.env.PWTEST_CACHE_DIR || (() => {
 
 const sourceMaps: Map<string, string> = new Map();
 const memoryCache = new Map<string, MemoryCache>();
+// Directories already created in this process — skip the recursive-mkdir
+// syscall on subsequent cache writes that share the same parent.
+const ensuredCacheDirs = new Set<string>();
+
+function ensureCacheDir(dirPath: string): void {
+  if (ensuredCacheDirs.has(dirPath))
+    return;
+  fs.mkdirSync(dirPath, { recursive: true });
+  ensuredCacheDirs.add(dirPath);
+}
+
 // Dependencies resolved by the loader.
 const fileDependencies = new Map<string, Set<string>>();
 // Dependencies resolved by the external bundler.
@@ -74,6 +102,8 @@ const devSourceInfix = path.sep + 'playwright' + path.sep + 'packages' + path.se
 
 export function installSourceMapSupport() {
   Error.stackTraceLimit = 200;
+  if (!useLegacyCache)
+    scheduleLegacyLayoutCleanup(cacheDir);
 
   sourceMapSupport.install({
     environment: 'node',
@@ -84,6 +114,23 @@ export function installSourceMapSupport() {
       if (!sourceMaps.has(source))
         return null;
       const sourceMapPath = sourceMaps.get(source)!;
+      // SQLite-backed entries store their key as `sqlite:<filename>#<contentHash>`.
+      // Legacy entries store a real filesystem path.
+      if (sourceMapPath.startsWith('sqlite:')) {
+        const hashIdx = sourceMapPath.indexOf('#');
+        if (hashIdx === -1)
+          return null;
+        const filename = sourceMapPath.slice('sqlite:'.length, hashIdx);
+        const contentHash = sourceMapPath.slice(hashIdx + 1);
+        const map = sqliteGetSourceMap(cacheDir, filename, contentHash);
+        if (!map)
+          return null;
+        try {
+          return { map: JSON.parse(map), url: source };
+        } catch {
+          return null;
+        }
+      }
       try {
         return {
           map: JSON.parse(fs.readFileSync(sourceMapPath, 'utf-8')),
@@ -94,6 +141,11 @@ export function installSourceMapSupport() {
       }
     }
   });
+
+  // Best-effort: close the DB on process exit so the WAL file can finalise.
+  // `exit` fires for normal termination; SIGINT/SIGTERM go through the same
+  // exit hook after the runner's own teardown.
+  process.once('exit', closeCacheDb);
 }
 
 function identitySourceMap(source: string) {
@@ -128,15 +180,82 @@ export function getFromCompilationCache(filename: string, contentHash: string, m
   // First check the memory cache by filename, this cache will always work in the worker,
   // because we just compiled this file in the loader.
   const cache = memoryCache.get(filename);
-  if (cache?.codePath) {
+  if (cache?.code !== undefined)
+    return { cachedCode: cache.code };
+  if (!useLegacyCache && cache?.contentHash) {
+    const entry = sqliteGetEntry(cacheDir, filename, cache.contentHash);
+    if (entry) {
+      if (entry.code.length <= MEMORY_CACHE_CODE_CAP)
+        cache.code = entry.code;
+      return { cachedCode: entry.code };
+    }
+  }
+  if (useLegacyCache && cache?.codePath) {
     try {
-      return { cachedCode: fs.readFileSync(cache.codePath, 'utf-8') };
+      const cachedCode = fs.readFileSync(cache.codePath, 'utf-8');
+      if (cachedCode.length <= MEMORY_CACHE_CODE_CAP)
+        cache.code = cachedCode;
+      return { cachedCode };
     } catch {
       // Not able to read the file - fall through.
     }
   }
 
-  // Then do the disk cache, this cache works between the Playwright Test runs.
+  if (useLegacyCache)
+    return _legacyDiskCacheLookup(filename, contentHash, moduleUrl);
+  return _sqliteDiskCacheLookup(filename, contentHash, moduleUrl);
+}
+
+function _sqliteDiskCacheLookup(filename: string, contentHash: string, moduleUrl?: string): CompilationCacheLookupResult {
+  const entry = sqliteGetEntry(cacheDir, filename, contentHash);
+  if (entry) {
+    const cachedInMemory = entry.code.length <= MEMORY_CACHE_CODE_CAP ? entry.code : undefined;
+    const serializedCache = _innerAddToCompilationCacheAndSerialize(filename, {
+      codePath: _sqliteSyntheticKey(filename, contentHash),
+      sourceMapPath: _sqliteSyntheticKey(filename, contentHash),
+      dataPath: _sqliteSyntheticKey(filename, contentHash),
+      moduleUrl,
+      code: cachedInMemory,
+      contentHash,
+    });
+    return { cachedCode: entry.code, serializedCache };
+  }
+
+  return {
+    addToCache: (code: string, map: any | undefined | null, data: Map<string, any>) => {
+      if (isWorkerProcess())
+        return {};
+      sqliteAddEntry(
+          cacheDir,
+          filename,
+          contentHash,
+          code,
+          map ? JSON.stringify(map) : null,
+          data.size ? JSON.stringify(Object.fromEntries(data), undefined, 2) : null,
+          moduleUrl ?? null,
+      );
+      const cachedInMemory = code.length <= MEMORY_CACHE_CODE_CAP ? code : undefined;
+      const serializedCache = _innerAddToCompilationCacheAndSerialize(filename, {
+        codePath: _sqliteSyntheticKey(filename, contentHash),
+        sourceMapPath: _sqliteSyntheticKey(filename, contentHash),
+        dataPath: _sqliteSyntheticKey(filename, contentHash),
+        moduleUrl,
+        code: cachedInMemory,
+        contentHash,
+      });
+      return { serializedCache };
+    },
+  };
+}
+
+// Synthetic identifier used when the storage is SQLite, so the existing
+// `MemoryCache` shape (designed around filesystem paths) keeps a non-empty
+// value while the actual code lives in the DB.
+function _sqliteSyntheticKey(filename: string, contentHash: string): string {
+  return `sqlite:${filename}#${contentHash}`;
+}
+
+function _legacyDiskCacheLookup(filename: string, contentHash: string, moduleUrl?: string): CompilationCacheLookupResult {
   const filePathHash = calculateFilePathHash(filename);
   const hashPrefix = filePathHash + '_' + contentHash.substring(0, 7);
   const cacheFolderName = filePathHash.substring(0, 2);
@@ -146,7 +265,8 @@ export function getFromCompilationCache(filename: string, contentHash: string, m
   const dataPath = cachePath + '.data';
   try {
     const cachedCode = fs.readFileSync(codePath, 'utf8');
-    const serializedCache = _innerAddToCompilationCacheAndSerialize(filename, { codePath, sourceMapPath, dataPath, moduleUrl });
+    const cachedInMemory = cachedCode.length <= MEMORY_CACHE_CODE_CAP ? cachedCode : undefined;
+    const serializedCache = _innerAddToCompilationCacheAndSerialize(filename, { codePath, sourceMapPath, dataPath, moduleUrl, code: cachedInMemory });
     return { cachedCode, serializedCache };
   } catch {
   }
@@ -157,13 +277,14 @@ export function getFromCompilationCache(filename: string, contentHash: string, m
         return {};
       // Trim cache. This won't help with deleted files, but it will remove storing multiple copies of the same file
       clearOldCacheEntries(cacheFolderName, filePathHash);
-      fs.mkdirSync(path.dirname(cachePath), { recursive: true });
+      ensureCacheDir(path.dirname(cachePath));
       if (map)
         fs.writeFileSync(sourceMapPath, JSON.stringify(map), 'utf8');
       if (data.size)
-        fs.writeFileSync(dataPath, JSON.stringify(Object.fromEntries(data.entries()), undefined, 2), 'utf8');
+        fs.writeFileSync(dataPath, JSON.stringify(Object.fromEntries(data), undefined, 2), 'utf8');
       fs.writeFileSync(codePath, code, 'utf8');
-      const serializedCache = _innerAddToCompilationCacheAndSerialize(filename, { codePath, sourceMapPath, dataPath, moduleUrl });
+      const cachedInMemory = code.length <= MEMORY_CACHE_CODE_CAP ? code : undefined;
+      const serializedCache = _innerAddToCompilationCacheAndSerialize(filename, { codePath, sourceMapPath, dataPath, moduleUrl, code: cachedInMemory });
       return { serializedCache };
     }
   };
@@ -243,7 +364,7 @@ export function setExternalDependencies(filename: string, deps: string[]) {
 }
 
 export function fileDependenciesForTest() {
-  return Object.fromEntries([...fileDependencies.entries()].map(entry => (
+  return Object.fromEntries([...fileDependencies].map(entry => (
     [path.basename(entry[0]), [...entry[1]].map(f => path.basename(f)).sort()]
   )));
 }
