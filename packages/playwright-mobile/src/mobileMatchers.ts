@@ -29,6 +29,14 @@ import type { MobileScreenshotOptions } from './screenshotComparator.js';
 
 export type MatcherTimeoutOptions = { timeout?: number };
 
+// Single package-wide last-resort fallback. AppLocator-based matchers prefer
+// the locator's `actionTimeoutMs` (which inherits from the device fixture, so
+// `defaultActionTimeoutMs` from config takes effect); web-locator matchers
+// and NativeDevice-only matchers fall back to this constant. Aligns mobile
+// and web assertions in mixed specs so identical `expect().toBeVisible()`
+// calls don't time out at different windows.
+const DEFAULT_MATCHER_TIMEOUT_MS = 20_000;
+
 type MatcherResult = { pass: boolean; message: () => string; name?: string; actual?: unknown; expected?: unknown };
 
 type MatcherContext = {
@@ -86,7 +94,7 @@ async function pollWeb(
   check: () => Promise<{ ok: boolean; detail?: string }>,
 ): Promise<MatcherResult> {
   const isNot = !!ctx.isNot;
-  const timeout = options.timeout ?? ctx.timeout ?? 5_000;
+  const timeout = options.timeout ?? ctx.timeout ?? DEFAULT_MATCHER_TIMEOUT_MS;
   const deadline = Date.now() + timeout;
   let last: { ok: boolean; detail?: string } = { ok: false };
   while (Date.now() <= deadline) {
@@ -316,14 +324,14 @@ export const mobileMatchers = {
     const scaleFactor = isLocator ? undefined : target.deviceScaleFactor;
 
     const capture = isLocator
-      ? async () => client.elementScreenshot(await target.resolve())
+      ? async () => target.screenshot()
       : async () => client.screenshot();
 
     const stabilizationFrames = options.stabilizationFrames ?? 2;
     const pollMs = options.pollMs ?? (isLocator ? target.pollMs : 100);
     const outerTimeoutMs = (options as MatcherTimeoutOptions).timeout
       ?? this.timeout
-      ?? (isLocator ? target.actionTimeoutMs : 20_000);
+      ?? (isLocator ? target.actionTimeoutMs : DEFAULT_MATCHER_TIMEOUT_MS);
     const stabilizationTimeoutMs = options.stabilizationTimeoutMs ?? Math.min(outerTimeoutMs, 5_000);
 
     // Playwright's `expect.extend` doesn't forward testInfo on `this`, so

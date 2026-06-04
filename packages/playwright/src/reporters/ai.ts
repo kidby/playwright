@@ -75,7 +75,6 @@ class AIReporter implements ReporterV2 {
   private _ticketRegex: RegExp | undefined;
   private _memory = new Map<string, { start: NodeJS.MemoryUsage; end?: NodeJS.MemoryUsage }>();
   private _logsByTest = new Map<string, string[]>();
-  private _currentTestId: string | undefined;
   private _testDurations: number[] = [];
 
   constructor(options: AIReporterOptions & CommonReporterOptions) {
@@ -101,7 +100,6 @@ class AIReporter implements ReporterV2 {
 
   onTestBegin(test: TestCase, _result: TestResult): void {
     const id = testKey(test);
-    this._currentTestId = id;
     if (this._options.trackMemory)
       this._memory.set(id, { start: process.memoryUsage() });
     this._logsByTest.set(id, []);

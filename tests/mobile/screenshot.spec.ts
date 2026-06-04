@@ -156,3 +156,40 @@ test('toHaveScreenshot stabilizes — waits for two matching captures', async ({
   expect(n).toBeGreaterThanOrEqual(3);
   await device.stop();
 });
+
+test('AppLocator.screenshot() returns the element PNG buffer', async () => {
+  let elementShotCalls = 0;
+  mock.setResponder(req => {
+    if (req.method === 'GET' && /\/element\/[^/]+\/screenshot$/.test(req.path)) {
+      elementShotCalls++;
+      return { body: { value: pngWhite.toString('base64') } };
+    }
+    if (req.method === 'GET' && /\/displayed$/.test(req.path))
+      return { body: { value: true } };
+    if (req.method === 'GET' && /\/enabled$/.test(req.path))
+      return { body: { value: true } };
+  });
+  const device = await newDevice();
+  const buffer = await device.app.byAccessibilityId('card').screenshot();
+  expect(Buffer.isBuffer(buffer)).toBe(true);
+  expect(buffer.length).toBeGreaterThan(0);
+  expect(elementShotCalls).toBe(1);
+  await device.stop();
+});
+
+test('AppLocator.screenshot({ path }) writes the PNG to disk', async ({}, testInfo) => {
+  mock.setResponder(req => {
+    if (req.method === 'GET' && /\/element\/[^/]+\/screenshot$/.test(req.path))
+      return { body: { value: pngWhite.toString('base64') } };
+    if (req.method === 'GET' && /\/displayed$/.test(req.path))
+      return { body: { value: true } };
+    if (req.method === 'GET' && /\/enabled$/.test(req.path))
+      return { body: { value: true } };
+  });
+  const device = await newDevice();
+  const outPath = path.join(testInfo.outputDir, 'card.png');
+  const buffer = await device.app.byAccessibilityId('card').screenshot({ path: outPath });
+  expect(fs.existsSync(outPath)).toBe(true);
+  expect(fs.readFileSync(outPath).equals(buffer)).toBe(true);
+  await device.stop();
+});

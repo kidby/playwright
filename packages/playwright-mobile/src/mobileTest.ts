@@ -70,6 +70,15 @@ export type AttachableTestInfo = {
   attach(name: string, opts: { body: Buffer | string; contentType: string }): Promise<void>;
 };
 
+// Fixture gating: the mobile `device` fixture runs once per test attempt
+// (test-scoped). Every failing retry attempt sees its own `testInfo` with
+// `status === 'failed'` and routes through captureFailureArtifacts; the
+// eventually-passing attempt is the only one we skip. This means flaky
+// tests that pass after retry DO get artifacts for each failed attempt.
+export function shouldCaptureFailureArtifacts(status: AttachableTestInfo['status']): boolean {
+  return status !== 'passed' && status !== 'skipped';
+}
+
 export async function captureFailureArtifacts(device: NativeDevice, testInfo: AttachableTestInfo): Promise<void> {
   try {
     const yaml = await device.snapshot();
@@ -98,7 +107,7 @@ export const mobileTest = base.extend<MobileFixtures>({
     try {
       await use(device);
     } finally {
-      if (testInfo.status !== 'passed' && testInfo.status !== 'skipped')
+      if (shouldCaptureFailureArtifacts(testInfo.status))
         await captureFailureArtifacts(device, testInfo);
       await device.stop().catch(() => undefined);
     }

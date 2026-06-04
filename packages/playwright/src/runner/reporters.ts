@@ -18,16 +18,21 @@ import { calculateSha1 } from '@utils/crypto';
 
 import { loadReporter } from './loadUtils.js';
 import { formatError } from '../reporters/base.js';
+import AIReporter from '../reporters/ai.js';
 import { BlobReporter } from '../reporters/blob.js';
+import CSVReporter from '../reporters/csv.js';
 import DotReporter from '../reporters/dot.js';
 import EmptyReporter from '../reporters/empty.js';
 import GitHubReporter from '../reporters/github.js';
 import HtmlReporter from '../reporters/html.js';
+import JiraReporter from '../reporters/jira.js';
 import JSONReporter from '../reporters/json.js';
 import JUnitReporter from '../reporters/junit.js';
 import LineReporter from '../reporters/line.js';
 import ListReporter from '../reporters/list.js';
 import ListModeReporter from '../reporters/listModeReporter.js';
+import NewRelicReporter from '../reporters/newRelic.js';
+import XrayReporter from '../reporters/xray.js';
 import { wrapReporterAsV2 } from '../reporters/reporterV2.js';
 import CatalogReporter from '../reporters/catalog.js';
 
@@ -50,6 +55,11 @@ export async function createReporters(config: FullConfigInternal, mode: 'list' |
     'null': EmptyReporter,
     'html': HtmlReporter,
     'catalog': CatalogReporter,
+    'ai': AIReporter,
+    'csv': CSVReporter,
+    'jira': JiraReporter,
+    'newRelic': NewRelicReporter,
+    'xray': XrayReporter,
   };
   const reporters: ReporterV2[] = [];
   descriptions ??= config.config.reporter;

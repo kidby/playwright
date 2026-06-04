@@ -39,6 +39,7 @@ const depsCache = {};
 async function checkDeps() {
   await innerCheckDeps(path.join(packagesDir, 'html-reporter'));
   await innerCheckDeps(path.join(packagesDir, 'playwright-ct-core'));
+  await innerCheckDeps(path.join(packagesDir, 'playwright-mobile'));
   await innerCheckDeps(path.join(packagesDir, 'protocol'));
   await innerCheckDeps(path.join(packagesDir, 'recorder'));
   await innerCheckDeps(path.join(packagesDir, 'trace-viewer'));

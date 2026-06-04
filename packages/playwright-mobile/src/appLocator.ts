@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+import fs from 'fs/promises';
+import path from 'path';
+
 import type { AppiumClient, ElementHandle, LocatorStrategy } from './appiumClient.js';
 
 export type LocatorChainPart = { using: LocatorStrategy; value: string };
@@ -270,6 +273,16 @@ export class AppLocator {
 
   async count(): Promise<number> {
     return (await this._resolveCandidates()).length;
+  }
+
+  async screenshot(options: LocatorScreenshotOptions = {}): Promise<Buffer> {
+    const handle = await this._waitForActionable({ requireEnabled: false, timeoutMs: options.timeout });
+    const buffer = await this._client.elementScreenshot(handle);
+    if (options.path) {
+      await fs.mkdir(path.dirname(options.path), { recursive: true });
+      await fs.writeFile(options.path, buffer);
+    }
+    return buffer;
   }
 
   chain(): LocatorChainPart[] { return [...this._chain]; }

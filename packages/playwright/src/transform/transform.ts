@@ -260,6 +260,13 @@ export function setTransformData(pluginName: string, value: any) {
   transformData.set(pluginName, value);
 }
 
+export function logTransformFallback(transformer: string, filename: string): void {
+  if (!process.env.DEBUG?.includes('pw:transform'))
+    return;
+  // eslint-disable-next-line no-restricted-properties
+  process.stderr.write(`[pw:transform] ${transformer} returned no code for ${filename}; falling back to original source\n`);
+}
+
 export function transformHook(originalCode: string, filename: string, moduleUrl?: string, format?: 'commonjs' | 'module'): { code: string, serializedCache?: any } {
   const hasPreprocessor =
     process.env.PW_TEST_SOURCE_TRANSFORM &&
@@ -286,8 +293,10 @@ export function transformHook(originalCode: string, filename: string, moduleUrl?
       const { esbuildCjsTransform }: { esbuildCjsTransform: EsbuildTransformFunction } = require(libPath('transform', 'esbuildBundle'));
       transformData = new Map<string, any>();
       const esResult = esbuildCjsTransform(originalCode, filename, _transformConfig.jsxImportSource);
-      if (!esResult?.code)
+      if (!esResult?.code) {
+        logTransformFallback('esbuild', filename);
         return { code: originalCode, serializedCache };
+      }
       const { code, map } = esResult;
       const added = addToCache!(code, map, transformData);
       return { code, serializedCache: added.serializedCache };
@@ -296,8 +305,10 @@ export function transformHook(originalCode: string, filename: string, moduleUrl?
     const { oxcTransform }: { oxcTransform: OxcTransformFunction } = require(libPath('transform', 'oxcBundle'));
     transformData = new Map<string, any>();
     const oxcResult = oxcTransform(originalCode, filename, _transformConfig.jsxImportSource);
-    if (!oxcResult?.code)
+    if (!oxcResult?.code) {
+      logTransformFallback('oxc', filename);
       return { code: originalCode, serializedCache };
+    }
     const { code, map } = oxcResult;
     const added = addToCache!(code, map, transformData);
     return { code, serializedCache: added.serializedCache };
@@ -320,8 +331,10 @@ export function transformHook(originalCode: string, filename: string, moduleUrl?
     { ...(opts || {}), setTransformData: setTransformDataForPlugin },
   ]);
   const babelResult = babelTransform(originalCode, filename, effectiveFormat === 'module', wrappedPrologue, pluginsEpilogue, _transformConfig.jsxImportSource);
-  if (!babelResult?.code)
+  if (!babelResult?.code) {
+    logTransformFallback('babel', filename);
     return { code: originalCode, serializedCache };
+  }
   const { code, map } = babelResult;
   const added = addToCache!(code, map, transformData);
   return { code, serializedCache: added.serializedCache };

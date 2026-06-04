@@ -16,8 +16,8 @@
 
 export { AppiumClient } from './appiumClient.js';
 export type { AppiumCapabilities, ElementHandle, LocatorStrategy } from './appiumClient.js';
-export { AppLocator, AppLocator as Locator } from './appLocator.js';
-export type { LocatorChainPart, LocatorFilter } from './appLocator.js';
+export { AppLocator } from './appLocator.js';
+export type { LocatorChainPart, LocatorFilter, LocatorScreenshotOptions } from './appLocator.js';
 export { NativeDevice } from "./nativeDevice.js";
 export type { AndroidKey, DeviceDescriptor, ScreenRecordingOptions, Viewport, WaitOptions } from "./nativeDevice.js";
 export { listWebViewContexts, switchToWebViewContext, waitForWebViewContext, NATIVE_APP_CONTEXT } from './webview.js';
@@ -28,7 +28,7 @@ export { gestures } from './gestures.js';
 export type { GestureApi, SwipeDirection, SwipeOptions, TapOptions, LongPressOptions, DoubleTapOptions, ScrollToElementOptions, PullToRefreshOptions } from './gestures.js';
 export { androidCapabilities, iosCapabilities } from './capabilities.js';
 export type { AndroidCapabilityOptions, IosCapabilityOptions } from './capabilities.js';
-export { mobileTest, expect, captureFailureArtifacts } from './mobileTest.js';
+export { mobileTest, expect, captureFailureArtifacts, shouldCaptureFailureArtifacts } from './mobileTest.js';
 export type { AppiumConfig, AttachableTestInfo, MobileFixtures, MobileTestArgs, MobileTestOptions } from './mobileTest.js';
 export { mobileMatchers } from './mobileMatchers.js';
 export type { MobileScreenshotOptions } from './screenshotComparator.js';

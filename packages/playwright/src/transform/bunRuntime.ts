@@ -41,12 +41,15 @@ export function isBun(): boolean {
   return !!process.versions.bun;
 }
 
-let installed = false;
+const INSTALL_KEY = Symbol.for('playwright.bunRuntimeInstalled');
 
 export function installBunRuntime(): void {
-  if (!isBun() || installed)
+  if (!isBun())
     return;
-  installed = true;
+  const globals = globalThis as unknown as Record<symbol, boolean | undefined>;
+  if (globals[INSTALL_KEY])
+    return;
+  globals[INSTALL_KEY] = true;
   Bun!.plugin({
     name: 'playwright-bun-runtime',
     setup(build) {

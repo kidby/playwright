@@ -307,7 +307,7 @@ export function toReporters(reporters: BuiltInReporter | ReporterDescription[] |
 
 export const builtInReporters = [
   'list', 'line', 'dot', 'json', 'junit', 'null', 'github', 'html', 'blob',
-  'catalog',
+  'catalog', 'ai', 'csv', 'jira', 'newRelic', 'xray',
 ] as const;
 export type BuiltInReporter = typeof builtInReporters[number];
 

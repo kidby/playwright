@@ -145,7 +145,73 @@ itBun('Bun.plugin onLoad handles .tsx with JSX correctly', async ({}, testInfo) 
   expect(result.stdout).toBe('1');
 });
 
-// Idempotency of installBunRuntime() is not externally observable: Bun.plugin is a non-writable,
-// non-configurable property and cannot be spied. The guard `if (installed) return` is unit-tested
-// transitively by the onLoad smoke test above — if it were broken, the second registration would
-// also fire and double-transform sources, which would either produce duplicated edits or throw.
+// The install guard is now a `Symbol.for('playwright.bunRuntimeInstalled')` stamp on globalThis,
+// so it's testable by stubbing the entire `Bun` global with a plain object whose `plugin` we can
+// spy. This is how we catch double-registration that would otherwise survive multiple module copies
+// loading in the same process (workspace symlinks, npm hoisting).
+
+const INSTALL_KEY = Symbol.for('playwright.bunRuntimeInstalled');
+
+type BunStub = {
+  plugin: (p: { name: string; setup: (b: unknown) => void }) => void;
+  pathToFileURL: (path: string) => URL;
+  calls: string[];
+};
+
+function withFakeBun<T>(fn: (bun: BunStub) => T): T {
+  const originalVersions = process.versions;
+  const globals = globalThis as unknown as Record<symbol | string, unknown>;
+  const originalBun = globals.Bun;
+  const originalGuard = globals[INSTALL_KEY];
+  Object.defineProperty(process, 'versions', {
+    value: { ...originalVersions, bun: '1.0.0' },
+    configurable: true,
+  });
+  const calls: string[] = [];
+  const bun: BunStub = {
+    plugin: p => { calls.push(p.name); },
+    pathToFileURL: (p: string) => new URL('file://' + p),
+    calls,
+  };
+  globals.Bun = bun;
+  delete globals[INSTALL_KEY];
+  try {
+    return fn(bun);
+  } finally {
+    Object.defineProperty(process, 'versions', { value: originalVersions, configurable: true });
+    if (originalBun === undefined)
+      delete globals.Bun;
+    else
+      globals.Bun = originalBun;
+    if (originalGuard === undefined)
+      delete globals[INSTALL_KEY];
+    else
+      globals[INSTALL_KEY] = originalGuard;
+  }
+}
+
+const { installBunRuntime } = require(bunRuntimeJs) as typeof import('../../packages/playwright/src/transform/bunRuntime.js');
+
+test('installBunRuntime registers Bun.plugin exactly once across repeated calls', () => {
+  withFakeBun(bun => {
+    installBunRuntime();
+    installBunRuntime();
+    installBunRuntime();
+    expect(bun.calls).toEqual(['playwright-bun-runtime']);
+  });
+});
+
+test('clearing the Symbol.for guard allows a fresh registration', () => {
+  withFakeBun(bun => {
+    installBunRuntime();
+    expect(bun.calls.length).toBe(1);
+    const globals = globalThis as unknown as Record<symbol, unknown>;
+    delete globals[INSTALL_KEY];
+    installBunRuntime();
+    expect(bun.calls.length).toBe(2);
+  });
+});
+
+test('installBunRuntime is a no-op when isBun() reports false', () => {
+  expect(() => installBunRuntime()).not.toThrow();
+});
