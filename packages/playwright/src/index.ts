@@ -527,7 +527,6 @@ function shouldCaptureVideo(videoMode: VideoMode, testInfo: TestInfo) {
   return videoMode === 'on'
     || videoMode === 'retain-on-failure'
     || videoMode === 'retain-on-failure-and-retries'
-    || videoMode === 'retain-all-failures'
     || (videoMode === 'on-first-retry' && testInfo.retry === 1)
     || (videoMode === 'on-all-retries' && testInfo.retry > 0)
     || (videoMode === 'retain-on-first-failure' && testInfo.retry === 0);
@@ -542,7 +541,6 @@ function shouldPreserveVideo(videoMode: VideoMode, testInfo: TestInfo) {
       return true;
     case 'retain-on-failure':
     case 'retain-on-first-failure':
-    case 'retain-all-failures':
       return testFailed;
     case 'retain-on-failure-and-retries':
       return testFailed || testInfo.retry > 0;
