@@ -54,6 +54,7 @@ export class TestServer {
   private _gzipRoutes = new Set<string>();
   private _requestSubscribers = new Map<string, Promise<any>>();
   private _upgradeCallback: (actions: UpgradeActions) => void | undefined;
+  private _sockets = new Set<net.Socket>();
   readonly PORT: number;
   readonly PREFIX: string;
   readonly CROSS_PROCESS_PREFIX: string;
@@ -87,7 +88,11 @@ export class TestServer {
       this._server = createHttpsServer(sslOptions, this._onRequest.bind(this));
     else
       this._server = createHttpServer(this._onRequest.bind(this));
-    this._server.on('connection', socket => this._onSocket(socket));
+    this._server.on('connection', socket => {
+      this._sockets.add(socket);
+      socket.once('close', () => this._sockets.delete(socket));
+      this._onSocket(socket);
+    });
     this._wsServer = new WebSocketServer({ noServer: true });
     this._server.on('upgrade', async (request, socket, head) => {
       const doUpgrade = () => {
@@ -219,7 +224,12 @@ export class TestServer {
     this._gzipRoutes.clear();
     this._upgradeCallback = undefined;
     this._wsServer.removeAllListeners('connection');
-    this._server.closeAllConnections();
+    // Bun's http.Server.closeAllConnections() closes the listening socket
+    // itself (not just open connections), breaking subsequent requests.
+    // Destroy tracked client sockets manually so the listener stays up.
+    for (const socket of this._sockets)
+      socket.destroy();
+    this._sockets.clear();
     for (const subscriber of this._requestSubscribers.values())
       subscriber[rejectSymbol].call(null);
     this._requestSubscribers.clear();

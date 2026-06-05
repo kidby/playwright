@@ -17,9 +17,14 @@
 import fs from 'fs';
 import path from 'path';
 
-import Database from 'better-sqlite3';
-
 import { isWorkerProcess } from '../globals.js';
+
+// `better-sqlite3` is a native binding — loading it parses ~30 KB of JS plus
+// the .node addon binding (50-100 ms cold). Defer to `openCacheDb()` so the
+// cost lands on first cache access, not at module-import time.
+// `import type` here keeps the types available for declarations without
+// triggering the runtime require.
+import type Database from 'better-sqlite3';
 
 export type SqliteCacheEntry = {
   code: string;
@@ -31,6 +36,15 @@ export type SqliteCacheEntry = {
 // One-shot env-var check: `PWTEST_LEGACY_CACHE=1` reverts to the file-per-hash
 // layout. Useful as a rollback escape hatch if the SQLite backend misbehaves.
 export const useLegacyCache = !!process.env.PWTEST_LEGACY_CACHE;
+
+let _DatabaseCtor: typeof Database | undefined;
+function loadDatabaseCtor(): typeof Database {
+  if (!_DatabaseCtor) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    _DatabaseCtor = require('better-sqlite3');
+  }
+  return _DatabaseCtor!;
+}
 
 let _db: Database.Database | undefined;
 let _dbOpenAttempted = false;
@@ -58,7 +72,8 @@ export function openCacheDb(cacheDir: string): Database.Database | undefined {
   try {
     if (!readonly)
       fs.mkdirSync(cacheDir, { recursive: true });
-    _db = new Database(dbPath, { readonly, fileMustExist: readonly });
+    const DatabaseCtor = loadDatabaseCtor();
+    _db = new DatabaseCtor(dbPath, { readonly, fileMustExist: readonly });
     if (!readonly) {
       _db.exec(`
         CREATE TABLE IF NOT EXISTS cache (
@@ -105,6 +120,9 @@ function deleteStmt(db: Database.Database): Database.Statement {
 }
 
 export function sqliteGetEntry(cacheDir: string, filename: string, contentHash: string): SqliteCacheEntry | undefined {
+  const queued = _queueIndex.get(queueKey(filename, contentHash));
+  if (queued)
+    return { code: queued[2], sourceMap: queued[3], data: queued[4], moduleUrl: queued[5] };
   const db = openCacheDb(cacheDir);
   if (!db)
     return undefined;
@@ -119,6 +137,9 @@ export function sqliteGetEntry(cacheDir: string, filename: string, contentHash: 
 }
 
 export function sqliteGetSourceMap(cacheDir: string, filename: string, contentHash: string): string | undefined {
+  const queued = _queueIndex.get(queueKey(filename, contentHash));
+  if (queued)
+    return queued[3] ?? undefined;
   const db = openCacheDb(cacheDir);
   if (!db)
     return undefined;
@@ -130,6 +151,73 @@ export function sqliteGetSourceMap(cacheDir: string, filename: string, contentHa
   }
 }
 
+// Write batching. Each `transformHook` cache miss calls sqliteAddEntry; on a
+// cold cache that's hundreds of synchronous INSERT OR REPLACE + DELETE pairs,
+// each paying WAL fsync overhead. Wrap consecutive inserts in a single
+// transaction (32 rows or 10 ms, whichever comes first), amortising the
+// fsync across the batch. Drops the synthetic-transform overhead from
+// +22% over the upstream file-per-hash path back toward parity.
+type QueuedEntry = [
+  filename: string,
+  contentHash: string,
+  code: string,
+  sourceMap: string | null,
+  data: string | null,
+  moduleUrl: string | null,
+  mtime: number,
+];
+const FLUSH_AFTER = 32;
+const FLUSH_MS = 10;
+const _queue: QueuedEntry[] = [];
+// Mirror the queue keyed by (filename, contentHash) so same-process reads
+// after a batched write find the in-memory copy before falling back to the
+// DB. Without this, a write-then-read in the same process would miss the
+// cache for up to FLUSH_MS.
+const _queueIndex = new Map<string, QueuedEntry>();
+let _queuedCacheDir: string | undefined;
+let _flushTimer: NodeJS.Timeout | undefined;
+let _flushTransaction: ((rows: QueuedEntry[]) => void) | undefined;
+
+function queueKey(filename: string, contentHash: string): string {
+  return filename + '\0' + contentHash;
+}
+
+function buildFlushTransaction(db: Database.Database): (rows: QueuedEntry[]) => void {
+  const ins = insertStmt(db);
+  const del = deleteStmt(db);
+  return db.transaction((rows: QueuedEntry[]) => {
+    for (const r of rows) {
+      ins.run(r[0], r[1], r[2], r[3], r[4], r[5], r[6]);
+      // Prune older content-hashes for the same filename — same as the
+      // pre-batching path, just inside the transaction so it amortises too.
+      del.run(r[0], r[1]);
+    }
+  }) as unknown as (rows: QueuedEntry[]) => void;
+}
+
+export function flushSqliteWrites(): void {
+  if (_flushTimer) {
+    clearTimeout(_flushTimer);
+    _flushTimer = undefined;
+  }
+  if (!_queue.length || !_queuedCacheDir)
+    return;
+  const db = openCacheDb(_queuedCacheDir);
+  if (!db) {
+    _queue.length = 0;
+    return;
+  }
+  try {
+    if (!_flushTransaction)
+      _flushTransaction = buildFlushTransaction(db);
+    _flushTransaction(_queue);
+  } catch {
+    // Best-effort: cache failures must not break the test run.
+  }
+  _queue.length = 0;
+  _queueIndex.clear();
+}
+
 export function sqliteAddEntry(
   cacheDir: string,
   filename: string,
@@ -139,18 +227,26 @@ export function sqliteAddEntry(
   data: string | null,
   moduleUrl: string | null,
 ): void {
-  const db = openCacheDb(cacheDir);
-  if (!db)
+  // Workers open the DB read-only; queueing in-process is wasted memory.
+  if (isWorkerProcess())
     return;
-  try {
-    insertStmt(db).run(filename, contentHash, code, sourceMap, data, moduleUrl, Date.now());
-    deleteStmt(db).run(filename, contentHash);
-  } catch {
-    // Best-effort. Cache failures must not break the test run.
+  _queuedCacheDir = cacheDir;
+  const entry: QueuedEntry = [filename, contentHash, code, sourceMap, data, moduleUrl, Date.now()];
+  _queue.push(entry);
+  _queueIndex.set(queueKey(filename, contentHash), entry);
+  if (_queue.length >= FLUSH_AFTER) {
+    flushSqliteWrites();
+    return;
   }
+  if (!_flushTimer)
+    _flushTimer = setTimeout(flushSqliteWrites, FLUSH_MS).unref();
 }
 
 export function closeCacheDb(): void {
+  // Flush any pending writes before tearing down. installSourceMapSupport
+  // registers this on `process.once('exit', ...)`, so this is the last
+  // chance to persist a partial batch.
+  flushSqliteWrites();
   if (!_db)
     return;
   try {
@@ -163,6 +259,7 @@ export function closeCacheDb(): void {
   _selectMapStmt = undefined;
   _insertStmt = undefined;
   _deleteStmt = undefined;
+  _flushTransaction = undefined;
   _dbOpenAttempted = false;
 }
 

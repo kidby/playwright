@@ -24,6 +24,41 @@ import { serializeError } from '../util.js';
 
 import type { EnvProducedPayload, ProcessInitParams, TestInfoErrorPayload } from './ipc.js';
 
+// Transport abstraction so the same worker entry runs under both
+// `child_process.fork` (Node mode, uses process.send/process.on('message'))
+// and `worker_threads.Worker` / `Bun.Worker` (uses parentPort). The fork path
+// stays the default on Node; the Worker path is enabled on Bun by the parent
+// in runner/processHost.ts to unlock Bun's zero-copy postMessage fast path.
+type WorkerTransport = {
+  postMessage(msg: unknown): void;
+  onMessage(handler: (msg: any) => void): void;
+  readonly isWorkerThread: boolean;
+};
+
+function createTransport(): WorkerTransport {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const wt = require('node:worker_threads') as typeof import('node:worker_threads');
+    if (!wt.isMainThread && wt.parentPort) {
+      const port = wt.parentPort;
+      return {
+        postMessage: m => port.postMessage(m),
+        onMessage: h => port.on('message', h),
+        isWorkerThread: true,
+      };
+    }
+  } catch {
+    // worker_threads unavailable — fall through to fork path.
+  }
+  return {
+    postMessage: m => process.send!(m),
+    onMessage: h => process.on('message', h),
+    isWorkerThread: false,
+  };
+}
+
+const transport = createTransport();
+
 export type ProtocolRequest = {
   id: number;
   method: string;
@@ -65,11 +100,17 @@ const startingEnv = { ...process.env };
 export function startProcessRunner(create: (params: any) => ProcessRunner) {
   sendMessageToParent({ method: 'ready' });
 
-  process.on('disconnect', () => gracefullyCloseAndExit(true));
-  process.on('SIGINT', () => {});
-  process.on('SIGTERM', () => {});
+  // Workers don't receive a `disconnect` event (no separate IPC channel) and
+  // don't observe SIGINT/SIGTERM — the parent process handles signals and
+  // drives shutdown via worker.terminate() or an explicit `__stop__` message.
+  // Under child_process.fork these handlers stay as the original safety net.
+  if (!transport.isWorkerThread) {
+    process.on('disconnect', () => gracefullyCloseAndExit(true));
+    process.on('SIGINT', () => {});
+    process.on('SIGTERM', () => {});
+  }
 
-  process.on('message', async (message: any) => {
+  transport.onMessage(async (message: any) => {
     if (message.method === '__init__') {
       const { processParams, runnerParams } = message.params as { processParams: ProcessInitParams, runnerParams: any };
       void startProfiling();
@@ -123,7 +164,7 @@ async function gracefullyCloseAndExit(forceExit: boolean) {
 
 function sendMessageToParent(message: { method: string, params?: any }) {
   try {
-    process.send!(message);
+    transport.postMessage(message);
   } catch (e) {
     try {
       // By default, the IPC messages are serialized as JSON.

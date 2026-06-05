@@ -294,7 +294,10 @@ export class TestTypeImpl {
         if (result.timedOut)
           throw new TimeoutError(`Step timeout of ${options.timeout}ms exceeded.`);
         step.complete({});
-        return result.result;
+        // tsgo can't narrow `{ result: T; timedOut: false } | { timedOut: true }` here
+        // under `strictNullChecks: false`. The runtime branch is correct — timedOut is
+        // false here — so the cast is a no-op at runtime.
+        return (result as { result: T; timedOut: false }).result;
       } catch (error) {
         step.complete({ error });
         throw error;

@@ -16,12 +16,15 @@
 
 import child_process from 'child_process';
 import { EventEmitter } from 'events';
+import path from 'path';
 import url from 'url';
 
 import debug from '@utils/debugLog';
 import { assert } from '@isomorphic/assert';
 import { monotonicTime, timeOrigin } from '@isomorphic/time';
 import { raceAgainstDeadline } from '@isomorphic/timeoutRunner';
+
+import { flushSqliteWrites } from '../transform/cacheBackend.js';
 
 import type { ipc, processRunner } from '../common/index.js';
 
@@ -31,8 +34,29 @@ export type ProcessExitData = {
   signal: NodeJS.Signals | null;
 };
 
+// Transport abstraction so the test runner can run workers as either
+// `child_process.fork` (Node mode, IPC channel) or `Bun.Worker` (Bun mode,
+// zero-copy postMessage fast path — 2-241× faster per Bun's own benchmarks).
+interface ChildTransport {
+  postMessage(msg: unknown): void;
+  onMessage(h: (msg: any) => void): void;
+  onExit(h: (code: number | null, signal: NodeJS.Signals | null) => void): void;
+  onError(h: (err: Error) => void): void;
+  terminate(): void;
+  forceKill(): void;
+  readonly pid: number | undefined;
+}
+
+// Opt-in: `PW_USE_BUN_WORKER=1` switches workers from `child_process.fork`
+// to `Bun.Worker`. Benchmarks (June 2026) showed identical median wall-clock
+// to the fork path with slightly worse tail latency — Bun's "2-241× faster
+// postMessage" doesn't translate when per-test JSC runtime, not IPC,
+// dominates the gap. Kept behind a flag so future Bun releases can be
+// re-tested without touching code. See `.claude/plans/bun-worker-migration.md`.
+const useBunWorker = !!process.versions.bun && !!process.env.PW_USE_BUN_WORKER;
+
 export class ProcessHost extends EventEmitter {
-  private process: child_process.ChildProcess | undefined;
+  private _child: ChildTransport | undefined;
   private _didSendStop = false;
   private _processDidExit = false;
   private _didExitAndRanOnExit = false;
@@ -52,37 +76,18 @@ export class ProcessHost extends EventEmitter {
   }
 
   async startRunner(runnerParams: any, options: { onStdOut?: (chunk: Buffer | string) => void, onStdErr?: (chunk: Buffer | string) => void } = {}): Promise<ProcessExitData | undefined> {
-    assert(!this.process, 'Internal error: starting the same process twice');
-    // Node 25's `child_process.fork(path)` chokes on entries inside a
-    // `"type": "module"` workspace (ENOENT on the file:// URL form). Route
-    // through a sibling `.cjs` shim that dynamic-imports the ESM module.
-    const entryScript = this._entryScript.endsWith('.js')
-      ? this._entryScript.replace(/\.js$/, '.cjs')
-      : this._entryScript;
-    this.process = child_process.fork(entryScript, {
-      // Note: we pass detached:false, so that workers are in the same process group.
-      // This way Ctrl+C or a kill command can shutdown all workers in case they misbehave.
-      // Otherwise user can end up with a bunch of workers stuck in a busy loop without self-destructing.
-      detached: false,
-      env: {
-        ...process.env,
-        ...this._extraEnv,
-      },
-      stdio: [
-        'ignore',
-        options.onStdOut ? 'pipe' : 'inherit',
-        (options.onStdErr && !process.env.PW_RUNNER_DEBUG) ? 'pipe' : 'inherit',
-        'ipc',
-      ],
-    });
-    this.process.on('exit', async (code, signal) => {
+    assert(!this._child, 'Internal error: starting the same process twice');
+    this._child = useBunWorker
+      ? spawnBunWorker(this._entryScript, this._extraEnv)
+      : spawnForkedChild(this._entryScript, this._extraEnv, options.onStdOut, options.onStdErr);
+    this._child.onExit(async (code, signal) => {
       this._processDidExit = true;
       await this.onExit();
       this._didExitAndRanOnExit = true;
       this.emit('exit', { unexpectedly: !this._didSendStop, code, signal } as ProcessExitData);
     });
-    this.process.on('error', e => {});  // do not yell at a send to dead process.
-    this.process.on('message', (message: any) => {
+    this._child.onError(() => {});  // do not yell at a send to dead process.
+    this._child.onMessage((message: any) => {
       if (debug.enabled('pw:test:protocol'))
         debug('pw:test:protocol')('◀ RECV ' + JSON.stringify(message));
       if (message.method === '__env_produced__') {
@@ -120,13 +125,8 @@ export class ProcessHost extends EventEmitter {
       }
     });
 
-    if (options.onStdOut)
-      this.process.stdout?.on('data', options.onStdOut);
-    if (options.onStdErr)
-      this.process.stderr?.on('data', options.onStdErr);
-
     const error = await new Promise<ProcessExitData | undefined>(resolve => {
-      this.process!.once('exit', (code, signal) => resolve({ unexpectedly: true, code, signal }));
+      this._child!.onExit((code, signal) => resolve({ unexpectedly: true, code, signal }));
       this.once('ready', () => resolve(undefined));
     });
 
@@ -186,17 +186,7 @@ export class ProcessHost extends EventEmitter {
   }
 
   private _forceKill() {
-    const pid = this.process?.pid;
-    if (!pid)
-      return;
-    try {
-      if (process.platform === 'win32')
-        child_process.spawnSync(`taskkill /pid ${pid} /T /F`, { shell: true });
-      else
-        process.kill(pid, 'SIGKILL');
-    } catch {
-      // The process may have already exited.
-    }
+    this._child?.forceKill();
   }
 
   didSendStop() {
@@ -210,6 +200,103 @@ export class ProcessHost extends EventEmitter {
   private send(message: { method: string, params?: any }) {
     if (debug.enabled('pw:test:protocol'))
       debug('pw:test:protocol')('SEND ► ' + JSON.stringify(message));
-    this.process?.send(message);
+    this._child?.postMessage(message);
   }
+}
+
+function spawnForkedChild(
+  entryScript: string,
+  extraEnv: Record<string, string | undefined>,
+  onStdOut?: (chunk: Buffer | string) => void,
+  onStdErr?: (chunk: Buffer | string) => void,
+): ChildTransport {
+  // Flush any queued cache writes before the fork — the child inherits
+  // file descriptors but not in-memory state, and would otherwise read a
+  // stale on-disk cache for entries the parent just queued.
+  flushSqliteWrites();
+  // Node 25's `child_process.fork(path)` chokes on entries inside a
+  // `"type": "module"` workspace (ENOENT on the file:// URL form). Route
+  // through a sibling `.cjs` shim that dynamic-imports the ESM module.
+  // Bun + older Node don't have that problem.
+  const needsCjsShim = !!process.versions.node && !process.versions.bun &&
+      parseInt(process.versions.node.split('.')[0], 10) >= 25;
+  const entry = (needsCjsShim && entryScript.endsWith('.js'))
+    ? entryScript.replace(/\.js$/, '.cjs')
+    : entryScript;
+  const child = child_process.fork(entry, {
+    // Note: detached:false so all workers share the parent's process group —
+    // Ctrl+C or `kill` shuts down the whole tree.
+    detached: false,
+    env: { ...process.env, ...extraEnv },
+    stdio: [
+      'ignore',
+      onStdOut ? 'pipe' : 'inherit',
+      (onStdErr && !process.env.PW_RUNNER_DEBUG) ? 'pipe' : 'inherit',
+      'ipc',
+    ],
+  });
+  if (onStdOut)
+    child.stdout?.on('data', onStdOut);
+  if (onStdErr)
+    child.stderr?.on('data', onStdErr);
+  return {
+    postMessage: m => child.send(m as any),
+    onMessage: h => child.on('message', h),
+    onExit: h => child.on('exit', h),
+    onError: h => child.on('error', h),
+    terminate: () => { child.kill('SIGTERM'); },
+    forceKill: () => {
+      const pid = child.pid;
+      if (!pid)
+        return;
+      try {
+        if (process.platform === 'win32')
+          child_process.spawnSync(`taskkill /pid ${pid} /T /F`, { shell: true });
+        else
+          process.kill(pid, 'SIGKILL');
+      } catch {
+        // The process may have already exited.
+      }
+    },
+    get pid() { return child.pid; },
+  };
+}
+
+function spawnBunWorker(
+  entryScript: string,
+  extraEnv: Record<string, string | undefined>,
+): ChildTransport {
+  // Bun.Worker re-installs Bun.plugin() per isolate, so preload the same
+  // bunRuntime that the main process loads. The shim is the .cjs sibling of
+  // the worker entry's per-package bunRuntime.
+  const preloadShim = path.resolve(path.dirname(entryScript), '../transform/bunRuntime.js');
+  const W = (globalThis as any).Worker as new (entry: string, options?: any) => any;
+  const worker = new W(entryScript, {
+    preload: [preloadShim],
+    env: { ...process.env, ...extraEnv },
+  });
+  // Bun's Worker exposes the Web Worker shape (addEventListener), plus the
+  // Node-compat `on` shape. Use addEventListener — it's the documented API.
+  const exitHandlers: Array<(code: number | null, signal: NodeJS.Signals | null) => void> = [];
+  let exited = false;
+  worker.addEventListener('close', (e: any) => {
+    exited = true;
+    const code = typeof e?.code === 'number' ? e.code : 0;
+    for (const h of exitHandlers)
+      h(code, null);
+  });
+  return {
+    postMessage: m => worker.postMessage(m),
+    onMessage: h => worker.addEventListener('message', (e: MessageEvent) => h((e as any).data)),
+    onExit: h => {
+      if (exited)
+        queueMicrotask(() => h(0, null));
+      else
+        exitHandlers.push(h);
+    },
+    onError: h => worker.addEventListener('error', (e: any) => h(e?.error ?? new Error(String(e?.message ?? e)))),
+    terminate: () => { worker.terminate(); },
+    forceKill: () => { worker.terminate(); },
+    pid: undefined,
+  };
 }

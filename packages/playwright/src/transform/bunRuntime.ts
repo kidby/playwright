@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 
-import fs from 'fs';
-import { createRequire } from 'module';
-import path from 'path';
+// Bun-runtime utilities. Bun's native loader handles `.ts`/`.tsx` (including
+// `import type` stripping) on its worker threadpool; the fork's transform
+// pipeline early-returns under Bun (see `transform.ts:installTransformIfNeeded`
+// and `:registerESMLoader`). Previously this module also registered a Bun
+// plugin to redirect `playwright(-core)/lib/*` specifiers; bench probes
+// (June 2026) showed Bun's default workspace resolver handles those paths
+// without our hook ever firing, so the plugin was removed as dead overhead.
 
-type BunPluginLoader = 'js' | 'jsx' | 'ts' | 'tsx';
-type BunOnLoadResult = { contents: string; loader?: BunPluginLoader } | undefined;
-type BunOnResolveResult = { path: string; namespace?: string } | undefined;
-type BunPluginBuilder = {
-  onLoad(
-    filter: { filter: RegExp; namespace?: string },
-    callback: (args: { path: string }) => BunOnLoadResult,
-  ): void;
-  onResolve(
-    filter: { filter: RegExp; namespace?: string },
-    callback: (args: { path: string; importer: string }) => BunOnResolveResult,
-  ): void;
-};
 type BunGlobal = {
-  plugin(plugin: { name: string; setup: (build: BunPluginBuilder) => void }): void;
   pathToFileURL(path: string): URL;
 };
 declare const Bun: BunGlobal | undefined;
@@ -41,79 +31,7 @@ export function isBun(): boolean {
   return !!process.versions.bun;
 }
 
-const INSTALL_KEY = Symbol.for('playwright.bunRuntimeInstalled');
-
-export function installBunRuntime(): void {
-  if (!isBun())
-    return;
-  const globals = globalThis as unknown as Record<symbol, boolean | undefined>;
-  if (globals[INSTALL_KEY])
-    return;
-  globals[INSTALL_KEY] = true;
-  Bun!.plugin({
-    name: 'playwright-bun-runtime',
-    setup(build) {
-      build.onResolve({ filter: /^playwright(-core)?\/lib\// }, args => resolvePackageLib(args.path, args.importer));
-      build.onLoad({ filter: /\.tsx?$/ }, args => {
-        let source: string;
-        try {
-          source = fs.readFileSync(args.path, 'utf-8');
-        } catch {
-          return undefined;
-        }
-        const loader: BunPluginLoader = args.path.endsWith('.tsx') ? 'tsx' : 'ts';
-        return { contents: stripTypeImports(source), loader };
-      });
-    },
-  });
-}
-
-const packageRootCache = new Map<string, string | null>();
-
-function resolvePackageLib(specifier: string, importer: string): BunOnResolveResult {
-  const match = specifier.match(/^(playwright(?:-core)?)\/(lib\/.+?)(?:\.js)?$/);
-  if (!match)
-    return undefined;
-  const [, pkgName, libPath] = match;
-  let pkgRoot = packageRootCache.get(pkgName);
-  if (pkgRoot === undefined) {
-    try {
-      const req = createRequire(importer || __filename);
-      pkgRoot = path.dirname(req.resolve(`${pkgName}/package.json`));
-    } catch {
-      pkgRoot = null;
-    }
-    packageRootCache.set(pkgName, pkgRoot);
-  }
-  if (!pkgRoot)
-    return undefined;
-  const resolved = path.join(pkgRoot, `${libPath}.js`);
-  if (!fs.existsSync(resolved))
-    return undefined;
-  return { path: resolved };
-}
-
-export function stripTypeImports(source: string): string {
-  if (!source.includes('type'))
-    return source;
-  return source
-      .replace(/\bimport\s+type\s*\{[\s\S]*?\}\s*from\s*['"][^'"]+['"]\s*;?/g, '')
-      .replace(/\bimport\s+type\s+\w+\s+from\s*['"][^'"]+['"]\s*;?/g, '')
-      .replace(/\bimport\s*\{([^}]*)\}\s*from/g, (_match, braced: string) => {
-        const kept = braced
-            .replace(/\/\*[\s\S]*?\*\//g, '')
-            .replace(/\/\/[^\n]*/g, '')
-            .split(',')
-            .map(s => s.trim())
-            .filter(s => s && !/^type\s+/.test(s))
-            .join(', ');
-        return kept ? `import { ${kept} } from` : 'import {} from';
-      });
-}
-
 export async function importUnderBun(file: string): Promise<unknown> {
   const fileUrl = Bun!.pathToFileURL(file).toString();
   return await import(fileUrl);
 }
-
-installBunRuntime();

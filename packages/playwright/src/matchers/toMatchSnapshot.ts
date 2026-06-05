@@ -30,7 +30,7 @@ import type { MatcherAttachment, MatcherResult } from './matcherHint.js';
 import type { ExpectMatcherStateInternal } from './matchers.js';
 import type { ExpectTestInfo } from './expect.js';
 import type { Locator, Page } from 'playwright-core';
-import type { ExpectScreenshotOptions, Page as PageEx } from 'playwright-core/lib/client/page';
+import type { ExpectScreenshotOptions, PageInternal as PageEx } from 'playwright-core/types/internal';
 import type { Comparator, ImageComparatorOptions } from '@utils/comparators';
 
 type NameOrSegments = string | string[];

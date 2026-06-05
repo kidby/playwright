@@ -10,7 +10,9 @@ Playwright is a framework for web automation and testing. It drives Chromium, Fi
 
 Tracks upstream `microsoft/playwright`. Local changes:
 
-**Bun runtime.** Under Bun, TypeScript loads via `Bun.plugin` (no separate transpile step) and reporter output goes through `Bun.write`. The oxc-based transformer avoids constructs Bun's TS handler can't parse. `ttest:bun` and `ctest:bun` run the suite under Bun.
+**Bun runtime.** Playwright runs under Bun as a first-class target alongside Node. Tests can use `Bun.*` APIs directly (`Bun.file`, `Bun.serve`, `Bun.spawn`, `Bun.$`, etc.) — the worker IS a Bun process under Bun. Upstream `microsoft/playwright` does not run under Bun; the fork is the only working option there.
+
+> **Heads up — Node is still faster in practice.** This fork was designed to be Bun-compatible, but Playwright's runtime architecture is built around Node, and in my experience tests run faster on Node than on Bun. I recommend running under Bun only when (a) your specs use Bun APIs, or (b) the code under test is itself Bun code. Otherwise, Node 24 is the better default.
 
 **Mobile package.** `@playwright/experimental-mobile` exposes a `mobileTest` fixture that drives Appium 2 over W3C WebDriver classic — iOS (XCUITest) and Android in one API. No `selenium-webdriver` or `webdriverio` at runtime. See [packages/playwright-mobile/README.md](packages/playwright-mobile/README.md).
 
@@ -38,11 +40,19 @@ await expect(page.getByClassName('featured')).toHaveCount(1);
 await expect(page.getByClassName('card', { exact: true })).toHaveCount(2);
 ```
 
-**Node 24 baseline.** Engine requirement: `node >=24`. Dependency bumps: Vite 6→8, CodeMirror 5→6, `@xterm/xterm` 5→6, chokidar 3→5, mime 4, commander 14→15, pngjs 7, ini 7, minimatch 3→10, formidable 2→3, yazl 2→3, dotenv 16→17, signal-exit 3→4. Replaced: `lodash`→`es-toolkit`, `get-stream`→`node:stream/consumers`, `debug`/`picocolors`→`util.format`/`util.styleText`.
+**Reporters.** Added built-in shorthands: `catalog`, `ai`, `csv`, `jira`, `new-relic`, `xray`.
 
-**Reporters.** Added `catalog`, `ai`, `csv`, `jira`, `new-relic`, `xray`.
+**Matchers.** Added `toBeWithinRange`, `toHaveResponseProperty`, `toMatchJsonSchema`.
 
 **Upstream PRs carried locally.** Patches not merged upstream — e.g. [shardingMode #30962](https://github.com/microsoft/playwright/pull/30962) (`partition` / `round-robin` / `duration-round-robin`).
+
+| Surface              | Fork  | Upstream | What the fork adds                                                                          |
+| -------------------- | ----- | -------- | ------------------------------------------------------------------------------------------- |
+| Built-in reporters   | **15** | 9       | `catalog`, `ai`, `csv`, `jira`, `xray`, `newRelic`, `intellum-social`                       |
+| Custom matchers      | **41** | 38      | `toBeWithinRange`, `toHaveResponseProperty`, `toMatchJsonSchema`                            |
+| Workspace packages   | **24** | 21      | `@playwright/mobile`, `@playwright/storybook`, `@playwright/lighthouse`                     |
+| Locator helpers      | **9**  | 7       | `getById`, `getByClassName` on `Page`, `Frame`, `Locator`, `FrameLocator`                   |
+| Runtime targets      | **3**  | 1       | Bun runtime, native mobile (via Appium 2)                                                   |
 
 ## Get Started
 

@@ -15,12 +15,11 @@
  */
 
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import { test, expect, devices, defineConfig as originalDefineConfig } from '@playwright/experimental-ct-core';
 
 const require = createRequire(import.meta.url);
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = import.meta.dirname;
 
 export const defineConfig = (config, ...configs) => {
   return originalDefineConfig({

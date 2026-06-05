@@ -17,12 +17,20 @@
 import crypto from 'crypto';
 
 import { assert } from '@isomorphic/assert';
+import { bunRuntime } from './bunRuntime.js';
+
+// Under Bun, `Bun.CryptoHasher` is faster than Node's `crypto.createHash`
+// (native implementation vs Node-compat shim) and produces byte-identical
+// output for SHA-1 / SHA-256. Verified June 2026.
+const _bunNs = bunRuntime();
 
 export function createGuid(): string {
   return crypto.randomUUID().replaceAll('-', '');
 }
 
 export function calculateSha1(buffer: Buffer | string): string {
+  if (_bunNs)
+    return new _bunNs.CryptoHasher('sha1').update(buffer).digest('hex');
   const hash = crypto.createHash('sha1');
   hash.update(buffer);
   return hash.digest('hex');

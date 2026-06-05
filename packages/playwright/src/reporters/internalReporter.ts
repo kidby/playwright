@@ -122,6 +122,64 @@ export class InternalReporter implements ReporterV2 {
   }
 }
 
+// Bench (June 2026): without these caches, codeframe generation was ~40% of
+// orchestrator CPU on a 127-test Bun bench — `readFileSync` 13.7% + the
+// newline-split inside `babel.codeFrameColumns` 25.7%. The same source files
+// + same locations get re-formatted for every error at every step. Three
+// bounded caches keep the universe of unique entries small (a typical run
+// touches <500 files / <2k unique locations) while preventing unbounded
+// growth in long sessions.
+const SOURCE_FILE_CACHE_LIMIT = 1024;
+const REALPATH_CACHE_LIMIT = 1024;
+const CODE_FRAME_CACHE_LIMIT = 4096;
+const _sourceFileCache = new Map<string, string | null>();
+const _realpathCache = new Map<string, string | null>();
+const _codeFrameCache = new Map<string, string>();
+
+function readSourceCached(file: string): string | null {
+  const hit = _sourceFileCache.get(file);
+  if (hit !== undefined)
+    return hit;
+  let value: string | null;
+  try {
+    value = fs.readFileSync(file, 'utf8');
+  } catch {
+    value = null;
+  }
+  if (_sourceFileCache.size >= SOURCE_FILE_CACHE_LIMIT)
+    _sourceFileCache.clear();
+  _sourceFileCache.set(file, value);
+  return value;
+}
+
+function realpathCached(file: string): string | null {
+  const hit = _realpathCache.get(file);
+  if (hit !== undefined)
+    return hit;
+  let value: string | null;
+  try {
+    value = fs.realpathSync(file);
+  } catch {
+    value = null;
+  }
+  if (_realpathCache.size >= REALPATH_CACHE_LIMIT)
+    _realpathCache.clear();
+  _realpathCache.set(file, value);
+  return value;
+}
+
+function codeFrameCached(source: string, location: { file: string; line: number; column?: number }): string {
+  const key = `${location.file}:${location.line}:${location.column ?? 0}`;
+  const hit = _codeFrameCache.get(key);
+  if (hit !== undefined)
+    return hit;
+  const value = babel.codeFrameColumns(source, { start: location }, { highlightCode: true });
+  if (_codeFrameCache.size >= CODE_FRAME_CACHE_LIMIT)
+    _codeFrameCache.clear();
+  _codeFrameCache.set(key, value);
+  return value;
+}
+
 export function addLocationAndSnippetToError(config: FullConfig, error: TestError, file?: string) {
   if (error.stack && !error.location)
     error.location = prepareErrorStack(error.stack).location;
@@ -132,18 +190,43 @@ export function addLocationAndSnippetToError(config: FullConfig, error: TestErro
   if (!!error.snippet)
     return;
 
+  // Defer the codeframe formatting until a reporter actually reads
+  // `error.snippet`. The dispatcher pre-generated snippets on every
+  // step-end / test-end even when the active reporter (e.g. `null` or `json`)
+  // never touched them — bench (June 2026) showed this was ~40% of
+  // orchestrator CPU under Bun on a passing 127-test workload. Reporters
+  // that DO format error output (line, list, html, etc.) pay the same one-
+  // shot cost on first read; the result is then memoized via defineProperty.
+  Object.defineProperty(error, 'snippet', {
+    configurable: true,
+    enumerable: true,
+    get: () => {
+      const value = buildSnippet(config, location, file);
+      Object.defineProperty(error, 'snippet', { value, configurable: true, enumerable: true, writable: true });
+      return value;
+    },
+    set: (value: string | undefined) => {
+      Object.defineProperty(error, 'snippet', { value, configurable: true, enumerable: true, writable: true });
+    },
+  });
+}
+
+function buildSnippet(config: FullConfig, location: { file: string; line: number; column?: number }, file: string | undefined): string | undefined {
+  const source = readSourceCached(location.file);
+  if (source === null)
+    return undefined;
   try {
     const tokens = [];
-    const source = fs.readFileSync(location.file, 'utf8');
-    const codeFrame = babel.codeFrameColumns(source, { start: location }, { highlightCode: true });
+    const codeFrame = codeFrameCached(source, location);
     // Convert /var/folders to /private/var/folders on Mac.
-    if (!file || fs.realpathSync(file) !== location.file) {
+    if (!file || realpathCached(file) !== location.file) {
       tokens.push(internalScreen.colors.gray(`   at `) + `${relativeFilePath(internalScreen, config, location.file)}:${location.line}`);
       tokens.push('');
     }
     tokens.push(codeFrame);
-    error.snippet = tokens.join('\n');
+    return tokens.join('\n');
   } catch (e) {
-    // Failed to read the source file - that's ok.
+    // Failed to format codeframe — that's ok.
+    return undefined;
   }
 }

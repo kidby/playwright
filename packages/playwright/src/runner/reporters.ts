@@ -41,7 +41,7 @@ export async function createReporters(config: FullConfigInternal, mode: 'list' |
     const [name, arg] = r;
     const options = { ...reportOptions, ...arg };
     if (isBuiltInReporter(name)) {
-      const Ctor = resolveBuiltInReporter(name, mode);
+      const Ctor = await resolveBuiltInReporter(name, mode);
       reporters.push(new Ctor(options));
     } else {
       const reporterConstructor = await loadReporter(config, name);
@@ -51,7 +51,7 @@ export async function createReporters(config: FullConfigInternal, mode: 'list' |
   if (process.env.PW_TEST_REPORTER) {
     const name = process.env.PW_TEST_REPORTER;
     if (isBuiltInReporter(name)) {
-      const Ctor = resolveBuiltInReporter(name, mode);
+      const Ctor = await resolveBuiltInReporter(name, mode);
       reporters.push(new Ctor(reportOptions));
     } else {
       const reporterConstructor = await loadReporter(config, name);

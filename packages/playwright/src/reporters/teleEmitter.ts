@@ -157,7 +157,7 @@ export class TeleReporterEmitter implements ReporterV2 {
     this._onStdIO('stderr', chunk, test, result);
   }
 
-  private _onStdIO(type: teleReceiver.JsonStdIOType, chunk: string | Buffer, test: void | reporterTypes.TestCase, result: void | reporterTypes.TestResult): void {
+  private _onStdIO(type: teleReceiver.JsonStdIOType, chunk: string | Buffer, test: reporterTypes.TestCase | undefined, result: reporterTypes.TestResult | undefined): void {
     if (this._emitterOptions.omitOutput)
       return;
     const isBase64 = typeof chunk !== 'string';

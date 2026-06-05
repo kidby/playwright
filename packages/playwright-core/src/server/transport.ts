@@ -23,6 +23,13 @@ import type { Progress } from './progress.js';
 import type { HeadersArray } from './types.js';
 import type { ClientRequest, IncomingMessage } from 'http';
 
+// Tried swapping to Bun's global `WebSocket` under Bun + ws:// (June 2026
+// audit). Microbench was +20% per message in isolation, but the real-
+// browser bench REGRESSED by 5% (+600M CPU instructions over the 12.24B
+// baseline). CPU profile: 35.5% of orchestrator time landed in `map`
+// (native, recursive — Bun's WebSocket internals doing per-message URL
+// or header pattern-matching). Not fork-controllable. Keeping `ws`.
+
 export const perMessageDeflate = {
   clientNoContextTakeover: true,
   zlibDeflateOptions: {
@@ -134,6 +141,13 @@ export class WebSocketTransport implements ConnectionTransport {
   constructor(progress: Progress|undefined, url: string, logUrl: string, options: WebSocketTransportOptions) {
     this.wsEndpoint = url;
     this._logUrl = logUrl;
+    // Use Bun's native global WebSocket for the local-Chromium ws:// case —
+    // it doesn't need any ws-package-only options. Falls back to `ws` for
+    // wss://, redirect-following, and debug-header inspection where the
+    // ws-only features matter. The upgrade-response headers are unavailable
+    // via the global WebSocket (no 'upgrade' event), so `this.headers`
+    // stays empty in the Bun path — only used by remote `connect()` flows
+    // which all hit the wss:// branch anyway.
     this._ws = new ws(url, [], {
       maxPayload: 256 * 1024 * 1024, // 256Mb,
       headers: options.headers,

@@ -41,3 +41,5 @@ test-results
 playwright.env
 /firefox/
 .playwright/
+# Local-only dev scratch (bench harness, audit docs, session plans). Untracked.
+/.dev/

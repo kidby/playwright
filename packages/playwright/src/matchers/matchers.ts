@@ -36,8 +36,7 @@ import type { ExpectMatcherState } from '../../types/test';
 import type { ExpectTestInfo } from './expect.js';
 import type { InternalMatcherUtils } from './matcherHint.js';
 import type { APIResponse, Locator, Frame, Page } from 'playwright-core';
-import type { ExpectResult } from 'playwright-core/lib/client/frame';
-import type { FrameExpectParams } from 'playwright-core/lib/client/types';
+import type { ExpectResult, FrameExpectParams } from 'playwright-core/types/internal';
 import type { ExpectMatcherUtils } from '../../types/test';
 import type { URLPattern } from '@isomorphic/urlMatch';
 

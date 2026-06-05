@@ -14,72 +14,87 @@
  * limitations under the License.
  */
 
-// Single source of truth for built-in reporter shorthands. Both `common/config.ts`
-// (for the `BuiltInReporter` type union) and `runner/reporters.ts` (for the
-// runtime constructor lookup) read from here. Adding a new built-in reporter
-// only requires touching this file.
+// Single source of truth for built-in reporter shorthands.
+//
+// Reporters are LOADED LAZILY at runtime. The cost of parsing + evaluating
+// reporter source code is fixed-at-startup if we eager-import — with 15
+// reporters bundled, that's ~235 KB of JS executed every time the CLI starts,
+// even when only one reporter is in use.
+//
+// To get true laziness, we resolve reporter files via `require()` with a
+// computed path string. esbuild can't statically analyse that, so it leaves
+// the call as-is in the bundle; at runtime, `createRequire` (provided by the
+// cjsCompat banner) resolves the file from `lib/reporters/<name>.js`. The
+// build pipeline emits a per-file `.js` for each reporter (see
+// `utils/build/build.js` reporters entry-point list).
 
-import AIReporter from './ai.js';
-import { BlobReporter } from './blob.js';
-import CSVReporter from './csv.js';
-import CatalogReporter from './catalog.js';
-import DotReporter from './dot.js';
-import EmptyReporter from './empty.js';
-import GitHubReporter from './github.js';
-import HtmlReporter from './html.js';
-import JSONReporter from './json.js';
-import JUnitReporter from './junit.js';
-import JiraReporter from './jira.js';
-import LineReporter from './line.js';
-import ListReporter from './list.js';
-import ListModeReporter from './listModeReporter.js';
-import NewRelicReporter from './newRelic.js';
-import XrayReporter from './xray.js';
+import path from 'path';
+import { createRequire } from 'module';
 
 import type { ReporterV2 } from './reporterV2.js';
 
 export type ReporterCtor = new (arg: any) => ReporterV2;
 
 type RegistryEntry = {
-  default: ReporterCtor;
-  // Some reporters render differently when the runner is just listing tests
-  // (`playwright test --list`) — they swap to ListModeReporter in that mode.
-  listMode?: ReporterCtor;
+  // Basename (no extension) of the reporter's per-file lib output.
+  file: string;
+  // The named export to pluck — most use `default`, some have a named export.
+  exportName?: string;
+  // Reporters that render differently in `--list` mode swap to listModeReporter.
+  listMode?: { file: string; exportName?: string };
 };
 
+const LIST_MODE_LOADER = { file: 'listModeReporter' };
+
 const REGISTRY: Record<string, RegistryEntry> = {
-  list: { default: ListReporter, listMode: ListModeReporter },
-  line: { default: LineReporter, listMode: ListModeReporter },
-  dot: { default: DotReporter, listMode: ListModeReporter },
-  json: { default: JSONReporter },
-  junit: { default: JUnitReporter },
-  null: { default: EmptyReporter },
-  github: { default: GitHubReporter },
-  html: { default: HtmlReporter },
-  blob: { default: BlobReporter },
-  catalog: { default: CatalogReporter },
-  ai: { default: AIReporter },
-  csv: { default: CSVReporter },
-  jira: { default: JiraReporter },
-  newRelic: { default: NewRelicReporter },
-  xray: { default: XrayReporter },
+  list: { file: 'list',    listMode: LIST_MODE_LOADER },
+  line: { file: 'line',    listMode: LIST_MODE_LOADER },
+  dot:  { file: 'dot',     listMode: LIST_MODE_LOADER },
+  json: { file: 'json' },
+  junit: { file: 'junit' },
+  null: { file: 'empty' },
+  github: { file: 'github' },
+  html: { file: 'html' },
+  blob: { file: 'blob', exportName: 'BlobReporter' },
+  catalog: { file: 'catalog' },
+  ai: { file: 'ai' },
+  csv: { file: 'csv' },
+  jira: { file: 'jira' },
+  newRelic: { file: 'newRelic' },
+  xray: { file: 'xray' },
 };
 
 export const BUILT_IN_REPORTER_NAMES = Object.keys(REGISTRY) as readonly BuiltInReporterName[];
 
-// Hand-listed string-literal union because TypeScript can't infer this from a
-// `Record<string, _>` (the index signature widens the keys to `string`).
-// Keep this in sync with the keys above — `isBuiltInReporter` guards the gap
-// at runtime.
+// Hand-listed string-literal union — keep in sync with REGISTRY keys above.
+// `isBuiltInReporter` guards the runtime side.
 export type BuiltInReporterName =
   | 'list' | 'line' | 'dot' | 'json' | 'junit' | 'null' | 'github' | 'html' | 'blob'
   | 'catalog' | 'ai' | 'csv' | 'jira' | 'newRelic' | 'xray';
 
-export function resolveBuiltInReporter(name: BuiltInReporterName, mode: 'list' | 'test' | 'merge'): ReporterCtor {
+// `require` is bound to `lib/common/index.js` (via the cjsCompat banner's
+// createRequire), so the reporter `.js` files are reached via the relative
+// path `../reporters/<name>.js`. Using `require()` instead of `import()` so
+// the call site is opaque to esbuild's bundler (no inline).
+const _requireFromHere = createRequire(import.meta.url);
+function loadReporterFile(file: string): { default?: ReporterCtor; [k: string]: unknown } {
+  // The variable argument prevents esbuild from statically resolving + bundling.
+  const target = path.join('..', 'reporters', file + '.js');
+  return _requireFromHere(target);
+}
+
+function pluckCtor(mod: { default?: ReporterCtor; [k: string]: unknown }, exportName: string): ReporterCtor {
+  const ctor = mod[exportName];
+  if (typeof ctor !== 'function')
+    throw new Error(`Reporter module did not export '${exportName}' as a constructor`);
+  return ctor as ReporterCtor;
+}
+
+export async function resolveBuiltInReporter(name: BuiltInReporterName, mode: 'list' | 'test' | 'merge'): Promise<ReporterCtor> {
   const entry = REGISTRY[name];
-  if (mode === 'list' && entry.listMode)
-    return entry.listMode;
-  return entry.default;
+  const target = (mode === 'list' && entry.listMode) ? entry.listMode : entry;
+  const mod = loadReporterFile(target.file);
+  return pluckCtor(mod, target.exportName || 'default');
 }
 
 export function isBuiltInReporter(name: string): name is BuiltInReporterName {

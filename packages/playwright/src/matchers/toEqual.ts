@@ -20,7 +20,7 @@ import { expectTypes, formatMatcherMessage } from './matcherHint.js';
 
 import type { MatcherResult } from './matcherHint.js';
 import type { Locator } from 'playwright-core';
-import type { ExpectResult } from 'playwright-core/lib/client/frame';
+import type { ExpectResult } from 'playwright-core/types/internal';
 import type { ExpectMatcherStateInternal } from './matchers.js';
 
 // Omit colon and one or more spaces, so can call getLabelPrinter.
