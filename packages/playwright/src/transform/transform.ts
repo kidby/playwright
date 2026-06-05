@@ -466,7 +466,12 @@ function registerESMLoader() {
   const nodeModule = require('node:module');
 
   if (nodeModule.registerHooks && !process.env.PLAYWRIGHT_FORCE_ASYNC_LOADER) {
-    nodeModule.registerHooks({ resolve: esmLoaderSync.resolve, load: esmLoaderSync.load });
+    nodeModule.registerHooks({
+      resolve: esmLoaderSync.resolve,
+      resolveSync: esmLoaderSync.resolve,
+      load: esmLoaderSync.load,
+      loadSync: esmLoaderSync.load,
+    });
     return;
   }
 
