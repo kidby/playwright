@@ -2034,6 +2034,7 @@ await frame.WaitForLoadStateAsync(); // Defaults to LoadState.Load
 
 ### option: Frame.waitForLoadState.timeout = %%-navigation-timeout-js-%%
 * since: v1.8
+### option: Frame.waitForLoadState.signal = %%-wait-for-event-signal-%%
 
 ## async method: Frame.waitForNavigation
 * since: v1.8
@@ -2117,6 +2118,7 @@ a navigation.
 
 ### option: Frame.waitForNavigation.timeout = %%-navigation-timeout-js-%%
 * since: v1.8
+### option: Frame.waitForNavigation.signal = %%-wait-for-event-signal-%%
 
 ### param: Frame.waitForNavigation.callback = %%-java-wait-for-event-callback-%%
 * since: v1.9
@@ -2313,6 +2315,7 @@ await frame.WaitForURLAsync("**/target.html");
 
 ### option: Frame.waitForURL.timeout = %%-navigation-timeout-js-%%
 * since: v1.11
+### option: Frame.waitForURL.signal = %%-wait-for-event-signal-%%
 
 ### option: Frame.waitForURL.waitUntil = %%-navigation-wait-until-%%
 * since: v1.11

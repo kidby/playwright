@@ -32,7 +32,7 @@ import { ChannelOwner } from './channelOwner.js';
 
 import type { BrowserContext } from './browserContext.js';
 import type { Page } from './page.js';
-import type { Headers, RemoteAddr, SecurityDetails, WaitForEventOptions } from './types.js';
+import type { Headers, RemoteAddr, SecurityDetails, TimeoutOptions, WaitForEventOptions } from './types.js';
 import type { Serializable } from '../../types/structs';
 import type * as api from '../../types/types';
 import type { HeadersArray } from '@isomorphic/types';
@@ -802,8 +802,10 @@ export class WebSocket extends ChannelOwner<channels.WebSocketChannel> implement
     return await this._wrapApiCall(async () => {
       const timeout = this._page._timeoutSettings.timeout(typeof optionsOrPredicate === 'function' ? {} : optionsOrPredicate);
       const predicate = typeof optionsOrPredicate === 'function' ? optionsOrPredicate : optionsOrPredicate.predicate;
+      const signal = typeof optionsOrPredicate === 'function' ? undefined : (optionsOrPredicate as TimeoutOptions).signal;
       const waiter = Waiter.createForEvent(this, event);
       waiter.rejectOnTimeout(timeout, `Timeout ${timeout}ms exceeded while waiting for event "${event}"`);
+      waiter.rejectOnSignal(signal);
       if (event !== Events.WebSocket.Error)
         waiter.rejectOnEvent(this, Events.WebSocket.Error, new Error('Socket error'));
       if (event !== Events.WebSocket.Close)
