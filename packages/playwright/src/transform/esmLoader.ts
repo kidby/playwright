@@ -21,6 +21,7 @@ import url from 'url';
 import { addToCompilationCache, currentFileDepsCollector, serializeCompilationCache, startCollectingFileDeps, stopCollectingFileDeps } from './compilationCache.js';
 import { PortTransport } from './portTransport.js';
 import { resolveHook, setSingleTSConfig, setTransformConfig, shouldTransform, transformHook } from './transform.js';
+import { resolve as resolveSync, load as loadSync } from './esmLoaderSync.js';
 
 // Before each import of the ESM module, a preflight request with the .esm.preflight extension is issued.
 // When handled, it is resolved similarly to the regular import, but loading it yields empty content.
@@ -218,4 +219,4 @@ function createTransport(port: MessagePort) {
 }
 
 
-export { initialize, load, resolve };
+export { initialize, load, resolve, resolveSync, loadSync };
