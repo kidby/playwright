@@ -47,10 +47,24 @@ type Rect = { x: number; y: number; width: number; height: number };
 type WindowRect = { width: number; height: number; x: number; y: number };
 type W3CResponseEnvelope = { value?: unknown; sessionId?: string; message?: string };
 
+type SessionLogEntry = {
+  ts: number;            // ms since session start
+  method: 'GET' | 'POST' | 'DELETE';
+  path: string;          // request path
+  status: 'ok' | 'err';  // outcome
+  err?: string;          // error message on failure
+};
+
 export class AppiumClient {
   private readonly _serverUrl: string;
   private _sessionId: string | undefined;
   private _capabilities: AppiumCapabilities | undefined;
+  // Session log of every WebDriver request. Capped to keep memory bounded on
+  // long sessions; full log is attached to the HTML report as `appium-log`
+  // by the mobile fixture teardown.
+  private _log: SessionLogEntry[] = [];
+  private readonly _logLimit = 4096;
+  private _logStartMs = 0;
 
   constructor(serverUrl: string) {
     this._serverUrl = serverUrl.replace(/\/+$/, '');
@@ -59,6 +73,18 @@ export class AppiumClient {
   get sessionId() { return this._sessionId; }
   get capabilities() { return this._capabilities; }
   get platform(): 'iOS' | 'Android' | undefined { return this._capabilities?.platformName; }
+
+  /** Return the captured WebDriver request log as a human-readable string. */
+  formatLog(): string {
+    const lines = [
+      `# Appium session log (${this._log.length} entries)`,
+      `# session=${this._sessionId ?? '(none)'} server=${this._serverUrl}`,
+      '',
+    ];
+    for (const e of this._log)
+      lines.push(`${e.ts.toString().padStart(7)}ms  ${e.method.padEnd(6)} ${e.status === 'ok' ? '   ' : 'ERR'} ${e.path}${e.err ? ` -- ${e.err}` : ''}`);
+    return lines.join('\n');
+  }
 
   attachSession(sessionId: string) {
     this._sessionId = sessionId;
@@ -193,6 +219,9 @@ export class AppiumClient {
   }
 
   private async _send(method: 'GET' | 'POST' | 'DELETE', path: string, body?: unknown): Promise<W3CResponseEnvelope> {
+    if (this._logStartMs === 0)
+      this._logStartMs = Date.now();
+    const ts = Date.now() - this._logStartMs;
     const url = new URL(this._serverUrl + path);
     let response: Response;
     try {
@@ -202,13 +231,16 @@ export class AppiumClient {
         body: body === undefined ? undefined : JSON.stringify(body),
       });
     } catch (e) {
-      throw new Error(`Appium ${method} ${path} failed: ${(e as Error).message}`);
+      const msg = (e as Error).message;
+      this._appendLog({ ts, method, path, status: 'err', err: msg });
+      throw new Error(`Appium ${method} ${path} failed: ${msg}`);
     }
     const text = await response.text();
     let payload: W3CResponseEnvelope;
     try {
       payload = text.length ? JSON.parse(text) : {};
     } catch {
+      this._appendLog({ ts, method, path, status: 'err', err: `non-JSON ${response.status}` });
       throw new Error(`Appium ${method} ${path} returned non-JSON (${response.status}): ${text.slice(0, 200)}`);
     }
     const errorValue = payload.value && typeof payload.value === 'object'
@@ -216,9 +248,20 @@ export class AppiumClient {
       : undefined;
     if (!response.ok || errorValue?.error) {
       const errMsg = errorValue?.message || payload.message || text || `HTTP ${response.status}`;
+      this._appendLog({ ts, method, path, status: 'err', err: errMsg });
       throw new Error(`Appium ${method} ${path} → ${response.status}: ${errMsg}`);
     }
+    this._appendLog({ ts, method, path, status: 'ok' });
     return payload;
+  }
+
+  private _appendLog(entry: SessionLogEntry): void {
+    if (this._log.length >= this._logLimit) {
+      // Drop the oldest entries when we hit the cap; keeps tail (most recent)
+      // since the failure context near test end is what users debug.
+      this._log.splice(0, Math.floor(this._logLimit / 4));
+    }
+    this._log.push(entry);
   }
 }
 

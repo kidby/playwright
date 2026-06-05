@@ -4,17 +4,17 @@
 
 ## [Documentation](https://playwright.dev) | [API reference](https://playwright.dev/docs/api/class-playwright)
 
-Playwright is a framework for web automation and testing. It drives Chromium, Firefox, and WebKit with a single API — in your tests, in your scripts, and as a tool for AI agents.
+Playwright is a framework for web automation and testing. It drives Chromium, Firefox, and WebKit with a single API: in your tests, in your scripts, and as a tool for AI agents.
 
 ## About This Fork
 
 Tracks upstream `microsoft/playwright`. Local changes:
 
-**Bun runtime.** Playwright runs under Bun as a first-class target alongside Node. Tests can use `Bun.*` APIs directly (`Bun.file`, `Bun.serve`, `Bun.spawn`, `Bun.$`, etc.) — the worker IS a Bun process under Bun. Upstream `microsoft/playwright` does not run under Bun; the fork is the only working option there.
+**Bun runtime.** Playwright runs under Bun as a first-class target alongside Node. Tests can use `Bun.*` APIs directly (`Bun.file`, `Bun.serve`, `Bun.spawn`, `Bun.$`, etc.). The worker IS a Bun process under Bun. Upstream `microsoft/playwright` does not run under Bun; the fork is the only working option there.
 
-> **Heads up — Node is still faster in practice.** This fork was designed to be Bun-compatible, but Playwright's runtime architecture is built around Node, and in my experience tests run faster on Node than on Bun. I recommend running under Bun only when (a) your specs use Bun APIs, or (b) the code under test is itself Bun code. Otherwise, Node 24 is the better default.
+> **Note.** This fork was designed to be Bun-compatible, but Playwright's runtime architecture is built around Node, and in my experience tests run faster on Node than on Bun. I recommend running under Bun only when (a) your specs use Bun APIs, or (b) the code under test is itself Bun code. Otherwise, Node 24 is the better default.
 
-**Mobile package.** `@playwright/experimental-mobile` exposes a `mobileTest` fixture that drives Appium 2 over W3C WebDriver classic — iOS (XCUITest) and Android in one API. No `selenium-webdriver` or `webdriverio` at runtime. See [packages/playwright-mobile/README.md](packages/playwright-mobile/README.md).
+**Mobile package.** `@playwright/experimental-mobile` exposes a `mobileTest` fixture that drives Appium 2 over W3C WebDriver classic: iOS (XCUITest) and Android in one API. No `selenium-webdriver` or `webdriverio` at runtime. See [packages/playwright-mobile/README.md](packages/playwright-mobile/README.md).
 
 **Lighthouse package.** `@playwright/lighthouse` runs Lighthouse against the same Chromium tab the test is driving; `--remote-debugging-port` is wired by the fixture. See [packages/playwright-lighthouse/README.md](packages/playwright-lighthouse/README.md).
 
@@ -44,7 +44,7 @@ await expect(page.getByClassName('card', { exact: true })).toHaveCount(2);
 
 **Matchers.** Added `toBeWithinRange`, `toHaveResponseProperty`, `toMatchJsonSchema`.
 
-**Upstream PRs carried locally.** Patches not merged upstream — e.g. [shardingMode #30962](https://github.com/microsoft/playwright/pull/30962) (`partition` / `round-robin` / `duration-round-robin`).
+**Upstream PRs carried locally.** Patches not merged upstream, e.g. [shardingMode #30962](https://github.com/microsoft/playwright/pull/30962) (`partition` / `round-robin` / `duration-round-robin`).
 
 | Surface              | Fork  | Upstream | What the fork adds                                                                          |
 | -------------------- | ----- | -------- | ------------------------------------------------------------------------------------------- |
@@ -108,7 +108,7 @@ test('get started link', async ({ page }) => {
 npx playwright test
 ```
 
-Tests run in parallel across all configured browsers, in headless mode by default. Each test gets a fresh browser context — full isolation with near-zero overhead.
+Tests run in parallel across all configured browsers, in headless mode by default. Each test gets a fresh browser context with full isolation and near-zero overhead.
 
 ### Key capabilities
 
@@ -123,7 +123,7 @@ page.getByPlaceholder('Search...')
 page.getByTestId('login-form')
 ```
 
-**Test isolation.** Each test runs in its own browser context — equivalent to a fresh browser profile. Save authentication state once and reuse it across tests:
+**Test isolation.** Each test runs in its own browser context, equivalent to a fresh browser profile. Save authentication state once and reuse it across tests:
 
 ```TypeScript
 // Save state after login
@@ -158,7 +158,7 @@ npx playwright show-trace trace.zip
 
 ## Playwright CLI
 
-[Playwright CLI](https://github.com/microsoft/playwright-cli) is a command-line interface for browser automation designed for coding agents. It's more token-efficient than MCP — commands avoid loading large tool schemas and accessibility trees into the model context.
+[Playwright CLI](https://github.com/microsoft/playwright-cli) is a command-line interface for browser automation designed for coding agents. It's more token-efficient than MCP; commands avoid loading large tool schemas and accessibility trees into the model context.
 
 ### Install
 
@@ -206,7 +206,7 @@ playwright-cli show
 
 ## Playwright MCP
 
-The [Playwright MCP server](https://github.com/microsoft/playwright-mcp) gives AI agents full browser control through the [Model Context Protocol](https://modelcontextprotocol.io). Agents interact with pages using structured accessibility snapshots — no vision models or screenshots required.
+The [Playwright MCP server](https://github.com/microsoft/playwright-mcp) gives AI agents full browser control through the [Model Context Protocol](https://modelcontextprotocol.io). Agents interact with pages using structured accessibility snapshots, with no vision models or screenshots required.
 
 ### Setup
 
@@ -251,7 +251,7 @@ The agent sees the page as a structured accessibility tree:
   - text: "Buy groceries"
 ```
 
-It uses element refs like `e5` and `e10` to click, type, and interact — deterministically and without visual ambiguity. Tools cover navigation, form filling, screenshots, network mocking, storage management, and more.
+It uses element refs like `e5` and `e10` to click, type, and interact deterministically, without visual ambiguity. Tools cover navigation, form filling, screenshots, network mocking, storage management, and more.
 
 [Full MCP documentation](https://playwright.dev/mcp/introduction) | [GitHub](https://github.com/microsoft/playwright-mcp)
 
@@ -259,7 +259,7 @@ It uses element refs like `e5` and `e10` to click, type, and interact — determ
 
 ## Playwright Library
 
-Use `playwright` as a library for browser automation scripts — web scraping, PDF generation, screenshot capture, and any workflow that needs programmatic browser control without a test runner.
+Use `playwright` as a library for browser automation scripts: web scraping, PDF generation, screenshot capture, and any workflow that needs programmatic browser control without a test runner.
 
 ### Install
 
@@ -330,11 +330,11 @@ The [Playwright VS Code extension](https://marketplace.visualstudio.com/items?it
 
 **Run and debug tests** from the editor with a single click. Set breakpoints, inspect variables, and step through test execution with a live browser view.
 
-**Generate tests with CodeGen.** Click "Record new" to open a browser — navigate and interact with your app while Playwright writes the test code for you.
+**Generate tests with CodeGen.** Click "Record new" to open a browser. Navigate and interact with your app while Playwright writes the test code for you.
 
 **Pick locators.** Hover over any element in the browser to see the best available locator, then click to copy it to your clipboard.
 
-**Trace Viewer integration.** Enable "Show Trace Viewer" in the sidebar to get a full execution trace after each test run — DOM snapshots, network requests, console logs, and screenshots at every step.
+**Trace Viewer integration.** Enable "Show Trace Viewer" in the sidebar to get a full execution trace after each test run: DOM snapshots, network requests, console logs, and screenshots at every step.
 
 [Install the extension](https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright) | [VS Code guide](https://playwright.dev/docs/getting-started-vscode)
 
