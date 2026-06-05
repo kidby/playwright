@@ -47,13 +47,29 @@ type Rect = { x: number; y: number; width: number; height: number };
 type WindowRect = { width: number; height: number; x: number; y: number };
 type W3CResponseEnvelope = { value?: unknown; sessionId?: string; message?: string };
 
-type SessionLogEntry = {
+export type SessionLogEntry = {
   ts: number;            // ms since session start
   method: 'GET' | 'POST' | 'DELETE';
   path: string;          // request path
   status: 'ok' | 'err';  // outcome
   err?: string;          // error message on failure
 };
+
+// Distinguishes calls that mutate visible state from passive reads. The
+// mobile trace recorder uses this to decide when to grab a post-call
+// screenshot (only after user-visible actions).
+export type AppiumCallKind = 'action' | 'read' | 'session';
+const ACTION_PATH = /\/(click|value|clear|back|forward|active)\b|\/execute(\/sync)?$/;
+
+function classifyCall(method: string, path: string): AppiumCallKind {
+  if (path === '/session' || path.startsWith('/session/') && method === 'DELETE' && !/\/element|\/timeouts/.test(path))
+    return 'session';
+  if (method === 'GET')
+    return 'read';
+  if (ACTION_PATH.test(path))
+    return 'action';
+  return 'read';
+}
 
 export class AppiumClient {
   private readonly _serverUrl: string;
@@ -65,6 +81,25 @@ export class AppiumClient {
   private _log: SessionLogEntry[] = [];
   private readonly _logLimit = 4096;
   private _logStartMs = 0;
+  // Subscribers receive every WebDriver call entry. Mobile trace recorders
+  // subscribe to align screenshots / events with the action timeline.
+  private readonly _callListeners: Array<(entry: SessionLogEntry, kind: AppiumCallKind) => void> = [];
+
+  /** Compat shim — older callers set `onCall` as a single handler. */
+  set onCall(handler: ((entry: SessionLogEntry, kind: AppiumCallKind) => void) | undefined) {
+    this._callListeners.length = 0;
+    if (handler)
+      this._callListeners.push(handler);
+  }
+  /** Subscribe an additional listener; returns an unsubscribe function. */
+  subscribeCalls(handler: (entry: SessionLogEntry, kind: AppiumCallKind) => void): () => void {
+    this._callListeners.push(handler);
+    return () => {
+      const i = this._callListeners.indexOf(handler);
+      if (i !== -1)
+        this._callListeners.splice(i, 1);
+    };
+  }
 
   constructor(serverUrl: string) {
     this._serverUrl = serverUrl.replace(/\/+$/, '');
@@ -262,6 +297,16 @@ export class AppiumClient {
       this._log.splice(0, Math.floor(this._logLimit / 4));
     }
     this._log.push(entry);
+    if (this._callListeners.length) {
+      const kind = classifyCall(entry.method, entry.path);
+      for (const fn of this._callListeners) {
+        try {
+          fn(entry, kind);
+        } catch {
+          // Listener failures must not break the call.
+        }
+      }
+    }
   }
 }
 

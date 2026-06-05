@@ -16,6 +16,8 @@
 
 import { expect as baseExpect, test as base } from 'playwright/test';
 
+import { MobileTrace } from './mobileTrace.js';
+import { MobileTraceZip } from './mobileTraceZip.js';
 import { NativeDevice } from "./nativeDevice.js";
 import { mobileMatchers } from './mobileMatchers.js';
 
@@ -195,7 +197,14 @@ export async function captureFailureArtifacts(device: NativeDevice, testInfo: At
   await attachScreenshotArtifacts(device, testInfo);
 }
 
-export const mobileTest = base.extend<MobileFixtures>({
+// `appium` is declared in `PlaywrightTestOptions` (test.d.ts) as a top-level
+// config field, but Playwright's fixture engine only resolves *fixtures*,
+// not raw config fields. The `capabilities` fixture below destructures it,
+// so we declare it here as an option-fixture with `undefined` default. Users
+// override it via `test.use({ appium: { capabilities: ... } })` or by
+// providing the `capabilities` fixture directly.
+export const mobileTest = base.extend<MobileFixtures & { appium: PlaywrightTestOptions['appium'] }>({
+  appium: [undefined, { option: true }] as unknown as PlaywrightTestOptions['appium'],
   appiumServerUrl: [resolveServerUrl, { option: true }],
   capabilities: [requireCapabilitiesFixture, { option: true }],
   descriptor: [undefined, { option: true }],
@@ -219,9 +228,38 @@ export const mobileTest = base.extend<MobileFixtures>({
       } catch { /* recording unsupported */ }
     }
 
+    // Mobile trace recorders: both formats run in parallel when the `trace`
+    // mode wants this run captured.
+    //   - MobileTrace     → self-contained `mobile-trace.html` (Option 1)
+    //   - MobileTraceZip  → Playwright-format `.zip` that opens in
+    //                       `npx playwright show-trace` (Option 2)
+    // Both attach so users can pick: the .html for quick offline review,
+    // the .zip for full Playwright trace-viewer integration.
+    let tracer: MobileTrace | undefined;
+    let zipTracer: MobileTraceZip | undefined;
+    if (shouldStartVideo(traceMode as unknown as VideoMode, testInfo)) {
+      tracer = new MobileTrace(device);
+      tracer.start();
+      zipTracer = new MobileTraceZip(device);
+      zipTracer.start(typeof testInfo === 'object' && testInfo !== null && 'title' in testInfo ? String((testInfo as { title?: unknown }).title) : undefined);
+    }
+
     try {
       await use(device);
     } finally {
+      // Stop the tracers first so a final page-source snapshot lands in the
+      // trace before any teardown shifts the device state.
+      if (tracer) {
+        await tracer.recordPageSource('teardown').catch(() => undefined);
+        tracer.stop(testInfo.status);
+      }
+      if (zipTracer) {
+        await zipTracer.recordPageSource('teardown').catch(() => undefined);
+        if (testInfo.status && testInfo.status !== testInfo.expectedStatus)
+          zipTracer.recordError(`Test ${testInfo.status}`);
+        zipTracer.stop();
+      }
+
       // Screenshot/snapshot/error-context: per the standard `screenshot` mode.
       if (shouldCaptureOnFailure(screenshotMode, testInfo))
         await attachScreenshotArtifacts(device, testInfo);
@@ -237,14 +275,27 @@ export const mobileTest = base.extend<MobileFixtures>({
         } catch { /* stop failures shouldn't block teardown */ }
       }
 
-      // Appium log: per the standard `trace` mode. The WebDriver call log
-      // is the closest mobile-side analogue to playwright's tracing surface.
+      // Appium log + mobile trace viewer: per the standard `trace` mode.
+      // The WebDriver call log is the closest mobile-side analogue to
+      // playwright's tracing surface; the trace viewer adds a visual
+      // timeline of screenshots + actions for replay.
       if (shouldKeepTrace(traceMode, testInfo)) {
         try {
           const logText = device.client.formatLog();
           if (logText)
             await testInfo.attach('appium-log', { body: logText, contentType: 'text/plain' });
         } catch { /* best-effort */ }
+        if (tracer && !tracer.isEmpty()) {
+          try {
+            await testInfo.attach('mobile-trace.html', { body: tracer.toHtml(), contentType: 'text/html' });
+          } catch { /* best-effort */ }
+        }
+        if (zipTracer && !zipTracer.isEmpty()) {
+          try {
+            const zipBytes = await zipTracer.build();
+            await testInfo.attach('mobile-trace.zip', { body: zipBytes, contentType: 'application/zip' });
+          } catch { /* best-effort */ }
+        }
       }
 
       await device.stop().catch(() => undefined);

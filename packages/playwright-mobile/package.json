@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "playwright": "1.61.0-next",
-    "pngjs": "7.0.0"
+    "pngjs": "7.0.0",
+    "yazl": "^3.3.1"
   }
 }

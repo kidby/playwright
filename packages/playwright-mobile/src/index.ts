@@ -30,6 +30,9 @@ export { androidCapabilities, iosCapabilities } from './capabilities.js';
 export type { AndroidCapabilityOptions, IosCapabilityOptions } from './capabilities.js';
 export { mobileTest, expect, captureFailureArtifacts, shouldCaptureFailureArtifacts } from './mobileTest.js';
 export type { AppiumConfig, AttachableTestInfo, MobileFixtures, MobileTestArgs, MobileTestOptions } from './mobileTest.js';
+export { MobileTrace } from './mobileTrace.js';
+export type { MobileTraceEvent, MobileTraceEventKind } from './mobileTrace.js';
+export { MobileTraceZip } from './mobileTraceZip.js';
 export { mobileMatchers } from './mobileMatchers.js';
 export type { MobileScreenshotOptions } from './screenshotComparator.js';
 
