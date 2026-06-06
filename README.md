@@ -12,9 +12,17 @@ Tracks upstream `microsoft/playwright`. Local changes:
 
 **Bun runtime.** Playwright runs under Bun as a first-class target alongside Node. Tests can use `Bun.*` APIs directly (`Bun.file`, `Bun.serve`, `Bun.spawn`, `Bun.$`, etc.). The worker IS a Bun process under Bun. Upstream `microsoft/playwright` does not run under Bun; the fork is the only working option there.
 
-> **Note.** This fork was designed to be Bun-compatible, but Playwright's runtime architecture is built around Node, and in my experience tests run faster on Node than on Bun. I recommend running under Bun only when (a) your specs use Bun APIs, or (b) the code under test is itself Bun code. Otherwise, Node 24 is the better default.
+> **Benchmarks (Node v24 vs Bun 1.3, Apple Silicon).** Bun is 10–18% faster on compatible suites. Both runtimes pass the full 217-test fork suite reliably (3/3 runs, 0 failures). Use Bun when your specs need Bun APIs; otherwise Node 24 is the safer default.
+>
+> | Suite | Node | Bun | Speedup |
+> |---|---|---|---|
+> | Lightweight (4 tests) | 1.74s | 1.58s | Bun +10% |
+> | Heavy (30+ tests) | 6.96s | 5.91s | Bun +18% |
+> | Full fork (217 tests) | 8.3s | 7.6s | Bun +9% |
 
-**Mobile package.** `@playwright/experimental-mobile` exposes a `mobileTest` fixture that drives Appium 2 over W3C WebDriver classic: iOS (XCUITest) and Android in one API. No `selenium-webdriver` or `webdriverio` at runtime. See [packages/playwright-mobile/README.md](packages/playwright-mobile/README.md).
+**Mobile package.** `@playwright/experimental-mobile` exposes a `mobileTest` fixture that drives Appium 2 over W3C WebDriver classic: iOS (XCUITest) and Android in one API. No `selenium-webdriver` or `webdriverio` at runtime. Full Playwright web API parity on `AppLocator` — `getByRole`, `getByText`, `getByLabel`, `getByTestId`, `getByPlaceholder`, `getByAltText`, `getByTitle`, `tap`, `check`, `uncheck`, `press`, `scrollIntoViewIfNeeded`, `dragTo`, `focus`, `blur`, `boundingBox`, and more. See [packages/playwright-mobile/README.md](packages/playwright-mobile/README.md).
+
+**Storybook package.** `@playwright/experimental-storybook` auto-discovers stories and generates Playwright tests. Supports `composeStories` CT mode for testing components without a running Storybook server. See [packages/playwright-storybook/README.md](packages/playwright-storybook/README.md).
 
 **Lighthouse package.** `@playwright/lighthouse` runs Lighthouse against the same Chromium tab the test is driving; `--remote-debugging-port` is wired by the fixture. See [packages/playwright-lighthouse/README.md](packages/playwright-lighthouse/README.md).
 
@@ -31,6 +39,8 @@ test('homepage perf budget', async ({ page, lighthouse }) => {
 });
 ```
 
+**Cloud client.** `playwright.appium.connectToCloud(wsEndpoint, capabilities, options)` connects to a remote device farm via WebSocket with token auth, configurable timeouts, and bidirectional lifecycle management.
+
 **Locators.** `getById(id, { exact? })` and `getByClassName(name, { exact? })` on `Page`, `Locator`, `Frame`, and `FrameLocator`. Substring match by default; `{ exact: true }` for strict.
 
 ```ts
@@ -44,6 +54,8 @@ await expect(page.getByClassName('card', { exact: true })).toHaveCount(2);
 
 **Matchers.** Added `toBeWithinRange`, `toHaveResponseProperty`, `toMatchJsonSchema`.
 
+**Upstream sync tooling.** `utils/sync_upstream.sh` (dry-run merge analysis) and `utils/analyze_upstream.sh` (conflict prediction) for safe upstream pulls.
+
 **Upstream PRs carried locally.** Patches not merged upstream, e.g. [shardingMode #30962](https://github.com/microsoft/playwright/pull/30962) (`partition` / `round-robin` / `duration-round-robin`).
 
 | Surface              | Fork  | Upstream | What the fork adds                                                                          |
@@ -53,6 +65,8 @@ await expect(page.getByClassName('card', { exact: true })).toHaveCount(2);
 | Workspace packages   | **24** | 21      | `@playwright/mobile`, `@playwright/storybook`, `@playwright/lighthouse`                     |
 | Locator helpers      | **9**  | 7       | `getById`, `getByClassName` on `Page`, `Frame`, `Locator`, `FrameLocator`                   |
 | Runtime targets      | **3**  | 1       | Bun runtime, native mobile (via Appium 2)                                                   |
+| Mobile locators      | **15** | 0       | Full AppLocator API parity: selectors, actions, properties, assertions                      |
+
 
 ## Get Started
 
