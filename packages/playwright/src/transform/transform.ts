@@ -24,7 +24,7 @@ import { loadTsConfig } from './tsconfig-loader.js';
 import { libPath, packageJSON } from '../package.js';
 import { createFileMatcher, debugTest, resolveImportSpecifierAfterMapping } from '../util.js';
 import { importUnderBun, isBun } from './bunRuntime.js';
-import { addToCompilationCache, belongsToNodeModules, currentFileDepsCollector, getFromCompilationCache, installSourceMapSupport, serializeCompilationCache, startCollectingFileDeps as ccStartCollectingFileDeps, stopCollectingFileDeps as ccStopCollectingFileDeps } from './compilationCache.js';
+import { addToCompilationCache, belongsToNodeModules, currentFileDepsCollector, getFromCompilationCache, installSourceMapSupport as _installSourceMapSupport, serializeCompilationCache, startCollectingFileDeps as ccStartCollectingFileDeps, stopCollectingFileDeps as ccStopCollectingFileDeps } from './compilationCache.js';
 import * as esmLoaderSync from './esmLoaderSync.js';
 import { PortTransport } from './portTransport.js';
 
@@ -388,7 +388,18 @@ function installTransformIfNeeded() {
   if (isBun())
     return;
 
-  installSourceMapSupport();
+  // Enable V8 compile cache (Node 22.8+): caches bytecode on disk so that
+  // workers loading the same 97 built JS files skip V8 parse/compile.
+  // This directly targets the compileSourceTextModule hotspot (~2% CPU per
+  // worker) and is cumulative across the full test run.
+  const nodeModule = require('node:module');
+  if (nodeModule.enableCompileCache)
+    nodeModule.enableCompileCache();
+
+  // Source-map support is installed lazily on first error stack access
+  // instead of eagerly per worker. The parseMappings/cloneCallSite overhead
+  // from the prepareStackTrace override is unnecessary during the happy path.
+  deferSourceMapInstall();
 
   const originalResolveFilename = (Module as any)._resolveFilename;
   function resolveFilename(this: any, specifier: string, parent: Module, ...rest: any[]) {
@@ -438,6 +449,27 @@ export function wrapFunctionWithLocation<A extends any[], R>(func: (location: Lo
 
 function isRelativeSpecifier(specifier: string) {
   return specifier === '.' || specifier === '..' || specifier.startsWith('./') || specifier.startsWith('../');
+}
+
+function deferSourceMapInstall() {
+  // Install a lightweight prepareStackTrace that, on first invocation,
+  // replaces itself with the full source-map-support version. This avoids
+  // eagerly parsing source maps in every worker on boot — parseMappings,
+  // cloneCallSite, doQuickSort all fire per callsite and are wasted when
+  // all tests pass.
+  let installed = false;
+  const origPrepare = Error.prepareStackTrace;
+  Error.prepareStackTrace = function lazyInstall(error: Error, stack: NodeJS.CallSite[]) {
+    if (!installed) {
+      installed = true;
+      _installSourceMapSupport();
+      // Re-invoke with the now-installed prepareStackTrace.
+      if (Error.prepareStackTrace && Error.prepareStackTrace !== lazyInstall)
+        return Error.prepareStackTrace(error, stack);
+    }
+    // Fallback: return default formatting if install didn't set a new one.
+    return origPrepare ? origPrepare(error, stack) : `${error}\n${stack.map(s => `    at ${s}`).join('\n')}`;
+  };
 }
 
 async function nextTask() {
