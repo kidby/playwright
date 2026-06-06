@@ -18,10 +18,10 @@ import fs from 'fs';
 import path from 'path';
 import url from 'url';
 
-import { addToCompilationCache, currentFileDepsCollector, serializeCompilationCache, startCollectingFileDeps, stopCollectingFileDeps } from './compilationCache.js';
-import { PortTransport } from './portTransport.js';
-import { resolveHook, setSingleTSConfig, setTransformConfig, shouldTransform, transformHook } from './transform.js';
-import { resolve as resolveSync, load as loadSync } from './esmLoaderSync.js';
+import { addToCompilationCache, currentFileDepsCollector, serializeCompilationCache, startCollectingFileDeps, stopCollectingFileDeps } from './compilationCache';
+import { PortTransport } from './portTransport';
+import { resolveHook, setSingleTSConfig, setTransformConfig, shouldTransform, transformHook } from './transform';
+import { resolve as resolveSync, load as loadSync } from './esmLoaderSync';
 
 // Before each import of the ESM module, a preflight request with the .esm.preflight extension is issued.
 // When handled, it is resolved similarly to the regular import, but loading it yields empty content.
@@ -35,6 +35,15 @@ async function resolve(originalSpecifier: string, context: { parentURL?: string 
     if (resolved !== undefined)
       specifier = url.pathToFileURL(resolved).toString();
   }
+  if (specifier.startsWith('.') && !specifier.endsWith('.js') && !specifier.endsWith('.json') && !specifier.endsWith('.ts')) {
+    try {
+      const urlWithExt = new url.URL(specifier + '.js', context.parentURL).href;
+      return await defaultResolve(urlWithExt, context, defaultResolve);
+    } catch {
+      // Fallback below
+    }
+  }
+
   let result;
   try {
     result = await defaultResolve(specifier, context, defaultResolve);
@@ -68,7 +77,7 @@ async function resolve(originalSpecifier: string, context: { parentURL?: string 
   // `import x from './foo.json'` statements keep working — the load hook
   // below then synthesizes named exports for the top-level keys.
   if (result?.url?.endsWith('.json'))
-    result.importAttributes = { ...(result.importAttributes ?? {}), type: 'json' };
+    result.importAttributes = { ...result.importAttributes, type: 'json' };
 
   if (originalSpecifier.endsWith(esmPreflightExtension))
     result.url = result.url + esmPreflightExtension;
