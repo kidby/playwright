@@ -1,0 +1,89 @@
+# Self-contained benchmark: Fork vs Upstream in Docker
+# No build context needed — everything is cloned inside.
+#
+# Build:  docker build -t pw-bench - < utils/benchmark/Dockerfile.bench
+# Run:    docker run --cpus=4 --memory=8g pw-bench
+# Bun:    docker run --cpus=4 --memory=8g -e RUNTIME=bun pw-bench
+
+FROM node:24-bookworm-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git curl unzip bc procps \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Bun
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:${PATH}"
+
+# Clone and build upstream
+WORKDIR /upstream
+RUN git clone --depth=1 https://github.com/microsoft/playwright.git . \
+    && npm install --ignore-scripts \
+    && npm run build
+
+# Clone and build fork
+WORKDIR /fork
+RUN git clone --depth=1 https://github.com/kidby/playwright.git . \
+    && npm install --ignore-scripts \
+    && npm run build
+
+ENV RUNTIME=node
+ENV ITERATIONS=3
+
+# Inline benchmark script
+RUN cat > /bench.sh << 'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+RUNTIME=${RUNTIME:-node}
+ITERATIONS=${ITERATIONS:-3}
+echo "========================================"
+echo "  Playwright Fork vs Upstream Benchmark"
+echo "========================================"
+echo "Runtime:    $RUNTIME"
+echo "Iterations: $ITERATIONS"
+echo "Node:       $(node --version)"
+echo "Bun:        $(bun --version 2>/dev/null || echo N/A)"
+echo "CPUs:       $(nproc)"
+echo "Memory:     $(free -h | awk '/Mem:/{print $2}')"
+echo "Fork:       $(cd /fork && git log --oneline -1)"
+echo "Upstream:   $(cd /upstream && git log --oneline -1)"
+echo ""
+echo "branch,runtime,suite,iter,wall_s,peak_rss_kb,cpu_pct,passed,failed" > /tmp/results.csv
+
+run_test() {
+  local branch=$1 dir=$2 suite=$3 file=$4 iter=$5
+  local runner
+  if [ "$branch" = "upstream" ]; then
+    runner="node ./tests/playwright-test/stable-test-runner/node_modules/@playwright/test/cli test --config=tests/playwright-test/playwright.config.ts"
+  elif [ "$RUNTIME" = "bun" ]; then
+    runner="bun ./node_modules/playwright/cli.js test --config=tests/playwright-test/playwright.config.ts"
+  else
+    runner="node ./node_modules/playwright/cli.js test --config=tests/playwright-test/playwright.config.ts"
+  fi
+  local out=$(mktemp) tm=$(mktemp) exit_code=0
+  /usr/bin/time -v bash -c "cd $dir && $runner $file --reporter=line" > "$out" 2> "$tm" || exit_code=$?
+  local rss=$(grep 'Maximum resident' "$tm" | awk '{print $NF}' || echo 0)
+  local cpu=$(grep 'Percent of CPU' "$tm" | awk '{print $NF}' || echo 0)
+  local passed=$(grep -oE '[0-9]+ passed' "$out" | awk '{print $1}' || echo 0)
+  local failed=$(grep -oE '[0-9]+ failed' "$out" | awk '{print $1}' || echo 0)
+  echo "$branch,$RUNTIME,$suite,$iter,,$rss,$cpu,$passed,$failed" | tee -a /tmp/results.csv
+  rm -f "$out" "$tm"
+}
+
+for entry in "basic:tests/playwright-test/basic.spec.ts" "hooks:tests/playwright-test/hooks.spec.ts" "expect:tests/playwright-test/expect.spec.ts"; do
+  IFS=':' read -r suite file <<< "$entry"
+  echo "--- $suite ---"
+  for i in $(seq 1 $ITERATIONS); do
+    run_test fork /fork "$suite" "$file" "$i"
+    run_test upstream /upstream "$suite" "$file" "$i"
+  done
+done
+
+echo ""
+echo "========================================"
+column -t -s',' /tmp/results.csv
+echo "========================================"
+SCRIPT
+RUN chmod +x /bench.sh
+
+CMD ["/bench.sh"]
