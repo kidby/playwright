@@ -1,0 +1,18 @@
+# Benchmark runner using official Playwright Docker image.
+# All browser deps + Node already included.
+FROM mcr.microsoft.com/playwright:v1.60.0-noble
+RUN apt-get update && apt-get install -y --no-install-recommends bc time && rm -rf /var/lib/apt/lists/*
+RUN npx playwright install --with-deps
+COPY run.sh /bench/run.sh
+RUN chmod +x /bench/run.sh
+
+# The entrypoint script will:
+# 1. Copy bind-mounted /fork-src and /upstream-src to writable dirs
+# 2. Run npm install to get Linux-native bindings
+# 3. Build both
+# 4. Run benchmarks
+COPY entrypoint.sh /bench/entrypoint.sh
+RUN chmod +x /bench/entrypoint.sh
+
+ENV RUNTIME=node ITERATIONS=3 FORK_DIR=/fork UPSTREAM_DIR=/upstream
+CMD ["/bench/entrypoint.sh"]

@@ -371,17 +371,10 @@ export async function requireOrImport(file: string) {
 
   const fileUrl = url.pathToFileURL(file).toString();
 
-  // The .esm.preflight extension is a synthetic specifier handled by our
-  // node:module ESM loader to flush source maps before the real import.
-  await import(fileUrl + '.esm.preflight')
-      .catch((error: any) => debugTest('Failed to load preflight for ' + file + ', source maps may be missing for errors thrown during loading.', error))
-      .finally(nextTask);
-
-  // Compilation cache, which includes source maps, is populated in a post task.
-  // When importing a module results in an error, the very next access to `error.stack`
-  // will need source maps. To make sure source maps have arrived, we insert a task
-  // that will be processed after compilation cache and guarantee that
-  // source maps are available, before `error.stack` is accessed.
+  // On Node 24+ with registerHooks(), the sync load hook in esmLoaderSync.ts
+  // populates source maps synchronously during import — no preflight needed.
+  // The old .esm.preflight dance was only required for the async loader path
+  // (Node < 22.15) where source maps arrived via PortTransport after load.
   return await import(fileUrl).finally(nextTask);
 }
 
@@ -475,13 +468,13 @@ function registerESMLoader() {
     return;
   }
 
+  // Legacy async loader path for Node < 22.15. On Node 24+ (this fork's target),
+  // registerHooks() above handles everything synchronously and we never reach here.
+  // Retained behind PLAYWRIGHT_FORCE_ASYNC_LOADER for debugging only.
   if (!nodeModule.register)
     return;
 
   const { port1, port2 } = new MessageChannel();
-  // register will wait until the loader is initialized. The path is relative to
-  // the bundle output layout (lib/common/index.js → ../transform/esmLoader.js),
-  // not the source layout — esmLoader.js is its own esbuild entry point.
   nodeModule.register(url.pathToFileURL(require.resolve('../transform/esmLoader.js')), {
     data: { port: port2 },
     transferList: [port2],
@@ -490,8 +483,6 @@ function registerESMLoader() {
     if (method === 'pushToCompilationCache')
       addToCompilationCache(params.cache);
   });
-  // Seed the loader thread with the state accumulated so far. Subsequent updates
-  // are pushed by setSingleTSConfig() / setTransformConfig() / startCollectingFileDeps().
   void loaderChannel.send('setSingleTSConfig', { tsconfig: _singleTSConfigPath });
   void loaderChannel.send('setTransformConfig', { config: _transformConfig });
   void loaderChannel.send('addToCompilationCache', { cache: serializeCompilationCache() });

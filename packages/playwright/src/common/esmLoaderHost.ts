@@ -35,12 +35,28 @@ export function registerESMLoader() {
   if (loaderChannel)
     return true;
 
-  const register = require('node:module').register;
+  const nodeModule = require('node:module');
+
+  // Node 24+ (this fork's target): use synchronous hooks — no off-thread
+  // loader, no MessagePort IPC, no PortTransport. The sync load hook in
+  // esmLoaderSync.ts handles resolve + load + source maps in-process.
+  if (nodeModule.registerHooks && !process.env.PLAYWRIGHT_FORCE_ASYNC_LOADER) {
+    const esmLoaderSync = require('../transform/esmLoaderSync.js');
+    nodeModule.registerHooks({
+      resolve: esmLoaderSync.resolve,
+      resolveSync: esmLoaderSync.resolve,
+      load: esmLoaderSync.load,
+      loadSync: esmLoaderSync.load,
+    });
+    return true;
+  }
+
+  // Legacy async loader path for Node < 22.15.
+  const register = nodeModule.register;
   if (!register)
     return false;
 
   const { port1, port2 } = new MessageChannel();
-  // register will wait until the loader is initialized.
   register(url.pathToFileURL(require.resolve('../transform/esmLoader.js')), {
     data: { port: port2 },
     transferList: [port2],

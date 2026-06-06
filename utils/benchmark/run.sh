@@ -99,7 +99,7 @@ echo "========================================"
 echo "  Results"
 echo "========================================"
 echo ""
-column -t -s',' "$RESULTS"
+cat /tmp/results.csv
 echo ""
 echo "Raw CSV: $RESULTS"
 
