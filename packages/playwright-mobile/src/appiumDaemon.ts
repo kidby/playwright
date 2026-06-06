@@ -48,21 +48,9 @@ export class AppiumDaemon {
     this._isAvailableCallback = getStatusProbe(this._options.serverUrl);
     this._options.cwd = this._options.cwd ? path.resolve(configDir, this._options.cwd) : configDir;
     try {
-      if (this._options.drivers && this._options.drivers.length > 0) {
-        const command = this._options.command ?? 'appium';
-        try {
-          const listOutput = child_process.execSync(`${command} driver list --json`, { cwd: this._options.cwd, encoding: 'utf8' });
-          const installedDrivers = JSON.parse(listOutput);
-          for (const driver of this._options.drivers) {
-            if (!installedDrivers[driver]?.installed) {
-              debugAppium(`Installing appium driver: ${driver}`);
-              child_process.execSync(`${command} driver install ${driver}`, { cwd: this._options.cwd, stdio: 'ignore' });
-            }
-          }
-        } catch (e) {
-          debugAppium(`Failed to check or install appium drivers: ${e}`);
-        }
-      }
+      if (this._options.drivers && this._options.drivers.length > 0)
+        await this._ensureDrivers(this._options.drivers);
+
 
       process.env.PLAYWRIGHT_APPIUM_URL = this._options.serverUrl;
 
@@ -78,6 +66,68 @@ export class AppiumDaemon {
     debugAppium(`Terminating Appium server`);
     await this._killProcess?.();
     debugAppium(`Terminated Appium server`);
+  }
+
+  private async _ensureDrivers(drivers: string[]) {
+    const command = this._options.command ?? 'appium';
+    const cwd = this._options.cwd;
+
+    // Verify appium is available.
+    try {
+      child_process.execSync(`${command} --version`, { cwd, encoding: 'utf8', stdio: 'pipe' });
+    } catch {
+      throw new Error(
+        `Appium not found. Install it with:\n  npm install -g appium\nor set appium.command in your config to the path to the appium binary.`
+      );
+    }
+
+    // Query installed drivers. Appium 2.x outputs JSON in different shapes
+    // depending on the version:
+    //   - v2.0-v2.1: { driverName: { installed: true, ... }, ... }
+    //   - v2.2+:     { installed: { driverName: {...} }, notInstalled: { driverName: {...} } }
+    let installedSet: Set<string>;
+    try {
+      const listOutput = child_process.execSync(
+        `${command} driver list --json`,
+        { cwd, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] },
+      );
+      const parsed = JSON.parse(listOutput);
+
+      // Handle both JSON shapes.
+      if (parsed.installed && typeof parsed.installed === 'object') {
+        // v2.2+ format: { installed: { uiautomator2: {...} }, notInstalled: {...} }
+        installedSet = new Set(Object.keys(parsed.installed));
+      } else {
+        // v2.0 format: { uiautomator2: { installed: true }, xcuitest: { installed: false } }
+        installedSet = new Set(
+          Object.entries(parsed)
+            .filter(([, v]: [string, any]) => v?.installed)
+            .map(([k]) => k),
+        );
+      }
+    } catch (e) {
+      debugAppium(`Warning: could not query installed drivers (${e}). Will attempt to install all requested drivers.`);
+      installedSet = new Set();
+    }
+
+    // Install missing drivers, isolating errors per-driver.
+    for (const driver of drivers) {
+      if (installedSet.has(driver)) {
+        debugAppium(`Driver already installed: ${driver}`);
+        continue;
+      }
+      debugAppium(`Installing Appium driver: ${driver} ...`);
+      try {
+        child_process.execSync(
+          `${command} driver install ${driver}`,
+          { cwd, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], timeout: 120_000 },
+        );
+        debugAppium(`Driver installed successfully: ${driver}`);
+      } catch (e: any) {
+        const stderr = e.stderr?.toString() || e.message;
+        throw new Error(`Failed to install Appium driver "${driver}": ${stderr}`);
+      }
+    }
   }
 
   private async _startProcess(): Promise<void> {

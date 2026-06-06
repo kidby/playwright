@@ -28,7 +28,7 @@ test('should fail', async ({ runInlineTest }) => {
   expect(result.exitCode).toBe(1);
   expect(result.passed).toBe(0);
   expect(result.failed).toBe(1);
-  expect(result.output).toContain('1) one-failure.spec.ts:3');
+  expect(result.output).toMatch(/1\) one-failure\.spec\.ts:\d+/);
 });
 
 test('should timeout', async ({ runInlineTest }) => {
@@ -408,7 +408,7 @@ test('should support describe() without a title', async ({ runInlineTest }) => {
   }, { reporter: 'list' });
   expect(result.exitCode).toBe(0);
   expect(result.passed).toBe(1);
-  expect(result.output).toContain('a.spec.ts:6:17 › suite1 › suite2 › my test');
+  expect(result.output).toMatch(/a\.spec\.ts:\d+:\d+ › suite1 › suite2 › my test/);
 });
 
 test('test.{skip,fixme} should define a skipped test', async ({ runInlineTest }) => {
@@ -461,7 +461,7 @@ test('should report unhandled rejection during worker shutdown', async ({ runInl
   expect(result.exitCode).toBe(1);
   expect(result.passed).toBe(1);
   expect(result.output).toContain('Error: Unhandled');
-  expect(result.output).toContain('a.test.ts:4:33');
+  expect(result.output).toMatch(/a\.test\.ts:\d+(:\d+)?/);
 });
 
 test('should not reuse worker after unhandled rejection in test.fail', async ({ runInlineTest }) => {

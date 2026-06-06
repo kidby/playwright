@@ -61,24 +61,30 @@ type TSCResult = {
 export type Files = { [key: string]: string | Buffer };
 type Params = { [key: string]: string | number | boolean | string[] };
 
-// Detect CJS-only files: `module.exports = ...` / `exports.x = ...` /
-// `export = ...` (TS CJS-export form) and no top-level ESM `import`/`export`.
+// Detect CJS-shaped files: `module.exports = ...` / `exports.x = ...` /
+// `export = ...` (TS CJS-export form).
 // The ESM-only loader fork forces `.ts`/`.js` files to ESM during transform,
 // so `module.exports` inside a `.ts` config raises "module is not defined".
 // Renaming to `.cjs` / `.cts` makes Node treat the file as CJS.
+//
+// Note: TypeScript files commonly mix `import` with `module.exports` because
+// TS compiles `import x from 'y'` → `const x = require('y')` in CJS mode.
+// So `module.exports` is the authoritative CJS signal, even if `import` is
+// present. Only treat the file as ESM if it uses ESM `export` syntax (other
+// than the TS-specific `export = X`).
 function looksLikeCjs(content: string): boolean {
   if (typeof content !== 'string')
     return false;
-  const hasCjs = /\b(?:module\.exports\b|exports\.[A-Za-z_$])/.test(content) ||
-      /^\s*export\s*=\s*/m.test(content);
-  if (!hasCjs)
+  const hasModuleExports = /\b(?:module\.exports\b|exports\.[A-Za-z_$])/.test(content);
+  const hasTsExportEquals = /^\s*export\s*=\s*/m.test(content);
+  if (!hasModuleExports && !hasTsExportEquals)
     return false;
   // `export = X` is TS-specific CJS syntax; `export *` / `export {` / `export
-  // default` / `export const` are ESM. Distinguish by requiring an `=` right
-  // after `export\b` for the CJS form.
-  const hasEsmImport = /^\s*import\b/m.test(content);
+  // default` / `export const` are ESM. If the file uses real ESM exports
+  // alongside module.exports, it's ambiguous — but in practice this means
+  // the author expects ESM, so leave it alone.
   const hasEsmExport = /^\s*export\b(?!\s*=\s)/m.test(content);
-  return !hasEsmImport && !hasEsmExport;
+  return !hasEsmExport;
 }
 
 function remapCjsExtension(name: string): string {
