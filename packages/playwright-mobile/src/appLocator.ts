@@ -253,6 +253,12 @@ export class AppLocator {
     await this._client.click(handle);
   }
 
+  async clear(options: TimeoutOptions = {}): Promise<void> {
+    await this._actAction(async handle => {
+      await this._client.clear(handle);
+    }, options.timeout);
+  }
+
   async fill(text: string, options: LocatorFillOptions = {}): Promise<void> {
     await this._actAction(async handle => {
       await this._client.clear(handle);

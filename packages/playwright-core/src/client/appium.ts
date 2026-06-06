@@ -19,6 +19,19 @@ import { AppLocator } from './appLocator';
 import { connectToEndpoint } from './connect';
 import type * as channels from '@protocol/channels';
 
+export type CloudConnectOptions = {
+  /** Authentication token for the cloud service. Overrides `PLAYWRIGHT_MOBILE_TOKEN` env var. */
+  token?: string;
+  /** Connection timeout in milliseconds. Default: 30000 (30s). */
+  timeout?: number;
+  /** Extra HTTP headers to send with the WebSocket upgrade request. */
+  headers?: Record<string, string>;
+  /** Slow down every command by this many milliseconds. Useful for debugging. */
+  slowMo?: number;
+  /** Optional log callback for cloud connection lifecycle events. */
+  logger?: (message: string) => void;
+};
+
 export class Appium extends ChannelOwner<channels.AppiumChannel> {
   static from(appium: channels.AppiumChannel): Appium {
     return (appium as any)._object;
@@ -29,37 +42,108 @@ export class Appium extends ChannelOwner<channels.AppiumChannel> {
     return AppiumDevice.from(device);
   }
 
-  async connectToCloud(wsEndpoint: string, capabilities: any): Promise<AppiumDevice> {
+  /**
+   * Connects to a remote Playwright Cloud device farm via WebSocket.
+   *
+   * The cloud orchestrator provisions a physical or virtual device matching
+   * the requested capabilities, then bridges the RPC connection so all
+   * subsequent `AppiumDevice` / `AppLocator` calls are transparently proxied.
+   *
+   * @example
+   * ```ts
+   * const device = await playwright.appium.connectToCloud(
+   *   'wss://mobile.playwright.dev',
+   *   { platformName: 'Android', 'appium:deviceName': 'Pixel 8' },
+   *   { token: process.env.PLAYWRIGHT_MOBILE_TOKEN, timeout: 60_000 }
+   * );
+   * ```
+   */
+  async connectToCloud(
+    wsEndpoint: string,
+    capabilities: any,
+    options: CloudConnectOptions = {},
+  ): Promise<AppiumDevice> {
+    const token = options.token || process.env.PLAYWRIGHT_MOBILE_TOKEN;
+    const timeout = options.timeout ?? 30_000;
+    const log = options.logger ?? (() => {});
+
+    // Build auth + custom headers for the WebSocket upgrade request.
+    const headers: Record<string, string> = { ...options.headers };
+    if (token)
+      headers['Authorization'] = `Bearer ${token}`;
+    // Pass requested capabilities as a header so the orchestrator can
+    // begin device allocation before the RPC handshake completes.
+    headers['x-playwright-capabilities'] = Buffer.from(JSON.stringify(capabilities)).toString('base64');
+
+    log(`Connecting to ${wsEndpoint} (timeout=${timeout}ms)`);
+
     const connection = await connectToEndpoint(this._connection, {
       endpoint: wsEndpoint,
-      headers: {},
-      timeout: 0,
+      headers,
+      timeout,
+      slowMo: options.slowMo,
     });
-    
-    // Initialize the remote Playwright server running in the cloud
+
+    log('WebSocket connected, initializing remote Playwright...');
+
+    // Initialize the remote Playwright server running in the cloud.
     const remotePlaywright = await connection.initializePlaywright();
-    
+
+    log('Remote Playwright initialized, requesting device...');
+
     // Ask the remote Playwright server to connect to Appium.
-    // The remote Playwright server (the Cloud Orchestrator) will intercept this,
-    // dynamically provision the physical device or Docker container matching
-    // capabilities['appium:deviceName'], and bridge the RPC connection to it.
+    // The remote Playwright server (the Cloud Orchestrator) intercepts this,
+    // dynamically provisions the physical device or Docker container matching
+    // the requested capabilities, and bridges the RPC connection to it.
     const device = await remotePlaywright.appium.connect('cloud-provisioned', capabilities);
-    
-    // Bind connection close to device close
-    device.on('close', () => connection.close());
-    
+
+    log(`Device allocated: ${device.sessionId ?? 'unknown'}`);
+
+    // Lifecycle binding: when the device is closed, tear down the WS connection.
+    device.on('close', () => {
+      log('Device closed, tearing down cloud connection');
+      connection.close();
+    });
+
+    // Reverse binding: if the cloud drops, emit close on the device.
+    connection.on('close', () => {
+      log('Cloud connection lost');
+      device.emit('close');
+    });
+
     return device;
   }
 }
 
+export type AppiumDeviceEvents = {
+  close: [];
+  console: [{ type: string; text: string }];
+};
+
 export class AppiumDevice extends ChannelOwner<channels.AppiumDeviceChannel> {
+  private _closed = false;
+  readonly sessionId: string | undefined;
+  readonly capabilities: any;
+
   static from(device: channels.AppiumDeviceChannel): AppiumDevice {
     return (device as any)._object;
   }
 
+  constructor(
+    parent: ChannelOwner,
+    type: string,
+    guid: string,
+    initializer: { sessionId?: string; capabilities?: any },
+  ) {
+    super(parent, type, guid, initializer);
+    this.sessionId = initializer.sessionId;
+    this.capabilities = initializer.capabilities;
+    this._channel.on('console', (event: any) => {
+      this.emit('console', event);
+    });
+  }
+
   appLocator(chain: any[], options?: any): AppLocator {
-    // We create the AppLocator client side and it initializes itself over the channel.
-    // Wait, the protocol says AppLocator is returned from appLocator command.
     return AppLocator.from((this._channel as any).appLocator({ chain, options }));
   }
 
@@ -74,6 +158,14 @@ export class AppiumDevice extends ChannelOwner<channels.AppiumDeviceChannel> {
   }
 
   async close(): Promise<void> {
-    await this._channel.close({});
+    if (this._closed)
+      return;
+    this._closed = true;
+    try {
+      await this._channel.close({});
+    } finally {
+      this.emit('close');
+    }
   }
 }
+
