@@ -93,10 +93,11 @@ export async function startMockAppium(): Promise<MockAppium> {
       return;
     }
     if (req.method === 'POST' && /\/elements$/.test(req.url!)) {
+      const id = nextElementId ?? `el-${++elementCounter}`;
+      nextElementId = undefined;
       res.end(JSON.stringify({
         value: [
-          { [W3C_ELEMENT_KEY]: `el-${++elementCounter}` },
-          { [W3C_ELEMENT_KEY]: `el-${++elementCounter}` },
+          { [W3C_ELEMENT_KEY]: id },
         ],
       }));
       return;
@@ -111,6 +112,14 @@ export async function startMockAppium(): Promise<MockAppium> {
     }
     if (req.method === 'GET' && /\/displayed$/.test(req.url!)) {
       res.end(JSON.stringify({ value: true }));
+      return;
+    }
+    if (req.method === 'GET' && /\/enabled$/.test(req.url!)) {
+      res.end(JSON.stringify({ value: true }));
+      return;
+    }
+    if (req.method === 'GET' && /\/element\/[^/]+\/rect$/.test(req.url!)) {
+      res.end(JSON.stringify({ value: { x: 100, y: 200, width: 50, height: 30 } }));
       return;
     }
     if (req.method === 'GET' && /\/window\/rect$/.test(req.url!)) {

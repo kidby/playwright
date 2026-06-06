@@ -1,6 +1,4 @@
 import { test, expect } from './playwright-test-fixtures';
-import * as fs from 'fs';
-import * as path from 'path';
 
 test.describe('Milestone 4 - Dynamic Validation', () => {
 

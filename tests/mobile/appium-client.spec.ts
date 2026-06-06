@@ -103,7 +103,7 @@ test('requireSession guards calls before createSession', async () => {
   }
 });
 
-test('sendKeys uses W3C { text } shape, not legacy { value: [] }', async () => {
+test('sendKeys uses W3C { text, value } shape for maximum driver compatibility', async () => {
   const server = await startMockAppium();
   try {
     const client = new AppiumClient(server.url);
@@ -112,7 +112,7 @@ test('sendKeys uses W3C { text } shape, not legacy { value: [] }', async () => {
     const el = await client.findElement('accessibility id', 'email');
     await client.sendKeys(el, 'hello@example.com');
     const sendReq = server.requests.find(r => r.method === 'POST' && /\/value$/.test(r.path))!;
-    expect(sendReq.body).toEqual({ text: 'hello@example.com' });
+    expect(sendReq.body).toEqual({ text: 'hello@example.com', value: [...'hello@example.com'] });
   } finally {
     await server.close();
   }

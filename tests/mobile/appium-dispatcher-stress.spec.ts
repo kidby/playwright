@@ -99,7 +99,8 @@ test.describe('AppiumDispatcher Concurrency and Stress Tests', () => {
     const connection = new DispatcherConnection();
     const rootDispatcher = new RootDispatcher(connection);
     const appiumDispatcher = new AppiumDispatcher(rootDispatcher, mockAppium);
-    const _deviceDispatcher = new AppiumDeviceDispatcher(appiumDispatcher, mockDevice);
+    // Constructor registers the device dispatcher as a side-effect.
+    new AppiumDeviceDispatcher(appiumDispatcher, mockDevice);
 
     const dispatchedMessages: any[] = [];
     connection.onmessage = (msg: any) => {

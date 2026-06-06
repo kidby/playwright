@@ -44,7 +44,7 @@ test('AppLocator click sends right strategy + value', async () => {
     const device = await NativeDevice.start(server.url, { 'platformName': 'Android', 'appium:automationName': 'UiAutomator2' });
     await device.app.byAccessibilityId('login').click();
 
-    const findReq = server.requests.find(r => r.method === 'POST' && r.path === '/session/mock-session-1/element')!;
+    const findReq = server.requests.find(r => r.method === 'POST' && r.path === '/session/mock-session-1/elements')!;
     expect(findReq.body).toEqual({ using: 'accessibility id', value: 'login' });
 
     const clickReq = server.requests.find(r => r.method === 'POST' && /\/click$/.test(r.path))!;
@@ -67,7 +67,7 @@ test('AppLocator chain resolves via /element/.../element', async () => {
     const parentReq = server.requests.find(r => r.method === 'POST' && r.path === '/session/mock-session-1/element')!;
     expect(parentReq.body).toEqual({ using: '-ios class chain', value: '**/XCUIElementTypeCell[1]' });
 
-    const childReq = server.requests.find(r => r.path === '/session/mock-session-1/element/parent-1/element')!;
+    const childReq = server.requests.find(r => r.path === '/session/mock-session-1/element/parent-1/elements')!;
     expect(childReq.body).toEqual({ using: 'accessibility id', value: 'subtitle' });
   } finally {
     await server.close();
@@ -80,10 +80,10 @@ test('AppLocator.fill clears then sends keys', async () => {
     const device = await NativeDevice.start(server.url, { 'platformName': 'Android', 'appium:automationName': 'UiAutomator2' });
     await device.app.byId('com.example:id/email').fill('a@b.c');
     const ops = server.requests
-        .filter(r => /\/(clear|value|element)$/.test(r.path))
+        .filter(r => r.method === 'POST' && /\/(clear|value|elements?)$/.test(r.path))
         .map(r => `${r.method} ${r.path.split('/').pop()}`);
-    // Element resolved once, then clear, then sendKeys (value).
-    expect(ops).toEqual(['POST element', 'POST clear', 'POST value']);
+    // Elements resolved (plural), then clear, then sendKeys (value).
+    expect(ops).toEqual(['POST elements', 'POST clear', 'POST value']);
   } finally {
     await server.close();
   }
@@ -95,7 +95,7 @@ test('AppLocator.isDisplayed returns false when element resolution throws', asyn
     server.setResponder(req => {
       if (req.path === '/session')
         return { body: { value: { sessionId: 'mock-session-1' } } };
-      if (req.method === 'POST' && /\/element$/.test(req.path))
+      if (req.method === 'POST' && /\/elements?$/.test(req.path))
         return { status: 404, body: { value: { error: 'no such element' } } };
       return undefined;
     });

@@ -48,7 +48,7 @@ test('captureFailureArtifacts attaches mobile-snapshot + mobile-screenshot', asy
   const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example' }));
   const { info, calls } = stubTestInfo();
   await captureFailureArtifacts(device, info);
-  expect(calls.map(c => c.name).sort()).toEqual(['mobile-screenshot', 'mobile-snapshot']);
+  expect(calls.map(c => c.name).sort()).toEqual(['error-context', 'mobile-screenshot', 'mobile-snapshot']);
   const yaml = calls.find(c => c.name === 'mobile-snapshot');
   expect(yaml?.contentType).toBe('application/x-yaml');
   expect(yaml?.size).toBeGreaterThan(0);
@@ -80,7 +80,8 @@ test('captureFailureArtifacts attaches snapshot when screenshot throws', async (
   const device = await NativeDevice.start(mock.url, iosCapabilities({ bundleId: 'com.example' }));
   const { info, calls } = stubTestInfo();
   await captureFailureArtifacts(device, info);
-  expect(calls.map(c => c.name)).toEqual(['mobile-snapshot']);
+  // error-context is also attached from page source.
+  expect(calls.map(c => c.name).filter(n => n !== 'error-context')).toEqual(['mobile-snapshot']);
   await device.stop();
 });
 

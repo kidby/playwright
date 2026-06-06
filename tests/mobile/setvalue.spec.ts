@@ -38,7 +38,7 @@ test('default setValue: click → clear → sendKeys', async () => {
   expect(clicks.length).toBe(1);
   expect(clears.length).toBe(1);
   expect(sendKeys.length).toBe(1);
-  expect(sendKeys[0].body).toEqual({ text: 'foo@bar.com' });
+  expect(sendKeys[0].body).toEqual({ text: 'foo@bar.com', value: [...'foo@bar.com'] });
   await device.stop();
 });
 
@@ -49,7 +49,7 @@ test('clearBefore: false skips the clear call', async () => {
   const sendKeys = elementCalls(mock.requests, 'el-1/value');
   expect(clears.length).toBe(0);
   expect(sendKeys.length).toBe(1);
-  expect(sendKeys[0].body).toEqual({ text: 'query' });
+  expect(sendKeys[0].body).toEqual({ text: 'query', value: [...'query'] });
   await device.stop();
 });
 
