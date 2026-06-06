@@ -173,6 +173,42 @@ export class AppLocator {
     return this._chained({ using: 'class name', value: fullClass });
   }
 
+  // ARIA role — maps to the element type on each platform. For example,
+  // `getByRole('button')` resolves to `XCUIElementTypeButton` on iOS and
+  // `android.widget.Button` on Android. Falls back to an XPath
+  // `@role='<role>'` attribute check for custom roles the type map doesn't
+  // cover, matching how web Playwright resolves implicit ARIA roles.
+  getByRole(role: string): AppLocator {
+    const mapped = roleToNativeClass(role, this._platform());
+    if (mapped)
+      return this._chained({ using: 'class name', value: mapped });
+    // Fallback: look for an explicit `role` or `content-desc` attribute via XPath.
+    return this._chained({ using: 'xpath', value: `//*[@role="${role}" or @content-desc="${role}"]` });
+  }
+
+  // Matches the placeholder / hint text. iOS: `value` attribute on text
+  // fields; Android: `content-desc` or the `hint` resource attribute.
+  getByPlaceholder(text: string | RegExp): AppLocator {
+    if (this._platform() === 'iOS')
+      return this._chained({ using: '-ios predicate string', value: iosTextPredicate('value', text) });
+    return this._chained({ using: '-android uiautomator', value: androidUiSelector('description', text) });
+  }
+
+  // Matches the accessibility description that corresponds to alt text.
+  // iOS: `label` attribute; Android: `content-desc`.
+  getByAltText(text: string | RegExp): AppLocator {
+    if (this._platform() === 'iOS')
+      return this._chained({ using: '-ios predicate string', value: iosTextPredicate('label', text) });
+    return this._chained({ using: '-android uiautomator', value: androidUiSelector('description', text) });
+  }
+
+  // Matches the title / tooltip. iOS: `label` or `name`; Android: `content-desc`.
+  getByTitle(text: string | RegExp): AppLocator {
+    if (this._platform() === 'iOS')
+      return this._chained({ using: '-ios predicate string', value: iosTextPredicate('name', text) });
+    return this._chained({ using: '-android uiautomator', value: androidUiSelector('description', text) });
+  }
+
   // Position selectors — mirror Playwright's Locator.first()/.nth()/.last().
   first(): AppLocator {
     return this._derived({ position: 0 });
@@ -283,6 +319,129 @@ export class AppLocator {
       await fs.writeFile(options.path, buffer);
     }
     return buffer;
+  }
+
+  // ── Playwright web API parity: actions ──────────────────────────────────
+
+  async tap(options: LocatorClickOptions = {}): Promise<void> {
+    return this.click(options);
+  }
+
+  async check(options: TimeoutOptions = {}): Promise<void> {
+    await this._actAction(async handle => {
+      const checked = await this._client.getAttribute(handle, 'checked').catch(() => 'false');
+      if (checked === 'true')
+        return;
+      await this._client.click(handle);
+    }, options.timeout);
+  }
+
+  async uncheck(options: TimeoutOptions = {}): Promise<void> {
+    await this._actAction(async handle => {
+      const checked = await this._client.getAttribute(handle, 'checked').catch(() => 'false');
+      if (checked !== 'true')
+        return;
+      await this._client.click(handle);
+    }, options.timeout);
+  }
+
+  async press(key: string, options: TimeoutOptions = {}): Promise<void> {
+    await this._actAction(async handle => {
+      await this._client.sendKeys(handle, key);
+    }, options.timeout);
+  }
+
+  async scrollIntoViewIfNeeded(options: TimeoutOptions = {}): Promise<void> {
+    const handle = await this._waitForActionable({ requireEnabled: false, timeoutMs: options.timeout });
+    const isDisp = await this._client.isDisplayed(handle).catch(() => false);
+    if (isDisp)
+      return;
+    // Use mobile:scroll on iOS, mobile:scrollGesture on Android
+    const platform = this._platform();
+    if (platform === 'iOS')
+      await this._client.executeScript('mobile: scroll', [{ elementId: handle.ELEMENT, direction: 'down' }]).catch(() => undefined);
+    else
+      await this._client.executeScript('mobile: scrollGesture', [{ elementId: handle.ELEMENT, direction: 'down', percent: 0.75 }]).catch(() => undefined);
+  }
+
+  async dragTo(target: AppLocator, options: TimeoutOptions = {}): Promise<void> {
+    const sourceHandle = await this._waitForActionable({ requireEnabled: true, timeoutMs: options.timeout });
+    const targetHandle = await target.resolve();
+    await this._client.executeScript('mobile: dragGesture', [{
+      elementId: sourceHandle.ELEMENT,
+      endX: 0, endY: 0,
+    }]).catch(async () => {
+      // Fallback: W3C Actions API drag
+      const sourceRect = await this._client.getElementRect(sourceHandle);
+      const targetRect = await this._client.getElementRect(targetHandle);
+      await this._client.performActions([{
+        type: 'pointer',
+        id: 'drag',
+        parameters: { pointerType: 'touch' },
+        actions: [
+          { type: 'pointerMove', duration: 0, x: Math.round(sourceRect.x + sourceRect.width / 2), y: Math.round(sourceRect.y + sourceRect.height / 2) },
+          { type: 'pointerDown', button: 0 },
+          { type: 'pause', duration: 250 },
+          { type: 'pointerMove', duration: 500, x: Math.round(targetRect.x + targetRect.width / 2), y: Math.round(targetRect.y + targetRect.height / 2) },
+          { type: 'pointerUp', button: 0 },
+        ],
+      }]);
+    });
+  }
+
+  async focus(options: TimeoutOptions = {}): Promise<void> {
+    await this._actAction(async handle => {
+      await this._client.click(handle);
+    }, options.timeout);
+  }
+
+  async blur(options: TimeoutOptions = {}): Promise<void> {
+    // No direct blur in Appium — tap outside the element to lose focus.
+    await this._waitForActionable({ requireEnabled: false, timeoutMs: options.timeout });
+    await this._client.performActions([{
+      type: 'pointer',
+      id: 'blur-tap',
+      parameters: { pointerType: 'touch' },
+      actions: [
+        { type: 'pointerMove', duration: 0, x: 1, y: 1 },
+        { type: 'pointerDown', button: 0 },
+        { type: 'pointerUp', button: 0 },
+      ],
+    }]).catch(() => undefined);
+  }
+
+  // ── Playwright web API parity: properties ───────────────────────────────
+
+  async textContent(options: LocatorReadOptions = {}): Promise<string> {
+    return this.text(options);
+  }
+
+  async innerText(options: LocatorReadOptions = {}): Promise<string> {
+    return this.text(options);
+  }
+
+  async inputValue(options: LocatorReadOptions = {}): Promise<string> {
+    const handle = await this._waitForActionable({ requireEnabled: false, timeoutMs: options.timeout });
+    const value = await this._client.getAttribute(handle, 'value').catch(() =>
+      this._client.getAttribute(handle, 'text').catch(() => null)
+    );
+    return value ?? '';
+  }
+
+  async isChecked(options: LocatorReadOptions = {}): Promise<boolean> {
+    const handle = await this._waitForActionable({ requireEnabled: false, timeoutMs: options.timeout });
+    const checked = await this._client.getAttribute(handle, 'checked').catch(() => 'false');
+    return checked === 'true';
+  }
+
+  async boundingBox(options: LocatorReadOptions = {}): Promise<LocatorBoundingBox | null> {
+    try {
+      const handle = await this._waitForActionable({ requireEnabled: false, timeoutMs: options.timeout });
+      const rect = await this._client.getElementRect(handle);
+      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+    } catch {
+      return null;
+    }
   }
 
   chain(): LocatorChainPart[] { return [...this._chain]; }
@@ -470,4 +629,47 @@ function androidUiSelector(attribute: 'text' | 'description', text: string | Reg
   if (text instanceof RegExp)
     return `new UiSelector().${attribute}Matches("${escapeQuotes(text.source)}")`;
   return `new UiSelector().${attribute}Contains("${escapeQuotes(text)}")`;
+}
+
+// Maps common ARIA roles to native platform class names.
+// Returns undefined for roles that have no direct native mapping.
+const kRoleToIos: Record<string, string> = {
+  button: 'XCUIElementTypeButton',
+  checkbox: 'XCUIElementTypeSwitch',
+  combobox: 'XCUIElementTypeComboBox',
+  heading: 'XCUIElementTypeStaticText',
+  img: 'XCUIElementTypeImage',
+  link: 'XCUIElementTypeLink',
+  listitem: 'XCUIElementTypeCell',
+  menuitem: 'XCUIElementTypeMenuItem',
+  progressbar: 'XCUIElementTypeProgressIndicator',
+  radio: 'XCUIElementTypeRadioButton',
+  searchbox: 'XCUIElementTypeSearchField',
+  slider: 'XCUIElementTypeSlider',
+  switch: 'XCUIElementTypeSwitch',
+  tab: 'XCUIElementTypeTab',
+  textbox: 'XCUIElementTypeTextField',
+};
+
+const kRoleToAndroid: Record<string, string> = {
+  button: 'android.widget.Button',
+  checkbox: 'android.widget.CheckBox',
+  combobox: 'android.widget.Spinner',
+  heading: 'android.widget.TextView',
+  img: 'android.widget.ImageView',
+  link: 'android.widget.TextView',
+  listitem: 'android.widget.LinearLayout',
+  menuitem: 'android.widget.TextView',
+  progressbar: 'android.widget.ProgressBar',
+  radio: 'android.widget.RadioButton',
+  searchbox: 'android.widget.EditText',
+  slider: 'android.widget.SeekBar',
+  switch: 'android.widget.Switch',
+  tab: 'android.widget.TabWidget',
+  textbox: 'android.widget.EditText',
+};
+
+function roleToNativeClass(role: string, platform: 'iOS' | 'Android' | undefined): string | undefined {
+  const map = platform === 'iOS' ? kRoleToIos : kRoleToAndroid;
+  return map[role.toLowerCase()];
 }

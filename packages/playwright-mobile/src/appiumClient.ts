@@ -247,6 +247,14 @@ export class AppiumClient {
     return typeof res.value === 'string' ? res.value : '';
   }
 
+  async getElementRect(element: ElementHandle): Promise<Rect> {
+    return this.elementRect(element);
+  }
+
+  async performActions(actions: any[]): Promise<void> {
+    await this._send('POST', `/session/${this._requireSession()}/actions`, { actions });
+  }
+
   private _requireSession(): string {
     if (!this._sessionId)
       throw new Error('No active Appium session. Call createSession() first.');

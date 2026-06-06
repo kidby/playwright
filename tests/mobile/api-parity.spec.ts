@@ -10,29 +10,31 @@ test.afterEach(async () => { await mock.close(); });
 test('AppLocator - parity actions', async () => {
   const device = await NativeDevice.start(mock.url, androidCapabilities({ appPackage: 'com.example', appActivity: '.Main' }));
   const loc = device.app.byAccessibilityId('test');
+  const fast = { timeout: 500 };
   
   // These should compile (typings) but might fail implementation against mock currently
   // We wrap in try-catch because mock server doesn't implement all W3C endpoints yet,
   // but we just want to ensure the methods exist on AppLocator and don't throw "not a function".
-  try { await loc.tap(); } catch(e) {}
-  try { await loc.clear(); } catch(e) {}
-  try { await loc.check(); } catch(e) {}
-  try { await loc.uncheck(); } catch(e) {}
-  try { await loc.press('Enter'); } catch(e) {}
-  try { await loc.scrollIntoViewIfNeeded(); } catch(e) {}
-  try { await loc.dragTo(device.app.byAccessibilityId('target')); } catch(e) {}
-  try { await loc.focus(); } catch(e) {}
-  try { await loc.blur(); } catch(e) {}
+  try { await loc.tap(fast); } catch(e) {}
+  try { await loc.clear(fast); } catch(e) {}
+  try { await loc.check(fast); } catch(e) {}
+  try { await loc.uncheck(fast); } catch(e) {}
+  try { await loc.press('Enter', fast); } catch(e) {}
+  try { await loc.scrollIntoViewIfNeeded(fast); } catch(e) {}
+  try { await loc.dragTo(device.app.byAccessibilityId('target'), fast); } catch(e) {}
+  try { await loc.focus(fast); } catch(e) {}
+  try { await loc.blur(fast); } catch(e) {}
 });
 
 test('AppLocator - parity properties', async () => {
   const device = await NativeDevice.start(mock.url, androidCapabilities({ appPackage: 'com.example', appActivity: '.Main' }));
   const loc = device.app.byAccessibilityId('test');
-  try { await loc.textContent(); } catch(e) {}
-  try { await loc.innerText(); } catch(e) {}
-  try { await loc.inputValue(); } catch(e) {}
-  try { await loc.isChecked(); } catch(e) {}
-  try { await loc.boundingBox(); } catch(e) {}
+  const fast = { timeout: 500 };
+  try { await loc.textContent(fast); } catch(e) {}
+  try { await loc.innerText(fast); } catch(e) {}
+  try { await loc.inputValue(fast); } catch(e) {}
+  try { await loc.isChecked(fast); } catch(e) {}
+  try { await loc.boundingBox(fast); } catch(e) {}
 });
 
 test('AppLocator - parity selectors', async () => {

@@ -98,6 +98,14 @@ export class Tracing extends SdkObject implements InstrumentationListener, Snaps
   private _pendingHarEntries = new Set<har.Entry>();
   private _started = false;
   readonly harRecorders = new Map<string, HarRecorder>();
+  private static _activeTracePaths = new Set<string>();
+  private _myActiveTracePaths = new Set<string>();
+
+  private _clearRegistry() {
+    for (const p of this._myActiveTracePaths)
+      Tracing._activeTracePaths.delete(p);
+    this._myActiveTracePaths.clear();
+  }
 
   constructor(context: BrowserContext | APIRequestContext, tracesDir: string | undefined) {
     super(context, 'tracing');
@@ -156,7 +164,7 @@ export class Tracing extends SdkObject implements InstrumentationListener, Snaps
 
     const tracesDir = this._createTracesDirIfNeeded();
     let traceName = options.name || createGuid();
-    if (options.name && tracesDir)
+    if (tracesDir)
       traceName = this._uniqueTraceName(tracesDir, traceName);
 
     // Init the state synchronously.
@@ -299,14 +307,27 @@ export class Tracing extends SdkObject implements InstrumentationListener, Snaps
     const suffix = state.chunkOrdinal ? `-chunk${state.chunkOrdinal}` : ``;
     state.chunkOrdinal++;
     state.traceFile = path.join(state.tracesDir, `${state.traceName}${suffix}.trace`);
+    Tracing._activeTracePaths.add(state.traceFile);
+    this._myActiveTracePaths.add(state.traceFile);
   }
 
   private _uniqueTraceName(tracesDir: string, name: string): string {
     let traceName = name;
     let suffix = 0;
-    while (fs.existsSync(path.join(tracesDir, traceName + '.trace')) || fs.existsSync(path.join(tracesDir, traceName + '.network'))) {
+    while (
+      fs.existsSync(path.join(tracesDir, traceName + '.trace')) ||
+      fs.existsSync(path.join(tracesDir, traceName + '.network')) ||
+      Tracing._activeTracePaths.has(path.join(tracesDir, traceName + '.trace')) ||
+      Tracing._activeTracePaths.has(path.join(tracesDir, traceName + '.network'))
+    ) {
       traceName = `${name}-${++suffix}`;
     }
+    const tracePath = path.join(tracesDir, traceName + '.trace');
+    const networkPath = path.join(tracesDir, traceName + '.network');
+    Tracing._activeTracePaths.add(tracePath);
+    Tracing._activeTracePaths.add(networkPath);
+    this._myActiveTracePaths.add(tracePath);
+    this._myActiveTracePaths.add(networkPath);
     return traceName;
   }
 
@@ -338,6 +359,7 @@ export class Tracing extends SdkObject implements InstrumentationListener, Snaps
     this.flushHarEntries();
     await this._fs.syncAndGetError().finally(() => {
       this._state = undefined;
+      this._clearRegistry();
     });
   }
 
@@ -356,6 +378,7 @@ export class Tracing extends SdkObject implements InstrumentationListener, Snaps
   abort() {
     this._snapshotter?.dispose();
     this._harTracer.stop();
+    this._clearRegistry();
   }
 
   async flush() {
