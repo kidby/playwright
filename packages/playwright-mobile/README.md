@@ -81,7 +81,7 @@ device.app.byAndroidUiSelector('new UiSelector().text("Submit")')
 device.app.byId('com.example:id/submit')
 ```
 
-Locators are lazy — they resolve to an element only when an action runs. Action surface: `click()`, `fill(text)`, `type(text)`, `text()`, `getAttribute(name)`, `isDisplayed()`, `count()`. Each action accepts an optional `{ timeout }` to override `device.defaultActionTimeoutMs`.
+Locators are lazy — they resolve to an element only when an action runs. Action surface: `click()`, `tap()`, `fill(text)`, `clear()`, `type(text)`, `check()`, `uncheck()`, `press(key)`, `scrollIntoViewIfNeeded()`, `dragTo(target)`, `focus()`, `blur()`, `screenshot()`. Property surface: `text()`, `textContent()`, `innerText()`, `inputValue()`, `getAttribute(name)`, `isVisible()`, `isDisplayed()`, `isEnabled()`, `isChecked()`, `boundingBox()`, `count()`. Composition: `first()`, `nth(i)`, `last()`, `filter(fn)`, `pollUntil(fn)`. Each action performs automatic actionability checks (waits for element to be displayed and enabled) and accepts an optional `{ timeout }` to override `device.defaultActionTimeoutMs`.
 
 #### Semantic queries
 
@@ -93,6 +93,10 @@ device.app.getByText(/Item \d+/)         // RegExp → MATCHES / textMatches
 device.app.getByLabel('Email')           // iOS accessibility id / Android content-desc
 device.app.getByTestId('save-btn')       // accessibility id on both platforms
 device.app.getByType('Button')           // iOS XCUIElementTypeButton / Android android.widget.Button
+device.app.getByRole('button')           // iOS XCUIElementTypeButton / Android android.widget.Button
+device.app.getByPlaceholder('Search')    // iOS value attribute / Android hint attribute
+device.app.getByAltText('Logo')          // maps to accessibility id / content-desc
+device.app.getByTitle('Settings')        // maps to accessibility id
 ```
 
 Chains compose with the existing `byX()` calls and with `filter() / first() / nth() / last()`.
@@ -269,3 +273,22 @@ Without `APPIUM_TEST=1` the three tests show as skipped with a clear reason. Use
 - **No Sauce / BrowserStack adapters.** Vendor-cloud integrations belong above this package — pass cloud credentials through `appiumServerUrl` + `extra` capabilities.
 - **No native push notifications API.** Use platform-specific approaches (ADB intent, `mobile: pushNotification` if your Appium server supports it).
 - **Phase B handleAlert: silent-on-exhaust.** If you need an alert to be present, check explicitly via your test logic — `handleAlert` returns silently after retries because alerts may or may not appear depending on system state.
+- **Gestures use platform-specific `mobile:` extensions.** `swipe`, `longPress`, `doubleTap`, `scrollToElement`, and `pullToRefresh` use Appium's `mobile:` commands. Only `dragTo` and `blur` use the W3C Actions API. A future release may migrate all gestures to W3C Actions for cross-platform consistency.
+
+### Cloud device farm
+
+Connect to a remote Playwright Cloud device farm for horizontal scaling:
+
+```ts
+const device = await playwright.appium.connectToCloud(
+  'wss://mobile.playwright.dev',
+  androidCapabilities({ appPackage: 'com.example' }),
+  {
+    token: process.env.PLAYWRIGHT_MOBILE_TOKEN,
+    timeout: 60_000,
+    logger: (msg) => console.log(msg),
+  }
+);
+```
+
+Token auth via `options.token` or `PLAYWRIGHT_MOBILE_TOKEN` env var. Capabilities are base64-encoded in upgrade headers for eager device allocation. Bidirectional close lifecycle: device close tears down the WebSocket, and connection drop emits close on the device.

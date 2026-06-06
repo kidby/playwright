@@ -75,5 +75,21 @@ test('Form/Login play function fills + submits', async ({ page, mountStory }) =>
 ## Notes
 
 - **`.mdx` stories are skipped** by `filterStories` (entry type `'docs'`, not `'story'`).
-- **Iframe rendering, not portable-stories**: deliberately uses Storybook's live preview iframe rather than `composeStories()`. This gives a real browser process per story (so Lighthouse and CDP work) and stays framework-agnostic.
+- **Dual rendering modes**: The default mode uses Storybook's live preview iframe for full-fidelity rendering (Lighthouse and CDP work). A `composeStories` CT mode is also available via the plugin system (`packages/playwright-storybook/src/plugin.ts`) for lightweight component testing without a running Storybook server — useful for TDD workflows where startup speed matters.
 - **`webServer` config owns the dev server**: this package doesn't spawn Storybook for you. Use Playwright's standard `webServer` config (same pattern as any other dev-server-backed test setup).
+
+## CT Mode (experimental)
+
+The `composeStories` CT mode compiles stories at build time and mounts them directly using Playwright Component Testing, bypassing the Storybook dev server entirely:
+
+```ts
+// playwright-ct.config.ts
+import { defineConfig } from '@playwright/experimental-ct-react';
+import { storybookCTPlugin } from '@playwright/storybook/plugin';
+
+export default defineConfig({
+  plugins: [storybookCTPlugin({ framework: '@storybook/react' })],
+});
+```
+
+This mode is experimental and works best with React. Vue and Svelte support is planned.

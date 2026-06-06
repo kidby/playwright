@@ -27,15 +27,29 @@
 
 `playwright-ct-core`, `playwright-ct-react`, `playwright-ct-vue`
 
+### Fork-Specific Experimental Packages
+
+| Package | npm name | Purpose |
+|---------|----------|---------|
+| `playwright-mobile` | `@playwright/experimental-mobile` | Native mobile testing via Appium 2 (iOS + Android) |
+| `playwright-storybook` | `@playwright/storybook` | Storybook auto-discovery, iframe + CT modes |
+| `playwright-lighthouse` | `@playwright/lighthouse` | Lighthouse audits from within Playwright tests |
+
+### Bun Compatibility
+
+This fork runs under Bun as a first-class target. Tests can use `Bun.*` APIs directly. Bun is 10–18% faster than Node on compatible test suites. Both runtimes pass the full 217-test fork suite reliably.
+
 ### Key Directories
 
 | Directory | Purpose |
 |-----------|---------|
-| `tests/` | All test suites (page, library, playwright-test, mcp, components, etc.) |
+| `tests/` | All test suites (page, library, playwright-test, mcp, components, mobile, etc.) |
+| `tests/mobile/` | Mobile / Appium integration tests (mock server, no real device needed) |
 | `docs/src/` | API documentation — **source of truth** for public TypeScript types |
 | `docs/src/api/` | Per-class API reference (`class-page.md`, `class-locator.md`, etc.) |
-| `utils/` | Build scripts, code generation, linting, doc tools |
+| `utils/` | Build scripts, code generation, linting, doc tools, upstream sync |
 | `browser_patches/` | Browser engine patches |
+| `.docs/` | Fork-specific plans, critiques, and implementation status docs |
 
 ## Build
 
@@ -65,6 +79,9 @@ Runs all lint checks in parallel: eslint, tsc, doclint, check-deps, generate_cha
 | `npm run ttest <filter>` | Test runner (`tests/playwright-test/`) |
 | `npm run ctest-mcp <filter>` | Chromium only MCP tools (`tests/mcp/`) |
 | `npm run test-mcp <filter> -- --project=<chromium,firefox,webkit>` | MCP tools (`tests/mcp/`) |
+| `node packages/playwright/cli.js test tests/mobile/` | Fork mobile tests (no browser needed) |
+| `node packages/playwright/cli.js test tests/playwright-test/storybook*.spec.ts` | Fork storybook tests |
+| `bun packages/playwright/cli.js test tests/mobile/` | Same as above, under Bun |
 
 
 ### Filtering
@@ -85,7 +102,17 @@ npm run ctest-mcp snapshot                             # By file name part
 | `tests/playwright-test/` | `import { test, expect } from './playwright-test-fixtures'` | test runner fixtures | Test runner: reporters, config, annotations, retries |
 | `tests/mcp/` | `import { test, expect } from './fixtures'` | `client`, `server` | MCP tools via `client.callTool()` |
 
-**Decision rule**: Does the test need `browser`/`browserType`/`context` → `tests/library/`. Just needs `page` + `server` → `tests/page/`.
+**Decision rule**: Does the test need `browser`/`browserType`/`context` → `tests/library/`. Just needs `page` + `server` → `tests/page/`. Mobile tests → `tests/mobile/`.
+
+## Upstream Sync
+
+This fork tracks `microsoft/playwright` as the `upstream` remote.
+
+```bash
+utils/sync_upstream.sh       # Dry-run merge analysis (what would happen if we merged upstream)
+utils/analyze_upstream.sh    # Conflict prediction report
+git fetch upstream main      # Fetch latest upstream
+```
 
 ## DEPS System
 

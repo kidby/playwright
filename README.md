@@ -12,7 +12,7 @@ Tracks upstream `microsoft/playwright`. Local changes:
 
 **Bun runtime.** Playwright runs under Bun as a first-class target alongside Node. Tests can use `Bun.*` APIs directly (`Bun.file`, `Bun.serve`, `Bun.spawn`, `Bun.$`, etc.). The worker IS a Bun process under Bun. Upstream `microsoft/playwright` does not run under Bun; the fork is the only working option there.
 
-> **Benchmarks (Node v24 vs Bun 1.3, Apple Silicon).** Bun is 10–18% faster on compatible suites. Both runtimes pass the full 217-test fork suite reliably (3/3 runs, 0 failures). Use Bun when your specs need Bun APIs; otherwise Node 24 is the safer default.
+> **Benchmarks (Node v24 vs Bun 1.3, Apple Silicon).** Bun is 10–18% faster on compatible suites. Both runtimes pass the full 217-test fork suite reliably (3/3 runs, 0 failures).
 >
 > | Suite | Node | Bun | Speedup |
 > |---|---|---|---|
