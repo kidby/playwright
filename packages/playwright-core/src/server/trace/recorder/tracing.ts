@@ -154,11 +154,10 @@ export class Tracing extends SdkObject implements InstrumentationListener, Snaps
     // Re-write for testing.
     this._contextCreatedEvent.sdkLanguage = this._sdkLanguage();
 
-    // TODO: passing the same name for two contexts makes them write into a single file
-    // and conflict.
-    const traceName = options.name || createGuid();
-
     const tracesDir = this._createTracesDirIfNeeded();
+    let traceName = options.name || createGuid();
+    if (options.name && tracesDir)
+      traceName = this._uniqueTraceName(tracesDir, traceName);
 
     // Init the state synchronously.
     this._state = {
@@ -302,12 +301,22 @@ export class Tracing extends SdkObject implements InstrumentationListener, Snaps
     state.traceFile = path.join(state.tracesDir, `${state.traceName}${suffix}.trace`);
   }
 
+  private _uniqueTraceName(tracesDir: string, name: string): string {
+    let traceName = name;
+    let suffix = 0;
+    while (fs.existsSync(path.join(tracesDir, traceName + '.trace')) || fs.existsSync(path.join(tracesDir, traceName + '.network'))) {
+      traceName = `${name}-${++suffix}`;
+    }
+    return traceName;
+  }
+
   private _changeTraceName(state: RecordingState, name: string, preserveNetworkResources: boolean) {
-    state.traceName = name;
+    const uniqueName = this._uniqueTraceName(state.tracesDir, name);
+    state.traceName = uniqueName;
     state.chunkOrdinal = 0;  // Reset ordinal for the new name.
     this._allocateNewTraceFile(state);
 
-    const newNetworkFile = path.join(state.tracesDir, name + '.network');
+    const newNetworkFile = path.join(state.tracesDir, uniqueName + '.network');
     if (preserveNetworkResources)
       this._fs.copyFile(state.networkFile, newNetworkFile);
     state.networkFile = newNetworkFile;

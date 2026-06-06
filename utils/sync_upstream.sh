@@ -21,6 +21,18 @@ count=$(echo "$incoming" | wc -l | tr -d ' ')
 echo "Incoming from ${UPSTREAM_REMOTE}/${UPSTREAM_BRANCH} ($count commits):"
 echo "$incoming"
 echo
+
+echo "--- Dry-Run Conflict Analysis ---"
+MERGE_OUTPUT=$(git merge-tree HEAD "${UPSTREAM_REMOTE}/${UPSTREAM_BRANCH}" 2>&1 || true)
+if echo "$MERGE_OUTPUT" | grep -q "CONFLICT"; then
+  echo "!!! WARNING: CRITICAL CONFLICTS DETECTED !!!"
+  echo "$MERGE_OUTPUT" | grep "CONFLICT" || true
+  echo "Proceeding will result in a dirty working tree requiring manual resolution."
+else
+  echo "Analysis complete: No merge conflicts detected. Safe to merge."
+fi
+echo
+
 read -p "Merge into $(git branch --show-current)? [y/N] " ack
 [[ "$ack" == "y" || "$ack" == "Y" ]] || { echo "Aborted."; exit 0; }
 

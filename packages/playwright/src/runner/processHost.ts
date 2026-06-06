@@ -53,7 +53,7 @@ interface ChildTransport {
 // postMessage" doesn't translate when per-test JSC runtime, not IPC,
 // dominates the gap. Kept behind a flag so future Bun releases can be
 // re-tested without touching code. See `.claude/plans/bun-worker-migration.md`.
-const useBunWorker = '1' // !!process.versions.bun && !!process.env.PW_USE_BUN_WORKER;
+const useBunWorker = !!(process as any).versions.bun && !!process.env.PW_USE_BUN_WORKER;
 
 export class ProcessHost extends EventEmitter {
   private _child: ChildTransport | undefined;

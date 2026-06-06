@@ -55,6 +55,8 @@ export class BidiPage implements PageDelegate {
   private readonly _pdf: BidiPDF;
   private _initScriptIds = new Map<InitScript, string>();
   private readonly _fragmentNavigations = new Set<string>();
+  private _screencastTimeout: NodeJS.Timeout | undefined;
+  private _screencastSessionId = 0;
 
   constructor(browserContext: BidiBrowserContext, bidiSession: BidiSession, opener: BidiPage | null) {
     this._session = bidiSession;
@@ -105,6 +107,7 @@ export class BidiPage implements PageDelegate {
   }
 
   didClose() {
+    this.stopScreencast();
     this._session.dispose();
     eventsHelper.removeEventListeners(this._sessionListeners);
     this._page._didClose();
@@ -479,19 +482,22 @@ export class BidiPage implements PageDelegate {
   }
 
   async takeScreenshot(progress: Progress, format: string, documentRect: types.Rect | undefined, viewportRect: types.Rect | undefined, quality: number | undefined, fitsViewport: boolean, scale: 'css' | 'device'): Promise<Buffer> {
-    const rect = (documentRect || viewportRect)!;
-    const { data } = await progress.race(this._session.send('browsingContext.captureScreenshot', {
+    const rect = documentRect || viewportRect;
+    const params: any = {
       context: this._session.sessionId,
       format: {
         type: `image/${format === 'png' ? 'png' : 'jpeg'}`,
         quality: quality !== undefined ? quality / 100 : undefined,
       },
       origin: documentRect ? 'document' : 'viewport',
-      clip: {
+    };
+    if (rect) {
+      params.clip = {
         type: 'box',
         ...rect,
-      }
-    }));
+      };
+    }
+    const { data } = await progress.race(this._session.send('browsingContext.captureScreenshot', params));
     return Buffer.from(data, 'base64');
   }
 
@@ -566,9 +572,47 @@ export class BidiPage implements PageDelegate {
   }
 
   startScreencast(options: { width: number, height: number, quality: number }) {
+    if (this._screencastTimeout)
+      return;
+    const interval = 100;
+    const sessionId = ++this._screencastSessionId;
+    const capture = async () => {
+      if (this._screencastSessionId !== sessionId || !this._screencastTimeout)
+        return;
+      try {
+        const buffer = await this.takeScreenshot(
+          nullProgress,
+          'jpeg',
+          undefined,
+          undefined,
+          options.quality,
+          false,
+          'device'
+        );
+        if (this._screencastSessionId !== sessionId || !this._screencastTimeout)
+          return;
+        const viewport = this._page.emulatedSize()?.viewport || this._browserContext._options.viewport || { width: options.width, height: options.height };
+        this._page.screencast.onScreencastFrame({
+          buffer,
+          frameSwapWallTime: Date.now(),
+          viewportWidth: viewport.width,
+          viewportHeight: viewport.height,
+        });
+      } catch (e) {
+        // Ignore errors
+      }
+      if (this._screencastSessionId === sessionId && this._screencastTimeout)
+        this._screencastTimeout = setTimeout(capture, interval);
+    };
+    this._screencastTimeout = setTimeout(capture, 0);
   }
 
   stopScreencast() {
+    if (this._screencastTimeout) {
+      clearTimeout(this._screencastTimeout);
+      this._screencastTimeout = undefined;
+    }
+    this._screencastSessionId++;
   }
 
   rafCountForStablePosition(): number {

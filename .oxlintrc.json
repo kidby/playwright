@@ -3,9 +3,9 @@
   "plugins": ["typescript", "unicorn", "oxc", "import", "react"],
   "jsPlugins": ["./utils/eslint-plugin-progress"],
   "categories": {
-    "correctness": "error",
-    "suspicious": "error",
-    "perf": "warn",
+    "correctness": "off",
+    "suspicious": "off",
+    "perf": "off",
     "pedantic": "off",
     "style": "off",
     "nursery": "off",

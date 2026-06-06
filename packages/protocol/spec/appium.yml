@@ -1,0 +1,53 @@
+# Copyright (c) Microsoft Corporation.
+
+Appium:
+  type: interface
+
+  commands:
+    connect:
+      internal: true
+      parameters:
+        serverUrl: string
+        capabilities: json
+      returns:
+        device: AppiumDevice
+
+AppiumDevice:
+  type: interface
+
+  initializer:
+    sessionId: string?
+    capabilities: json?
+
+  commands:
+    appLocator:
+      internal: true
+      parameters:
+        chain: json
+        options: json?
+      returns:
+        locator: AppLocator
+
+    screenshot:
+      title: Screenshot
+      parameters:
+        timeout: float?
+      returns:
+        binary: binary
+
+    request:
+      internal: true
+      parameters:
+        method: string
+        path: string
+        body: json?
+      returns:
+        result: json?
+
+    close:
+      title: Close
+
+  events:
+    console:
+      parameters:
+        $mixin: ConsoleMessage

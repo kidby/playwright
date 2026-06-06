@@ -1,0 +1,43 @@
+# Copyright (c) Microsoft Corporation.
+
+AppLocator:
+  type: interface
+
+  commands:
+    wait:
+      title: Wait
+      parameters:
+        state:
+          type: enum?
+          literals:
+          - attached
+          - detached
+          - visible
+          - hidden
+        timeout: float?
+      returns:
+        element: ElementHandle?
+
+    click:
+      title: Click
+      parameters:
+        timeout: float?
+        trial: boolean?
+
+    fill:
+      title: Fill
+      parameters:
+        text: string
+        timeout: float?
+
+    clear:
+      title: Clear
+      parameters:
+        timeout: float?
+
+    screenshot:
+      title: Screenshot
+      parameters:
+        timeout: float?
+      returns:
+        binary: binary

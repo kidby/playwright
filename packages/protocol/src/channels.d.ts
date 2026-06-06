@@ -31,6 +31,9 @@ export type InitializerTraits<T> =
     T extends AndroidSocketChannel ? AndroidSocketInitializer :
     T extends AndroidDeviceChannel ? AndroidDeviceInitializer :
     T extends APIRequestContextChannel ? APIRequestContextInitializer :
+    T extends AppLocatorChannel ? AppLocatorInitializer :
+    T extends AppiumChannel ? AppiumInitializer :
+    T extends AppiumDeviceChannel ? AppiumDeviceInitializer :
     T extends ArtifactChannel ? ArtifactInitializer :
     T extends StreamChannel ? StreamInitializer :
     T extends WritableStreamChannel ? WritableStreamInitializer :
@@ -71,6 +74,9 @@ export type EventsTraits<T> =
     T extends AndroidSocketChannel ? AndroidSocketEvents :
     T extends AndroidDeviceChannel ? AndroidDeviceEvents :
     T extends APIRequestContextChannel ? APIRequestContextEvents :
+    T extends AppLocatorChannel ? AppLocatorEvents :
+    T extends AppiumChannel ? AppiumEvents :
+    T extends AppiumDeviceChannel ? AppiumDeviceEvents :
     T extends ArtifactChannel ? ArtifactEvents :
     T extends StreamChannel ? StreamEvents :
     T extends WritableStreamChannel ? WritableStreamEvents :
@@ -111,6 +117,9 @@ export type EventTargetTraits<T> =
     T extends AndroidSocketChannel ? AndroidSocketEventTarget :
     T extends AndroidDeviceChannel ? AndroidDeviceEventTarget :
     T extends APIRequestContextChannel ? APIRequestContextEventTarget :
+    T extends AppLocatorChannel ? AppLocatorEventTarget :
+    T extends AppiumChannel ? AppiumEventTarget :
+    T extends AppiumDeviceChannel ? AppiumDeviceEventTarget :
     T extends ArtifactChannel ? ArtifactEventTarget :
     T extends StreamChannel ? StreamEventTarget :
     T extends WritableStreamChannel ? WritableStreamEventTarget :
@@ -747,6 +756,152 @@ export type APIResponse = {
   securityDetails?: SecurityDetails,
   serverAddr?: RemoteAddr,
 };
+
+// ----------- AppLocator -----------
+export type AppLocatorInitializer = {};
+export interface AppLocatorEventTarget {
+}
+export interface AppLocatorChannel extends AppLocatorEventTarget, Channel {
+  _type_AppLocator: boolean;
+  wait(params: AppLocatorWaitParams, progress?: Progress): Promise<AppLocatorWaitResult>;
+  click(params: AppLocatorClickParams, progress?: Progress): Promise<AppLocatorClickResult>;
+  fill(params: AppLocatorFillParams, progress?: Progress): Promise<AppLocatorFillResult>;
+  clear(params: AppLocatorClearParams, progress?: Progress): Promise<AppLocatorClearResult>;
+  screenshot(params: AppLocatorScreenshotParams, progress?: Progress): Promise<AppLocatorScreenshotResult>;
+}
+export type AppLocatorWaitParams = {
+  state?: 'attached' | 'detached' | 'visible' | 'hidden',
+  timeout?: number,
+};
+export type AppLocatorWaitOptions = {
+  state?: 'attached' | 'detached' | 'visible' | 'hidden',
+  timeout?: number,
+};
+export type AppLocatorWaitResult = {
+  element?: ElementHandleChannel,
+};
+export type AppLocatorClickParams = {
+  timeout?: number,
+  trial?: boolean,
+};
+export type AppLocatorClickOptions = {
+  timeout?: number,
+  trial?: boolean,
+};
+export type AppLocatorClickResult = void;
+export type AppLocatorFillParams = {
+  text: string,
+  timeout?: number,
+};
+export type AppLocatorFillOptions = {
+  timeout?: number,
+};
+export type AppLocatorFillResult = void;
+export type AppLocatorClearParams = {
+  timeout?: number,
+};
+export type AppLocatorClearOptions = {
+  timeout?: number,
+};
+export type AppLocatorClearResult = void;
+export type AppLocatorScreenshotParams = {
+  timeout?: number,
+};
+export type AppLocatorScreenshotOptions = {
+  timeout?: number,
+};
+export type AppLocatorScreenshotResult = {
+  binary: Binary,
+};
+
+export interface AppLocatorEvents {
+}
+
+// ----------- Appium -----------
+export type AppiumInitializer = {};
+export interface AppiumEventTarget {
+}
+export interface AppiumChannel extends AppiumEventTarget, Channel {
+  _type_Appium: boolean;
+  connect(params: AppiumConnectParams, progress?: Progress): Promise<AppiumConnectResult>;
+}
+export type AppiumConnectParams = {
+  serverUrl: string,
+  capabilities: any,
+};
+export type AppiumConnectOptions = {
+
+};
+export type AppiumConnectResult = {
+  device: AppiumDeviceChannel,
+};
+
+export interface AppiumEvents {
+}
+
+// ----------- AppiumDevice -----------
+export type AppiumDeviceInitializer = {
+  sessionId?: string,
+  capabilities?: any,
+};
+export interface AppiumDeviceEventTarget {
+  on(event: 'console', callback: (params: AppiumDeviceConsoleEvent) => void): this;
+}
+export interface AppiumDeviceChannel extends AppiumDeviceEventTarget, Channel {
+  _type_AppiumDevice: boolean;
+  appLocator(params: AppiumDeviceAppLocatorParams, progress?: Progress): Promise<AppiumDeviceAppLocatorResult>;
+  screenshot(params: AppiumDeviceScreenshotParams, progress?: Progress): Promise<AppiumDeviceScreenshotResult>;
+  request(params: AppiumDeviceRequestParams, progress?: Progress): Promise<AppiumDeviceRequestResult>;
+  close(params?: AppiumDeviceCloseParams, progress?: Progress): Promise<AppiumDeviceCloseResult>;
+}
+export type AppiumDeviceConsoleEvent = {
+  type: string,
+  text: string,
+  args: JSHandleChannel[],
+  location: {
+    url: string,
+    lineNumber: number,
+    columnNumber: number,
+  },
+  timestamp: number,
+};
+export type AppiumDeviceAppLocatorParams = {
+  chain: any,
+  options?: any,
+};
+export type AppiumDeviceAppLocatorOptions = {
+  options?: any,
+};
+export type AppiumDeviceAppLocatorResult = {
+  locator: AppLocatorChannel,
+};
+export type AppiumDeviceScreenshotParams = {
+  timeout?: number,
+};
+export type AppiumDeviceScreenshotOptions = {
+  timeout?: number,
+};
+export type AppiumDeviceScreenshotResult = {
+  binary: Binary,
+};
+export type AppiumDeviceRequestParams = {
+  method: string,
+  path: string,
+  body?: any,
+};
+export type AppiumDeviceRequestOptions = {
+  body?: any,
+};
+export type AppiumDeviceRequestResult = {
+  result?: any,
+};
+export type AppiumDeviceCloseParams = {};
+export type AppiumDeviceCloseOptions = {};
+export type AppiumDeviceCloseResult = void;
+
+export interface AppiumDeviceEvents {
+  'console': AppiumDeviceConsoleEvent;
+}
 
 // ----------- Artifact -----------
 export type ArtifactInitializer = {

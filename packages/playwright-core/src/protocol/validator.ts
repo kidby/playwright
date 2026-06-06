@@ -362,6 +362,80 @@ scheme.APIResponse = tObject({
   securityDetails: tOptional(tType('SecurityDetails')),
   serverAddr: tOptional(tType('RemoteAddr')),
 });
+scheme.AppLocatorInitializer = tOptional(tObject({}));
+scheme.AppLocatorWaitParams = tObject({
+  state: tOptional(tEnum(['attached', 'detached', 'visible', 'hidden'])),
+  timeout: tOptional(tFloat),
+});
+scheme.AppLocatorWaitResult = tObject({
+  element: tOptional(tChannel(['ElementHandle'])),
+});
+scheme.AppLocatorClickParams = tObject({
+  timeout: tOptional(tFloat),
+  trial: tOptional(tBoolean),
+});
+scheme.AppLocatorClickResult = tOptional(tObject({}));
+scheme.AppLocatorFillParams = tObject({
+  text: tString,
+  timeout: tOptional(tFloat),
+});
+scheme.AppLocatorFillResult = tOptional(tObject({}));
+scheme.AppLocatorClearParams = tObject({
+  timeout: tOptional(tFloat),
+});
+scheme.AppLocatorClearResult = tOptional(tObject({}));
+scheme.AppLocatorScreenshotParams = tObject({
+  timeout: tOptional(tFloat),
+});
+scheme.AppLocatorScreenshotResult = tObject({
+  binary: tBinary,
+});
+scheme.AppiumInitializer = tOptional(tObject({}));
+scheme.AppiumConnectParams = tObject({
+  serverUrl: tString,
+  capabilities: tAny,
+});
+scheme.AppiumConnectResult = tObject({
+  device: tChannel(['AppiumDevice']),
+});
+scheme.AppiumDeviceInitializer = tObject({
+  sessionId: tOptional(tString),
+  capabilities: tOptional(tAny),
+});
+scheme.AppiumDeviceConsoleEvent = tObject({
+  type: tString,
+  text: tString,
+  args: tArray(tChannel(['ElementHandle', 'JSHandle'])),
+  location: tObject({
+    url: tString,
+    lineNumber: tInt,
+    columnNumber: tInt,
+  }),
+  timestamp: tFloat,
+});
+scheme.AppiumDeviceAppLocatorParams = tObject({
+  chain: tAny,
+  options: tOptional(tAny),
+});
+scheme.AppiumDeviceAppLocatorResult = tObject({
+  locator: tChannel(['AppLocator']),
+});
+scheme.AppiumDeviceScreenshotParams = tObject({
+  timeout: tOptional(tFloat),
+});
+scheme.AppiumDeviceScreenshotResult = tObject({
+  binary: tBinary,
+});
+scheme.AppiumDeviceRequestParams = tObject({
+  method: tString,
+  path: tString,
+  body: tOptional(tAny),
+});
+scheme.AppiumDeviceRequestResult = tObject({
+  result: tOptional(tAny),
+});
+scheme.AppiumDeviceCloseParams = tOptional(tObject({}));
+scheme.AppiumDeviceCloseResult = tOptional(tObject({}));
 scheme.ArtifactInitializer = tObject({
   absolutePath: tString,
 });

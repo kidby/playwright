@@ -162,9 +162,12 @@ export class BidiNetworkManager {
     if (!request)
       return;
     const response = request.request._existingResponse()!;
-    // TODO: body size is the encoded size
-    response.setTransferSize(params.response.bodySize);
-    response.setEncodedBodySize(params.response.bodySize);
+    const headers = fromBidiHeaders(params.response.headers);
+    const headersSize = network.responseHeadersSize(headers, params.response.statusText);
+    const transferSize = params.response.bytesReceived;
+    const encodedBodySize = Math.max(0, transferSize - headersSize);
+    response.setTransferSize(transferSize);
+    response.setEncodedBodySize(encodedBodySize);
 
     // Keep redirected requests in the map for future reference as redirectedFrom.
     const isRedirected = response.status() >= 300 && response.status() <= 399;
@@ -192,7 +195,8 @@ export class BidiNetworkManager {
     }
     request.request._setFailureText(params.errorText);
     // TODO: support canceled flag
-    this._page.frameManager.requestFailed(request.request, params.errorText === 'NS_BINDING_ABORTED');
+    const isCanceled = params.errorText === 'NS_BINDING_ABORTED' || params.errorText === 'net::ERR_ABORTED' || (params.errorText && (params.errorText.toLowerCase().includes('aborted') || params.errorText.toLowerCase().includes('canceled')));
+    this._page.frameManager.requestFailed(request.request, !!isCanceled);
   }
 
   private _onAuthRequired(params: bidi.Network.AuthRequiredParameters) {
@@ -391,9 +395,8 @@ export function bidiBytesValueToString(value: bidi.Network.BytesValue): string {
   if (value.type === 'string')
     return value.value;
   if (value.type === 'base64')
-    return Buffer.from(value.type, 'base64').toString('binary');
+    return Buffer.from(value.value, 'base64').toString('binary');
   return 'unknown value type: ' + (value as any).type;
-
 }
 
 function toBidiSameSite(sameSite?: 'Strict' | 'Lax' | 'None'): bidi.Network.SameSite | undefined {
