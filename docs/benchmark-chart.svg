@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 912 320" width="912" height="320" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap');
+    </style>
+  </defs>
+  <rect width="912" height="320" fill="#f2f4f8" rx="8"/>
+  <text x="456" y="24" text-anchor="middle" font-size="14" font-weight="600" fill="#161616">Fork vs Upstream — lower is better</text>
+  <rect x="276" y="292" width="12" height="12" rx="2" fill="#0f62fe"/>
+  <text x="292" y="302" font-size="11" fill="#525252">Bun fork</text>
+  <rect x="406" y="292" width="12" height="12" rx="2" fill="#009d9a"/>
+  <text x="422" y="302" font-size="11" fill="#525252">Node fork</text>
+  <rect x="536" y="292" width="12" height="12" rx="2" fill="#8d8d8d"/>
+  <text x="552" y="302" font-size="11" fill="#525252">Node upstream</text>
+  <line x1="60" y1="189.33333333333334" x2="200" y2="189.33333333333334" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="60" y1="122.66666666666669" x2="200" y2="122.66666666666669" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="60" y1="256" x2="200" y2="256" stroke="#c6c6c6" stroke-width="1"/>
+  <rect x="70" y="147.30434782608694" width="36" height="108.69565217391306" rx="3" fill="#0f62fe"/>
+  <text x="88" y="143.30434782608694" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">5.0</text>
+  <rect x="112" y="134.26086956521738" width="36" height="121.73913043478262" rx="3" fill="#009d9a"/>
+  <text x="130" y="130.26086956521738" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">5.6</text>
+  <rect x="154" y="56" width="36" height="200" rx="3" fill="#8d8d8d"/>
+  <text x="172" y="52" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">9.2</text>
+  <text x="130" y="272" text-anchor="middle" font-size="12" font-weight="500" fill="#161616">Test suite</text>
+  <text x="130" y="286" text-anchor="middle" font-size="10" fill="#6f6f6f">(s)</text>
+  <line x1="232" y1="189.33333333333334" x2="372" y2="189.33333333333334" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="232" y1="122.66666666666669" x2="372" y2="122.66666666666669" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="232" y1="256" x2="372" y2="256" stroke="#c6c6c6" stroke-width="1"/>
+  <rect x="242" y="93.03703703703704" width="36" height="162.96296296296296" rx="3" fill="#0f62fe"/>
+  <text x="260" y="89.03703703703704" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">220</text>
+  <rect x="284" y="56" width="36" height="200" rx="3" fill="#009d9a"/>
+  <text x="302" y="52" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">270</text>
+  <rect x="326" y="56" width="36" height="200" rx="3" fill="#8d8d8d"/>
+  <text x="344" y="52" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">270</text>
+  <text x="302" y="272" text-anchor="middle" font-size="12" font-weight="500" fill="#161616">Startup</text>
+  <text x="302" y="286" text-anchor="middle" font-size="10" fill="#6f6f6f">(ms)</text>
+  <line x1="404" y1="189.33333333333331" x2="544" y2="189.33333333333331" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="404" y1="122.66666666666666" x2="544" y2="122.66666666666666" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="404" y1="256" x2="544" y2="256" stroke="#c6c6c6" stroke-width="1"/>
+  <rect x="414" y="220.39454691259022" width="36" height="35.605453087409785" rx="3" fill="#0f62fe"/>
+  <text x="432" y="216.39454691259022" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">222</text>
+  <rect x="456" y="220.39454691259022" width="36" height="35.605453087409785" rx="3" fill="#009d9a"/>
+  <text x="474" y="216.39454691259022" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">222</text>
+  <rect x="498" y="56" width="36" height="200" rx="3" fill="#8d8d8d"/>
+  <text x="516" y="52" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">1247</text>
+  <text x="474" y="272" text-anchor="middle" font-size="12" font-weight="500" fill="#161616">Peak memory</text>
+  <text x="474" y="286" text-anchor="middle" font-size="10" fill="#6f6f6f">(MB)</text>
+  <line x1="576" y1="189.33333333333334" x2="716" y2="189.33333333333334" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="576" y1="122.66666666666669" x2="716" y2="122.66666666666669" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="576" y1="256" x2="716" y2="256" stroke="#c6c6c6" stroke-width="1"/>
+  <rect x="586" y="143.5" width="36" height="112.5" rx="3" fill="#0f62fe"/>
+  <text x="604" y="139.5" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">9.0</text>
+  <rect x="628" y="136" width="36" height="120" rx="3" fill="#009d9a"/>
+  <text x="646" y="132" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">9.6</text>
+  <rect x="670" y="56" width="36" height="200" rx="3" fill="#8d8d8d"/>
+  <text x="688" y="52" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">16.0</text>
+  <text x="646" y="272" text-anchor="middle" font-size="12" font-weight="500" fill="#161616">CPU time</text>
+  <text x="646" y="286" text-anchor="middle" font-size="10" fill="#6f6f6f">(s)</text>
+  <line x1="748" y1="189.33333333333331" x2="888" y2="189.33333333333331" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="748" y1="122.66666666666666" x2="888" y2="122.66666666666666" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="748" y1="256" x2="888" y2="256" stroke="#c6c6c6" stroke-width="1"/>
+  <rect x="758" y="159.22580645161293" width="36" height="96.77419354838709" rx="3" fill="#0f62fe"/>
+  <text x="776" y="155.22580645161293" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">1.5</text>
+  <rect x="800" y="159.22580645161293" width="36" height="96.77419354838709" rx="3" fill="#009d9a"/>
+  <text x="818" y="155.22580645161293" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">1.5</text>
+  <rect x="842" y="56" width="36" height="200" rx="3" fill="#8d8d8d"/>
+  <text x="860" y="52" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">3.1</text>
+  <text x="818" y="272" text-anchor="middle" font-size="12" font-weight="500" fill="#161616">utilsBundle</text>
+  <text x="818" y="286" text-anchor="middle" font-size="10" fill="#6f6f6f">(MB)</text>
+</svg>

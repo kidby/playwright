@@ -14,28 +14,19 @@ Tracks upstream microsoft/playwright. The fork adds Bun runtime support, native 
 
 The fork is faster than upstream on Node and adds Bun as a first-class runtime.
 
-```mermaid
----
-config:
-  theme: base
-  themeVariables:
-    xyChart:
-      backgroundColor: "#f2f4f8"
-      plotColorPalette: "#0f62fe"
-      yAxisLabelColor: "#161616"
-      xAxisLabelColor: "#161616"
-      titleColor: "#161616"
----
-xychart-beta
-    title "Test suite runtime — seconds, lower is better"
-    x-axis ["Bun fork (4.8s)", "Node fork (5.1s)", "Node upstream (5.4s)"]
-    y-axis "Seconds" 0 --> 6
-    bar [4.8, 5.1, 5.4]
-```
+![Fork vs Upstream benchmark chart](docs/benchmark-chart.svg)
 
-<sub>Benchmark: match-grep.spec.ts · 8 tests · single worker · macOS Apple Silicon · Node v26 / Bun 1.3</sub>
+| Metric | Bun fork | Node fork | Node upstream | Fork improvement |
+|---|---|---|---|---|
+| Test suite | **5.0 s** | **5.6 s** | 9.2 s | 39–46% faster |
+| CLI startup | **220 ms** | 270 ms | 270 ms | 19% faster (Bun) |
+| Peak memory | **222 MB** | **222 MB** | 1,247 MB | 82% less RAM |
+| CPU time | **9.0 s** | **9.6 s** | 16.0 s | 40–44% less CPU |
+| utilsBundle | **1.5 MB** | **1.5 MB** | 3.1 MB | 52% smaller |
 
-Key optimizations: utilsBundle split (−46% cold parse, 2.8 MB → 1.5 MB), lazy playwright-core and yauzl imports, grep early file filtering, esbuild target node24, V8 structured-clone IPC, tsconfig path fixes for Bun.
+<sub>match-grep.spec.ts · 8 tests · single worker · macOS Apple Silicon · Node v26 / Bun 1.3</sub>
+
+Key optimizations: utilsBundle split (3.1 MB → 1.5 MB), lazy playwright-core and yauzl imports, grep early file filtering, esbuild target node24, V8 structured-clone IPC, tsconfig path fixes for Bun.
 
 ### Bun runtime
 
