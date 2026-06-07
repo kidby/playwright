@@ -66,6 +66,12 @@ export type MobileTestOptions = {
 const DEFAULT_ACTION_TIMEOUT_LOCAL_MS = 20_000;
 const DEFAULT_ACTION_TIMEOUT_CI_MS = 30_000;
 
+// Perf 2.9 — module-level session pool for Appium session reuse across tests
+// in the same worker. Keyed by `workerIndex` so sessions are never shared
+// across workers. Enabled when the user sets `appium: { reuseSession: true }`
+// in playwright.config.ts.
+const _sessionPool = new Map<number, NativeDevice>();
+
 const requireCapabilitiesFixture: TestFixture<AppiumCapabilities, MobileFixtureArgs> = async ({ appium }, use) => {
   if (appium?.capabilities) {
     await use(appium.capabilities as AppiumCapabilities);
@@ -209,12 +215,28 @@ export const mobileTest = base.extend<MobileFixtures & { appium: PlaywrightTestO
   capabilities: [requireCapabilitiesFixture, { option: true }],
   descriptor: [undefined, { option: true }],
   defaultActionTimeoutMs: [process.env.CI ? DEFAULT_ACTION_TIMEOUT_CI_MS : DEFAULT_ACTION_TIMEOUT_LOCAL_MS, { option: true }],
-  device: async ({ appiumServerUrl, capabilities, descriptor, defaultActionTimeoutMs, screenshot, video, trace }, use, testInfo) => {
+  device: async ({ appiumServerUrl, capabilities, descriptor, defaultActionTimeoutMs, screenshot, video, trace, appium }, use, testInfo) => {
     const screenshotMode = modeFrom(screenshot as CaptureMode | { mode: CaptureMode } | undefined, 'off');
     const videoMode = modeFrom(video as VideoMode | { mode: VideoMode } | undefined, 'off');
     const traceMode = modeFrom(trace as TraceMode | { mode: TraceMode } | undefined, 'off');
 
-    const device = await NativeDevice.start(appiumServerUrl, capabilities, { descriptor });
+    // Perf 2.9: session pre-warming / reuse. When `appium.reuseSession` is
+    // true, the first test in a worker creates the session and stashes it;
+    // subsequent tests in the same worker reuse it, skipping the 5-30+s
+    // `POST /session` round-trip.
+    const reuseSession = !!(appium as any)?.reuseSession;
+    const workerIndex: number = (testInfo as any).workerIndex ?? -1;
+    let device: NativeDevice;
+    let isReusedSession = false;
+
+    if (reuseSession && workerIndex >= 0 && _sessionPool.has(workerIndex)) {
+      device = _sessionPool.get(workerIndex)!;
+      isReusedSession = true;
+    } else {
+      device = await NativeDevice.start(appiumServerUrl, capabilities, { descriptor });
+      if (reuseSession && workerIndex >= 0)
+        _sessionPool.set(workerIndex, device);
+    }
     device.defaultActionTimeoutMs = defaultActionTimeoutMs;
 
     // Start screen recording only when the configured video mode wants it on
@@ -298,7 +320,9 @@ export const mobileTest = base.extend<MobileFixtures & { appium: PlaywrightTestO
         }
       }
 
-      await device.stop().catch(() => undefined);
+      // Perf 2.9: only tear down the session if we're not reusing it.
+      if (!isReusedSession)
+        await device.stop().catch(() => undefined);
     }
   },
 });

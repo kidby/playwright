@@ -86,6 +86,13 @@ export class AppLocator {
   private readonly _position: number | 'last' | undefined;
   private readonly _filter: LocatorFilter | undefined;
 
+  // ── Element reference cache (perf 2.6) ──────────────────────────────────
+  // Short-lived cache that avoids redundant HTTP findElement round-trips when
+  // the same locator is resolved multiple times within a 500ms window (e.g.
+  // resolve → actionability check → action). Invalidated after any DOM-
+  // mutating action (click, fill, clear, etc.).
+  private _cachedHandle: { handle: ElementHandle; expiry: number } | null = null;
+
   constructor(
     client: AppiumClient,
     chain: LocatorChainPart[],
@@ -230,6 +237,15 @@ export class AppLocator {
   }
 
   async resolve(): Promise<ElementHandle> {
+    // Perf 2.6: return the cached element handle when still fresh.
+    if (this._cachedHandle && Date.now() < this._cachedHandle.expiry)
+      return this._cachedHandle.handle;
+    const handle = await this._resolveUncached();
+    this._cachedHandle = { handle, expiry: Date.now() + 500 };
+    return handle;
+  }
+
+  private async _resolveUncached(): Promise<ElementHandle> {
     const matches = await this._resolveCandidates();
     if (matches.length === 0)
       throw new Error(`No elements matched ${this._describe()}`);
@@ -251,6 +267,7 @@ export class AppLocator {
     if (options.trial)
       return;
     await this._client.click(handle);
+    this._invalidateCache();
   }
 
   async clear(options: TimeoutOptions = {}): Promise<void> {
@@ -393,6 +410,7 @@ export class AppLocator {
         ],
       }]);
     });
+    this._invalidateCache();
   }
 
   async focus(options: TimeoutOptions = {}): Promise<void> {
@@ -551,10 +569,19 @@ export class AppLocator {
   private async _waitForActionable(opts: { requireEnabled: boolean; timeoutMs?: number }): Promise<ElementHandle> {
     return this._pollUntil<ElementHandle>(async () => {
       const handle = await this.resolve();
-      if (!(await this._client.isDisplayed(handle)))
-        return { matched: false, value: undefined };
-      if (opts.requireEnabled && !(await this._client.isEnabled(handle)))
-        return { matched: false, value: undefined };
+      if (opts.requireEnabled) {
+        // Perf 2.7: batch both actionability checks in parallel to save one
+        // sequential HTTP round-trip per poll iteration.
+        const [displayed, enabled] = await Promise.all([
+          this._client.isDisplayed(handle),
+          this._client.isEnabled(handle),
+        ]);
+        if (!displayed || !enabled)
+          return { matched: false, value: undefined };
+      } else {
+        if (!(await this._client.isDisplayed(handle)))
+          return { matched: false, value: undefined };
+      }
       return { matched: true, value: handle };
     }, { what: `${this._describe()} to be actionable`, timeoutMs: opts.timeoutMs });
   }
@@ -597,6 +624,11 @@ export class AppLocator {
   private async _actAction(action: (handle: ElementHandle) => Promise<void>, timeoutMs?: number): Promise<void> {
     const handle = await this._waitForActionable({ requireEnabled: true, timeoutMs });
     await action(handle);
+    this._invalidateCache();
+  }
+
+  private _invalidateCache(): void {
+    this._cachedHandle = null;
   }
 
   private _describe(): string {
