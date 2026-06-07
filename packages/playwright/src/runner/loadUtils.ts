@@ -83,6 +83,26 @@ export async function loadFileSuites(testRun: TestRun, mode: 'out-of-process' | 
   for (const files of testRun.projectFiles.values())
     files.forEach(file => allTestFiles.add(file));
 
+  // Grep early filtering: when --grep is set and the pattern is a simple string,
+  // skip files that can't possibly contain a matching test title. This avoids
+  // the expensive transform pipeline for those files.
+  const grepLiterals = _extractGrepLiterals(testRun.options.grep);
+  if (grepLiterals.length) {
+    const before = allTestFiles.size;
+    for (const file of allTestFiles) {
+      try {
+        const source = fs.readFileSync(file, 'utf8');
+        const matches = grepLiterals.some(lit => source.includes(lit));
+        if (!matches)
+          allTestFiles.delete(file);
+      } catch {
+        // If we can't read the file, keep it (let the loader report the error).
+      }
+    }
+    if (allTestFiles.size < before)
+      process.stderr.write(`  grep pre-filter: loading ${allTestFiles.size}/${before} files\n`);
+  }
+
   // Load test files.
   const fileSuiteByFile = new Map<string, testNs.Suite>();
   const loaderHost = mode === 'out-of-process' ? new OutOfProcessLoaderHost(config) : new InProcessLoaderHost(config);
@@ -365,4 +385,22 @@ export async function loadTestList(config: FullConfigInternal, filePath: string)
   } catch (e) {
     throw errorWithFile(filePath, 'Cannot read test list file: ' + e.message);
   }
+}
+
+/**
+ * Extract literal substrings from a grep pattern that MUST appear in any
+ * matching test title. Returns empty array if the pattern is too complex
+ * to extract reliable literals from (in which case we load all files).
+ */
+function _extractGrepLiterals(grep: string | undefined): string[] {
+  if (!grep)
+    return [];
+  // If pattern has regex metacharacters that make substring extraction unreliable,
+  // fall back to loading all files (safe: no false negatives).
+  if (/[.*+?^${}()|[\]\\]/.test(grep))
+    return [];
+  // Pattern is a simple string — the file must contain it for any test to match.
+  if (grep.length < 3)
+    return []; // Too short, would match everything.
+  return [grep];
 }

@@ -18,12 +18,19 @@ import fs from 'fs';
 import path from 'path';
 
 import * as yazl from 'yazl';
-import * as yauzl from '@utils/third_party/yauzl/index.js';
+import type * as yauzlTypes from '@utils/third_party/yauzl/index.js';
+let _yauzl: typeof yauzlTypes | undefined;
 import { ManualPromise } from '@isomorphic/manualPromise';
 import { monotonicTime } from '@isomorphic/time';
 import { calculateSha1, createGuid } from '@utils/crypto';
 import { SerializedFS } from '@utils/serializedFS';
-import { getPlaywrightVersion } from 'playwright-core/lib/coreBundle';
+// Lazy-loaded to avoid parsing the 3.4MB coreBundle.js in workers that don't need tracing.
+let _playwrightVersion: string | undefined;
+function lazyPlaywrightVersion(): string {
+  if (!_playwrightVersion)
+    _playwrightVersion = (require('playwright-core/lib/coreBundle') as { getPlaywrightVersion: () => string }).getPlaywrightVersion();
+  return _playwrightVersion;
+}
 
 import { filteredStackTrace } from '../util.js';
 
@@ -61,7 +68,7 @@ export class TestTracing {
       type: 'context-options',
       origin: 'testRunner',
       browserName: '',
-      playwrightVersion: getPlaywrightVersion(),
+      playwrightVersion: lazyPlaywrightVersion(),
       options: {},
       platform: process.platform,
       wallTime: Date.now(),
@@ -358,7 +365,8 @@ async function mergeTraceFiles(fileName: string, temporaryTraceFiles: string[]) 
   for (let i = temporaryTraceFiles.length - 1; i >= 0; --i) {
     const tempFile = temporaryTraceFiles[i];
     const promise = new ManualPromise<void>();
-    yauzl.open(tempFile, (err, inZipFile) => {
+    if (!_yauzl) _yauzl = require('@utils/third_party/yauzl/index.js') as typeof yauzlTypes;
+    _yauzl.open(tempFile, (err, inZipFile) => {
       if (err) {
         promise.reject(err);
         return;
