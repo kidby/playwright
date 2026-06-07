@@ -39,36 +39,199 @@ Key optimizations: utilsBundle split (−46% cold parse, 2.8 MB → 1.5 MB), laz
 
 ### Bun runtime
 
-Playwright runs under Bun as a first-class target alongside Node. Tests can use Bun APIs directly — Bun.file, Bun.serve, Bun.spawn, Bun.$, and so on. The worker IS a Bun process when run under Bun. Upstream microsoft/playwright does not support Bun.
+Playwright runs under Bun as a first-class target alongside Node. The worker IS a Bun process when run under Bun — Bun APIs are available directly in tests. Upstream microsoft/playwright does not support Bun.
 
-### Mobile testing
+**Run tests with Bun:**
 
-The @playwright/mobile package exposes a mobileTest fixture that drives Appium 2 over W3C WebDriver — iOS via XCUITest and Android in one API. No selenium-webdriver or webdriverio at runtime. Full Playwright locator parity on AppLocator: getByRole, getByText, getByLabel, getByTestId, tap, press, scrollIntoViewIfNeeded, dragTo, and more. See [packages/playwright-mobile/README.md](packages/playwright-mobile/README.md).
+```bash
+bun playwright test
+```
+
+**Use Bun APIs in tests:**
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test('serve a fixture with Bun', async ({ page }) => {
+  const server = Bun.serve({
+    port: 0,
+    fetch: () => new Response('<h1>Hello</h1>', {
+      headers: { 'Content-Type': 'text/html' },
+    }),
+  });
+  await page.goto(`http://localhost:${server.port}`);
+  await expect(page.getByRole('heading')).toHaveText('Hello');
+  server.stop();
+});
+```
+
+### Mobile testing — Android
+
+The @playwright/mobile package drives native apps through Appium 2 over W3C WebDriver. No selenium-webdriver or webdriverio at runtime. See [packages/playwright-mobile/README.md](packages/playwright-mobile/README.md).
+
+**Android test:**
+
+```ts
+import { mobileTest as test, expect, androidCapabilities } from '@playwright/experimental-mobile';
+
+test.use({
+  capabilities: androidCapabilities({
+    app: 'apks/dev.apk',
+    appPackage: 'com.example.dev',
+  }),
+});
+
+test('login and check the dashboard', async ({ device }) => {
+  await device.app.getByTestId('email').fill('user@example.com');
+  await device.app.getByTestId('password').fill('s3cret');
+  await device.app.getByTestId('signin').click();
+  await device.waitForVisible(device.app.getByText('Dashboard'));
+  await expect(device.app.getByText('Welcome back')).toBeVisible();
+});
+```
+
+### Mobile testing — iOS
+
+iOS uses the same mobileTest fixture with iosCapabilities. Pass a Playwright device descriptor for screenshot baseline metadata.
+
+**iOS test:**
+
+```ts
+import { mobileTest as test, expect, iosCapabilities } from '@playwright/experimental-mobile';
+import { devices } from '@playwright/test';
+
+test.use({
+  capabilities: iosCapabilities({
+    app: 'apps/MyApp.app',
+    bundleId: 'com.example.myapp',
+    deviceName: 'iPhone 15 Sim',
+  }),
+  descriptor: devices['iPhone 15'],
+});
+
+test('search and screenshot', async ({ device }) => {
+  await device.app.getByPlaceholder('Search').fill('playwright');
+  await device.app.getByRole('button').first().tap();
+  await expect(device.app.getByText('Results')).toBeVisible();
+  await expect(device).toHaveScreenshot();
+});
+```
+
+### Mobile testing — WebView hybrid apps
+
+Switch between native and web contexts in the same test. The device detects available WebViews and lets you switch contexts to use Playwright-style locators inside them.
+
+```ts
+import { mobileTest as test, expect, androidCapabilities } from '@playwright/experimental-mobile';
+
+test.use({
+  capabilities: androidCapabilities({ appPackage: 'com.example.hybrid' }),
+});
+
+test('native to webview round trip', async ({ device }) => {
+  await device.app.getByTestId('open-webview').click();
+  const wv = await device.waitForWebViewContext({ title: /Checkout/ });
+  await device.switchToWebViewContext(wv);
+  // Now inside the WebView — standard web locators work
+  await device.switchToContext(undefined); // back to native
+  await expect(device.app.getByText('Order confirmed')).toBeVisible();
+});
+```
 
 ### Storybook integration
 
-The @playwright/storybook package auto-discovers stories and generates Playwright tests. Supports composeStories CT mode for testing components without a running Storybook server. See [packages/playwright-storybook/README.md](packages/playwright-storybook/README.md).
+The @playwright/storybook package auto-discovers stories from a running Storybook's index.json and generates Playwright tests. See [packages/playwright-storybook/README.md](packages/playwright-storybook/README.md).
+
+**Discover and test all stories:**
+
+```ts
+import { storybookTest as test, expect, fetchStoryIndex, filterStories } from '@playwright/storybook';
+
+const index = await fetchStoryIndex('http://localhost:6006');
+const stories = filterStories(index, { include: ['Button/*'] });
+
+for (const story of stories) {
+  test(`renders ${story.title} / ${story.name}`, async ({ mountStory, page }) => {
+    await mountStory(story.id);
+    await expect(page.locator('#storybook-root, #root')).toBeVisible();
+    await expect(page).toHaveScreenshot(`${story.id}.png`);
+  });
+}
+```
+
+**Replay a Storybook play function:**
+
+```ts
+import { storybookTest as test, expect, runPlayFunction } from '@playwright/storybook';
+
+test('Login form play function', async ({ page, mountStory }) => {
+  await mountStory('form-login--default');
+  await runPlayFunction(page, 'form-login--default');
+  await expect(page.getByText('Welcome')).toBeVisible();
+});
+```
+
+**Config** — point Playwright at your Storybook dev server:
+
+```ts
+// playwright.config.ts
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: { baseURL: 'http://localhost:6006' },
+  webServer: {
+    command: 'npm run storybook -- --ci',
+    url: 'http://localhost:6006',
+    reuseExistingServer: true,
+  },
+});
+```
 
 ### Lighthouse audits
 
-The @playwright/lighthouse package runs Lighthouse against the same Chromium tab the test is driving. The remote-debugging-port is wired by the fixture. See [packages/playwright-lighthouse/README.md](packages/playwright-lighthouse/README.md).
+The @playwright/lighthouse package runs Lighthouse against the same Chromium tab the test is driving. The remote-debugging-port is wired automatically by the fixture. See [packages/playwright-lighthouse/README.md](packages/playwright-lighthouse/README.md).
+
+**Performance and accessibility audit:**
 
 ```ts
 import { lighthouseTest as test, expect } from '@playwright/lighthouse';
 
-test('homepage perf budget', async ({ page, lighthouse }) => {
+test('homepage meets perf budget', async ({ page, lighthouse }) => {
   await page.goto('https://example.com');
   const result = await lighthouse({
-    thresholds: { performance: 90, accessibility: 95 },
+    thresholds: { performance: 90, accessibility: 95, seo: 80 },
     saveReport: 'html',
   });
   expect(result.passed, result.failures.join('\n')).toBe(true);
 });
 ```
 
+**Compose Storybook + Lighthouse** for per-story perf budgets:
+
+```ts
+import { storybookTest } from '@playwright/storybook';
+import { lighthouseTest } from '@playwright/lighthouse';
+
+const test = storybookTest.extend(lighthouseTest.fixtures);
+
+test('Button/Primary perf budget', async ({ page, mountStory, lighthouse }) => {
+  await mountStory('button--primary');
+  const result = await lighthouse({ thresholds: { performance: 90 } });
+  expect(result.passed).toBe(true);
+});
+```
+
 ### Additional features
 
-**Cloud client.** connectToCloud lets you connect to remote device farms via WebSocket with token auth, configurable timeouts, and bidirectional lifecycle management.
+**Cloud device farms.** Connect to a remote Appium device farm via WebSocket with token auth:
+
+```ts
+const device = await playwright.appium.connectToCloud(
+  'wss://mobile.playwright.dev',
+  androidCapabilities({ appPackage: 'com.example' }),
+  { token: process.env.PLAYWRIGHT_MOBILE_TOKEN, timeout: 60_000 }
+);
+```
 
 **Locators.** getById and getByClassName on Page, Locator, Frame, and FrameLocator. Substring match by default, exact match with the exact option.
 
@@ -81,7 +244,7 @@ await page.getByClassName('featured').click();
 
 **Matchers.** Added toBeWithinRange, toHaveResponseProperty, toMatchJsonSchema.
 
-**Upstream sync.** utils/sync_upstream.sh (dry-run merge analysis) and utils/analyze_upstream.sh (conflict prediction) for safe upstream pulls. Patches not merged upstream are carried locally, e.g. shardingMode [#30962](https://github.com/microsoft/playwright/pull/30962).
+**Upstream sync.** utils/sync_upstream.sh (dry-run merge) and utils/analyze_upstream.sh (conflict prediction) for safe upstream pulls. Patches not merged upstream are carried locally, e.g. shardingMode [#30962](https://github.com/microsoft/playwright/pull/30962).
 
 | Surface | Fork | Upstream | What the fork adds |
 |---|---|---|---|
