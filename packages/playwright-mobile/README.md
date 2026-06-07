@@ -19,13 +19,13 @@ Pick `_android` when you're testing Chrome-on-Android with full CDP (network moc
 ## Quick start
 
 ```ts
-import { mobileTest as test, expect, androidCapabilities } from '@playwright/experimental-mobile';
+import { mobileTest as test, expect } from '@playwright/experimental-mobile';
 
 test.use({
-  capabilities: androidCapabilities({
+  capabilities: {
     app: 'apks/dev.apk',
     appPackage: 'com.example.dev',
-  }),
+  },
 });
 
 test('login then check the dashboard', async ({ device }) => {
@@ -39,21 +39,21 @@ test('login then check the dashboard', async ({ device }) => {
 iOS is the symmetric case:
 
 ```ts
-import { iosCapabilities } from '@playwright/experimental-mobile';
-
 test.use({
-  capabilities: iosCapabilities({
+  capabilities: {
     app: 'apps/dev.app',
     bundleId: 'com.example.dev',
-  }),
+  },
 });
 ```
+
+The platform is inferred automatically: `bundleId` or `.app`/`.ipa` extensions resolve to iOS; `appPackage`, `appActivity`, or `.apk` extensions resolve to Android. Keys like `app`, `appPackage`, and `bundleId` are expanded to their `appium:`-prefixed W3C equivalents at runtime. If you need explicit control, you can still use the `androidCapabilities()` and `iosCapabilities()` builder functions.
 
 ## API areas
 
 ### Device session
 
-`NativeDevice.start(serverUrl, capabilities, { descriptor? })` creates a new Appium session. `NativeDevice.attach(serverUrl, sessionId, { descriptor? })` reuses one. The `mobileTest` fixture handles both for you, and the test-side fixture key stays `device` (lowercase) — only the class name carries the `Native` prefix, to disambiguate from Playwright web's `devices['iPhone 15']` descriptor.
+`NativeDevice.start(serverUrl, capabilities, { descriptor? })` creates a new Appium session. `NativeDevice.attach(serverUrl, sessionId, { descriptor? })` reuses one. The `mobileTest` fixture handles both for you, and the test-side fixture key stays `device` (lowercase). Only the class name carries the `Native` prefix, to disambiguate from Playwright web's `devices['iPhone 15']` descriptor.
 
 ```ts
 device.platform                // 'iOS' | 'Android' | undefined
@@ -63,8 +63,8 @@ device.screenshot(): Promise<Buffer>
 device.stop(): Promise<void>
 
 device.descriptor              // the Playwright DeviceDescriptor, if supplied
-device.deviceScaleFactor       // number | undefined — from descriptor, else `appium:pixelRatio`
-device.viewport()              // { width, height } — from descriptor, else live from Appium
+device.deviceScaleFactor       // number | undefined; from descriptor, else `appium:pixelRatio`
+device.viewport()              // { width, height }; from descriptor, else live from Appium
 ```
 
 ### Locators
@@ -81,7 +81,7 @@ device.app.byAndroidUiSelector('new UiSelector().text("Submit")')
 device.app.byId('com.example:id/submit')
 ```
 
-Locators are lazy — they resolve to an element only when an action runs. Action surface: `click()`, `tap()`, `fill(text)`, `clear()`, `type(text)`, `check()`, `uncheck()`, `press(key)`, `scrollIntoViewIfNeeded()`, `dragTo(target)`, `focus()`, `blur()`, `screenshot()`. Property surface: `text()`, `textContent()`, `innerText()`, `inputValue()`, `getAttribute(name)`, `isVisible()`, `isDisplayed()`, `isEnabled()`, `isChecked()`, `boundingBox()`, `count()`. Composition: `first()`, `nth(i)`, `last()`, `filter(fn)`, `pollUntil(fn)`. Each action performs automatic actionability checks (waits for element to be displayed and enabled) and accepts an optional `{ timeout }` to override `device.defaultActionTimeoutMs`.
+Locators are lazy: they resolve to an element only when an action runs. Action surface: `click()`, `tap()`, `fill(text)`, `clear()`, `type(text)`, `check()`, `uncheck()`, `press(key)`, `scrollIntoViewIfNeeded()`, `dragTo(target)`, `focus()`, `blur()`, `screenshot()`. Property surface: `text()`, `textContent()`, `innerText()`, `inputValue()`, `getAttribute(name)`, `isVisible()`, `isDisplayed()`, `isEnabled()`, `isChecked()`, `boundingBox()`, `count()`. Composition: `first()`, `nth(i)`, `last()`, `filter(fn)`, `pollUntil(fn)`. Each action performs automatic actionability checks (waits for element to be displayed and enabled) and accepts an optional `{ timeout }` to override `device.defaultActionTimeoutMs`.
 
 #### Semantic queries
 
@@ -118,7 +118,7 @@ test('login', async ({ device }) => {
 
 Matcher surface: `toBeVisible`, `toBeHidden`, `toBeEnabled`, `toBeDisabled`, `toHaveText`, `toContainText`, `toHaveAttribute`, `toHaveValue`, `toHaveCount`, `toBeChecked`, `toBeFocused`, `toHaveScreenshot`. Each polls until the condition is met or the matcher timeout fires (default: `device.defaultActionTimeoutMs`).
 
-`toHaveScreenshot` works on both `device` (full-screen) and a locator (element-level via W3C `/element/{id}/screenshot`). Baseline filenames include the platform, `appium:deviceName`, and — when a `DeviceDescriptor` is supplied — an `@Nx` suffix from `deviceScaleFactor` so iPhone 15 (3x) and iPad Air (2x) baselines don't collide.
+`toHaveScreenshot` works on both `device` (full-screen) and a locator (element-level via W3C `/element/{id}/screenshot`). Baseline filenames include the platform, `appium:deviceName`, and, when a `DeviceDescriptor` is supplied, an `@Nx` suffix from `deviceScaleFactor` so iPhone 15 (3x) and iPad Air (2x) baselines don't collide.
 
 ### WebView contexts
 
@@ -170,7 +170,7 @@ device.filesCount(directory, grepPattern?)        // Android only
 device.handleAlert({ action: 'accept' | 'dismiss', buttonName?, retries?, pollMs? })
 ```
 
-Retries up to `retries` (default 10) with `pollMs` (default 500ms) backoff. Returns silently after exhausting retries — alert may or may not have been present, the test shouldn't fail on its absence.
+Retries up to `retries` (default 10) with `pollMs` (default 500ms) backoff. Returns silently after exhausting retries; the alert may or may not have been present, and the test shouldn't fail on its absence.
 
 ### Form input
 
@@ -187,7 +187,7 @@ device.waitForVisible(target, { timeoutMs?, pollMs? })
 device.tapUntilVisible(target, { scrollTarget?, maxTaps?, direction?, timeoutMs?, pollMs? })
 ```
 
-`waitForVisible` honors `device.defaultActionTimeoutMs` (settable; defaults to 30s under `CI`, 20s otherwise — wired automatically from the `mobileTest` fixture). `tapUntilVisible` caps on whichever of `maxTaps` or `timeoutMs` fires first.
+`waitForVisible` honors `device.defaultActionTimeoutMs` (settable; defaults to 30s under `CI`, 20s otherwise, wired automatically from the `mobileTest` fixture). `tapUntilVisible` caps on whichever of `maxTaps` or `timeoutMs` fires first.
 
 ### Gestures
 
@@ -202,14 +202,30 @@ device.gestures.pullToRefresh({ fromYFraction?, toYFraction?, durationMs? })
 
 Cross-platform: each gesture picks the right Appium `mobile:` extension command based on session `platformName`. iOS commands use percentages and element ids; Android takes absolute coordinates from window rect.
 
-### Capability builders
+### Capability helpers
+
+Plain objects are the simplest way to specify capabilities. The fixture auto-normalizes shorthand keys to Appium W3C format and infers `platformName` and `automationName` from context:
 
 ```ts
-androidCapabilities({ app?, appPackage?, appActivity?, deviceName?, platformVersion?, udid?, noReset?, newCommandTimeoutSec?, extra? })
-iosCapabilities({ app?, bundleId?, deviceName?, platformVersion?, udid?, noReset?, newCommandTimeoutSec?, extra? })
+// Inferred as Android (appPackage key + .apk extension)
+test.use({ capabilities: { app: 'apks/dev.apk', appPackage: 'com.example' } });
+
+// Inferred as iOS (bundleId key + .app extension)
+test.use({ capabilities: { app: 'apps/My.app', bundleId: 'com.example' } });
 ```
 
-Both default `newCommandTimeoutSec` to 240. Use `extra` to pass any capability the builders don't know about.
+Supported shorthand keys: `app`, `appPackage`, `appActivity`, `bundleId`, `deviceName`, `platformVersion`, `udid`, `noReset`, `newCommandTimeoutSec`, `extra`.
+
+For explicit control, builder functions are also available:
+
+```ts
+import { androidCapabilities, iosCapabilities } from '@playwright/experimental-mobile';
+
+androidCapabilities({ app: 'apks/dev.apk', deviceName: 'Pixel 8' })
+iosCapabilities({ bundleId: 'com.example', platformVersion: '17.4', extra: { 'appium:autoAcceptAlerts': true } })
+```
+
+Both default `newCommandTimeoutSec` to 240. Use `extra` to pass any capability the shorthand keys don't cover.
 
 ## Configuration
 
@@ -224,7 +240,7 @@ export default defineConfig({
       name: 'android-smoke',
       use: {
         appiumServerUrl: 'http://appium.internal:4723',
-        capabilities: androidCapabilities({ app: 'apks/smoke.apk' }),
+        capabilities: { app: 'apks/smoke.apk', appPackage: 'com.example.smoke' },
         defaultActionTimeoutMs: 25_000,
       },
     },
@@ -236,21 +252,21 @@ export default defineConfig({
 
 ### Device profiles via Playwright `devices`
 
-Pass any entry from Playwright's exported `devices` map as the `descriptor` option to give the session metadata (viewport, pixel ratio, user agent) that the screenshot matcher and `device.viewport()` use. The descriptor is **metadata only** — it does not synthesize Appium capabilities, since the iOS-name → simulator-version mapping is too lossy to do automatically.
+Pass any entry from Playwright's exported `devices` map as the `descriptor` option to give the session metadata (viewport, pixel ratio, user agent) that the screenshot matcher and `device.viewport()` use. The descriptor is **metadata only**; it does not synthesize Appium capabilities, since the iOS-name to simulator-version mapping is too lossy to do automatically.
 
 ```ts
 import { devices } from '@playwright/test';
-import { mobileTest as test, iosCapabilities } from '@playwright/experimental-mobile';
+import { mobileTest as test } from '@playwright/experimental-mobile';
 
 test.use({
-  capabilities: iosCapabilities({ bundleId: 'com.example.dev', deviceName: 'iPhone 15 Sim' }),
+  capabilities: { bundleId: 'com.example.dev', deviceName: 'iPhone 15 Sim' },
   descriptor: devices['iPhone 15'],
 });
 
 test('captures @3x baseline automatically', async ({ device }) => {
   expect(device.deviceScaleFactor).toBe(3);
   expect((await device.viewport()).width).toBe(393);
-  await expect(device).toHaveScreenshot();   // baseline: …-iOS-iPhone-15-Sim-@3x.png
+  await expect(device).toHaveScreenshot();   // baseline: ...-iOS-iPhone-15-Sim-@3x.png
 });
 ```
 
@@ -258,7 +274,7 @@ Types: `import type { DeviceDescriptor, MobileTestArgs, MobileTestOptions, Viewp
 
 ### Smoke testing against a real Appium server
 
-The package ships with a skipped-by-default smoke spec that exercises the W3C client against a live Appium 2.x server. It does not require a connected device — only Appium itself.
+The package ships with a skipped-by-default smoke spec that exercises the W3C client against a live Appium 2.x server. It does not require a connected device, only Appium itself.
 
 ```bash
 APPIUM_TEST=1 APPIUM_URL=http://127.0.0.1:4723 npx playwright test \
@@ -270,9 +286,9 @@ Without `APPIUM_TEST=1` the three tests show as skipped with a clear reason. Use
 ## Limitations + known gaps
 
 - **No iOS-specific text-menu clear fallback.** `device.setValue` uses the W3C `/clear` endpoint, falling back to `mobile: longClickGesture` on Android only. iOS text fields that don't honor `/clear` (e.g., some secure inputs) need a custom routine.
-- **No Sauce / BrowserStack adapters.** Vendor-cloud integrations belong above this package — pass cloud credentials through `appiumServerUrl` + `extra` capabilities.
+- **No Sauce / BrowserStack adapters.** Vendor-cloud integrations belong above this package. Pass cloud credentials through `appiumServerUrl` + `extra` capabilities.
 - **No native push notifications API.** Use platform-specific approaches (ADB intent, `mobile: pushNotification` if your Appium server supports it).
-- **Phase B handleAlert: silent-on-exhaust.** If you need an alert to be present, check explicitly via your test logic — `handleAlert` returns silently after retries because alerts may or may not appear depending on system state.
+- **Phase B handleAlert: silent-on-exhaust.** If you need an alert to be present, check explicitly via your test logic. `handleAlert` returns silently after retries because alerts may or may not appear depending on system state.
 - **Gestures use platform-specific `mobile:` extensions.** `swipe`, `longPress`, `doubleTap`, `scrollToElement`, and `pullToRefresh` use Appium's `mobile:` commands. Only `dragTo` and `blur` use the W3C Actions API. A future release may migrate all gestures to W3C Actions for cross-platform consistency.
 
 ### Cloud device farm
@@ -282,7 +298,7 @@ Connect to a remote Playwright Cloud device farm for horizontal scaling:
 ```ts
 const device = await playwright.appium.connectToCloud(
   'wss://mobile.playwright.dev',
-  androidCapabilities({ appPackage: 'com.example' }),
+  { appPackage: 'com.example' },
   {
     token: process.env.PLAYWRIGHT_MOBILE_TOKEN,
     timeout: 60_000,
