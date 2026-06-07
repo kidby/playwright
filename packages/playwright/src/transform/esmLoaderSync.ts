@@ -40,6 +40,12 @@ export function resolve(specifier: string, context: { parentURL?: string, condit
   return result;
 }
 
+function isTypeScriptLike(filename: string): boolean {
+  return filename.endsWith('.ts') || filename.endsWith('.tsx')
+    || filename.endsWith('.mts') || filename.endsWith('.cts')
+    || filename.endsWith('.jsx');
+}
+
 // Fork is ESM-only: any unknown / 'typescript' format defaults to 'module'.
 const kSupportedFormats = new Map<string | null | undefined, string | null | undefined>([
   ['commonjs', 'commonjs'],
@@ -66,8 +72,22 @@ export function load(moduleUrl: string, context: { format?: string }, nextLoad: 
   if (!shouldTransform(filename))
     return nextLoad(moduleUrl, context);
 
+  // Vendored CJS modules (e.g. test assets with `module.exports`) must NOT
+  // be force-loaded as ESM. Defer to Node's default loader so it honors the
+  // nearest package.json. This mirrors the guard in esmLoader.ts.
+  if (filename.endsWith('.js') && context.format === 'commonjs')
+    return nextLoad(moduleUrl, context);
+
   // Output format is required, so we determine it manually when unknown.
-  const format = (kSupportedFormats.get(context.format) || 'module') as 'commonjs' | 'module';
+  // Default ambiguous .js (null/undefined format) to 'commonjs' — only files
+  // with an explicit 'module' format or TypeScript extensions get ESM treatment.
+  const mapped = kSupportedFormats.get(context.format);
+  const format: 'commonjs' | 'module' = mapped === 'commonjs' ? 'commonjs'
+    : mapped === 'module' ? 'module'
+    : (filename.endsWith('.mjs') || filename.endsWith('.mts')) ? 'module'
+    : (filename.endsWith('.cjs') || filename.endsWith('.cts')) ? 'commonjs'
+    : isTypeScriptLike(filename) ? 'module'
+    : 'commonjs';
 
   const code = fs.readFileSync(filename, 'utf-8');
   // Pass `moduleUrl` only for ESM. For CommonJS the transformer routes through
