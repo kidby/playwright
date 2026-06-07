@@ -1,0 +1,28 @@
+{
+  /*
+    This config extends the root tsconfig.json and re-adds the lib/* path
+    mappings that were removed to avoid Bun's runtime resolver picking them up.
+    Use this config for `tsc --noEmit` type-checking only (never for runtime).
+  */
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      /* Inherit all @-prefixed paths from base config */
+      "@dashboard/*": ["./packages/dashboard/src/*"],
+      "@trace-viewer/*": ["./packages/trace-viewer/src/*"],
+      "@html-reporter/*": ["./packages/html-reporter/src/*"],
+      "@injected/*": ["./packages/injected/src/*"],
+      "@isomorphic/*": ["./packages/isomorphic/*"],
+      "@utils/*": ["./packages/utils/*"],
+      "@protocol/*": ["./packages/protocol/src/*"],
+      "@recorder/*": ["./packages/recorder/src/*"],
+      "@testIsomorphic/*": ["./packages/playwright/src/isomorphic/*"],
+      "@trace/*": ["./packages/trace/src/*"],
+      "@web/*": ["./packages/web/src/*"],
+      "@playwright/*": ["./packages/playwright/src/*"],
+      /* lib/* paths — safe for tsc type-checking, NOT for Bun runtime */
+      "playwright-core/lib/*": ["./packages/playwright-core/src/*"],
+      "playwright/lib/*": ["./packages/playwright/src/*"]
+    }
+  }
+}

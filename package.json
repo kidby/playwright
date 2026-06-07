@@ -34,7 +34,7 @@
     "ctest-mcp": "./node_modules/playwright/cli.js test --config=tests/mcp/playwright.config.ts --project=chrome",
     "test-extension": "./node_modules/playwright/cli.js test --config=tests/extension/playwright.config.ts",
     "oxlint": "oxlint",
-    "tsc": "tsgo -p .",
+    "tsc": "tsgo -p tsconfig.check.json",
     "doc": "node utils/doclint/cli.js",
     "lint": "npm run oxlint && npm run tsc && npm run doc && npm run check-deps && node utils/generate_channels.js && node utils/generate_types/ && npm run lint-tests && npm run test-types && npm run lint-packages",
     "lint-packages": "node utils/workspace.js --ensure-consistent",

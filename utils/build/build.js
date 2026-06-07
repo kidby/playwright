@@ -473,9 +473,14 @@ class CustomCallbackStep extends Step {
 //    through the vendored utilsBundle. The mapping lives in
 //    utils/build/utilsBundleMapping.js.
 const { MAPPING: VENDORED_MAPPING, VENDORED_PACKAGES } = require('./utilsBundleMapping');
+const { MAPPING: MCP_VENDORED_MAPPING, VENDORED_PACKAGES: MCP_VENDORED_PACKAGES } = require('./mcpUtilsBundleMapping');
+
+// Merge both mappings so a single regex can match all vendored imports.
+const ALL_VENDORED_MAPPING = { ...VENDORED_MAPPING, ...MCP_VENDORED_MAPPING };
+const ALL_VENDORED_PACKAGES = new Set([...VENDORED_PACKAGES, ...MCP_VENDORED_PACKAGES]);
 
 const VENDORED_INVERSE_NAMED = {};
-for (const [pkg, def] of Object.entries(VENDORED_MAPPING)) {
+for (const [pkg, def] of Object.entries(ALL_VENDORED_MAPPING)) {
   VENDORED_INVERSE_NAMED[pkg] = {};
   if (def.named) {
     for (const [srcName, key] of Object.entries(def.named))
@@ -489,7 +494,7 @@ const VENDORED_PKG_RE = new RegExp(
     '\\*\\s+as\\s+\\w+|' +
     '\\w+(?:\\s*,\\s*\\{[^}]*\\})?' +
     ')\\s+from\\s+\'(' +
-    [...VENDORED_PACKAGES].map(p => p.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')).join('|') +
+    [...ALL_VENDORED_PACKAGES].map(p => p.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')).join('|') +
     ')\';?',
     'gm'
 );
@@ -501,6 +506,19 @@ function _utilsBundleSpecifier(filePath) {
     return "'playwright-core/lib/utilsBundle'";
   const coreSrcRoot = filePath.slice(0, idx + coreSrcMarker.length - 1);
   let rel = path.relative(path.dirname(filePath), path.join(coreSrcRoot, 'utilsBundle'));
+  rel = rel.split(path.sep).join('/');
+  if (!rel.startsWith('.'))
+    rel = './' + rel;
+  return `'${rel}'`;
+}
+
+function _mcpUtilsBundleSpecifier(filePath) {
+  const coreSrcMarker = `${path.sep}playwright-core${path.sep}src${path.sep}`;
+  const idx = filePath.indexOf(coreSrcMarker);
+  if (idx === -1)
+    return "'playwright-core/lib/mcpUtilsBundle'";
+  const coreSrcRoot = filePath.slice(0, idx + coreSrcMarker.length - 1);
+  let rel = path.relative(path.dirname(filePath), path.join(coreSrcRoot, 'mcpUtilsBundle'));
   rel = rel.split(path.sep).join('/');
   if (!rel.startsWith('.'))
     rel = './' + rel;
@@ -550,9 +568,12 @@ function _parseNamedList(braced) {
 }
 
 function _rewriteVendoredImports(filePath, contents) {
-  const bundleSpec = _utilsBundleSpecifier(filePath);
+  const utilsBundleSpec = _utilsBundleSpecifier(filePath);
+  const mcpBundleSpec = _mcpUtilsBundleSpecifier(filePath);
   return contents.replace(VENDORED_PKG_RE, (full, clause, pkg) => {
-    const def = VENDORED_MAPPING[pkg];
+    const isMcp = MCP_VENDORED_PACKAGES.has(pkg);
+    const bundleSpec = isMcp ? mcpBundleSpec : utilsBundleSpec;
+    const def = ALL_VENDORED_MAPPING[pkg];
     const parsed = _parseClause(clause);
     if (!parsed)
       return full;
@@ -584,7 +605,7 @@ const dynamicImportToRequirePlugin = {
       const isPlaywrightSrc = args.path.includes(`${path.sep}playwright${path.sep}src${path.sep}`);
       const hasAlias = isPlaywrightSrc && (contents.includes("'@isomorphic/") || contents.includes("'@utils/"));
       let hasVendored = false;
-      for (const pkg of VENDORED_PACKAGES) {
+      for (const pkg of ALL_VENDORED_PACKAGES) {
         if (contents.includes(`'${pkg}'`)) { hasVendored = true; break; }
       }
       if (!hasAlias && !hasVendored)
@@ -682,6 +703,15 @@ steps.push(new EsbuildStep({
   },
 }, [filePath('packages/playwright-core/src/utilsBundle.ts'), filePath('utils/build/raw-body.ts')]));
 
+// playwright-core/lib/mcpUtilsBundle.js — MCP SDK + zod split out from
+// utilsBundle so test workers don't cold-parse ~300KB on boot.
+steps.push(new EsbuildStep({
+  bundle: true,
+  entryPoints: [filePath('packages/playwright-core/src/mcpUtilsBundle.ts')],
+  outfile: filePath('packages/playwright-core/lib/mcpUtilsBundle.js'),
+  external: ['fsevents'],
+}, [filePath('packages/playwright-core/src/mcpUtilsBundle.ts')]));
+
 // Build playwright-core as a single bundle.
 steps.push(new EsbuildStep({
   bundle: true,
@@ -706,8 +736,14 @@ steps.push(new EsbuildStep({
   },
   plugins: [{
     name: 'externalize-utilsBundle',
-    setup: build => build.onResolve({ filter: /utilsBundle/ },
-        () => ({ path: './utilsBundle.js', external: true })),
+    setup: build => {
+      // Match both ./utilsBundle and ./mcpUtilsBundle (note: capital U in mcp variant)
+      build.onResolve({ filter: /[Uu]tilsBundle/ }, (args) => {
+        if (args.path.includes('mcpUtilsBundle'))
+          return { path: './mcpUtilsBundle.js', external: true };
+        return { path: './utilsBundle.js', external: true };
+      });
+    },
   }, dynamicImportToRequirePlugin],
 }, [playwrightCoreSrc]));
 

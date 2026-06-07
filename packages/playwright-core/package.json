@@ -26,6 +26,7 @@
     "./lib/bootstrap": "./lib/bootstrap.js",
     "./lib/coreBundle": "./lib/coreBundle.js",
     "./lib/utilsBundle": "./lib/utilsBundle.js",
+    "./lib/mcpUtilsBundle": "./lib/mcpUtilsBundle.js",
     "./lib/tools/cli-client/program": "./lib/tools/cli-client/program.js",
     "./types/internal": {
       "types": "./types/internal.d.ts",

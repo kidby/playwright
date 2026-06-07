@@ -83,7 +83,7 @@ type RecordingState = {
 export class Tracing extends SdkObject implements InstrumentationListener, SnapshotterDelegate, HarTracerDelegate {
   private _fs = new SerializedFS();
   private _snapshotter?: Snapshotter;
-  private _harTracer: HarTracer;
+  private _harTracer?: HarTracer;
   private _screencastListeners: RegisteredListener[] = [];
   private _pageTracingRecorders = new Map<Page, ScreencastTracingRecorder>();
   private _eventListeners: RegisteredListener[] = [];
@@ -111,12 +111,6 @@ export class Tracing extends SdkObject implements InstrumentationListener, Snaps
     super(context, 'tracing');
     this._context = context;
     this._precreatedTracesDir = tracesDir;
-    this._harTracer = new HarTracer(context, null, this, {
-      content: 'attach',
-      includeTraceInfo: true,
-      recordRequestOverrides: false,
-      waitForContentOnStop: false,
-    });
     const testIdAttributeName = ('selectors' in context) ? context.selectors().testIdAttributeName() : undefined;
     this._contextCreatedEvent = {
       version,
@@ -133,7 +127,6 @@ export class Tracing extends SdkObject implements InstrumentationListener, Snaps
       contextId: context.guid,
     };
     if (context instanceof BrowserContext) {
-      this._snapshotter = new Snapshotter(context, this);
       assert(tracesDir, 'tracesDir must be specified for BrowserContext');
       this._contextCreatedEvent.browserName = context._browser.options.name;
       this._contextCreatedEvent.channel = context._browser.options.channel;
@@ -184,6 +177,20 @@ export class Tracing extends SdkObject implements InstrumentationListener, Snaps
     };
     this._fs.mkdir(this._state.resourcesDir);
     this._fs.writeFile(this._state.networkFile, '');
+
+    // Lazily create HarTracer and Snapshotter on first start() — avoids
+    // allocating them for every context when tracing is never enabled.
+    if (!this._harTracer) {
+      this._harTracer = new HarTracer(this._context, null, this, {
+        content: 'attach',
+        includeTraceInfo: true,
+        recordRequestOverrides: false,
+        waitForContentOnStop: false,
+      });
+    }
+    if (!this._snapshotter && this._context instanceof BrowserContext)
+      this._snapshotter = new Snapshotter(this._context, this);
+
     // Tracing is 10x bigger if we include scripts in every trace.
     if (options.snapshots)
       this._harTracer.start({ omitScripts: !options.live });
@@ -355,7 +362,7 @@ export class Tracing extends SdkObject implements InstrumentationListener, Snaps
     if (this._state.recording)
       throw new Error(`Must stop trace file before stopping tracing`);
     this._closeAllGroups();
-    this._harTracer.stop();
+    this._harTracer?.stop();
     this.flushHarEntries();
     await this._fs.syncAndGetError().finally(() => {
       this._state = undefined;
@@ -377,7 +384,7 @@ export class Tracing extends SdkObject implements InstrumentationListener, Snaps
 
   abort() {
     this._snapshotter?.dispose();
-    this._harTracer.stop();
+    this._harTracer?.stop();
     this._clearRegistry();
   }
 

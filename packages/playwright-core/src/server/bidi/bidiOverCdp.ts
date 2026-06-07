@@ -85,6 +85,13 @@ class BidiConnection implements ConnectionTransport {
   onclose?: ((reason?: string) => void) | undefined;
 }
 
+// The chromium-bidi `Transport` interface requires string-typed messages
+// (setOnMessage receives strings, sendMessage accepts strings), while
+// Playwright's `ConnectionTransport` uses parsed JSON objects. This creates an
+// unavoidable JSON.stringify → JSON.parse round-trip:
+//   CDP object → stringify → chromium-bidi (string) → parse → CDP object
+// Eliminating this would require upstream changes to chromium-bidi's Transport
+// interface to accept/emit objects instead of strings.
 class CdpTransportImpl implements bidiTransport.Transport {
   private _connection: ConnectionTransport;
   private _handler?: (message: string) => Promise<void> | void;
