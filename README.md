@@ -12,7 +12,7 @@ Tracks upstream microsoft/playwright. The fork adds Bun runtime support, native 
 
 ### Performance
 
-The fork is faster than upstream on Node and adds Bun as a first-class runtime. All numbers below are from a Docker-isolated benchmark using the official Playwright v1.60.0 image, capped at 4 CPUs and 8 GB RAM.
+All numbers below are from a Docker-isolated benchmark using the official Playwright v1.60.0 image, capped at 4 CPUs and 8 GB RAM.
 
 ![Fork vs Upstream benchmark chart](docs/benchmark-chart.svg)
 
@@ -21,16 +21,16 @@ The fork is faster than upstream on Node and adds Bun as a first-class runtime. 
 | Peak memory | **173 MB** | **197 MB** | 1,405 MB | 86% less | 88% less |
 | CPU time | 14.0 s | **4.1 s** | 19.7 s | 79% less | 29% less |
 | Import time | **0.17 s** | **0.39 s** | 0.53 s | 26% faster | 68% faster |
-| CLI startup | **0.33 s** | 0.85 s | 0.69 s | — | 52% faster |
+| CLI startup | **0.33 s** | 0.85 s | 0.69 s | 23% slower | 52% faster |
 | utilsBundle | **1.5 MB** | **1.5 MB** | 3.1 MB | 52% smaller | 52% smaller |
 
 <sub>Docker: mcr.microsoft.com/playwright:v1.60.0 · match-grep.spec.ts · single worker · 4 CPUs · 8 GB · Node v24 / Bun 1.3</sub>
 
-Key optimizations: utilsBundle split (3.1 MB → 1.5 MB), lazy playwright-core and yauzl imports, grep early file filtering, esbuild target node24, V8 structured-clone IPC, tsconfig path fixes for Bun. Reproduce with `docker build -t pw-bench -f docs/Dockerfile.bench . && docker run --rm -v $(pwd):/bench/fork --cpus=4 --memory=8g pw-bench`.
+Key optimizations: utilsBundle split (3.1 → 1.5 MB), lazy playwright-core and yauzl imports, grep-based early file filtering, esbuild targeting node24, V8 structured-clone IPC, and tsconfig path fixes for Bun. Reproduce with `docker build -t pw-bench -f docs/Dockerfile.bench . && docker run --rm -v $(pwd):/bench/fork --cpus=4 --memory=8g pw-bench`.
 
 ### Bun runtime
 
-Playwright runs under Bun as a first-class target alongside Node. The worker IS a Bun process when run under Bun — Bun APIs are available directly in tests. Upstream microsoft/playwright does not support Bun.
+Playwright runs under Bun as a first-class runtime alongside Node. Workers are native Bun processes, so Bun APIs are available directly in tests. Upstream microsoft/playwright does not support Bun.
 
 **Run tests with Bun:**
 
@@ -58,7 +58,7 @@ test('serve a fixture with Bun', async ({ page }) => {
 
 ### Mobile testing — Android
 
-The @playwright/mobile package drives native apps through Appium 2 over W3C WebDriver. No selenium-webdriver or webdriverio at runtime. See [packages/playwright-mobile/README.md](packages/playwright-mobile/README.md).
+The @playwright/mobile package drives native apps through Appium 2 via the W3C WebDriver protocol. No selenium-webdriver or webdriverio dependency at runtime. See [packages/playwright-mobile/README.md](packages/playwright-mobile/README.md).
 
 **Android test:**
 
@@ -83,7 +83,7 @@ test('login and check the dashboard', async ({ device }) => {
 
 ### Mobile testing — iOS
 
-iOS uses the same mobileTest fixture with iosCapabilities. Pass a Playwright device descriptor for screenshot baseline metadata.
+iOS uses the same `mobileTest` fixture with `iosCapabilities`. Pass a Playwright device descriptor for screenshot baseline metadata.
 
 **iOS test:**
 
@@ -110,7 +110,7 @@ test('search and screenshot', async ({ device }) => {
 
 ### Mobile testing — WebView hybrid apps
 
-Switch between native and web contexts in the same test. The device detects available WebViews and lets you switch contexts to use Playwright-style locators inside them.
+Switch between native and web contexts in the same test. The device detects available WebViews and lets you use Playwright-style locators inside them.
 
 ```ts
 import { mobileTest as test, expect, androidCapabilities } from '@playwright/experimental-mobile';
@@ -131,7 +131,7 @@ test('native to webview round trip', async ({ device }) => {
 
 ### Storybook integration
 
-The @playwright/storybook package auto-discovers stories from a running Storybook's index.json and generates Playwright tests. See [packages/playwright-storybook/README.md](packages/playwright-storybook/README.md).
+The @playwright/storybook package auto-discovers stories from a running Storybook instance and generates Playwright tests. See [packages/playwright-storybook/README.md](packages/playwright-storybook/README.md).
 
 **Discover and test all stories:**
 
@@ -180,7 +180,7 @@ export default defineConfig({
 
 ### Lighthouse audits
 
-The @playwright/lighthouse package runs Lighthouse against the same Chromium tab the test is driving. The remote-debugging-port is wired automatically by the fixture. See [packages/playwright-lighthouse/README.md](packages/playwright-lighthouse/README.md).
+The @playwright/lighthouse package runs Lighthouse against the same Chromium tab the test is driving. The remote debugging port is wired automatically by the fixture. See [packages/playwright-lighthouse/README.md](packages/playwright-lighthouse/README.md).
 
 **Performance and accessibility audit:**
 
