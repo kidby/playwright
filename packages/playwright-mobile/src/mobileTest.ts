@@ -49,7 +49,7 @@ const extendedExpect = baseExpect.extend(mobileMatchers);
 
 export type MobileFixtures = {
   appiumServerUrl: string;
-  capabilities: AppiumCapabilities;
+  capabilities: AppiumCapabilities | Record<string, unknown>;
   descriptor: DeviceDescriptor | undefined;
   defaultActionTimeoutMs: number;
   device: NativeDevice;
@@ -58,7 +58,7 @@ export type MobileFixtures = {
 export type MobileTestArgs = MobileFixtures;
 export type MobileTestOptions = {
   appiumServerUrl?: string;
-  capabilities?: AppiumCapabilities;
+  capabilities?: AppiumCapabilities | Record<string, unknown>;
   descriptor?: DeviceDescriptor;
   defaultActionTimeoutMs?: number;
 };
@@ -78,7 +78,7 @@ const requireCapabilitiesFixture: TestFixture<AppiumCapabilities, MobileFixtureA
     return;
   }
   throw new Error(
-      'mobileTest: `capabilities` fixture not provided. Set `appium.capabilities` in playwright.config.ts use, or call test.use({ capabilities: androidCapabilities({...}) }).',
+      'mobileTest: `capabilities` fixture not provided. Set capabilities via test.use({ capabilities: { appPackage: "..." } }) or in playwright.config.ts.',
   );
 };
 
@@ -233,7 +233,9 @@ export const mobileTest = base.extend<MobileFixtures & { appium: PlaywrightTestO
       device = _sessionPool.get(workerIndex)!;
       isReusedSession = true;
     } else {
-      device = await NativeDevice.start(appiumServerUrl, capabilities, { descriptor });
+      const { normalizeCapabilities } = await import('./capabilities.js');
+      const normalizedCaps = normalizeCapabilities(capabilities);
+      device = await NativeDevice.start(appiumServerUrl, normalizedCaps, { descriptor });
       if (reuseSession && workerIndex >= 0)
         _sessionPool.set(workerIndex, device);
     }

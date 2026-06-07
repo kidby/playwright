@@ -88,3 +88,53 @@ export function iosCapabilities(opts: IosCapabilityOptions = {}): AppiumCapabili
     Object.assign(caps, opts.extra);
   return caps;
 }
+
+// Shorthand key map: friendly name -> appium: prefixed key.
+const shorthandMap: Record<string, string> = {
+  app: 'appium:app',
+  appPackage: 'appium:appPackage',
+  appActivity: 'appium:appActivity',
+  bundleId: 'appium:bundleId',
+  deviceName: 'appium:deviceName',
+  platformVersion: 'appium:platformVersion',
+  udid: 'appium:udid',
+  noReset: 'appium:noReset',
+  newCommandTimeoutSec: 'appium:newCommandTimeout',
+};
+
+/**
+ * Normalize capabilities so users can pass plain objects with friendly keys:
+ *   { app: 'foo.apk', appPackage: 'com.example' }
+ * and have them expanded to proper Appium W3C capabilities:
+ *   { platformName: 'Android', 'appium:automationName': 'UiAutomator2', 'appium:app': 'foo.apk', ... }
+ *
+ * Already-normalized capabilities (containing `platformName`) pass through unchanged.
+ */
+export function normalizeCapabilities(caps: Record<string, unknown>): AppiumCapabilities {
+  // Already in W3C format: pass through.
+  if ('platformName' in caps)
+    return caps as AppiumCapabilities;
+
+  // Infer platform from keys: bundleId -> iOS, everything else -> Android.
+  const isIos = 'bundleId' in caps;
+  const result: AppiumCapabilities = {
+    'platformName': isIos ? 'iOS' : 'Android',
+    'appium:automationName': isIos ? 'XCUITest' : 'UiAutomator2',
+    'appium:newCommandTimeout': DEFAULT_NEW_COMMAND_TIMEOUT_SEC,
+  };
+
+  for (const [key, value] of Object.entries(caps)) {
+    if (value === undefined)
+      continue;
+    const mapped = shorthandMap[key];
+    if (mapped)
+      result[mapped] = value;
+    else if (key === 'extra' && typeof value === 'object' && value !== null)
+      Object.assign(result, value);
+    else
+      result[key] = value;
+  }
+
+  return result;
+}
+
