@@ -16,13 +16,13 @@ The fork is faster than upstream on Node and adds Bun as a first-class runtime. 
 
 ![Fork vs Upstream benchmark chart](docs/benchmark-chart.svg)
 
-| Metric | Bun fork | Node fork | Node upstream | Fork improvement |
-|---|---|---|---|---|
-| Peak memory | **173 MB** | **197 MB** | 1,405 MB | 86% less RAM |
-| CPU time | 14.0 s | **4.1 s** | 19.7 s | 79% less CPU |
-| Import time | — | **0.39 s** | 0.53 s | 26% faster |
-| CLI startup | **0.33 s** | 0.85 s | 0.69 s | 52% faster (Bun) |
-| utilsBundle | **1.5 MB** | **1.5 MB** | 3.1 MB | 52% smaller |
+| Metric | Bun fork | Node fork | Node upstream | Node win | Bun win |
+|---|---|---|---|---|---|
+| Peak memory | **173 MB** | **197 MB** | 1,405 MB | 86% less | 88% less |
+| CPU time | 14.0 s | **4.1 s** | 19.7 s | 79% less | 29% less |
+| Import time | — | **0.39 s** | 0.53 s | 26% faster | — |
+| CLI startup | **0.33 s** | 0.85 s | 0.69 s | — | 52% faster |
+| utilsBundle | **1.5 MB** | **1.5 MB** | 3.1 MB | 52% smaller | 52% smaller |
 
 <sub>Docker: mcr.microsoft.com/playwright:v1.60.0 · match-grep.spec.ts · single worker · 4 CPUs · 8 GB · Node v24 / Bun 1.3</sub>
 
