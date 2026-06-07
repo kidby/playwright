@@ -16,7 +16,7 @@ The fork is faster than upstream on Node and adds Bun as a first-class runtime. 
 
 ![Fork vs Upstream benchmark chart](docs/benchmark-chart.svg)
 
-| Metric | Bun fork | Node fork | Node upstream | Node win | Bun win |
+| Metric | Bun fork | Node fork | Node upstream | Δ Node | Δ Bun |
 |---|---|---|---|---|---|
 | Peak memory | **173 MB** | **197 MB** | 1,405 MB | 86% less | 88% less |
 | CPU time | 14.0 s | **4.1 s** | 19.7 s | 79% less | 29% less |
