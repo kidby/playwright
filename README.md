@@ -8,23 +8,37 @@ Playwright is a framework for web automation and testing. It drives Chromium, Fi
 
 ## About This Fork
 
-Tracks upstream `microsoft/playwright`. Local changes:
+Tracks upstream microsoft/playwright. The fork adds Bun runtime support, native mobile testing, Storybook integration, Lighthouse audits, and performance optimizations — while keeping full compatibility with upstream Playwright tests.
 
-**Bun runtime.** Playwright runs under Bun as a first-class target alongside Node. Tests can use `Bun.*` APIs directly (`Bun.file`, `Bun.serve`, `Bun.spawn`, `Bun.$`, etc.). The worker IS a Bun process under Bun. Upstream `microsoft/playwright` does not run under Bun; the fork is the only working option there.
+### Performance
 
-> **Benchmarks (Node v24 vs Bun 1.3, Apple Silicon).** Bun is 10–18% faster on compatible suites. Both runtimes pass the full 217-test fork suite reliably (3/3 runs, 0 failures).
+The fork is faster than upstream on Node and adds Bun as a first-class runtime.
+
+> | Runtime | Median | vs Upstream |
+> |---|---|---|
+> | Bun fork | **4.8 s** | 11% faster (Bun not supported upstream) |
+> | Node fork | **5.1 s** | 6% faster |
+> | Node upstream | 5.4 s | baseline |
 >
-> | Suite | Node | Bun | Speedup |
-> |---|---|---|---|
-> | Lightweight (4 tests) | 1.74s | 1.58s | Bun +10% |
-> | Heavy (30+ tests) | 6.96s | 5.91s | Bun +18% |
-> | Full fork (217 tests) | 8.3s | 7.6s | Bun +9% |
+> Benchmark: match-grep.spec.ts, 8 tests, single worker, macOS Apple Silicon, Node v26 / Bun 1.3.
 
-**Mobile package.** `@playwright/experimental-mobile` exposes a `mobileTest` fixture that drives Appium 2 over W3C WebDriver classic: iOS (XCUITest) and Android in one API. No `selenium-webdriver` or `webdriverio` at runtime. Full Playwright web API parity on `AppLocator` — `getByRole`, `getByText`, `getByLabel`, `getByTestId`, `getByPlaceholder`, `getByAltText`, `getByTitle`, `tap`, `check`, `uncheck`, `press`, `scrollIntoViewIfNeeded`, `dragTo`, `focus`, `blur`, `boundingBox`, and more. See [packages/playwright-mobile/README.md](packages/playwright-mobile/README.md).
+Key optimizations: utilsBundle split (−46% cold parse, 2.8 MB → 1.5 MB), lazy playwright-core and yauzl imports, grep-based early file filtering, esbuild target node24, V8 structured-clone IPC, and tsconfig path fixes for Bun module resolution.
 
-**Storybook package.** `@playwright/experimental-storybook` auto-discovers stories and generates Playwright tests. Supports `composeStories` CT mode for testing components without a running Storybook server. See [packages/playwright-storybook/README.md](packages/playwright-storybook/README.md).
+### Bun runtime
 
-**Lighthouse package.** `@playwright/lighthouse` runs Lighthouse against the same Chromium tab the test is driving; `--remote-debugging-port` is wired by the fixture. See [packages/playwright-lighthouse/README.md](packages/playwright-lighthouse/README.md).
+Playwright runs under Bun as a first-class target alongside Node. Tests can use Bun APIs directly — Bun.file, Bun.serve, Bun.spawn, Bun.$, and so on. The worker IS a Bun process when run under Bun. Upstream microsoft/playwright does not support Bun.
+
+### Mobile testing
+
+The @playwright/mobile package exposes a mobileTest fixture that drives Appium 2 over W3C WebDriver — iOS via XCUITest and Android in one API. No selenium-webdriver or webdriverio at runtime. Full Playwright locator parity on AppLocator: getByRole, getByText, getByLabel, getByTestId, tap, press, scrollIntoViewIfNeeded, dragTo, and more. See [packages/playwright-mobile/README.md](packages/playwright-mobile/README.md).
+
+### Storybook integration
+
+The @playwright/storybook package auto-discovers stories and generates Playwright tests. Supports composeStories CT mode for testing components without a running Storybook server. See [packages/playwright-storybook/README.md](packages/playwright-storybook/README.md).
+
+### Lighthouse audits
+
+The @playwright/lighthouse package runs Lighthouse against the same Chromium tab the test is driving. The remote-debugging-port is wired by the fixture. See [packages/playwright-lighthouse/README.md](packages/playwright-lighthouse/README.md).
 
 ```ts
 import { lighthouseTest as test, expect } from '@playwright/lighthouse';
@@ -39,33 +53,31 @@ test('homepage perf budget', async ({ page, lighthouse }) => {
 });
 ```
 
-**Cloud client.** `playwright.appium.connectToCloud(wsEndpoint, capabilities, options)` connects to a remote device farm via WebSocket with token auth, configurable timeouts, and bidirectional lifecycle management.
+### Additional features
 
-**Locators.** `getById(id, { exact? })` and `getByClassName(name, { exact? })` on `Page`, `Locator`, `Frame`, and `FrameLocator`. Substring match by default; `{ exact: true }` for strict.
+**Cloud client.** connectToCloud lets you connect to remote device farms via WebSocket with token auth, configurable timeouts, and bidirectional lifecycle management.
+
+**Locators.** getById and getByClassName on Page, Locator, Frame, and FrameLocator. Substring match by default, exact match with the exact option.
 
 ```ts
-await page.getById('submit-btn').click();              // matches "submit-btn-9a8f"
-await page.getById('submit-btn-9a8f', { exact: true }).click();
-await expect(page.getByClassName('featured')).toHaveCount(1);
-await expect(page.getByClassName('card', { exact: true })).toHaveCount(2);
+await page.getById('submit-btn').click();
+await page.getByClassName('featured').click();
 ```
 
-**Reporters.** Added built-in shorthands: `catalog`, `ai`, `csv`, `jira`, `new-relic`, `xray`.
+**Reporters.** Added built-in shorthands: catalog, ai, csv, jira, new-relic, xray.
 
-**Matchers.** Added `toBeWithinRange`, `toHaveResponseProperty`, `toMatchJsonSchema`.
+**Matchers.** Added toBeWithinRange, toHaveResponseProperty, toMatchJsonSchema.
 
-**Upstream sync tooling.** `utils/sync_upstream.sh` (dry-run merge analysis) and `utils/analyze_upstream.sh` (conflict prediction) for safe upstream pulls.
+**Upstream sync.** utils/sync_upstream.sh (dry-run merge analysis) and utils/analyze_upstream.sh (conflict prediction) for safe upstream pulls. Patches not merged upstream are carried locally, e.g. shardingMode [#30962](https://github.com/microsoft/playwright/pull/30962).
 
-**Upstream PRs carried locally.** Patches not merged upstream, e.g. [shardingMode #30962](https://github.com/microsoft/playwright/pull/30962) (`partition` / `round-robin` / `duration-round-robin`).
-
-| Surface              | Fork  | Upstream | What the fork adds                                                                          |
-| -------------------- | ----- | -------- | ------------------------------------------------------------------------------------------- |
-| Built-in reporters   | **15** | 9       | `catalog`, `ai`, `csv`, `jira`, `xray`, `newRelic`, `intellum-social`                       |
-| Custom matchers      | **41** | 38      | `toBeWithinRange`, `toHaveResponseProperty`, `toMatchJsonSchema`                            |
-| Workspace packages   | **24** | 21      | `@playwright/mobile`, `@playwright/storybook`, `@playwright/lighthouse`                     |
-| Locator helpers      | **9**  | 7       | `getById`, `getByClassName` on `Page`, `Frame`, `Locator`, `FrameLocator`                   |
-| Runtime targets      | **3**  | 1       | Bun runtime, native mobile (via Appium 2)                                                   |
-| Mobile locators      | **15** | 0       | Full AppLocator API parity: selectors, actions, properties, assertions                      |
+| Surface | Fork | Upstream | What the fork adds |
+|---|---|---|---|
+| Runtime targets | **3** | 1 | Bun runtime, native mobile via Appium 2 |
+| Built-in reporters | **15** | 9 | catalog, ai, csv, jira, xray, newRelic |
+| Custom matchers | **41** | 38 | toBeWithinRange, toHaveResponseProperty, toMatchJsonSchema |
+| Workspace packages | **24** | 21 | @playwright/mobile, @playwright/storybook, @playwright/lighthouse |
+| Locator helpers | **9** | 7 | getById, getByClassName |
+| Mobile locators | **15** | 0 | Full AppLocator API parity |
 
 
 ## Get Started
