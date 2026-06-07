@@ -12,21 +12,21 @@ Tracks upstream microsoft/playwright. The fork adds Bun runtime support, native 
 
 ### Performance
 
-The fork is faster than upstream on Node and adds Bun as a first-class runtime.
+The fork is faster than upstream on Node and adds Bun as a first-class runtime. All numbers below are from a Docker-isolated benchmark using the official Playwright v1.60.0 image, capped at 4 CPUs and 8 GB RAM.
 
 ![Fork vs Upstream benchmark chart](docs/benchmark-chart.svg)
 
 | Metric | Bun fork | Node fork | Node upstream | Fork improvement |
 |---|---|---|---|---|
-| Test suite | **5.0 s** | **5.6 s** | 9.2 s | 39–46% faster |
-| CLI startup | **220 ms** | 270 ms | 270 ms | 19% faster (Bun) |
-| Peak memory | **222 MB** | **222 MB** | 1,247 MB | 82% less RAM |
-| CPU time | **9.0 s** | **9.6 s** | 16.0 s | 40–44% less CPU |
+| Peak memory | **173 MB** | **197 MB** | 1,405 MB | 86% less RAM |
+| CPU time | 14.0 s | **4.1 s** | 19.7 s | 79% less CPU |
+| Import time | — | **0.39 s** | 0.53 s | 26% faster |
+| CLI startup | **0.33 s** | 0.85 s | 0.69 s | 52% faster (Bun) |
 | utilsBundle | **1.5 MB** | **1.5 MB** | 3.1 MB | 52% smaller |
 
-<sub>match-grep.spec.ts · 8 tests · single worker · macOS Apple Silicon · Node v26 / Bun 1.3</sub>
+<sub>Docker: mcr.microsoft.com/playwright:v1.60.0 · match-grep.spec.ts · single worker · 4 CPUs · 8 GB · Node v24 / Bun 1.3</sub>
 
-Key optimizations: utilsBundle split (3.1 MB → 1.5 MB), lazy playwright-core and yauzl imports, grep early file filtering, esbuild target node24, V8 structured-clone IPC, tsconfig path fixes for Bun.
+Key optimizations: utilsBundle split (3.1 MB → 1.5 MB), lazy playwright-core and yauzl imports, grep early file filtering, esbuild target node24, V8 structured-clone IPC, tsconfig path fixes for Bun. Reproduce with `docker build -t pw-bench -f docs/Dockerfile.bench . && docker run --rm -v $(pwd):/bench/fork --cpus=4 --memory=8g pw-bench`.
 
 ### Bun runtime
 

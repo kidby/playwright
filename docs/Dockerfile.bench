@@ -1,0 +1,13 @@
+FROM mcr.microsoft.com/playwright:v1.60.0
+
+RUN apt-get update && apt-get install -y --no-install-recommends time unzip && rm -rf /var/lib/apt/lists/*
+
+# Install Bun
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:${PATH}"
+
+WORKDIR /bench
+COPY docs/bench.sh /bench/bench.sh
+RUN chmod +x /bench/bench.sh
+
+CMD ["/bench/bench.sh"]

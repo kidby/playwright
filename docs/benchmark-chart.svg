@@ -1,70 +1,66 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 912 320" width="912" height="320" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
-  <defs>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap');
-    </style>
-  </defs>
-  <rect width="912" height="320" fill="#f2f4f8" rx="8"/>
-  <text x="456" y="24" text-anchor="middle" font-size="14" font-weight="600" fill="#161616">Fork vs Upstream — lower is better</text>
-  <rect x="276" y="292" width="12" height="12" rx="2" fill="#0f62fe"/>
-  <text x="292" y="302" font-size="11" fill="#525252">Bun fork</text>
-  <rect x="406" y="292" width="12" height="12" rx="2" fill="#009d9a"/>
-  <text x="422" y="302" font-size="11" fill="#525252">Node fork</text>
-  <rect x="536" y="292" width="12" height="12" rx="2" fill="#8d8d8d"/>
-  <text x="552" y="302" font-size="11" fill="#525252">Node upstream</text>
-  <line x1="60" y1="189.33333333333334" x2="200" y2="189.33333333333334" stroke="#e0e0e0" stroke-width="0.5"/>
-  <line x1="60" y1="122.66666666666669" x2="200" y2="122.66666666666669" stroke="#e0e0e0" stroke-width="0.5"/>
-  <line x1="60" y1="256" x2="200" y2="256" stroke="#c6c6c6" stroke-width="1"/>
-  <rect x="70" y="147.30434782608694" width="36" height="108.69565217391306" rx="3" fill="#0f62fe"/>
-  <text x="88" y="143.30434782608694" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">5.0</text>
-  <rect x="112" y="134.26086956521738" width="36" height="121.73913043478262" rx="3" fill="#009d9a"/>
-  <text x="130" y="130.26086956521738" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">5.6</text>
-  <rect x="154" y="56" width="36" height="200" rx="3" fill="#8d8d8d"/>
-  <text x="172" y="52" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">9.2</text>
-  <text x="130" y="272" text-anchor="middle" font-size="12" font-weight="500" fill="#161616">Test suite</text>
-  <text x="130" y="286" text-anchor="middle" font-size="10" fill="#6f6f6f">(s)</text>
-  <line x1="232" y1="189.33333333333334" x2="372" y2="189.33333333333334" stroke="#e0e0e0" stroke-width="0.5"/>
-  <line x1="232" y1="122.66666666666669" x2="372" y2="122.66666666666669" stroke="#e0e0e0" stroke-width="0.5"/>
-  <line x1="232" y1="256" x2="372" y2="256" stroke="#c6c6c6" stroke-width="1"/>
-  <rect x="242" y="93.03703703703704" width="36" height="162.96296296296296" rx="3" fill="#0f62fe"/>
-  <text x="260" y="89.03703703703704" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">220</text>
-  <rect x="284" y="56" width="36" height="200" rx="3" fill="#009d9a"/>
-  <text x="302" y="52" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">270</text>
-  <rect x="326" y="56" width="36" height="200" rx="3" fill="#8d8d8d"/>
-  <text x="344" y="52" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">270</text>
-  <text x="302" y="272" text-anchor="middle" font-size="12" font-weight="500" fill="#161616">Startup</text>
-  <text x="302" y="286" text-anchor="middle" font-size="10" fill="#6f6f6f">(ms)</text>
-  <line x1="404" y1="189.33333333333331" x2="544" y2="189.33333333333331" stroke="#e0e0e0" stroke-width="0.5"/>
-  <line x1="404" y1="122.66666666666666" x2="544" y2="122.66666666666666" stroke="#e0e0e0" stroke-width="0.5"/>
-  <line x1="404" y1="256" x2="544" y2="256" stroke="#c6c6c6" stroke-width="1"/>
-  <rect x="414" y="220.39454691259022" width="36" height="35.605453087409785" rx="3" fill="#0f62fe"/>
-  <text x="432" y="216.39454691259022" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">222</text>
-  <rect x="456" y="220.39454691259022" width="36" height="35.605453087409785" rx="3" fill="#009d9a"/>
-  <text x="474" y="216.39454691259022" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">222</text>
-  <rect x="498" y="56" width="36" height="200" rx="3" fill="#8d8d8d"/>
-  <text x="516" y="52" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">1247</text>
-  <text x="474" y="272" text-anchor="middle" font-size="12" font-weight="500" fill="#161616">Peak memory</text>
-  <text x="474" y="286" text-anchor="middle" font-size="10" fill="#6f6f6f">(MB)</text>
-  <line x1="576" y1="189.33333333333334" x2="716" y2="189.33333333333334" stroke="#e0e0e0" stroke-width="0.5"/>
-  <line x1="576" y1="122.66666666666669" x2="716" y2="122.66666666666669" stroke="#e0e0e0" stroke-width="0.5"/>
-  <line x1="576" y1="256" x2="716" y2="256" stroke="#c6c6c6" stroke-width="1"/>
-  <rect x="586" y="143.5" width="36" height="112.5" rx="3" fill="#0f62fe"/>
-  <text x="604" y="139.5" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">9.0</text>
-  <rect x="628" y="136" width="36" height="120" rx="3" fill="#009d9a"/>
-  <text x="646" y="132" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">9.6</text>
-  <rect x="670" y="56" width="36" height="200" rx="3" fill="#8d8d8d"/>
-  <text x="688" y="52" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">16.0</text>
-  <text x="646" y="272" text-anchor="middle" font-size="12" font-weight="500" fill="#161616">CPU time</text>
-  <text x="646" y="286" text-anchor="middle" font-size="10" fill="#6f6f6f">(s)</text>
-  <line x1="748" y1="189.33333333333331" x2="888" y2="189.33333333333331" stroke="#e0e0e0" stroke-width="0.5"/>
-  <line x1="748" y1="122.66666666666666" x2="888" y2="122.66666666666666" stroke="#e0e0e0" stroke-width="0.5"/>
-  <line x1="748" y1="256" x2="888" y2="256" stroke="#c6c6c6" stroke-width="1"/>
-  <rect x="758" y="159.22580645161293" width="36" height="96.77419354838709" rx="3" fill="#0f62fe"/>
-  <text x="776" y="155.22580645161293" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">1.5</text>
-  <rect x="800" y="159.22580645161293" width="36" height="96.77419354838709" rx="3" fill="#009d9a"/>
-  <text x="818" y="155.22580645161293" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">1.5</text>
-  <rect x="842" y="56" width="36" height="200" rx="3" fill="#8d8d8d"/>
-  <text x="860" y="52" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">3.1</text>
-  <text x="818" y="272" text-anchor="middle" font-size="12" font-weight="500" fill="#161616">utilsBundle</text>
-  <text x="818" y="286" text-anchor="middle" font-size="10" fill="#6f6f6f">(MB)</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 876 320" width="876" height="320" font-family="'IBM Plex Sans', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="876" height="320" fill="#f2f4f8" rx="8"/>
+  <text x="438" y="24" text-anchor="middle" font-size="14" font-weight="600" fill="#161616">Fork vs Upstream — lower is better</text>
+  <text x="438" y="24" text-anchor="middle" font-size="10" fill="#6f6f6f" dy="14">Docker isolated · Playwright v1.60 image · 4 CPUs · 8 GB RAM</text>
+  <rect x="258" y="294" width="12" height="12" rx="2" fill="#0f62fe"/>
+  <text x="274" y="304" font-size="11" fill="#525252">Bun fork</text>
+  <rect x="388" y="294" width="12" height="12" rx="2" fill="#009d9a"/>
+  <text x="404" y="304" font-size="11" fill="#525252">Node fork</text>
+  <rect x="518" y="294" width="12" height="12" rx="2" fill="#8d8d8d"/>
+  <text x="534" y="304" font-size="11" fill="#525252">Node upstream</text>
+  <line x1="24" y1="192.66666666666669" x2="164" y2="192.66666666666669" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="24" y1="129.33333333333334" x2="164" y2="129.33333333333334" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="24" y1="256" x2="164" y2="256" stroke="#c6c6c6" stroke-width="1"/>
+  <rect x="34" y="232.60498220640568" width="36" height="23.395017793594306" rx="3" fill="#0f62fe"/>
+  <text x="52" y="227.60498220640568" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">173</text>
+  <rect x="76" y="229.3594306049822" width="36" height="26.640569395017792" rx="3" fill="#009d9a"/>
+  <text x="94" y="224.3594306049822" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">197</text>
+  <rect x="118" y="66" width="36" height="190" rx="3" fill="#8d8d8d"/>
+  <text x="136" y="61" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">1,405</text>
+  <text x="94" y="272" text-anchor="middle" font-size="12" font-weight="500" fill="#161616">Peak memory</text>
+  <text x="94" y="286" text-anchor="middle" font-size="10" fill="#6f6f6f">(MB)</text>
+  <line x1="196" y1="192.66666666666669" x2="336" y2="192.66666666666669" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="196" y1="129.33333333333334" x2="336" y2="129.33333333333334" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="196" y1="256" x2="336" y2="256" stroke="#c6c6c6" stroke-width="1"/>
+  <rect x="206" y="120.9746192893401" width="36" height="135.0253807106599" rx="3" fill="#0f62fe"/>
+  <text x="224" y="115.9746192893401" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">14.0</text>
+  <rect x="248" y="216.4568527918782" width="36" height="39.54314720812182" rx="3" fill="#009d9a"/>
+  <text x="266" y="211.4568527918782" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">4.10</text>
+  <rect x="290" y="66" width="36" height="190" rx="3" fill="#8d8d8d"/>
+  <text x="308" y="61" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">19.7</text>
+  <text x="266" y="272" text-anchor="middle" font-size="12" font-weight="500" fill="#161616">CPU time</text>
+  <text x="266" y="286" text-anchor="middle" font-size="10" fill="#6f6f6f">(s)</text>
+  <line x1="368" y1="192.66666666666669" x2="508" y2="192.66666666666669" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="368" y1="129.33333333333334" x2="508" y2="129.33333333333334" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="368" y1="256" x2="508" y2="256" stroke="#c6c6c6" stroke-width="1"/>
+  <rect x="378" y="236" width="36" height="20" rx="3" fill="none" stroke="#0f62fe" stroke-dasharray="3,2" opacity="0.4"/>
+  <text x="396" y="232" text-anchor="middle" font-size="9" fill="#a8a8a8">N/A</text>
+  <rect x="420" y="116.18867924528303" width="36" height="139.81132075471697" rx="3" fill="#009d9a"/>
+  <text x="438" y="111.18867924528303" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">0.39</text>
+  <rect x="462" y="66" width="36" height="190" rx="3" fill="#8d8d8d"/>
+  <text x="480" y="61" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">0.53</text>
+  <text x="438" y="272" text-anchor="middle" font-size="12" font-weight="500" fill="#161616">Import time</text>
+  <text x="438" y="286" text-anchor="middle" font-size="10" fill="#6f6f6f">(s)</text>
+  <line x1="540" y1="192.66666666666669" x2="680" y2="192.66666666666669" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="540" y1="129.33333333333334" x2="680" y2="129.33333333333334" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="540" y1="256" x2="680" y2="256" stroke="#c6c6c6" stroke-width="1"/>
+  <rect x="550" y="182.23529411764707" width="36" height="73.76470588235294" rx="3" fill="#0f62fe"/>
+  <text x="568" y="177.23529411764707" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">0.33</text>
+  <rect x="592" y="66" width="36" height="190" rx="3" fill="#009d9a"/>
+  <text x="610" y="61" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">0.85</text>
+  <rect x="634" y="101.76470588235293" width="36" height="154.23529411764707" rx="3" fill="#8d8d8d"/>
+  <text x="652" y="96.76470588235293" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">0.69</text>
+  <text x="610" y="272" text-anchor="middle" font-size="12" font-weight="500" fill="#161616">CLI startup</text>
+  <text x="610" y="286" text-anchor="middle" font-size="10" fill="#6f6f6f">(s)</text>
+  <line x1="712" y1="192.66666666666666" x2="852" y2="192.66666666666666" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="712" y1="129.33333333333331" x2="852" y2="129.33333333333331" stroke="#e0e0e0" stroke-width="0.5"/>
+  <line x1="712" y1="256" x2="852" y2="256" stroke="#c6c6c6" stroke-width="1"/>
+  <rect x="722" y="164.06451612903226" width="36" height="91.93548387096773" rx="3" fill="#0f62fe"/>
+  <text x="740" y="159.06451612903226" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">1.50</text>
+  <rect x="764" y="164.06451612903226" width="36" height="91.93548387096773" rx="3" fill="#009d9a"/>
+  <text x="782" y="159.06451612903226" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">1.50</text>
+  <rect x="806" y="66" width="36" height="190" rx="3" fill="#8d8d8d"/>
+  <text x="824" y="61" text-anchor="middle" font-size="10" font-weight="500" fill="#161616">3.10</text>
+  <text x="782" y="272" text-anchor="middle" font-size="12" font-weight="500" fill="#161616">utilsBundle</text>
+  <text x="782" y="286" text-anchor="middle" font-size="10" fill="#6f6f6f">(MB)</text>
 </svg>
