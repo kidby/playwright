@@ -17,7 +17,11 @@
 import fs from 'fs';
 import path from 'path';
 
-import * as playwrightLibrary from 'playwright-core';
+// Lazy-loaded: playwright-core triggers coreBundle.js (3.4MB) parsing.
+// Only needed inside fixture functions, not at module load time.
+function lazyPlaywrightLibrary(): typeof import('playwright-core') {
+  return require('playwright-core');
+}
 import { asLocatorDescription } from '@isomorphic/locatorGenerators';
 import { getActionGroup, renderTitleForCall } from '@isomorphic/protocolFormatter';
 import { escapeHTML } from '@isomorphic/stringUtils';
@@ -383,7 +387,7 @@ const playwrightFixtures: Fixtures<TestFixtures, WorkerFixtures, UtilityTestFixt
   _setupContextOptions: [async ({ playwright, actionTimeout, navigationTimeout, testIdAttribute }, use, _testInfo) => {
     const testInfo = _testInfo as TestInfoImpl;
     if (testIdAttribute)
-      playwrightLibrary.selectors.setTestIdAttribute(testIdAttribute);
+      lazyPlaywrightLibrary().selectors.setTestIdAttribute(testIdAttribute);
     testInfo.snapshotSuffix = process.platform;
     testInfo._onCustomMessageCallback = () => Promise.reject(new Error('Only tests that use default Playwright context or page fixture support test_debug'));
     if (debugMode() === 'inspector')
