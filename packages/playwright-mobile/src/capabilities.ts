@@ -115,8 +115,14 @@ export function normalizeCapabilities(caps: Record<string, unknown>): AppiumCapa
   if ('platformName' in caps)
     return caps as AppiumCapabilities;
 
-  // Infer platform from keys: bundleId -> iOS, everything else -> Android.
-  const isIos = 'bundleId' in caps;
+  // Infer platform from keys and file extensions.
+  const app = typeof caps.app === 'string' ? caps.app : '';
+  const iosSignals = ('bundleId' in caps) ||
+      app.endsWith('.app') || app.endsWith('.ipa');
+  const androidSignals = ('appPackage' in caps) || ('appActivity' in caps) ||
+      app.endsWith('.apk');
+  // iOS wins only on an unambiguous iOS signal; otherwise default to Android.
+  const isIos = iosSignals && !androidSignals;
   const result: AppiumCapabilities = {
     'platformName': isIos ? 'iOS' : 'Android',
     'appium:automationName': isIos ? 'XCUITest' : 'UiAutomator2',
