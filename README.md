@@ -30,7 +30,7 @@ Key optimizations: utilsBundle split (3.1 → 1.5 MB), lazy playwright-core and 
 
 ### Bun runtime
 
-Playwright runs under Bun as a first-class runtime alongside Node. Workers are native Bun processes, so Bun APIs are available directly in tests. Upstream microsoft/playwright does not support Bun.
+Playwright runs under Bun as a first-class runtime alongside Node. Workers are native Bun processes, so Bun APIs are available directly in tests. Upstream microsoft/playwright does not officially support Bun; its workers always fork Node, so Bun APIs are unavailable in test code.
 
 **Run tests with Bun:**
 
