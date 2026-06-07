@@ -85,11 +85,11 @@ The `composeStories` CT mode compiles stories at build time and mounts them dire
 ```ts
 // playwright-ct.config.ts
 import { defineConfig } from '@playwright/experimental-ct-react';
-import { storybookCTPlugin } from '@playwright/storybook/plugin';
+import { storybookCtPlugin } from '@playwright/storybook/plugin';
 
 export default defineConfig({
-  plugins: [storybookCTPlugin({ framework: '@storybook/react' })],
+  plugins: [storybookCtPlugin()],
 });
 ```
 
-This mode is experimental and works best with React. Vue and Svelte support is planned.
+This mode is experimental and works best with React. The framework (`@storybook/react`, `@storybook/vue3`, or `@storybook/svelte`) is auto-detected from your installed dependencies.
