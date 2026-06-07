@@ -20,7 +20,7 @@ The fork is faster than upstream on Node and adds Bun as a first-class runtime. 
 |---|---|---|---|---|---|
 | Peak memory | **173 MB** | **197 MB** | 1,405 MB | 86% less | 88% less |
 | CPU time | 14.0 s | **4.1 s** | 19.7 s | 79% less | 29% less |
-| Import time | — | **0.39 s** | 0.53 s | 26% faster | — |
+| Import time | **0.17 s** | **0.39 s** | 0.53 s | 26% faster | 68% faster |
 | CLI startup | **0.33 s** | 0.85 s | 0.69 s | — | 52% faster |
 | utilsBundle | **1.5 MB** | **1.5 MB** | 3.1 MB | 52% smaller | 52% smaller |
 

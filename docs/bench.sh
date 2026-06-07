@@ -100,6 +100,10 @@ echo "--- Node fork ---"
 /usr/bin/time -f "  %es" node -e "require('$FORK_DIR/packages/playwright/lib')" 2>&1
 echo "--- Node upstream ---"
 /usr/bin/time -f "  %es" node -e "require('$UP_DIR/packages/playwright/lib')" 2>&1
+if command -v bun &>/dev/null; then
+  echo "--- Bun fork ---"
+  /usr/bin/time -f "  %es" bun -e "require('$FORK_DIR/packages/playwright/lib')" 2>&1
+fi
 echo ""
 
 echo "============================================"
