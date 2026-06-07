@@ -16,7 +16,7 @@ const MAPPING = {
   'https-proxy-agent': { default: 'httpProxyAgent', named: { HttpsProxyAgent: 'HttpsProxyAgent' } },
   'jpeg-js': { default: 'jpegjs' },
   'mime': { default: 'mime' },
-  'minimatch': { default: 'minimatch' },
+  'minimatch': { default: 'minimatch', named: { minimatch: 'minimatch' } },
   'open': { default: 'open' },
   'pngjs': { named: { PNG: 'PNG' } },
   'commander': { named: { program: 'program', Option: 'ProgramOption' } },

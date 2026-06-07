@@ -316,6 +316,8 @@ class EsbuildStep extends Step {
       sourcemap: withSourceMaps ? 'linked' : false,
       platform: 'node',
       format: 'esm',
+      target: 'node24',
+      legalComments: 'none',
       ...options,
     };
     // ESM bundles often pull in CJS deps that use `require(...)`, `__dirname`,
@@ -364,6 +366,25 @@ class EsbuildStep extends Step {
       console.log('==== Running esbuild:', this._relativeEntryPoints().join(', '));
       const start = Date.now();
       const result = await build(this._options);
+      // When emitting ESM bundles, esbuild wraps require() calls in a
+      // `__require` Proxy that checks `typeof require !== "undefined"` on
+      // every access. Since we inject `const require = createRequire(...)`
+      // in the banner, `require` is always defined and the Proxy is
+      // redundant. Replace it with a direct alias to eliminate overhead
+      // on Bun (31+ calls through the Proxy trap per bundle).
+      if (this._options.format === 'esm') {
+        for (const ep of this._options.entryPoints) {
+          const outfile = this._options.outfile || ep.replace(/\.ts$/, '.js');
+          if (fs.existsSync(outfile)) {
+            let code = fs.readFileSync(outfile, 'utf8');
+            const proxyPattern = /var __require = \/\* @__PURE__ \*\/[\s\S]*?\}\);/;
+            if (proxyPattern.test(code)) {
+              code = code.replace(proxyPattern, 'var __require = require;');
+              fs.writeFileSync(outfile, code);
+            }
+          }
+        }
+      }
       await this._writeBundleReport(result);
       console.log('==== Done in', Date.now() - start, 'ms');
     }

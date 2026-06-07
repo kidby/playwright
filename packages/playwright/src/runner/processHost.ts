@@ -24,7 +24,11 @@ import { assert } from '@isomorphic/assert';
 import { monotonicTime, timeOrigin } from '@isomorphic/time';
 import { raceAgainstDeadline } from '@isomorphic/timeoutRunner';
 
-import { flushSqliteWrites } from '../transform/cacheBackend.js';
+// Lazy-loaded to avoid eagerly inlining cacheBackend.ts into the runner bundle.
+function flushSqliteWrites() {
+  const modPath = path.join(__dirname, '..', 'transform', 'cacheBackend.js');
+  return require(modPath).flushSqliteWrites();
+}
 
 import type { ipc, processRunner } from '../common/index.js';
 
@@ -227,6 +231,10 @@ function spawnForkedChild(
     // Note: detached:false so all workers share the parent's process group —
     // Ctrl+C or `kill` shuts down the whole tree.
     detached: false,
+    // V8 structured clone is ~2-3× faster than JSON for IPC messages.
+    // Safe here because spawnForkedChild() is Node-only (Bun uses
+    // spawnBunWorker instead).
+    serialization: 'advanced',
     env: { ...process.env, ...extraEnv },
     stdio: [
       'ignore',

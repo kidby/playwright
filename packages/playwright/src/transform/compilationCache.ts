@@ -25,15 +25,31 @@ import { isUnderTest } from '@utils/debug';
 
 import { isWorkerProcess } from '../globals.js';
 import { packageRoot } from '../package.js';
-import {
-  closeCacheDb,
-  openCacheDb,
-  scheduleLegacyLayoutCleanup,
-  sqliteAddEntry,
-  sqliteGetEntry,
-  sqliteGetSourceMap,
-  useLegacyCache,
-} from './cacheBackend.js';
+
+// Lazy-loaded: cacheBackend.ts contains the SQLite wrapper (~186 lines of
+// schema code + native binding loader). By deferring the require, Bun never
+// pays the parse cost since it never calls into the transform cache.
+type CacheBackend = typeof import('./cacheBackend.js');
+let _cacheBackend: CacheBackend | undefined;
+function loadCacheBackend(): CacheBackend {
+  if (!_cacheBackend) {
+    // Compute the path at runtime so esbuild cannot statically resolve and
+    // inline the module. This keeps ~186 lines of SQLite schema/wrapper code
+    // out of every bundle that imports compilationCache.
+    // At runtime the bundle lives at lib/common/index.js, so we resolve
+    // relative to __dirname to reach lib/transform/cacheBackend.js.
+    const modPath = path.join(__dirname, '..', 'transform', 'cacheBackend.js');
+    _cacheBackend = require(modPath);
+  }
+  return _cacheBackend!;
+}
+function getUseLegacyCache() { return loadCacheBackend().useLegacyCache; }
+function closeCacheDb() { return loadCacheBackend().closeCacheDb(); }
+function openCacheDb(dir: string) { return loadCacheBackend().openCacheDb(dir); }
+function scheduleLegacyLayoutCleanup(dir: string) { return loadCacheBackend().scheduleLegacyLayoutCleanup(dir); }
+function sqliteAddEntry(...args: Parameters<CacheBackend['sqliteAddEntry']>) { return loadCacheBackend().sqliteAddEntry(...args); }
+function sqliteGetEntry(dir: string, filename: string, hash: string) { return loadCacheBackend().sqliteGetEntry(dir, filename, hash); }
+function sqliteGetSourceMap(dir: string, filename: string, hash: string) { return loadCacheBackend().sqliteGetSourceMap(dir, filename, hash); }
 
 // `code` is populated when the compiled output fits the per-entry cap, which
 // lets the warm-path lookup skip the disk read entirely. Larger files keep
@@ -102,7 +118,7 @@ const devSourceInfix = path.sep + 'playwright' + path.sep + 'packages' + path.se
 
 export function installSourceMapSupport() {
   Error.stackTraceLimit = 200;
-  if (!useLegacyCache)
+  if (!getUseLegacyCache())
     scheduleLegacyLayoutCleanup(cacheDir);
 
   sourceMapSupport.install({
@@ -182,7 +198,7 @@ export function getFromCompilationCache(filename: string, contentHash: string, m
   const cache = memoryCache.get(filename);
   if (cache?.code !== undefined)
     return { cachedCode: cache.code };
-  if (!useLegacyCache && cache?.contentHash) {
+  if (!getUseLegacyCache() && cache?.contentHash) {
     const entry = sqliteGetEntry(cacheDir, filename, cache.contentHash);
     if (entry) {
       if (entry.code.length <= MEMORY_CACHE_CODE_CAP)
@@ -190,7 +206,7 @@ export function getFromCompilationCache(filename: string, contentHash: string, m
       return { cachedCode: entry.code };
     }
   }
-  if (useLegacyCache && cache?.codePath) {
+  if (getUseLegacyCache() && cache?.codePath) {
     try {
       const cachedCode = fs.readFileSync(cache.codePath, 'utf-8');
       if (cachedCode.length <= MEMORY_CACHE_CODE_CAP)
@@ -201,7 +217,7 @@ export function getFromCompilationCache(filename: string, contentHash: string, m
     }
   }
 
-  if (useLegacyCache)
+  if (getUseLegacyCache())
     return _legacyDiskCacheLookup(filename, contentHash, moduleUrl);
   return _sqliteDiskCacheLookup(filename, contentHash, moduleUrl);
 }

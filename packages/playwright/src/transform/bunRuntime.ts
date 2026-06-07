@@ -17,10 +17,14 @@
 // Bun-runtime utilities. Bun's native loader handles `.ts`/`.tsx` (including
 // `import type` stripping) on its worker threadpool; the fork's transform
 // pipeline early-returns under Bun (see `transform.ts:installTransformIfNeeded`
-// and `:registerESMLoader`). Previously this module also registered a Bun
-// plugin to redirect `playwright(-core)/lib/*` specifiers; bench probes
-// (June 2026) showed Bun's default workspace resolver handles those paths
-// without our hook ever firing, so the plugin was removed as dead overhead.
+// and `:registerESMLoader`).
+//
+// IMPORTANT: The root tsconfig.json must NOT contain path entries like
+// `"playwright-core/lib/*" → ["./packages/playwright-core/src/*"]` because
+// Bun follows tsconfig paths at runtime and would resolve compiled-bundle
+// specifiers to the raw TypeScript sources, causing ~27× slower module
+// loading. If those entries are ever re-added for IDE support, a Bun.plugin
+// resolver must be registered here to override them.
 
 type BunGlobal = {
   pathToFileURL(path: string): URL;
@@ -35,3 +39,4 @@ export async function importUnderBun(file: string): Promise<unknown> {
   const fileUrl = Bun!.pathToFileURL(file).toString();
   return await import(fileUrl);
 }
+
