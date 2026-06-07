@@ -63,13 +63,13 @@ The @playwright/mobile package drives native apps through Appium 2 via the W3C W
 **Android test:**
 
 ```ts
-import { mobileTest as test, expect, androidCapabilities } from '@playwright/experimental-mobile';
+import { mobileTest as test, expect } from '@playwright/experimental-mobile';
 
 test.use({
-  capabilities: androidCapabilities({
+  capabilities: {
     app: 'apks/dev.apk',
     appPackage: 'com.example.dev',
-  }),
+  },
 });
 
 test('login and check the dashboard', async ({ device }) => {
@@ -83,20 +83,20 @@ test('login and check the dashboard', async ({ device }) => {
 
 ### Mobile testing - iOS
 
-iOS uses the same `mobileTest` fixture with `iosCapabilities`. Pass a Playwright device descriptor for screenshot baseline metadata.
+iOS uses the same `mobileTest` fixture. Pass a Playwright device descriptor for screenshot baseline metadata.
 
 **iOS test:**
 
 ```ts
-import { mobileTest as test, expect, iosCapabilities } from '@playwright/experimental-mobile';
+import { mobileTest as test, expect } from '@playwright/experimental-mobile';
 import { devices } from '@playwright/test';
 
 test.use({
-  capabilities: iosCapabilities({
+  capabilities: {
     app: 'apps/MyApp.app',
     bundleId: 'com.example.myapp',
     deviceName: 'iPhone 15 Sim',
-  }),
+  },
   descriptor: devices['iPhone 15'],
 });
 
@@ -113,10 +113,10 @@ test('search and screenshot', async ({ device }) => {
 Switch between native and web contexts in the same test. The device detects available WebViews and lets you use Playwright-style locators inside them.
 
 ```ts
-import { mobileTest as test, expect, androidCapabilities } from '@playwright/experimental-mobile';
+import { mobileTest as test, expect } from '@playwright/experimental-mobile';
 
 test.use({
-  capabilities: androidCapabilities({ appPackage: 'com.example.hybrid' }),
+  capabilities: { appPackage: 'com.example.hybrid' },
 });
 
 test('native to webview round trip', async ({ device }) => {
@@ -219,7 +219,7 @@ test('Button/Primary perf budget', async ({ page, mountStory, lighthouse }) => {
 ```ts
 const device = await playwright.appium.connectToCloud(
   'wss://mobile.playwright.dev',
-  androidCapabilities({ appPackage: 'com.example' }),
+  { appPackage: 'com.example' },
   { token: process.env.PLAYWRIGHT_MOBILE_TOKEN, timeout: 60_000 }
 );
 ```
