@@ -8,7 +8,7 @@ Playwright is a framework for web automation and testing. It drives Chromium, Fi
 
 ## About This Fork
 
-Tracks upstream microsoft/playwright. The fork adds Bun runtime support, native mobile testing, Storybook integration, Lighthouse audits, and performance optimizations — while keeping full compatibility with upstream Playwright tests.
+Tracks upstream microsoft/playwright. The fork adds Bun runtime support, native mobile testing, Storybook integration, Lighthouse audits, and performance optimizations while keeping full compatibility with upstream Playwright tests.
 
 ### Performance
 
@@ -56,7 +56,7 @@ test('serve a fixture with Bun', async ({ page }) => {
 });
 ```
 
-### Mobile testing — Android
+### Mobile testing - Android
 
 The @playwright/mobile package drives native apps through Appium 2 via the W3C WebDriver protocol. No selenium-webdriver or webdriverio dependency at runtime. See [packages/playwright-mobile/README.md](packages/playwright-mobile/README.md).
 
@@ -81,7 +81,7 @@ test('login and check the dashboard', async ({ device }) => {
 });
 ```
 
-### Mobile testing — iOS
+### Mobile testing - iOS
 
 iOS uses the same `mobileTest` fixture with `iosCapabilities`. Pass a Playwright device descriptor for screenshot baseline metadata.
 
@@ -108,7 +108,7 @@ test('search and screenshot', async ({ device }) => {
 });
 ```
 
-### Mobile testing — WebView hybrid apps
+### Mobile testing - WebView hybrid apps
 
 Switch between native and web contexts in the same test. The device detects available WebViews and lets you use Playwright-style locators inside them.
 
@@ -123,7 +123,7 @@ test('native to webview round trip', async ({ device }) => {
   await device.app.getByTestId('open-webview').click();
   const wv = await device.waitForWebViewContext({ title: /Checkout/ });
   await device.switchToWebViewContext(wv);
-  // Now inside the WebView — standard web locators work
+  // Now inside the WebView; standard web locators work
   await device.switchToContext(undefined); // back to native
   await expect(device.app.getByText('Order confirmed')).toBeVisible();
 });
@@ -162,7 +162,7 @@ test('Login form play function', async ({ page, mountStory }) => {
 });
 ```
 
-**Config** — point Playwright at your Storybook dev server:
+**Config** - point Playwright at your Storybook dev server:
 
 ```ts
 // playwright.config.ts
