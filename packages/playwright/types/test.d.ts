@@ -6791,9 +6791,20 @@ type Proxy = Exclude<BrowserContextOptions['proxy'], undefined>;
 type StorageState = Exclude<BrowserContextOptions['storageState'], undefined>;
 type ServiceWorkerPolicy = Exclude<BrowserContextOptions['serviceWorkers'], undefined>;
 
+export type AppiumDevice = {
+  udid?: string;
+  deviceName?: string;
+  platformVersion?: string;
+  systemPort?: number;
+  mjpegServerPort?: number;
+  wdaLocalPort?: number;
+  capabilities?: Record<string, unknown>;
+};
+
 export type AppiumConfig = {
   serverUrl?: string;
   capabilities?: Record<string, unknown>;
+  devices?: AppiumDevice[];
   autoStart?: boolean;
   command?: string;
   args?: string[];

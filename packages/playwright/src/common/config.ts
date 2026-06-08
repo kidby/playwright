@@ -42,9 +42,20 @@ export const defaultTimeout = 30000;
 export type ShardingMode = 'partition' | 'round-robin' | 'duration-round-robin';
 export const shardingModes: ShardingMode[] = ['partition', 'round-robin', 'duration-round-robin'];
 
+export type AppiumDevice = {
+  udid?: string;
+  deviceName?: string;
+  platformVersion?: string;
+  systemPort?: number;
+  mjpegServerPort?: number;
+  wdaLocalPort?: number;
+  capabilities?: Record<string, unknown>;
+};
+
 export type AppiumConfig = {
   serverUrl?: string;
   capabilities?: Record<string, unknown>;
+  devices?: AppiumDevice[];
   autoStart?: boolean;
   command?: string;
   args?: string[];

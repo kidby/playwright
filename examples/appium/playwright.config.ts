@@ -2,17 +2,23 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: './',
+  // To run on multiple emulators in parallel, set workers and list devices:
+  //   workers: 2,
+  //   use: {
+  //     appium: {
+  //       autoStart: true,
+  //       devices: [
+  //         { udid: 'emulator-5554' },
+  //         { udid: 'emulator-5556' },
+  //       ],
+  //     },
+  //   },
+  // The fixture rotates devices by workerIndex and auto-allocates per-worker
+  // systemPort (UIA2) / wdaLocalPort (XCUITest) so drivers don't collide.
   use: {
-    // Appium mobile configuration expects baseURL or other specific configs
-    // depending on your test setup.
+    appium: { autoStart: true, reuseExistingServer: true },
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    trace: 'retain-on-failure',
   },
-  projects: [
-    {
-      name: 'Android',
-      use: {
-        // Here you would define your capabilities for Playwright mobile
-        // but the actual connection happens via `appium` capabilities
-      },
-    },
-  ],
 });

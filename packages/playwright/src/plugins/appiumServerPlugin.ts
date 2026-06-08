@@ -49,6 +49,11 @@ export class AppiumServerPlugin implements TestRunnerPlugin {
   }
 
   public async setup(_config: FullConfig, configDir: string, reporter: ReporterV2) {
+    const devices = this._options.devices;
+    if (devices && devices.length > 0 && _config.workers > devices.length) {
+      const where = this._projectName ? ` (project "${this._projectName}")` : '';
+      throw new Error(`appium.devices${where} has ${devices.length} entries but workers=${_config.workers}; add devices or reduce workers.`);
+    }
     if (!this._options.autoStart)
       return;
     this._reporter = reporter;

@@ -23,9 +23,9 @@ import { mobileMatchers } from './mobileMatchers.js';
 
 import type { AppiumCapabilities } from './appiumClient.js';
 import type { DeviceDescriptor } from './nativeDevice.js';
-import type { AppiumConfig, PlaywrightTestOptions, PlaywrightWorkerOptions, TestFixture } from 'playwright/test';
+import type { AppiumConfig, AppiumDevice, PlaywrightTestOptions, PlaywrightWorkerOptions, TestFixture } from 'playwright/test';
 
-export type { AppiumConfig };
+export type { AppiumConfig, AppiumDevice };
 
 // The standard playwright worker options (screenshot/video/trace) drive
 // what the mobile fixture captures on each test. Mirrors the web flow:
@@ -233,8 +233,14 @@ export const mobileTest = base.extend<MobileFixtures & { appium: PlaywrightTestO
       device = _sessionPool.get(workerIndex)!;
       isReusedSession = true;
     } else {
-      const { normalizeCapabilities } = await import('./capabilities.js');
-      const normalizedCaps = normalizeCapabilities(capabilities);
+      const { normalizeCapabilities, mergeDeviceIntoCapabilities } = await import('./capabilities.js');
+      let normalizedCaps = normalizeCapabilities(capabilities);
+      const devices = appium?.devices;
+      if (devices && devices.length > 0) {
+        if (workerIndex < 0 || workerIndex >= devices.length)
+          throw new Error(`appium.devices has ${devices.length} entries but workerIndex=${workerIndex}; configure more devices or reduce workers.`);
+        normalizedCaps = mergeDeviceIntoCapabilities(normalizedCaps, devices[workerIndex], workerIndex);
+      }
       device = await NativeDevice.start(appiumServerUrl, normalizedCaps, { descriptor });
       if (reuseSession && workerIndex >= 0)
         _sessionPool.set(workerIndex, device);

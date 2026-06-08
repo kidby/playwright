@@ -14,9 +14,15 @@
  * limitations under the License.
  */
 
+import type { AppiumDevice } from 'playwright/test';
+
 import type { AppiumCapabilities } from './appiumClient.js';
 
 const DEFAULT_NEW_COMMAND_TIMEOUT_SEC = 240;
+
+const DEFAULT_UIA2_SYSTEM_PORT = 8200;
+const DEFAULT_UIA2_MJPEG_PORT = 7810;
+const DEFAULT_XCUITEST_WDA_PORT = 8100;
 
 export type AndroidCapabilityOptions = {
   app?: string;
@@ -142,5 +148,47 @@ export function normalizeCapabilities(caps: Record<string, unknown>): AppiumCapa
   }
 
   return result;
+}
+
+const deviceKeyMap: Record<keyof AppiumDevice, string> = {
+  udid: 'appium:udid',
+  deviceName: 'appium:deviceName',
+  platformVersion: 'appium:platformVersion',
+  systemPort: 'appium:systemPort',
+  mjpegServerPort: 'appium:mjpegServerPort',
+  wdaLocalPort: 'appium:wdaLocalPort',
+  capabilities: '',
+};
+
+export function mergeDeviceIntoCapabilities(
+  baseCaps: AppiumCapabilities,
+  device: AppiumDevice,
+  workerIndex: number,
+): AppiumCapabilities {
+  const merged: AppiumCapabilities = { ...baseCaps };
+
+  for (const [key, mappedKey] of Object.entries(deviceKeyMap)) {
+    if (key === 'capabilities')
+      continue;
+    const value = device[key as keyof AppiumDevice];
+    if (value !== undefined)
+      merged[mappedKey] = value;
+  }
+
+  const automationName = merged['appium:automationName'];
+  if (automationName === 'UiAutomator2') {
+    if (device.systemPort === undefined)
+      merged['appium:systemPort'] = DEFAULT_UIA2_SYSTEM_PORT + workerIndex;
+    if (device.mjpegServerPort === undefined)
+      merged['appium:mjpegServerPort'] = DEFAULT_UIA2_MJPEG_PORT + workerIndex;
+  } else if (automationName === 'XCUITest') {
+    if (device.wdaLocalPort === undefined)
+      merged['appium:wdaLocalPort'] = DEFAULT_XCUITEST_WDA_PORT + workerIndex;
+  }
+
+  if (device.capabilities)
+    Object.assign(merged, device.capabilities);
+
+  return merged;
 }
 

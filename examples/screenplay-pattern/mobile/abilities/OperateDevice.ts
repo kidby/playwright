@@ -1,9 +1,9 @@
-import type { AppiumClient } from '@playwright/mobile/appiumClient';
+import type { NativeDevice } from '@playwright/mobile';
 
 export class OperateDevice {
-  constructor(public readonly device: AppiumClient) {}
+  constructor(public readonly device: NativeDevice) {}
 
-  static using(device: AppiumClient): OperateDevice {
+  static using(device: NativeDevice): OperateDevice {
     return new OperateDevice(device);
   }
 }

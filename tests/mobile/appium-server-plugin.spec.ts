@@ -53,3 +53,29 @@ test('AppiumServerPlugin starts and stops successfully without unhandled rejecti
     process.off('unhandledRejection', onUnhandled);
   }
 });
+
+test('AppiumServerPlugin rejects when workers > devices.length', async ({}, testInfo) => {
+  const plugin = new AppiumServerPlugin({
+    devices: [{ udid: 'A' }, { udid: 'B' }],
+  }, 'pool-project');
+  const reporter = { onStdOut: () => {}, onStdErr: () => {} } as any;
+
+  await expect(plugin.setup({ workers: 3 } as any, testInfo.outputDir, reporter))
+      .rejects.toThrow(/devices.*has 2 entries but workers=3/);
+});
+
+test('AppiumServerPlugin passes validation when devices.length >= workers', async ({}, testInfo) => {
+  const plugin = new AppiumServerPlugin({
+    devices: [{ udid: 'A' }, { udid: 'B' }],
+    // autoStart omitted → setup returns early after validation
+  }, 'pool-ok');
+  const reporter = { onStdOut: () => {}, onStdErr: () => {} } as any;
+
+  await plugin.setup({ workers: 2 } as any, testInfo.outputDir, reporter);
+});
+
+test('AppiumServerPlugin: no devices configured — validation skipped', async ({}, testInfo) => {
+  const plugin = new AppiumServerPlugin({}, 'no-pool');
+  const reporter = { onStdOut: () => {}, onStdErr: () => {} } as any;
+  await plugin.setup({ workers: 5 } as any, testInfo.outputDir, reporter);
+});

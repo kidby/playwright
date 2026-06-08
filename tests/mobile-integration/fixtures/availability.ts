@@ -47,6 +47,17 @@ export async function isAppiumReachable(): Promise<boolean> {
   return _appiumReady;
 }
 
+export function allBootedAndroidUdids(): string[] {
+  try {
+    const out = spawnSync('adb', ['devices'], { encoding: 'utf-8', timeout: 5000 });
+    if (out.status !== 0)
+      return [];
+    return out.stdout.split('\n').slice(1)
+        .map(line => line.match(/^(\S+)\s+device\b/)?.[1])
+        .filter((u): u is string => !!u);
+  } catch { return []; }
+}
+
 export function bootedAndroidUdid(): string | undefined {
   if (_androidChecked)
     return _androidUdid;
