@@ -1,4 +1,4 @@
-# @playwright/experimental-mobile
+# @playwright/mobile
 
 Appium-driven mobile test automation for iOS and Android, exposed through a Playwright-shaped `mobileTest` fixture. Speaks W3C WebDriver classic to an Appium 2 server (default `http://127.0.0.1:4723`); no `selenium-webdriver` or `webdriverio` runtime dependency.
 
@@ -19,7 +19,7 @@ Pick `_android` when you're testing Chrome-on-Android with full CDP (network moc
 ## Quick start
 
 ```ts
-import { mobileTest as test, expect } from '@playwright/experimental-mobile';
+import { mobileTest as test, expect } from '@playwright/mobile';
 
 test.use({
   capabilities: {
@@ -83,6 +83,13 @@ device.app.byId('com.example:id/submit')
 
 Locators are lazy: they resolve to an element only when an action runs. Action surface: `click()`, `tap()`, `fill(text)`, `clear()`, `type(text)`, `check()`, `uncheck()`, `press(key)`, `scrollIntoViewIfNeeded()`, `dragTo(target)`, `focus()`, `blur()`, `screenshot()`. Property surface: `text()`, `textContent()`, `innerText()`, `inputValue()`, `getAttribute(name)`, `isVisible()`, `isDisplayed()`, `isEnabled()`, `isChecked()`, `boundingBox()`, `count()`. Composition: `first()`, `nth(i)`, `last()`, `filter(fn)`, `pollUntil(fn)`. Each action performs automatic actionability checks (waits for element to be displayed and enabled) and accepts an optional `{ timeout }` to override `device.defaultActionTimeoutMs`.
 
+#### ⚠️ Semantic differences from Playwright web
+
+While the API intentionally mirrors Playwright for web, the native backend relies on different mechanisms. Keep these divergences in mind when porting tests:
+- **Visibility is presence, not occlusion.** `isVisible()` and `toBeVisible()` mean the element is displayed and exists in the UI hierarchy. It does **not** check if the element is occluded by another view (like a modal scrim). An element under a modal may report `isVisible: true` and pass `toBeVisible()`, but attempting to `click()` it will tap the scrim instead.
+- **Actionability is displayed + enabled.** It does not perform a hit-test to ensure the element isn't covered.
+- **`getByRole` checks type, not ARIA.** It maps to the native class (e.g. `XCUIElementTypeButton`) rather than computing an ARIA role hierarchy.
+
 #### Semantic queries
 
 Platform-aware shortcuts so one test reads the same on iOS and Android. The right Appium strategy is picked from the session's `platformName`:
@@ -106,7 +113,7 @@ Chains compose with the existing `byX()` calls and with `filter() / first() / nt
 `expect.extend(mobileMatchers)` is registered when you `import` from this package, so the standard `expect` exported here understands locators and the device:
 
 ```ts
-import { mobileTest as test, expect } from '@playwright/experimental-mobile';
+import { mobileTest as test, expect } from '@playwright/mobile';
 
 test('login', async ({ device }) => {
   await expect(device.app.getByTestId('email')).toBeVisible();
@@ -219,7 +226,7 @@ Supported shorthand keys: `app`, `appPackage`, `appActivity`, `bundleId`, `devic
 For explicit control, builder functions are also available:
 
 ```ts
-import { androidCapabilities, iosCapabilities } from '@playwright/experimental-mobile';
+import { androidCapabilities, iosCapabilities } from '@playwright/mobile';
 
 androidCapabilities({ app: 'apks/dev.apk', deviceName: 'Pixel 8' })
 iosCapabilities({ bundleId: 'com.example', platformVersion: '17.4', extra: { 'appium:autoAcceptAlerts': true } })
@@ -256,7 +263,7 @@ Pass any entry from Playwright's exported `devices` map as the `descriptor` opti
 
 ```ts
 import { devices } from '@playwright/test';
-import { mobileTest as test } from '@playwright/experimental-mobile';
+import { mobileTest as test } from '@playwright/mobile';
 
 test.use({
   capabilities: { bundleId: 'com.example.dev', deviceName: 'iPhone 15 Sim' },
@@ -270,7 +277,7 @@ test('captures @3x baseline automatically', async ({ device }) => {
 });
 ```
 
-Types: `import type { DeviceDescriptor, MobileTestArgs, MobileTestOptions, Viewport } from '@playwright/experimental-mobile'`. Use `MobileTestArgs` when extending the fixture (`test.extend<MyArgs & MobileTestArgs>(…)`); use `MobileTestOptions` for the option-only shape passed to `test.use({…})`.
+Types: `import type { DeviceDescriptor, MobileTestArgs, MobileTestOptions, Viewport } from '@playwright/mobile'`. Use `MobileTestArgs` when extending the fixture (`test.extend<MyArgs & MobileTestArgs>(…)`); use `MobileTestOptions` for the option-only shape passed to `test.use({…})`.
 
 ### Smoke testing against a real Appium server
 
@@ -291,13 +298,13 @@ Without `APPIUM_TEST=1` the three tests show as skipped with a clear reason. Use
 - **Phase B handleAlert: silent-on-exhaust.** If you need an alert to be present, check explicitly via your test logic. `handleAlert` returns silently after retries because alerts may or may not appear depending on system state.
 - **Gestures use platform-specific `mobile:` extensions.** `swipe`, `longPress`, `doubleTap`, `scrollToElement`, and `pullToRefresh` use Appium's `mobile:` commands. Only `dragTo` and `blur` use the W3C Actions API. A future release may migrate all gestures to W3C Actions for cross-platform consistency.
 
-### Cloud device farm
+### Cloud device farm *(Not yet available)*
 
 Connect to a remote Playwright Cloud device farm for horizontal scaling:
 
 ```ts
 const device = await playwright.appium.connectToCloud(
-  'wss://mobile.playwright.dev',
+  'wss://[not-yet-available]',
   { appPackage: 'com.example' },
   {
     token: process.env.PLAYWRIGHT_MOBILE_TOKEN,

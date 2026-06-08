@@ -185,12 +185,16 @@ export class AppLocator {
   // `android.widget.Button` on Android. Falls back to an XPath
   // `@role='<role>'` attribute check for custom roles the type map doesn't
   // cover, matching how web Playwright resolves implicit ARIA roles.
-  getByRole(role: string): AppLocator {
+  getByRole(role: string, options?: { name?: string | RegExp }): AppLocator {
     const mapped = roleToNativeClass(role, this._platform());
-    if (mapped)
-      return this._chained({ using: 'class name', value: mapped });
-    // Fallback: look for an explicit `role` or `content-desc` attribute via XPath.
-    return this._chained({ using: 'xpath', value: `//*[@role="${role}" or @content-desc="${role}"]` });
+    let locator = mapped
+      ? this._chained({ using: 'class name', value: mapped })
+      : this._chained({ using: 'xpath', value: `//*[@role="${role}" or @content-desc="${role}"]` });
+      
+    if (options?.name !== undefined)
+      locator = locator.filter({ hasText: options.name });
+      
+    return locator;
   }
 
   // Matches the placeholder / hint text. iOS: `value` attribute on text

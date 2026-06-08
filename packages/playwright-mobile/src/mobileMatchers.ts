@@ -35,7 +35,7 @@ export type MatcherTimeoutOptions = { timeout?: number };
 // and NativeDevice-only matchers fall back to this constant. Aligns mobile
 // and web assertions in mixed specs so identical `expect().toBeVisible()`
 // calls don't time out at different windows.
-const DEFAULT_MATCHER_TIMEOUT_MS = 20_000;
+const DEFAULT_MATCHER_TIMEOUT_MS = 5000;
 
 type MatcherResult = { pass: boolean; message: () => string; name?: string; actual?: unknown; expected?: unknown };
 
@@ -56,11 +56,9 @@ type MatcherContext = {
 };
 
 // Resolution order for every matcher's timeout: explicit per-call option →
-// expect.configure({ timeout }) (this.timeout) → locator/device default
-// (passed as `undefined`, which the locator's pollUntil maps to its own
-// `actionTimeoutMs`).
-function effectiveTimeout(ctx: MatcherContext, options: { timeout?: number }): number | undefined {
-  return options.timeout ?? ctx.timeout;
+// expect.configure({ timeout }) (this.timeout) → DEFAULT_MATCHER_TIMEOUT_MS
+function effectiveTimeout(ctx: MatcherContext, options: { timeout?: number }): number {
+  return options.timeout ?? ctx.timeout ?? DEFAULT_MATCHER_TIMEOUT_MS;
 }
 
 function requireAppLocator(received: unknown, matcher: string): AppLocator {

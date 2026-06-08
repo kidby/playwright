@@ -49,6 +49,9 @@ export class Appium extends ChannelOwner<channels.AppiumChannel> {
    * the requested capabilities, then bridges the RPC connection so all
    * subsequent `AppiumDevice` / `AppLocator` calls are transparently proxied.
    *
+   * **Note on secrets**: Capabilities passed here or in `extra` should not contain
+   * sensitive credentials, as they may be logged by cloud test runners.
+   *
    * @example
    * ```ts
    * const device = await playwright.appium.connectToCloud(
@@ -71,9 +74,8 @@ export class Appium extends ChannelOwner<channels.AppiumChannel> {
     const headers: Record<string, string> = { ...options.headers };
     if (token)
       headers['Authorization'] = `Bearer ${token}`;
-    // Pass requested capabilities as a header so the orchestrator can
-    // begin device allocation before the RPC handshake completes.
-    headers['x-playwright-capabilities'] = Buffer.from(JSON.stringify(capabilities)).toString('base64');
+    // Note: capabilities are passed securely over the WebSocket in the
+    // `appium.connect` RPC call below, preventing leaks in proxy logs.
 
     log(`Connecting to ${wsEndpoint} (timeout=${timeout}ms)`);
 
