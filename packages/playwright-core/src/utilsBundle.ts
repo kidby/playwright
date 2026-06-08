@@ -83,7 +83,7 @@ export const getEastAsianWidth = getEastAsianWidthLibrary;
 export * as yazl from 'yazl';
 export * as yauzl from 'yauzl';
 
-// @ts-expect-error untyped vendored module
+// @ts-ignore -- graceful-fs types may not be resolved through Bun's node_modules layout
 import * as gracefulFsLibrary from 'graceful-fs';
 export const gracefulFs = gracefulFsLibrary;
 

@@ -32,7 +32,7 @@ export class Appium extends SdkObject {
       throw new Error('serverUrl is required to connect to Appium. Pass it explicitly or use autoStart in config.');
 
     const proxy = new MobileNetworkProxy();
-    const port = await proxy.start();
+    const port = await progress.race(proxy.start());
 
     params.capabilities = params.capabilities || {};
     params.capabilities['alwaysMatch'] = params.capabilities['alwaysMatch'] || {};
@@ -42,7 +42,7 @@ export class Appium extends SdkObject {
     // Best effort try to connect, if it's already a session we don't need to create one,
     // but the protocol connect takes capabilities. Let's just create one.
     if (params.capabilities)
-      await client.createSession(params.capabilities);
+      await progress.race(client.createSession(params.capabilities));
     
     const device = new AppiumDevice(this, client);
     device.proxy = proxy;
@@ -167,7 +167,7 @@ export class AppiumDevice extends SdkObject {
   }
 
   async request(progress: Progress, params: { method: string, path: string, body?: any }): Promise<{ result?: any }> {
-    const result = await this.client.request(params.method, params.path, params.body);
+    const result = await progress.race(this.client.request(params.method, params.path, params.body));
     return { result };
   }
 
@@ -178,7 +178,7 @@ export class AppiumDevice extends SdkObject {
       this._mjpegAbort = null;
     }
     if (this._logPollingInterval) clearInterval(this._logPollingInterval);
-    if (this.proxy) await this.proxy.stop();
-    await this.client.deleteSession();
+    if (this.proxy) await progress.race(this.proxy.stop());
+    await progress.race(this.client.deleteSession());
   }
 }

@@ -21,8 +21,8 @@ import { test, expect } from './playwright-test-fixtures.js';
 async function getSnapshotPaths(runInlineTest, testInfo, playwrightConfig, pathArgs) {
   const SEPARATOR = '==== 8< ---- ';
   const result = await runInlineTest({
-    'playwright.config.js': `
-      module.exports = ${JSON.stringify(playwrightConfig, null, 2)}
+    'playwright.config.ts': `
+      export default ${JSON.stringify(playwrightConfig, null, 2)}
     `,
     'a/b/c/d.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -122,8 +122,8 @@ test('args array should work', async ({ runInlineTest }, testInfo) => {
 
 test('arg should receive default arg', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
-    'playwright.config.js': `
-      module.exports = {
+    'playwright.config.ts': `
+      export default {
         snapshotPathTemplate: '__screenshots__/{arg}{ext}',
       }
     `,

@@ -20,7 +20,7 @@ test('globalSetup and globalTeardown should work', async ({ runInlineTest }) => 
   const result = await runInlineTest({
     'dir/playwright.config.ts': `
       import * as path from 'path';
-      module.exports = {
+      export default {
         testDir: '..',
         globalSetup: './globalSetup',
         globalTeardown: path.join(__dirname, 'globalTeardown.ts'),
@@ -28,16 +28,16 @@ test('globalSetup and globalTeardown should work', async ({ runInlineTest }) => 
       };
     `,
     'dir/globalSetup.ts': `
-      module.exports = async () => {
+      export default async () => {
         console.log('\\n%%from-global-setup');
       };
     `,
     'dir/globalTeardown.ts': `
-      module.exports = async () => {
+      export default async () => {
         console.log('\\n%%from-global-teardown');
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('should work', async ({}, testInfo) => {
         console.log('\\n%%from-test');
@@ -57,16 +57,16 @@ test('standalone globalTeardown should work', async ({ runInlineTest }) => {
   const { results, output } = await runInlineTest({
     'playwright.config.ts': `
       import * as path from 'path';
-      module.exports = {
+      export default {
         globalTeardown: './globalTeardown.ts',
       };
     `,
     'globalTeardown.ts': `
-      module.exports = async () => {
+      export default async () => {
         console.log('got my teardown');
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('should work', async ({}, testInfo) => {
       });
@@ -80,24 +80,24 @@ test('globalTeardown runs after failures', async ({ runInlineTest }) => {
   const { results, output } = await runInlineTest({
     'playwright.config.ts': `
       import * as path from 'path';
-      module.exports = {
+      export default {
         globalSetup: 'globalSetup.ts',
         globalTeardown: './globalTeardown.ts',
       };
     `,
     'globalSetup.ts': `
-      module.exports = async () => {
+      export default async () => {
         await new Promise(f => setTimeout(f, 100));
         global.value = 42;
         process.env.FOO = String(global.value);
       };
     `,
     'globalTeardown.ts': `
-      module.exports = async () => {
+      export default async () => {
         console.log('teardown=' + global.value);
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('should work', async ({}, testInfo) => {
         expect(process.env.FOO).toBe('43');
@@ -112,23 +112,23 @@ test('globalTeardown still runs when globalSetup times out', async ({ runInlineT
   const result = await runInlineTest({
     'playwright.config.ts': `
       import * as path from 'path';
-      module.exports = {
+      export default {
         globalSetup: './globalSetup.ts',
         globalTeardown: 'globalTeardown.ts',
         globalTimeout: 1000,
       };
     `,
     'globalSetup.ts': `
-      module.exports = async () => {
+      export default async () => {
         await new Promise(f => setTimeout(f, 10000));
       };
     `,
     'globalTeardown.ts': `
-      module.exports = async () => {
+      export default async () => {
         console.log('teardown=');
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('should not run', async ({}, testInfo) => {
       });
@@ -142,16 +142,16 @@ test('globalSetup should work with sync function', async ({ runInlineTest }) => 
   const { passed } = await runInlineTest({
     'playwright.config.ts': `
       import * as path from 'path';
-      module.exports = {
+      export default {
         globalSetup: './globalSetup.ts',
       };
     `,
     'globalSetup.ts': `
-      module.exports = () => {
+      export default () => {
         process.env.FOO = JSON.stringify({ foo: 'bar' });
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('should work', async ({}) => {
         const value = JSON.parse(process.env.FOO);
@@ -166,16 +166,16 @@ test('globalSetup error should prevent tests from executing', async ({ runInline
   const { passed, output } = await runInlineTest({
     'playwright.config.ts': `
       import * as path from 'path';
-      module.exports = {
+      export default {
         globalSetup: './globalSetup.ts',
       };
     `,
     'globalSetup.ts': `
-      module.exports = () => {
+      export default () => {
         throw new Error('failure in global setup!');
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('a', async ({}) => {
         console.log('this test ran');
@@ -195,14 +195,14 @@ test('globalSetup should throw when passed non-function', async ({ runInlineTest
   const { output } = await runInlineTest({
     'playwright.config.ts': `
       import * as path from 'path';
-      module.exports = {
+      export default {
         globalSetup: './globalSetup.ts',
       };
     `,
     'globalSetup.ts': `
-      module.exports = 42;
+      export default 42;
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('should work', async ({}) => {
       });
@@ -215,7 +215,7 @@ test('globalSetup should work with default export and run the returned fn', asyn
   const { output, exitCode, passed } = await runInlineTest({
     'playwright.config.ts': `
       import * as path from 'path';
-      module.exports = {
+      export default {
         globalSetup: './globalSetup.ts',
       };
     `,
@@ -230,7 +230,7 @@ test('globalSetup should work with default export and run the returned fn', asyn
       }
       export default setup;
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('should work', async ({}) => {
       });
@@ -246,18 +246,18 @@ test('globalSetup should allow requiring a package from node_modules', async ({ 
   const { results } = await runInlineTest({
     'playwright.config.ts': `
       import * as path from 'path';
-      module.exports = {
+      export default {
         globalSetup: 'my-global-setup'
       };
     `,
     'node_modules/my-global-setup/index.js': `
-      module.exports = async () => {
+      export default async () => {
         await new Promise(f => setTimeout(f, 100));
         global.value = 42;
         process.env.FOO = String(global.value);
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('should work', async ({}, testInfo) => {
         expect(process.env.FOO).toBe('42');
@@ -390,19 +390,19 @@ test('teardown after error', async ({ runInlineTest }) => {
 test('globalSetup should support multiple', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         globalSetup: ['./globalSetup1.ts','./globalSetup2.ts','./globalSetup3.ts','./globalSetup4.ts'],
         globalTeardown: ['./globalTeardown1.ts', './globalTeardown2.ts'],
       };
     `,
-    'globalSetup1.ts': `module.exports = () => { console.log('%%globalSetup1'); return () => { console.log('%%callback1'); throw new Error('kaboom'); } };`,
-    'globalSetup2.ts': `module.exports = () => console.log('%%globalSetup2');`,
-    'globalSetup3.ts': `module.exports = () => { console.log('%%globalSetup3'); return () => console.log('%%callback3'); }`,
-    'globalSetup4.ts': `module.exports = () => console.log('%%globalSetup4');`,
-    'globalTeardown1.ts': `module.exports = () => console.log('%%globalTeardown1')`,
-    'globalTeardown2.ts': `module.exports = () => { console.log('%%globalTeardown2'); throw new Error('kaboom'); }`,
+    'globalSetup1.ts': `export default () => { console.log('%%globalSetup1'); return () => { console.log('%%callback1'); throw new Error('kaboom'); } };`,
+    'globalSetup2.ts': `export default () => console.log('%%globalSetup2');`,
+    'globalSetup3.ts': `export default () => { console.log('%%globalSetup3'); return () => console.log('%%callback3'); }`,
+    'globalSetup4.ts': `export default () => console.log('%%globalSetup4');`,
+    'globalTeardown1.ts': `export default () => console.log('%%globalTeardown1')`,
+    'globalTeardown2.ts': `export default () => { console.log('%%globalTeardown2'); throw new Error('kaboom'); }`,
 
-    'a.test.js': `
+    'a.test.ts': `
       import { test } from '@playwright/test';
       test('a', () => console.log('%%test a'));
       test('b', () => console.log('%%test b'));
@@ -430,15 +430,15 @@ test('globalSetup should support multiple', async ({ runInlineTest }) => {
 test('globalTeardown runs even if callback failed', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         globalSetup: './globalSetup.ts',
         globalTeardown: './globalTeardown.ts',
       };
     `,
-    'globalSetup.ts': `module.exports = () => { console.log('%%globalSetup'); return () => { throw new Error('kaboom'); } };`,
-    'globalTeardown.ts': `module.exports = () => console.log('%%globalTeardown')`,
+    'globalSetup.ts': `export default () => { console.log('%%globalSetup'); return () => { throw new Error('kaboom'); } };`,
+    'globalTeardown.ts': `export default () => console.log('%%globalTeardown')`,
 
-    'a.test.js': `
+    'a.test.ts': `
       import { test } from '@playwright/test';
       test('a', () => console.log('%%test'));
     `,
@@ -459,7 +459,7 @@ test('globalSetup and globalTeardown should have PLAYWRIGHT_TEST=1', async ({ ru
   const result = await runInlineTest({
     'playwright.config.ts': `
       import * as path from 'path';
-      module.exports = {
+      export default {
         globalSetup: './globalSetup',
         globalTeardown: './globalTeardown',
       };
@@ -474,7 +474,7 @@ test('globalSetup and globalTeardown should have PLAYWRIGHT_TEST=1', async ({ ru
         console.log('\\n%%teardown env=' + process.env.PLAYWRIGHT_TEST);
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('should work', async ({}, testInfo) => {
         console.log('\\n%%test env=' + process.env.PLAYWRIGHT_TEST);

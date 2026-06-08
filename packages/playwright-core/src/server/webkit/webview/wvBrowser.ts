@@ -132,7 +132,7 @@ export async function connectOverRDP(progress: Progress, parent: SdkObject, para
   else if (!Object.keys(headersMap).some(key => key.toLowerCase() === 'user-agent'))
     headersMap['User-Agent'] = getUserAgent();
 
-  const transport = params.transport as ConnectOverCDPTransport | undefined;
+  const transport = params.transport as unknown as ConnectOverCDPTransport | undefined;
   const proxyBase = transport ? '' : deriveProxyBase(params.endpointURL!);
 
   const artifactsDir = params.artifactsDir ?? path.join(os.tmpdir(), 'playwright-artifacts-');

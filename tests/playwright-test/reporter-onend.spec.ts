@@ -22,14 +22,14 @@ class Reporter {
     return { status: 'passed' };
   }
 }
-module.exports = Reporter;
+export default Reporter;
 `;
 
 test('should override exit code', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'reporter.ts': reporter,
-    'playwright.config.ts': `module.exports = { reporter: './reporter' };`,
-    'a.test.js': `
+    'playwright.config.ts': `export default { reporter: './reporter' };`,
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('fail', async ({}) => {
         expect(1 + 1).toBe(3);

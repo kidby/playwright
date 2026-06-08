@@ -22,7 +22,7 @@ import { Appium, AppiumDevice } from '../../packages/playwright-core/src/server/
 import { createRootSdkObject, SdkObject } from '../../packages/playwright-core/src/server/instrumentation';
 
 class MockAppium extends Appium {
-  connect(progress: any, params: any): Promise<AppiumDevice> {
+  override connect(progress: any, params: any): Promise<AppiumDevice> {
     throw new Error('Method not implemented.');
   }
 }
@@ -35,16 +35,16 @@ class MockAppiumDevice extends AppiumDevice {
       getLogs: async () => []
     } as any);
   }
-  appLocator(chain: any[], options?: any): Promise<any> {
+  override appLocator(chain: any[], options?: any): Promise<any> {
     throw new Error('Method not implemented.');
   }
-  screenshot(progress: any, params: any): Promise<Buffer> {
+  override screenshot(progress: any, params: any): Promise<Buffer> {
     throw new Error('Method not implemented.');
   }
-  request(progress: any, params: any): Promise<{ result?: any }> {
+  override request(progress: any, params: any): Promise<{ result?: any }> {
     throw new Error('Method not implemented.');
   }
-  close(progress: any): Promise<void> {
+  override close(progress: any): Promise<void> {
     throw new Error('Method not implemented.');
   }
 }

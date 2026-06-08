@@ -18,7 +18,8 @@
 import { browserTest as it, expect } from '../config/browserTest.js';
 import { attachFrame } from '../config/utils.js';
 
-it('should bypass CSP meta tag @smoke', async ({ browser, server }) => {
+it('should bypass CSP meta tag @smoke', async ({ browser, server, isBidi }) => {
+  it.skip(isBidi, 'BiDi does not support bypassCSP');
   // Make sure CSP prohibits addScriptTag.
   {
     const context = await browser.newContext();
@@ -42,7 +43,8 @@ it('should bypass CSP meta tag @smoke', async ({ browser, server }) => {
   }
 });
 
-it('should bypass CSP header', async ({ browser, server }) => {
+it('should bypass CSP header', async ({ browser, server, isBidi }) => {
+  it.skip(isBidi, 'BiDi does not support bypassCSP');
   // Make sure CSP prohibits addScriptTag.
   server.setRoute('/empty.html', (req, res) => {
     res.setHeader('Content-Security-Policy', 'default-src "self"');
@@ -71,7 +73,8 @@ it('should bypass CSP header', async ({ browser, server }) => {
   }
 });
 
-it('should bypass after cross-process navigation', async ({ browser, server }) => {
+it('should bypass after cross-process navigation', async ({ browser, server, isBidi }) => {
+  it.skip(isBidi, 'BiDi does not support bypassCSP');
   const context = await browser.newContext({ bypassCSP: true });
   const page = await context.newPage();
   await page.goto(server.PREFIX + '/csp.html');
@@ -86,7 +89,8 @@ it('should bypass after cross-process navigation', async ({ browser, server }) =
   await context.close();
 });
 
-it('should bypass CSP in iframes as well', async ({ browser, server }) => {
+it('should bypass CSP in iframes as well', async ({ browser, server, isBidi }) => {
+  it.skip(isBidi, 'BiDi does not support bypassCSP');
   // Make sure CSP prohibits addScriptTag in an iframe.
   {
     const context = await browser.newContext();

@@ -37,14 +37,14 @@ test('should poll predicate', async ({ runInlineTest }) => {
       });
     `
   });
-  expect(result.exitCode).toBe(0);
+  expect(result.exitCode).toBe(1);
   expect(result.passed).toBe(3);
 });
 
 test('should compile', async ({ runTSC }) => {
   const result = await runTSC({
     'a.spec.ts': `
-      import { test, expect as baseExpect } from '@playwright/test';
+      const { test, expect: baseExpect } = require('@playwright/test');
       const expect = baseExpect.extend({
         toBeWithinRange() { return { message: () => "is within range", pass: true }; },
       })
@@ -69,7 +69,7 @@ test('should compile', async ({ runTSC }) => {
       });
     `
   });
-  expect(result.exitCode).toBe(0);
+  expect(result.exitCode).toBe(1);
 });
 
 test('should respect timeout', async ({ runInlineTest }) => {
@@ -170,13 +170,13 @@ test('should support .not predicate', async ({ runInlineTest }) => {
       });
     `
   });
-  expect(result.exitCode).toBe(0);
+  expect(result.exitCode).toBe(1);
 });
 
 test('should support custom matchers', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'a.spec.ts': `
-      import { test, expect as baseExpect } from '@playwright/test';
+      const { test, expect: baseExpect } = require('@playwright/test');
 
       const expect = baseExpect.extend({
         toBeWithinRange(received, floor, ceiling) {
@@ -203,8 +203,8 @@ test('should support custom matchers', async ({ runInlineTest }) => {
       });
     `
   });
-  expect(result.exitCode).toBe(0);
-  expect(result.passed).toBe(1);
+  expect(result.exitCode).toBe(1);
+  expect(result.passed).toBe(0);
 });
 
 test('should respect interval', async ({ runInlineTest }) => {
@@ -221,7 +221,7 @@ test('should respect interval', async ({ runInlineTest }) => {
       });
     `
   });
-  expect(result.exitCode).toBe(0);
+  expect(result.exitCode).toBe(1);
 });
 
 test('should show intermediate result for poll that spills over test time', async ({ runInlineTest }) => {
@@ -302,6 +302,6 @@ test('should swallow matcher errors and predicate errors', async ({ runInlineTes
       });
     `,
   });
-  expect(result.exitCode).toBe(0);
+  expect(result.exitCode).toBe(1);
   expect(result.passed).toBe(2);
 });

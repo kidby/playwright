@@ -20,7 +20,7 @@ import { lastDryRunPayload } from './dry-run-helpers.js';
 test('extracts test keys from titles, skips tests with no key', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { reporter: [['xray', { dryRun: true, testPlan: 'QE-100' }]] };
+      export default { reporter: [['xray', { dryRun: true, testPlan: 'QE-100' }]] };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';

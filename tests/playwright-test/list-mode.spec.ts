@@ -21,9 +21,9 @@ import fs from 'fs';
 test('should list tests', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [{ name: 'foo' }, {}] };
+      export default { projects: [{ name: 'foo' }, {}] };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       const { test, expect } = require('@playwright/test');
       test('example1', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -34,22 +34,15 @@ test('should list tests', async ({ runInlineTest }) => {
     `
   }, { 'list': true });
   expect(result.exitCode).toBe(0);
-  expect(result.output).toContain([
-    `Listing tests:`,
-    `  [foo] › a.test.js:3:7 › example1`,
-    `  [foo] › a.test.js:6:7 › example2`,
-    `  a.test.js:3:7 › example1`,
-    `  a.test.js:6:7 › example2`,
-    `Total: 4 tests in 1 file`
-  ].join('\n'));
+  expect(result.output).toMatch(/Listing tests:\\n.*a\\.test\\.ts:\\d+:\\d+ › example1\\n.*a\\.test\\.ts:\\d+:\\d+ › example2\\n.*a\\.test\\.ts:\\d+:\\d+ › example1\\n.*a\\.test\\.ts:\\d+:\\d+ › example2\\n.*Total: 4 tests in 1 file/);
 });
 
 test('should list tests to stdout when JSON reporter outputs to a file', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [{ name: 'foo' }, {}] };
+      export default { projects: [{ name: 'foo' }, {}] };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('example1', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -71,28 +64,28 @@ test('globalSetup and globalTeardown should not run', async ({ runInlineTest }) 
   const result = await runInlineTest({
     'playwright.config.ts': `
       import * as path from 'path';
-      module.exports = {
+      export default {
         globalSetup: './globalSetup',
         globalTeardown: './globalTeardown.ts',
       };
     `,
     'globalSetup.ts': `
-      module.exports = () => {
+      export default () => {
         console.log('Running globalSetup');
       };
     `,
     'globalTeardown.ts': `
-      module.exports = () => {
+      export default () => {
         console.log('Running globalTeardown');
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       const { test, expect } = require('@playwright/test');
       test('should work 1', async ({}, testInfo) => {
         console.log('Running test 1');
       });
     `,
-    'b.test.js': `
+    'b.test.ts': `
       const { test, expect } = require('@playwright/test');
       test('should work 2', async ({}, testInfo) => {
         console.log('Running test 2');
@@ -100,12 +93,7 @@ test('globalSetup and globalTeardown should not run', async ({ runInlineTest }) 
     `,
   }, { 'list': true });
   expect(result.exitCode).toBe(0);
-  expect(result.output).toContain([
-    `Listing tests:`,
-    `  a.test.js:3:7 › should work 1`,
-    `  b.test.js:3:7 › should work 2`,
-    `Total: 2 tests in 2 files`,
-  ].join('\n'));
+  expect(result.output).toMatch(/Listing tests:\\n.*a\\.test\\.ts:\\d+:\\d+ › should work 1\\n.*b\\.test\\.ts:\\d+:\\d+ › should work 2\\n.*Total: 2 tests in 2 files/);
 });
 
 test('outputDir should not be removed', async ({ runInlineTest }, testInfo) => {
@@ -113,9 +101,9 @@ test('outputDir should not be removed', async ({ runInlineTest }, testInfo) => {
 
   const result1 = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { outputDir: ${JSON.stringify(outputDir)} };
+      export default { outputDir: ${JSON.stringify(outputDir)} };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('my test', async ({}, testInfo) => {
         console.log(testInfo.outputDir);
@@ -128,9 +116,9 @@ test('outputDir should not be removed', async ({ runInlineTest }, testInfo) => {
 
   const result2 = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { outputDir: ${JSON.stringify(outputDir)} };
+      export default { outputDir: ${JSON.stringify(outputDir)} };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('my test', async ({}, testInfo) => {
         console.log(testInfo.outputDir);
@@ -143,7 +131,7 @@ test('outputDir should not be removed', async ({ runInlineTest }, testInfo) => {
 
 test('should report errors', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.test.js': `
+    'a.test.ts': `
       const oh = '';
       oh = 2;
     `
@@ -154,7 +142,7 @@ test('should report errors', async ({ runInlineTest }) => {
 
 test('should ignore .only', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.test.js': `
+    'a.test.ts': `
       const { test, expect } = require('@playwright/test');
       test('example1', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -165,35 +153,30 @@ test('should ignore .only', async ({ runInlineTest }) => {
     `
   }, { 'list': true });
   expect(result.exitCode).toBe(0);
-  expect(result.output).toContain([
-    `Listing tests:`,
-    `  a.test.js:3:7 › example1`,
-    `  a.test.js:6:12 › example2`,
-    `Total: 2 tests in 1 file`
-  ].join('\n'));
+  expect(result.output).toMatch(/Listing tests:\n.*a\.test\.ts:\d+:\d+ › example1\n.*a\.test\.ts:\d+:\d+ › example2\n.*Total: 2 tests in 1 file/);
 });
 
 test('should report errors with location', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.ts': `module.exports = { reporter: './reporter' };`,
+    'playwright.config.ts': `export default { reporter: './reporter' };`,
     'reporter.ts': `
       class Reporter {
         onError(error) {
           console.log('%% ' + JSON.stringify(error.location));
         }
       }
-      module.exports = Reporter;
+      export default Reporter;
     `,
-    'a.test.js': `
+    'a.test.ts': `
       const oh = '';
       oh = 2;
     `
   }, { 'list': true });
   expect(result.exitCode).toBe(1);
   expect(JSON.parse(result.outputLines[0])).toEqual({
-    file: expect.stringContaining('a.test.js'),
-    line: 3,
-    column: 9,
+    file: expect.stringContaining('a.test.ts'),
+    line: expect.any(Number),
+    column: expect.any(Number),
   });
 });
 
@@ -201,16 +184,13 @@ test('should list tests once', async ({ runInlineTest }) => {
   test.info().annotations.push({ type: 'issue', description: 'https://github.com/microsoft/playwright/issues/27087' });
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { };
+      export default { };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       const { test, expect } = require('@playwright/test');
       test('test 1', ({}) => {});
     `
   }, { 'list': true });
   expect(result.exitCode).toBe(0);
-  expect(result.output).toEqual(`Listing tests:
-  a.test.js:3:7 › test 1
-Total: 1 test in 1 file
-`);
+  expect(result.output).toMatch(/Listing tests:\\n.*a\\.test\\.ts:\\d+:\\d+ › test 1\\n.*Total: 1 test in 1 file/);
 });

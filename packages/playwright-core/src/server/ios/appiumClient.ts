@@ -186,6 +186,16 @@ export class AppiumClient {
     return typeof res.value === 'string' ? res.value : '';
   }
 
+  async getLogs(logType: string): Promise<{ level: string; message: string; timestamp?: number }[]> {
+    const res = await this._send('POST', `/session/${this._requireSession()}/log`, { type: logType });
+    return (res.value as { level: string; message: string; timestamp?: number }[]) ?? [];
+  }
+
+  async request(method: string, path: string, body?: any): Promise<any> {
+    const res = await this._send(method as 'GET' | 'POST' | 'DELETE', path, body);
+    return res.value;
+  }
+
   private _requireSession(): string {
     if (!this._sessionId)
       throw new Error('No active Appium session. Call createSession() first.');

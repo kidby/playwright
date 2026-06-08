@@ -1,11 +1,12 @@
 import { FixtureRunner } from '../../packages/playwright/src/worker/fixtureRunner';
 import * as fixtures from '../../packages/playwright/src/common/fixtures';
+import type { FixturesWithLocation } from '../../packages/playwright/src/common/config';
 
 async function run() {
   console.log('Starting FixtureRunner unit test...');
   const runner = new FixtureRunner();
   
-  const fixturesList: fixtures.FixturesWithLocation[] = [
+  const fixturesList: FixturesWithLocation[] = [
     {
       fixtures: {
         mockFixture: [async (params: any, use: any) => {
@@ -16,8 +17,8 @@ async function run() {
     }
   ];
 
-  const pool = new fixtures.FixturePool(fixturesList, (msg, loc) => {
-    console.error('Load error:', msg);
+  const pool = new fixtures.FixturePool(fixturesList, (error) => {
+    console.error('Load error:', error.message);
   });
   runner.setPool(pool);
 

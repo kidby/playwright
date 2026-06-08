@@ -267,7 +267,7 @@ export async function showHTMLReport(reportFolder: string | undefined, host: str
   // server so edits to packages/html-reporter/src/* reload live. Release
   // builds always take the static branch (the dev-server arm is DCE'd).
   // Set PW_HMR_STATIC=1 during watch to exercise the bundled output.
-  const server = (__PW_HMR__ && process.env.PW_HMR_STATIC !== '1')
+  const server = (typeof __PW_HMR__ !== 'undefined' && __PW_HMR__ && process.env.PW_HMR_STATIC !== '1')
     ? await serveHtmlReportWithHMR(folder)
     : serveFolder(folder);
   await server.start({ port, host, preferredPort: port ? undefined : 9323 });

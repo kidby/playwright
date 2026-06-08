@@ -65,8 +65,8 @@ test('should reuse browser', async ({ runInlineTest, runServer }) => {
 test('should reuse browser with special characters in the launch options', async ({ runInlineTest, runServer }) => {
   const server = await runServer();
   const result = await runInlineTest({
-    'playwright.config.js': `
-      module.exports = {
+    'playwright.config.ts': `
+      export default {
         use: {
           launchOptions: {
             env: {
@@ -111,7 +111,7 @@ test('should produce correct test steps', async ({ runInlineTest, runServer }) =
             console.log('%% onStepEnd [' + step.category + '] ' + step.title);
         }
       }
-      module.exports = Reporter;
+      export default Reporter;
     `,
     'src/a.test.ts': `
       import { test, expect } from '@playwright/test';

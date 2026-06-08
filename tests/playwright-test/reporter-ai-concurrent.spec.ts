@@ -30,7 +30,7 @@ import { test, expect } from './playwright-test-fixtures.js';
 test('logs are attributed to the correct test under workers > 1', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['ai', { outputDir: 'ai-out' }]],
         workers: 3,
       };

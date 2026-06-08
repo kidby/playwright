@@ -19,7 +19,7 @@ import { test, expect } from './playwright-test-fixtures.js';
 test('prints area buckets with pass/fail/flaky counts and percentiles', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['catalog', {
           productAreaResolver: file => ({ area: file.endsWith('billing.spec.ts') ? 'billing' : 'core' })
         }]]
@@ -48,7 +48,7 @@ test('prints area buckets with pass/fail/flaky counts and percentiles', async ({
 test('renders jira shortcut links per test', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['catalog', {
           jira: { baseUrl: 'https://example.atlassian.net/browse/' },
         }]],
@@ -66,7 +66,7 @@ test('renders jira shortcut links per test', async ({ runInlineTest }) => {
 test('linkResolver overrides jira shortcut', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['catalog', {
           jira: { baseUrl: 'https://wrong.atlassian.net/browse/' },
           linkResolver: () => ({ jira: 'https://custom.example/TICKET-1' }),
@@ -86,7 +86,7 @@ test('linkResolver overrides jira shortcut', async ({ runInlineTest }) => {
 test('sourceBaseUrl emits a source link with line anchor', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['catalog', { sourceBaseUrl: 'https://example.com/src/' }]],
       };
     `,
@@ -102,7 +102,7 @@ test('sourceBaseUrl emits a source link with line anchor', async ({ runInlineTes
 test('emits insights box and reports overall metrics', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['catalog', { showInsights: true }]],
       };
     `,
@@ -121,7 +121,7 @@ test('emits insights box and reports overall metrics', async ({ runInlineTest })
 test('inline failure block is printed under the failing test', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['catalog', { printFailuresInline: true }]],
       };
     `,

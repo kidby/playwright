@@ -4,7 +4,7 @@
   "description": "Playwright Component Testing for React",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/microsoft/playwright.git"
+    "url": "git+https://github.com/kidby/playwright.git"
   },
   "homepage": "https://playwright.dev",
   "engines": {

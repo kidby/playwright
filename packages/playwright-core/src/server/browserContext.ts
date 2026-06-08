@@ -306,7 +306,7 @@ export abstract class BrowserContext<EM extends EventMap = EventMap> extends Sdk
     return await progress.race(this._cookies(urls));
   }
 
-  private async _cookies(urls: string | string[] | undefined = []): Promise<channels.NetworkCookie[]> {
+  protected async _cookies(urls: string | string[] | undefined = []): Promise<channels.NetworkCookie[]> {
     if (urls && !Array.isArray(urls))
       urls = [urls];
     return await this.doGetCookies(urls as string[]);

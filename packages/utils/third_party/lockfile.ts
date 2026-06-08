@@ -26,7 +26,7 @@
 
 import path from 'path';
 
-// @ts-expect-error untyped vendored module
+// @ts-ignore -- graceful-fs types may not be resolved through Bun's node_modules layout
 import gracefulFs from 'graceful-fs';
 import retry from 'retry';
 import { onExit } from 'signal-exit';

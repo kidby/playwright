@@ -223,7 +223,7 @@ test('should show intermediate result for toPass that spills over test time', as
 
 test('should respect timeout in config file when timeout parameter is not passed', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.js': `module.exports = { expect: { toPass: { timeout: 100 } } }`,
+    'playwright.config.ts': `export default { expect: { toPass: { timeout: 100 } } }`,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('should fail', async () => {
@@ -243,7 +243,7 @@ test('should respect timeout in config file when timeout parameter is not passed
 
 test('should give priority to timeout parameter over timeout in config file', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.js': `module.exports = { expect: { toPass: { timeout: 100 } } }`,
+    'playwright.config.ts': `export default { expect: { toPass: { timeout: 100 } } }`,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('should fail', async () => {
@@ -263,7 +263,7 @@ test('should give priority to timeout parameter over timeout in config file', as
 
 test('should respect intervals in config file when intervals parameter is not passed', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.js': `module.exports = { expect: { toPass: { timeout: 2000, intervals: [100, 1000] } } }`,
+    'playwright.config.ts': `export default { expect: { toPass: { timeout: 2000, intervals: [100, 1000] } } }`,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('should fail', async () => {
@@ -282,7 +282,7 @@ test('should respect intervals in config file when intervals parameter is not pa
 
 test('should give priority to intervals parameter over intervals in config file', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.js': `module.exports = { expect: { toPass: { timeout: 2000, intervals: [100] } } }`,
+    'playwright.config.ts': `export default { expect: { toPass: { timeout: 2000, intervals: [100] } } }`,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('should fail', async () => {

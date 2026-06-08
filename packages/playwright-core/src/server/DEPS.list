@@ -33,3 +33,6 @@ node_modules/yazl
 [browser.ts]
 ../remote/
 ../serverRegistry.ts
+
+[appium.ts]
+./ios/

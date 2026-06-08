@@ -16,7 +16,7 @@ The Playwright trace system is a comprehensive recording and visualization frame
 ## 2. File Structure
 
 ### packages/trace/src/ - Trace Type Definitions
-Located in `/home/pfeldman/code/playwright/packages/trace/src/`
+Located in `<repo-root>/packages/trace/src/`
 
 **Key Files:**
 - **trace.ts** - Core trace event type definitions
@@ -325,7 +325,7 @@ traces-dir/
 
 ## 7. Trace Recording (tracing.ts)
 
-Located: `/home/pfeldman/code/playwright/packages/playwright-core/src/server/trace/recorder/tracing.ts`
+Located: `<repo-root>/packages/playwright-core/src/server/trace/recorder/tracing.ts`
 
 ### Tracing Class Architecture
 
@@ -431,7 +431,7 @@ type RecordingState = {
 
 ## 8. Trace Loading (traceLoader.ts)
 
-Located: `/home/pfeldman/code/playwright/packages/playwright-core/src/utils/isomorphic/trace/traceLoader.ts`
+Located: `<repo-root>/packages/playwright-core/src/utils/isomorphic/trace/traceLoader.ts`
 
 ### TraceLoaderBackend Interface
 ```typescript
@@ -496,7 +496,7 @@ type ContextEntry = {
 
 ## 9. Trace Model (traceModel.ts)
 
-Located: `/home/pfeldman/code/playwright/packages/playwright-core/src/utils/isomorphic/trace/traceModel.ts`
+Located: `<repo-root>/packages/playwright-core/src/utils/isomorphic/trace/traceModel.ts`
 
 ### TraceModel Class
 High-level data model for trace viewer:
@@ -555,7 +555,7 @@ type ActionTraceEventInContext = ActionEntry & {
 
 ## 10. Trace Modernizer (traceModernizer.ts)
 
-Located: `/home/pfeldman/code/playwright/packages/playwright-core/src/utils/isomorphic/trace/traceModernizer.ts`
+Located: `<repo-root>/packages/playwright-core/src/utils/isomorphic/trace/traceModernizer.ts`
 
 ### Version Support
 - **Latest:** Version 8
@@ -587,7 +587,7 @@ class TraceModernizer {
 
 ## 11. Trace Viewer
 
-Located: `/home/pfeldman/code/playwright/packages/trace-viewer/src/`
+Located: `<repo-root>/packages/trace-viewer/src/`
 
 ### Structure
 ```
@@ -626,7 +626,7 @@ trace-viewer/src/
 
 ## 12. CLI Commands
 
-Located: `/home/pfeldman/code/playwright/packages/playwright-core/src/cli/program.ts`
+Located: `<repo-root>/packages/playwright-core/src/cli/program.ts`
 
 ### show-trace Command
 ```bash

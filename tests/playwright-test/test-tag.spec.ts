@@ -35,12 +35,12 @@ test('should have correct tags', async ({ runInlineTest }) => {
       }
     `,
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: './reporter',
         tag: '@global',
       };
     `,
-    'stdio.spec.js': `
+    'stdio.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('no-tags', () => {
       });
@@ -95,7 +95,7 @@ test('should have correct tags', async ({ runInlineTest }) => {
 test('config.grep should work', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { grep: /@tag1/ };
+      export default { grep: /@tag1/ };
     `,
     'a.test.ts': `
       import { test, expect } from '@playwright/test';
@@ -111,7 +111,7 @@ test('config.grep should work', async ({ runInlineTest }) => {
 test('config.project.grep should work', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'p1' },
         { name: 'p2', grep: /@tag1/ }
       ] };
@@ -142,7 +142,7 @@ test('--grep should work', async ({ runInlineTest }) => {
 
 test('should enforce @ symbol', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'stdio.spec.js': `
+    'stdio.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('test1', { tag: 'foo' }, () => {
       });
@@ -170,7 +170,7 @@ test('should be included in testInfo', async ({ runInlineTest }, testInfo) => {
 test('should be included in testInfo if coming from describe or global tag', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { tag: ['@global1', '@global2'] };
+      export default { tag: ['@global1', '@global2'] };
     `,
     'a.test.ts': `
     import { test, expect } from '@playwright/test';
@@ -203,7 +203,7 @@ test('should not parse file names as tags', async ({ runInlineTest }) => {
       }
     `,
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: './reporter',
       };
     `,

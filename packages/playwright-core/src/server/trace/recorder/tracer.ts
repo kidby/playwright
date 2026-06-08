@@ -20,7 +20,7 @@ export class MobileTracer {
           queryString: [],
           headersSize: -1,
           bodySize: -1,
-          postData: event.request.postData ? { mimeType: '', text: event.request.postData } : undefined,
+          postData: event.request.postData ? { mimeType: '', text: event.request.postData, params: [] } : undefined,
         },
         response: {
           status: -1,

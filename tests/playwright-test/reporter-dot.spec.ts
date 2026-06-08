@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// @ts-ignore -- picocolors is a transitive dep, not directly installed
 import colors from 'picocolors';
 import { test, expect } from './playwright-test-fixtures.js';
 
@@ -23,7 +24,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
 
     test('render expected', async ({ runInlineTest }) => {
       const result = await runInlineTest({
-        'a.test.js': `
+        'a.test.ts': `
           import { test, expect } from '@playwright/test';
           test('one', async ({}) => {
             expect(1).toBe(1);
@@ -36,7 +37,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
 
     test('render unexpected', async ({ runInlineTest }) => {
       const result = await runInlineTest({
-        'a.test.js': `
+        'a.test.ts': `
           import { test, expect } from '@playwright/test';
           test('one', async ({}) => {
             expect(1).toBe(0);
@@ -49,7 +50,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
 
     test('render unexpected after retry', async ({ runInlineTest }) => {
       const result = await runInlineTest({
-        'a.test.js': `
+        'a.test.ts': `
           import { test, expect } from '@playwright/test';
           test('one', async ({}) => {
             expect(1).toBe(0);
@@ -64,7 +65,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
 
     test('render flaky', async ({ runInlineTest }) => {
       const result = await runInlineTest({
-        'a.test.js': `
+        'a.test.ts': `
           import { test, expect } from '@playwright/test';
           test('one', async ({}, testInfo) => {
             expect(testInfo.retry).toBe(3);
@@ -82,9 +83,9 @@ for (const useIntermediateMergeReport of [false, true] as const) {
     test('should work from config', async ({ runInlineTest }) => {
       const result = await runInlineTest({
         'playwright.config.ts': `
-          module.exports = { reporter: 'dot' };
+          export default { reporter: 'dot' };
         `,
-        'a.test.js': `
+        'a.test.ts': `
           import { test, expect } from '@playwright/test';
           test('one', async ({}) => {
             expect(1).toBe(1);
@@ -97,7 +98,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
 
     test('render 243 tests in rows by 80', async ({ runInlineTest }) => {
       const result = await runInlineTest({
-        'a.test.js': `
+        'a.test.ts': `
           import { test, expect } from '@playwright/test';
           for (let i = 0; i < 243; i++) {
             test('test' + i, () => {});

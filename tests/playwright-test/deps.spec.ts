@@ -19,7 +19,7 @@ import { test, expect } from './playwright-test-fixtures.js';
 test('should run projects with dependencies', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'A' },
           { name: 'B', dependencies: ['A'] },
@@ -41,7 +41,7 @@ test('should run projects with dependencies', async ({ runInlineTest }) => {
 test('should inherit env changes from dependencies', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'A', testMatch: '**/a.spec.ts' },
         { name: 'B', testMatch: '**/b.spec.ts', teardown: 'E' },
         { name: 'C', testMatch: '**/c.spec.ts', dependencies: ['A'] },
@@ -92,7 +92,7 @@ test('should inherit env changes from dependencies', async ({ runInlineTest }) =
 test('should not run projects with dependencies when --no-deps is passed', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'A' },
           { name: 'B', dependencies: ['A'] },
@@ -114,7 +114,7 @@ test('should not run projects with dependencies when --no-deps is passed', async
 test('should not run project if dependency failed', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'A' },
           { name: 'B', dependencies: ['A'] },
@@ -141,7 +141,7 @@ test('should not run project if dependency failed', async ({ runInlineTest }) =>
 test('should not run project if dependency failed (2)', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'A1' },
           { name: 'A2', dependencies: ['A1'] },
@@ -167,7 +167,7 @@ test('should not run project if dependency failed (2)', async ({ runInlineTest }
 test('should filter by project list, but run deps', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'A' },
         { name: 'B' },
         { name: 'C', dependencies: ['A'] },
@@ -191,7 +191,7 @@ test('should filter by project list, but run deps', async ({ runInlineTest }) =>
 test('should not filter dependency by file name', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'A' },
         { name: 'B', dependencies: ['A'] },
       ] };
@@ -207,13 +207,13 @@ test('should not filter dependency by file name', async ({ runInlineTest }) => {
   }, undefined, undefined, { additionalArgs: ['two.spec.ts'] });
   expect(result.exitCode).toBe(1);
   expect(result.failed).toBe(1);
-  expect(result.output).toContain('1) [A] › one.spec.ts:3:11 › fails');
+  expect(result.output).toContain('1) [A] › one.spec.ts:3:7 › fails');
 });
 
 test('should filter dependency by only', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'setup', testMatch: /setup.ts/ },
         { name: 'browser', dependencies: ['setup'] },
       ] };
@@ -241,7 +241,7 @@ test('should filter dependency by only', async ({ runInlineTest }) => {
 test('should filter dependency by only when running explicitly', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'setup', testMatch: /setup.ts/ },
         { name: 'browser', dependencies: ['setup'] },
       ] };
@@ -269,7 +269,7 @@ test('should filter dependency by only when running explicitly', async ({ runInl
 test('should not filter dependency by only 3', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'setup', testMatch: /setup.*.ts/ },
         { name: 'browser', dependencies: ['setup'] },
       ] };
@@ -300,7 +300,7 @@ test('should not filter dependency by only 3', async ({ runInlineTest }) => {
 test('should not report skipped dependent tests', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'setup', testMatch: /setup.ts/ },
         { name: 'browser', dependencies: ['setup'] },
       ] };
@@ -325,7 +325,7 @@ test('should not report skipped dependent tests', async ({ runInlineTest }) => {
 test('should report circular dependencies', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'A', dependencies: ['B'] },
         { name: 'B', dependencies: ['A'] },
       ] };
@@ -342,7 +342,7 @@ test('should report circular dependencies', async ({ runInlineTest }) => {
 test('should run dependency in each shard', async ({ runInlineTest }) => {
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'setup', testMatch: /setup.ts/ },
           { name: 'chromium', dependencies: ['setup'] },
@@ -385,7 +385,7 @@ test('should run dependency in each shard', async ({ runInlineTest }) => {
 test('should run setup project with zero tests', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'setup', testMatch: /not-matching/ },
           { name: 'real', dependencies: ['setup'] },
@@ -406,7 +406,7 @@ test('should run setup project with zero tests', async ({ runInlineTest }) => {
 test('should run setup project with zero tests recursively', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'A', testMatch: /a.spec/ },
           { name: 'B', testMatch: /not-matching/, dependencies: ['A'] },
@@ -434,7 +434,7 @@ test('should run setup project with zero tests recursively', async ({ runInlineT
 test('should run project with teardown', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'A', teardown: 'B' },
           { name: 'B' },
@@ -455,7 +455,7 @@ test('should run project with teardown', async ({ runInlineTest }) => {
 test('should run teardown after dependents', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'A', teardown: 'E' },
           { name: 'B', dependencies: ['A'] },
@@ -479,7 +479,7 @@ test('should run teardown after dependents', async ({ runInlineTest }) => {
 test('should run teardown after failure', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'A', teardown: 'D' },
           { name: 'B', dependencies: ['A'] },
@@ -506,7 +506,7 @@ test('should run teardown after failure', async ({ runInlineTest }) => {
 test('should complain about teardown being a dependency', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'A', teardown: 'B' },
           { name: 'B' },
@@ -525,7 +525,7 @@ test('should complain about teardown being a dependency', async ({ runInlineTest
 test('should complain about teardown having a dependency', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'A', teardown: 'B' },
           { name: 'B', dependencies: ['C'] },
@@ -544,7 +544,7 @@ test('should complain about teardown having a dependency', async ({ runInlineTes
 test('should support the same teardown used multiple times', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'A', teardown: 'D' },
           { name: 'B', teardown: 'D' },
@@ -566,7 +566,7 @@ test('should support the same teardown used multiple times', async ({ runInlineT
 test('should only apply --repeat-each to top-level', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'A' },
           { name: 'B', dependencies: ['A'] },
@@ -588,7 +588,7 @@ test('should only apply --repeat-each to top-level', async ({ runInlineTest }) =
 test('should run teardown when all projects are top-level at run point', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'setup', teardown: 'teardown' },
           { name: 'teardown' },
@@ -610,7 +610,7 @@ test('should run teardown when all projects are top-level at run point', async (
 test('should not run deps for projects filtered with grep', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'setupA', teardown: 'teardownA', testMatch: '**/hook.spec.ts' },
           { name: 'teardownA', testMatch: '**/hook.spec.ts' },
@@ -647,7 +647,7 @@ test('should not run deps for projects filtered with grep', async ({ runInlineTe
 test('should allow only in dependent', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'setup', testMatch: '**/setup.ts' },
           { name: 'project', dependencies: ['setup'] },
@@ -671,7 +671,7 @@ test('should allow only in dependent', async ({ runInlineTest }) => {
 test('should allow only in dependent (2)', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [
           { name: 'setup', testMatch: '**/setup.ts' },
           { name: 'project', dependencies: ['setup'] },

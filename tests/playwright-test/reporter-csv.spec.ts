@@ -21,7 +21,7 @@ import { test, expect } from './playwright-test-fixtures.js';
 test('csv reporter emits header + one row per test', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { reporter: [['csv', { outputFile: 'out.csv' }]] };
+      export default { reporter: [['csv', { outputFile: 'out.csv' }]] };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -45,7 +45,7 @@ test('csv reporter emits header + one row per test', async ({ runInlineTest }, t
 test('csv reporter extracts ticket id when ticketPattern matches', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['csv', { outputFile: 'out.csv', ticketPattern: '\\\\[(QE-\\\\d+)\\\\]' }]]
       };
     `,
@@ -65,7 +65,7 @@ test('csv reporter extracts ticket id when ticketPattern matches', async ({ runI
 test('csv reporter escapes commas and quotes per RFC 4180', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { reporter: [['csv', { outputFile: 'out.csv' }]] };
+      export default { reporter: [['csv', { outputFile: 'out.csv' }]] };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -82,7 +82,7 @@ test('csv reporter escapes commas and quotes per RFC 4180', async ({ runInlineTe
 test('csv reporter noHeader omits column row', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { reporter: [['csv', { outputFile: 'out.csv', noHeader: true }]] };
+      export default { reporter: [['csv', { outputFile: 'out.csv', noHeader: true }]] };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';

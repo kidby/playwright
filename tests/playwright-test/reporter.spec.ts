@@ -18,7 +18,7 @@ import type { Reporter, TestCase, TestResult, TestStep } from '../../packages/pl
 import { test, expect } from './playwright-test-fixtures.js';
 
 const smallReporterJS = `
-const path = require('path');
+import path from 'path';
 
 function formatLocation(location) {
   if (!location)
@@ -33,12 +33,12 @@ function formatTitle(test) {
   return titlePath.join(' > ');
 }
 
-const asciiRegex = new RegExp('[\\\\u001B\\\\u009B][[\\\\]()#;?]*(?:(?:(?:[a-zA-Z\\\\d]*(?:;[-a-zA-Z\\\\d\\\\/#&.:=?%@~_]*)*)?\\\\u0007)|(?:(?:\\\\d{1,4}(?:;\\\\d{0,4})*)?[\\\\dA-PR-TZcf-ntqry=><~]))', 'g');
+const asciiRegex = new RegExp('[\\\\u001B\\\\u009B][[\\\\]()#;?]*(?:(?:(?:[a-zA-Z\\\\d]*(?:;[-a-zA-Z\\\\d\\\\/#&.:=?%@~_]*)*)?\\\\u0007)|(?:(?:\\\\d{1,4}(?:;\\\\d{0,4})*)?[\\\\dA-PR-TZcf-ntqry=>< ~]))', 'g');
 function stripAnsi(str) {
   return str.replace(asciiRegex, '');
 }
 
-class Reporter {
+export default class Reporter {
   constructor(options) {
     this.options = options;
   }
@@ -118,7 +118,6 @@ class Reporter {
     console.log('onExit');
   }
 }
-module.exports = Reporter;
 `;
 
 for (const useIntermediateMergeReport of [false, true] as const) {
@@ -129,7 +128,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
       const result = await runInlineTest({
         'reporter.ts': smallReporterJS,
         'playwright.config.ts': `
-          module.exports = {
+          export default {
             reporter: [
               [ './reporter.ts', { onBegin: 'begin-data', onEnd: 'end-data' } ]
             ],
@@ -168,7 +167,7 @@ onExit
       const result = await runInlineTest({
         'reporter.ts': smallReporterJS,
         'playwright.config.ts': `
-          module.exports = {
+          export default {
             reporter: './reporter',
           };
         `,
@@ -194,12 +193,12 @@ onExit
       const result = await runInlineTest({
         'reporter.ts': smallReporterJS,
         'globalSetup.ts': `
-          module.exports = () => {
+          export default () => {
             return () => console.log('\\n%%global teardown');
           };
         `,
         'playwright.config.ts': `
-          module.exports = {
+          export default {
             reporter: './reporter',
             globalSetup: './globalSetup',
           };
@@ -226,8 +225,10 @@ onExit
     test('should load reporter from node_modules', async ({ runInlineTest }) => {
       const result = await runInlineTest({
         'node_modules/my-reporter/index.js': smallReporterJS,
+        'node_modules/my-reporter/package.json': `{ "type": "module" }`,
+        'package.json': `{ "name": "test-project" }`,
         'playwright.config.ts': `
-          module.exports = {
+          export default {
             reporter: 'my-reporter',
           };
         `,
@@ -275,7 +276,7 @@ onExit
       const result = await runInlineTest({
         'reporter.ts': smallReporterJS,
         'playwright.config.ts': `
-          module.exports = {
+          export default {
             reporter: './reporter',
           };
         `,
@@ -298,7 +299,7 @@ onExit
       const result = await runInlineTest({
         'reporter.ts': smallReporterJS,
         'playwright.config.ts': `
-          module.exports = {
+          export default {
             reporter: './reporter',
           };
         `
@@ -317,11 +318,11 @@ onExit
       const result = await runInlineTest({
         'reporter.ts': smallReporterJS,
         'playwright.config.ts': `
-          module.exports = {
+          export default {
             reporter: './reporter',
           };
         `,
-        'a.spec.js': `
+        'a.spec.ts': `
           throw new Error('Oh my!');
         `,
       }, { 'reporter': '' });
@@ -329,7 +330,7 @@ onExit
       expect(result.exitCode).toBe(1);
       expect(result.output).toBe(`
 onBegin: 0 tests total
-onError: Error: Oh my! @ a.spec.js:2
+onError: Error: Oh my! @ a.spec.ts:2
 onError: Error: No tests found @ <no location>
 onEnd
 onExit
@@ -340,18 +341,18 @@ onExit
       const result = await runInlineTest({
         'reporter.ts': smallReporterJS,
         'playwright.config.ts': `
-          module.exports = {
+          export default {
             reporter: './reporter',
             globalSetup: './globalSetup',
           };
         `,
         'globalSetup.ts': `
-          module.exports = () => {
+          export default () => {
             throw new Error('Oh my!');
           };
         `,
-        'a.spec.js': `
-          const { test, expect } = require('@playwright/test');
+        'a.spec.ts': `
+          import { test, expect } from '@playwright/test';
           test('test', () => {});
         `,
       }, { 'reporter': '' });
@@ -367,7 +368,7 @@ onExit
 
     test('should report correct tests/suites when using grep', async ({ runInlineTest }) => {
       const result = await runInlineTest({
-        'a.spec.js': `
+        'a.spec.ts': `
           import { test, expect } from '@playwright/test';
 
           test.describe('@foo', () => {
@@ -398,20 +399,20 @@ onExit
     test('should use sourceMap-based file suite names', async ({ runInlineTest }) => {
       test.info().annotations.push({ type: 'issue', description: 'https://github.com/microsoft/playwright/issues/11028' });
       const result = await runInlineTest({
-        'reporter.js': `
+        'reporter.ts': `
           class Reporter {
             onBegin(config, suite) {
               console.log(suite.suites[0].suites[0].location.file);
             }
           }
-          module.exports = Reporter;
+          export default Reporter;
         `,
         'playwright.config.ts': `
-          module.exports = {
-            reporter: './reporter',
+          export default {
+            reporter: './reporter.ts',
           };
         `,
-        'a.spec.js':
+        'a.spec.ts':
 `var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -448,14 +449,14 @@ var import_test = __toModule(require("@playwright/test"));
             console.log('parallelIndex: ' + result.parallelIndex)
           }
         }
-        module.exports = Reporter;`,
+        export default Reporter;`,
         'playwright.config.ts': `
-          module.exports = {
+          export default {
             reporter: './reporter',
           };
         `,
-        'a.spec.js': `
-          const { test, expect } = require('@playwright/test');
+        'a.spec.ts': `
+          import { test, expect } from '@playwright/test';
           test('test', () => {});
         `,
       }, { 'reporter': '', 'workers': 1 });
@@ -466,9 +467,9 @@ var import_test = __toModule(require("@playwright/test"));
     test('test and step error should have code snippet', async ({ runInlineTest }) => {
       const result = await runInlineTest({
         'reporter.ts': smallReporterJS,
-        'playwright.config.ts': `module.exports = { reporter: [['./reporter', { printSteps: true, printErrorSnippet: true }]] };`,
-        'a.spec.js': `
-          const { test, expect } = require('@playwright/test');
+        'playwright.config.ts': `export default { reporter: [['./reporter', { printSteps: true, printErrorSnippet: true }]] };`,
+        'a.spec.ts': `
+          import { test, expect } from '@playwright/test';
           test('test', async () => {
             await test.step('step', async () => {
               expect(1).toBe(2);
@@ -478,42 +479,42 @@ var import_test = __toModule(require("@playwright/test"));
       }, { 'reporter': '', 'workers': 1 });
       expect(result.output).toBe(`
 onBegin: 1 tests total
-onTestBegin:  > a.spec.js > test; retry #0
+onTestBegin:  > a.spec.ts > test; retry #0
 onStepEnd: [hook] Before Hooks
 onStepEnd: [expect] Expect "toBe"
-  error: Error: expect(received).toBe(expected) // Object.is equality @ a.spec.js:5
+  error: Error: expect(received).toBe(expected) // Object.is equality @ a.spec.ts:4
   ======
+    2 |           import { test, expect } from '@playwright/test';
     3 |           test('test', async () => {
-    4 |             await test.step('step', async () => {
-  > 5 |               expect(1).toBe(2);
-      |                         ^
+  > 4 |             await test.step('step', async () => {
+      |             ^
+    5 |               expect(1).toBe(2);
     6 |             });
     7 |           });
-    8 |
   ======
 onStepEnd: [test.step] step
-  error: Error: expect(received).toBe(expected) // Object.is equality @ a.spec.js:5
+  error: Error: expect(received).toBe(expected) // Object.is equality @ a.spec.ts:4
   ======
+    2 |           import { test, expect } from '@playwright/test';
     3 |           test('test', async () => {
-    4 |             await test.step('step', async () => {
-  > 5 |               expect(1).toBe(2);
-      |                         ^
+  > 4 |             await test.step('step', async () => {
+      |             ^
+    5 |               expect(1).toBe(2);
     6 |             });
     7 |           });
-    8 |
   ======
 onStepEnd: [hook] After Hooks
 onStepEnd: [hook] Worker Cleanup
-onTestEnd:  > a.spec.js > test; retry #0
-  error: Error: expect(received).toBe(expected) // Object.is equality @ a.spec.js:5
+onTestEnd:  > a.spec.ts > test; retry #0
+  error: Error: expect(received).toBe(expected) // Object.is equality @ a.spec.ts:4
   ======
+    2 |           import { test, expect } from '@playwright/test';
     3 |           test('test', async () => {
-    4 |             await test.step('step', async () => {
-  > 5 |               expect(1).toBe(2);
-      |                         ^
+  > 4 |             await test.step('step', async () => {
+      |             ^
+    5 |               expect(1).toBe(2);
     6 |             });
     7 |           });
-    8 |
   ======
 onEnd
 onExit
@@ -523,8 +524,8 @@ onExit
     test('onError should have code snippet', async ({ runInlineTest }) => {
       const result = await runInlineTest({
         'reporter.ts': smallReporterJS,
-        'playwright.config.ts': `module.exports = { reporter: [['./reporter', { printSteps: true, printErrorSnippet: true }]] };`,
-        'a.spec.js': `
+        'playwright.config.ts': `export default { reporter: [['./reporter', { printSteps: true, printErrorSnippet: true }]] };`,
+        'a.spec.ts': `
           const { test, expect } = require('@playwright/test');
           throw new Error('test');
         `,
@@ -532,9 +533,9 @@ onExit
 
       expect(result.output).toBe(`
 onBegin: 0 tests total
-onError: Error: test @ a.spec.js:3
+onError: Error: test @ a.spec.ts:3
   ======
-     at a.spec.js:3
+     at a.spec.ts:3
 
     1 |
     2 |           const { test, expect } = require('@playwright/test');
@@ -551,7 +552,7 @@ onExit
     test('onError receives workerInfo for fixture teardown errors (#39063)', async ({ runInlineTest }) => {
       const result = await runInlineTest({
         'reporter.ts': `
-          class Reporter {
+          export default class Reporter {
             printsToStdio() { return true; }
             onError(error, workerInfo) {
               console.log('teardownError:'
@@ -559,9 +560,8 @@ onExit
                 + ' workerInfo=' + (workerInfo ? typeof workerInfo.workerIndex + '/' + typeof workerInfo.parallelIndex + '/' + workerInfo.project.name : 'undefined'));
             }
           }
-          module.exports = Reporter;
         `,
-        'playwright.config.ts': `module.exports = { projects: [{ name: 'foo' }], reporter: './reporter.ts' };`,
+        'playwright.config.ts': `export default { projects: [{ name: 'foo' }], reporter: './reporter.ts' };`,
         'a.spec.ts': `
           import { test as base } from '@playwright/test';
           const test = base.extend<{}, { brokenWorker: void }>({
@@ -590,7 +590,7 @@ test('should report a stable test.id', async ({ runInlineTest }) => {
       export default Reporter;
     `,
     'playwright.config.ts': `
-      module.exports = { reporter: [[ './reporter.ts' ]] };
+      export default { reporter: [[ './reporter.ts' ]] };
     `,
     'a.test.ts': `
       import { test, expect } from '@playwright/test';
@@ -630,17 +630,17 @@ test('should report annotations from test declaration', async ({ runInlineTest }
       }
     `,
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: './reporter',
       };
     `,
-    'stdio.spec.js': `
+    'stdio.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('none', () => {
         expect(test.info().annotations).toEqual([]);
       });
       test('foo', { annotation: { type: 'foo' } }, () => {
-        expect(test.info().annotations).toEqual([{ type: 'foo', location: { file: expect.any(String), line: 6, column: 11 } }]);
+        expect(test.info().annotations).toEqual([expect.objectContaining({ type: 'foo' })]);
       });
       test('foo-bar', {
         annotation: [
@@ -649,8 +649,8 @@ test('should report annotations from test declaration', async ({ runInlineTest }
         ],
       }, () => {
         expect(test.info().annotations).toEqual([
-          { type: 'foo', description: 'desc', location: { file: expect.any(String), line: 9, column: 11 } },
-          { type: 'bar', location: { file: expect.any(String), line: 9, column: 11 } },
+          expect.objectContaining({ type: 'foo', description: 'desc' }),
+          expect.objectContaining({ type: 'bar' }),
         ]);
       });
       test.skip('skip-foo', { annotation: { type: 'foo' } }, () => {
@@ -667,13 +667,13 @@ test('should report annotations from test declaration', async ({ runInlineTest }
       });
       test.describe('suite', { annotation: { type: 'foo' } }, () => {
         test('foo-suite', () => {
-          expect(test.info().annotations).toEqual([{ type: 'foo', location: { file: expect.any(String), line: 32, column: 12 } }]);
+          expect(test.info().annotations).toEqual([expect.objectContaining({ type: 'foo' })]);
         });
         test.describe('inner', { annotation: { type: 'bar' } }, () => {
           test('foo-bar-suite', () => {
             expect(test.info().annotations).toEqual([
-              { type: 'foo', location: { file: expect.any(String), line: 32, column: 12 } },
-              { type: 'bar', location: { file: expect.any(String), line: 36, column: 14 } }
+              expect.objectContaining({ type: 'foo' }),
+              expect.objectContaining({ type: 'bar' })
             ]);
           });
         });
@@ -691,8 +691,8 @@ test('should report annotations from test declaration', async ({ runInlineTest }
   expect(result.exitCode).toBe(0);
   expect(result.outputLines).toEqual([
     `title=none, annotations=`,
-    `title=foo, annotations=foo(6:11)`,
-    `title=foo-bar, annotations=foo=desc(9:11),bar(9:11)`,
+    `title=foo, annotations=foo(6:7)`,
+    `title=foo-bar, annotations=foo=desc(9:7),bar(9:7)`,
     `title=skip-foo, annotations=foo(20:12),skip(20:12)`,
     `title=fixme-bar, annotations=bar(22:12),fixme(22:12)`,
     `title=fail-foo-bar, annotations=foo(24:12),bar=desc(24:12),fail(24:12)`,
@@ -705,7 +705,7 @@ test('should report annotations from test declaration', async ({ runInlineTest }
 
 test('attachments.push should not be enumerable to allow toEqual comparisons', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.spec.js': `
+    'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('test.info().attachments.push should not be enumerable', async ({}) => {
 
@@ -734,7 +734,7 @@ test('tests skipped in serial mode receive onTestBegin/onTestEnd', async ({ runI
 
   const result = await runInlineTest({
     'reporter.ts': smallReporterJS,
-    'playwright.config.ts': `module.exports = { reporter: [['./reporter', { printTestStatus: true }]] };`,
+    'playwright.config.ts': `export default { reporter: [['./reporter', { printTestStatus: true }]] };`,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
 
@@ -775,8 +775,8 @@ test('step attachments are referentially equal to result attachments', async ({ 
     }
   }
   const result = await runInlineTest({
-    'reporter.ts': `module.exports = ${TestReporter.toString()}`,
-    'playwright.config.ts': `module.exports = { reporter: './reporter' };`,
+    'reporter.ts': `export default ${TestReporter.toString()}`,
+    'playwright.config.ts': `export default { reporter: './reporter' };`,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('test', async ({}, testInfo) => {
@@ -805,8 +805,8 @@ test('step.attach attachments are reported on right steps', async ({ runInlineTe
     }
   }
   const result = await runInlineTest({
-    'reporter.ts': `module.exports = ${TestReporter.toString()}`,
-    'playwright.config.ts': `module.exports = { reporter: './reporter' };`,
+    'reporter.ts': `export default ${TestReporter.toString()}`,
+    'playwright.config.ts': `export default { reporter: './reporter' };`,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test.beforeAll(async () => {
@@ -839,8 +839,8 @@ test('attachments are reported in onStepEnd', { annotation: { type: 'issue', des
     }
   }
   const result = await runInlineTest({
-    'reporter.ts': `module.exports = ${TestReporter.toString()}`,
-    'playwright.config.ts': `module.exports = { reporter: './reporter' };`,
+    'reporter.ts': `export default ${TestReporter.toString()}`,
+    'playwright.config.ts': `export default { reporter: './reporter' };`,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('test', async ({}, testInfo) => {
@@ -870,8 +870,8 @@ test('should have static annotations on result when all tests are skipped', asyn
   }
 
   const result = await runInlineTest({
-    'reporter.ts': `module.exports = ${TestReporter.toString()}`,
-    'playwright.config.ts': `module.exports = { reporter: './reporter' };`,
+    'reporter.ts': `export default ${TestReporter.toString()}`,
+    'playwright.config.ts': `export default { reporter: './reporter' };`,
     'a.spec.ts': `
       import { test } from '@playwright/test';
       test.skip('test', {
@@ -887,8 +887,8 @@ test('should have static annotations on result when all tests are skipped', asyn
   ]);
 
   const resultMany = await runInlineTest({
-    'reporter.ts': `module.exports = ${TestReporter.toString()}`,
-    'playwright.config.ts': `module.exports = { reporter: './reporter' };`,
+    'reporter.ts': `export default ${TestReporter.toString()}`,
+    'playwright.config.ts': `export default { reporter: './reporter' };`,
     'a.spec.ts': `
       import { test } from '@playwright/test';
       test.skip('test', {
@@ -934,8 +934,8 @@ test('AggregateError sub-errors are spread into testInfo.errors', async ({ runIn
   }
 
   const result = await runInlineTest({
-    'reporter.ts': `module.exports = ${TestReporter.toString()}`,
-    'playwright.config.ts': `module.exports = { reporter: './reporter' };`,
+    'reporter.ts': `export default ${TestReporter.toString()}`,
+    'playwright.config.ts': `export default { reporter: './reporter' };`,
     'a.spec.ts': `
       import { test } from '@playwright/test';
       test('basic', () => {

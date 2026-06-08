@@ -72,7 +72,9 @@ test('it should not allow a focused test when forbid-only is used', async ({ run
     `
   });
   expect(result.exitCode).toBe(1);
-  expect(result.output).toContain(`Error: item focused with '.only' is not allowed due to the 'forbidOnly' option in 'playwright.config.ts': \"tests${path.sep}focused-test.spec.js i-am-focused\"`);
+  expect(result.output).toContain(`Error: item focused with '.only' is not allowed due to the 'forbidOnly' option in 'playwright.config.`
+  );
+  expect(result.output).toContain(`': \"tests${path.sep}focused-test.spec.js i-am-focused\"`);
   expect(result.output).toContain(`test.only('i-am-focused'`);
   expect(result.output).toContain(`tests${path.sep}focused-test.spec.js:3`);
 });
@@ -219,7 +221,7 @@ test('worker interrupt should report errors', async ({ interactWithTestRunner })
       });
     `,
   });
-  await testProcess.waitForOutput('%%SEND-SIGINT%%');
+  await testProcess.waitForOutput("%%SEND-SIGINT%%");
   process.kill(-testProcess.process.pid!, 'SIGINT');
   const { exitCode } = await testProcess.exited;
   expect(exitCode).toBe(130);
@@ -236,7 +238,7 @@ test('should not stall when workers are available', async ({ runInlineTest }) =>
   const result = await runInlineTest({
     'a.spec.js': `
       import { test, expect } from '@playwright/test';
-      const { writeFile, waitForFile } = require('./utils.js');
+      import { writeFile, waitForFile } from './utils.ts';
       test('fails-1', async ({}, testInfo) => {
         await waitForFile(testInfo, 'lockA');
         console.log('\\n%%fails-1-started');
@@ -251,7 +253,7 @@ test('should not stall when workers are available', async ({ runInlineTest }) =>
     `,
     'b.spec.js': `
       import { test, expect } from '@playwright/test';
-      const { writeFile, waitForFile } = require('./utils.js');
+      import { writeFile, waitForFile } from './utils.ts';
       test('passes-2', async ({}, testInfo) => {
         console.log('\\n%%passes-2-started');
         writeFile(testInfo, 'lockA');
@@ -260,15 +262,15 @@ test('should not stall when workers are available', async ({ runInlineTest }) =>
         console.log('\\n%%passes-2-done');
       });
     `,
-    'utils.js': `
-      const fs = require('fs');
-      const path = require('path');
+    'utils.ts': `
+      import * as fs from 'fs';
+      import * as path from 'path';
 
       function fullName(testInfo, file) {
         return path.join(testInfo.config.projects[0].outputDir, file);
       }
 
-      async function waitForFile(testInfo, file) {
+      export async function waitForFile(testInfo, file) {
         const fn = fullName(testInfo, file);
         while (true) {
           if (fs.existsSync(fn))
@@ -277,13 +279,12 @@ test('should not stall when workers are available', async ({ runInlineTest }) =>
         }
       }
 
-      function writeFile(testInfo, file) {
+      export function writeFile(testInfo, file) {
         const fn = fullName(testInfo, file);
         fs.mkdirSync(path.dirname(fn), { recursive: true });
         fs.writeFileSync(fn, '0');
       }
 
-      module.exports = { writeFile, waitForFile };
     `,
   }, { workers: 2 });
   expect(result.exitCode).toBe(1);
@@ -397,25 +398,25 @@ test('should throw in serial mode if test suites in worker are inconsistent with
   expect.soft(result.output).toContain(expectedError);
 });
 
-test('sigint should stop global setup', async ({ interactWithTestRunner }) => {
+test('sigint should stop global setup', async ({ interactWithTestRunner }, testInfo) => {
   test.skip(process.platform === 'win32', 'No sending SIGINT on Windows');
 
   const testProcess = await interactWithTestRunner({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         globalSetup: './globalSetup',
-        globalTeardown: './globalTeardown.ts',
+        globalTeardown: './globalTeardown',
       };
     `,
     'globalSetup.ts': `
-      module.exports = () => {
+      export default () => {
         console.log('Global setup');
         console.log('%%SEND-SIGINT%%');
         return new Promise(f => setTimeout(f, 30000));
       };
     `,
     'globalTeardown.ts': `
-      module.exports = () => {
+      export default () => {
         console.log('Global teardown');
       };
     `,
@@ -471,7 +472,7 @@ test('sigint should stop plugins', async ({ interactWithTestRunner }) => {
       });
     `,
   }, { 'workers': 1 });
-  await testProcess.waitForOutput('%%SEND-SIGINT%%');
+  await testProcess.waitForOutput("%%SEND-SIGINT%%");
   process.kill(-testProcess.process.pid!, 'SIGINT');
   const { exitCode } = await testProcess.exited;
   expect(exitCode).toBe(130);
@@ -519,7 +520,7 @@ test('sigint should stop plugins 2', async ({ interactWithTestRunner }) => {
       });
     `,
   }, { 'workers': 1 });
-  await testProcess.waitForOutput('%%SEND-SIGINT%%');
+  await testProcess.waitForOutput("%%SEND-SIGINT%%");
   process.kill(-testProcess.process.pid!, 'SIGINT');
   const { exitCode } = await testProcess.exited;
   expect(exitCode).toBe(130);
@@ -651,7 +652,7 @@ test('fast double SIGINT should be ignored', async ({ interactWithTestRunner }) 
       });
     `,
   });
-  await testProcess.waitForOutput('%%SEND-SIGINT%%');
+  await testProcess.waitForOutput("%%SEND-SIGINT%%");
   // Send SIGINT twice in quick succession.
   process.kill(-testProcess.process.pid!, 'SIGINT');
   process.kill(-testProcess.process.pid!, 'SIGINT');
@@ -685,7 +686,7 @@ test('slow double SIGINT should be respected', async ({ interactWithTestRunner }
       });
     `,
   });
-  await testProcess.waitForOutput('%%SEND-SIGINT%%');
+  await testProcess.waitForOutput("%%SEND-SIGINT%%");
   process.kill(-testProcess.process.pid!, 'SIGINT');
   await new Promise(f => setTimeout(f, 2000));
   process.kill(-testProcess.process.pid!, 'SIGINT');
@@ -726,7 +727,7 @@ test('slow double SIGINT should be respected in reporter.onExit', async ({ inter
       });
     `,
   }, { reporter: '' });
-  await testProcess.waitForOutput('%%SEND-SIGINT%%');
+  await testProcess.waitForOutput("%%SEND-SIGINT%%");
   process.kill(-testProcess.process.pid!, 'SIGINT');
   await new Promise(f => setTimeout(f, 2000));
   await testProcess.waitForOutput('MyReporter.onExit started');
@@ -868,15 +869,15 @@ test('should run last failed tests in a shard', async ({ runInlineTest }) => {
   expect(result1.exitCode).toBe(1);
   expect(result1.passed).toBe(1);
   expect(result1.failed).toBe(1);
-  expect(result1.output).toContain('b.spec.js:3:11 › pass-b');
-  expect(result1.output).toContain('b.spec.js:4:11 › fail-b');
+  expect(result1.output).toContain('b.spec.js:3:7 › pass-b');
+  expect(result1.output).toContain('b.spec.js:4:7 › fail-b');
 
   const result2 = await runInlineTest(workspace, { shard: '2/2' }, {}, { additionalArgs: ['--last-failed'] });
   expect(result2.exitCode).toBe(1);
   expect(result2.passed).toBe(0);
   expect(result2.failed).toBe(1);
-  expect(result2.output).not.toContain('b.spec.js:3:11 › pass-b');
-  expect(result2.output).toContain('b.spec.js:4:11 › fail-b');
+  expect(result2.output).not.toContain('b.spec.js:3:7 › pass-b');
+  expect(result2.output).toContain('b.spec.js:4:7 › fail-b');
 });
 
 test('should run last failed tests in a shard with PLAYWRIGHT_LAST_RUN_OUTPUT_FILE', async ({ runInlineTest }, testInfo) => {
@@ -906,15 +907,15 @@ test('should run last failed tests in a shard with PLAYWRIGHT_LAST_RUN_OUTPUT_FI
   expect(result1.failed).toBe(1);
   expect(fs.existsSync(customAbs)).toBe(true);
   expect(fs.existsSync(defaultLastRun)).toBe(false);
-  expect(result1.output).toContain('b.spec.js:3:11 › pass-b');
-  expect(result1.output).toContain('b.spec.js:4:11 › fail-b');
+  expect(result1.output).toContain('b.spec.js:3:7 › pass-b');
+  expect(result1.output).toContain('b.spec.js:4:7 › fail-b');
 
   const result2 = await runInlineTest(workspace, { shard: '2/2' }, env, { additionalArgs: ['--last-failed'] });
   expect(result2.exitCode).toBe(1);
   expect(result2.passed).toBe(0);
   expect(result2.failed).toBe(1);
-  expect(result2.output).not.toContain('b.spec.js:3:11 › pass-b');
-  expect(result2.output).toContain('b.spec.js:4:11 › fail-b');
+  expect(result2.output).not.toContain('b.spec.js:3:7 › pass-b');
+  expect(result2.output).toContain('b.spec.js:4:7 › fail-b');
 });
 
 test('should run last failed tests in a shard with --last-failed-file', async ({ runInlineTest }, testInfo) => {
@@ -944,13 +945,13 @@ test('should run last failed tests in a shard with --last-failed-file', async ({
   expect(result1.failed).toBe(1);
   expect(fs.existsSync(customAbs)).toBe(true);
   expect(fs.existsSync(defaultLastRun)).toBe(false);
-  expect(result1.output).toContain('b.spec.js:3:11 › pass-b');
-  expect(result1.output).toContain('b.spec.js:4:11 › fail-b');
+  expect(result1.output).toContain('b.spec.js:3:7 › pass-b');
+  expect(result1.output).toContain('b.spec.js:4:7 › fail-b');
 
   const result2 = await runInlineTest(workspace, { shard: '2/2' }, {}, { additionalArgs: lastRunArgs });
   expect(result2.exitCode).toBe(1);
   expect(result2.passed).toBe(0);
   expect(result2.failed).toBe(1);
-  expect(result2.output).not.toContain('b.spec.js:3:11 › pass-b');
-  expect(result2.output).toContain('b.spec.js:4:11 › fail-b');
+  expect(result2.output).not.toContain('b.spec.js:3:7 › pass-b');
+  expect(result2.output).toContain('b.spec.js:4:7 › fail-b');
 });

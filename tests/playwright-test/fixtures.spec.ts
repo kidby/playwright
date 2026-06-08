@@ -333,7 +333,7 @@ test('tests should be able to share worker fixtures', async ({ runInlineTest }) 
       const test = base.extend({
         worker: [ async ({}, test) => await test(global.counter++), { scope: 'worker' } ],
       });
-      module.exports = { test, expect };
+      export default { test, expect };
     `,
     'a.test.ts': `
       const { test, expect } = require('./worker.js');
@@ -589,7 +589,7 @@ test('should understand worker fixture params in overrides calling base', async 
       });
     `,
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { use: { param: 'p1' } },
         { use: { param: 'p2' } },
         { use: { param: 'p3' } },

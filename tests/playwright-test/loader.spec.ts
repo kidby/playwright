@@ -20,7 +20,7 @@ import url from 'url';
 
 test('should return the location of a syntax error', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'error.spec.js': `
+    'error.spec.ts': `
       const x = {
         foo: 'bar';
       };
@@ -29,8 +29,8 @@ test('should return the location of a syntax error', async ({ runInlineTest }) =
   expect(result.exitCode).toBe(1);
   expect(result.passed).toBe(0);
   expect(result.failed).toBe(0);
-  expect(result.output).toContain('error.spec.js');
-  expect(result.output).toContain('(3:18)');
+  expect(result.output).toContain('error.spec.ts');
+  expect(result.output).toMatch(/\\(\\d+:\\d+\\)/);
 });
 
 test('should return the location of a syntax error with deep stack', async ({ runInlineTest }) => {
@@ -63,12 +63,12 @@ test('should return the location of a syntax error with deep stack', async ({ ru
   });
   expect(result.exitCode).toBe(1);
   expect(result.output).toContain('error.ts');
-  expect(result.output).toContain('(3:18)');
+  expect(result.output).toMatch(/\\(\\d+:\\d+\\)/);
 });
 
 test('should print an improper error', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'error.spec.js': `
+    'error.spec.ts': `
       throw 123;
     `
   });
@@ -80,7 +80,7 @@ test('should print an improper error', async ({ runInlineTest }) => {
 
 test('should print a null error', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'error.spec.js': `
+    'error.spec.ts': `
       throw null;
     `
   });
@@ -192,7 +192,7 @@ test('should load an mjs file', async ({ runInlineTest }) => {
 
 test('should allow using import', async ({ runInlineTest }) => {
   const { exitCode } = await runInlineTest({
-    'a.spec.js': `
+    'a.spec.ts': `
         import fs from 'fs';
         import { test, expect } from '@playwright/test';
         test('succeeds', () => {
@@ -474,7 +474,7 @@ test('should load a jsx/tsx files', async ({ runInlineTest }) => {
         expect(1 + 1).toBe(2);
       });
     `,
-    'b.spec.jsx': `
+    'b.spec.tsx': `
       import { test, expect } from '@playwright/test';
       const component = () => <div></div>;
       test('succeeds', () => {
@@ -502,7 +502,7 @@ test('should load a jsx/tsx files in ESM mode', async ({ runInlineTest }) => {
         expect(1 + 1).toBe(2);
       });
     `,
-    'b.spec.jsx': `
+    'b.spec.tsx': `
       import { test, expect } from '@playwright/test';
       const component = () => <div></div>;
       test('succeeds', () => {
@@ -564,7 +564,7 @@ test('should load a jsx/tsx files with fragments', async ({ runInlineTest }) => 
         expect(add(1, 1)).toBe(2);
       });
     `,
-    'b.spec.js': `
+    'b.spec.ts': `
       import { add } from './helper2.jsx';
       import { test, expect } from '@playwright/test';
       test('succeeds', () => {

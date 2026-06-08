@@ -67,11 +67,11 @@ class LocationReporter implements ReporterV2 {
 
 test('--pause should pause at end', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'location-reporter.js': `export default ${LocationReporter}`,
-    'playwright.config.js': `
-      module.exports = { reporter: './location-reporter.js' };
+    'location-reporter.ts': `export default ${LocationReporter}`,
+    'playwright.config.ts': `
+      export default { reporter: './location-reporter.ts' };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', () => {
       });
@@ -89,22 +89,22 @@ test('--pause should pause at end', async ({ runInlineTest }) => {
 
 test('--pause should pause at end with setup project', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'location-reporter.js': `export default ${LocationReporter}`,
-    'playwright.config.js': `
-      module.exports = {
-        reporter: './location-reporter.js',
+    'location-reporter.ts': `export default ${LocationReporter}`,
+    'playwright.config.ts': `
+      export default {
+        reporter: './location-reporter.ts',
         projects: [
           { name: 'setup', testMatch: /setup\\.test\\.js/ },
           { name: 'main', dependencies: ['setup'] }
         ]
       };
     `,
-    'setup.test.js': `
+    'setup.test.ts': `
       import { test } from '@playwright/test';
       test('setup', () => {
       });
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', () => {
         console.log('main test started');
@@ -116,11 +116,11 @@ test('--pause should pause at end with setup project', async ({ runInlineTest })
 
 test('--pause should pause on error', async ({ runInlineTest, mergeReports }) => {
   const result = await runInlineTest({
-    'location-reporter.js': `export default ${LocationReporter}`,
-    'playwright.config.js': `
-      module.exports = { reporter: [['./location-reporter.js'], ['blob']] };
+    'location-reporter.ts': `export default ${LocationReporter}`,
+    'playwright.config.ts': `
+      export default { reporter: [['./location-reporter.ts'], ['blob']] };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', () => {
         expect.soft(1).toBe(2);
@@ -130,28 +130,28 @@ test('--pause should pause on error', async ({ runInlineTest, mergeReports }) =>
     `
   }, {}, { PWPAUSE: '1' });
   expect(result.outputLines).toEqual([
-    'onTestPaused on error at :4:24',
-    'result.errors[0] at :4:24',
-    'result.errors[1] at :5:19',
+    'onTestPaused on error at :3:17',
+    'result.errors[0] at :3:17',
+    'result.errors[1] at :4:12',
     'onTestEnd',
   ]);
 
-  const merged = await mergeReports('blob-report', undefined, { additionalArgs: ['--reporter', 'location-reporter.js'] });
+  const merged = await mergeReports('blob-report', undefined, { additionalArgs: ['--reporter', 'location-reporter.ts'] });
   expect(merged.outputLines, 'merge reporter doesnt get onTestPaused').toEqual([
     'onTestEnd',
-    'result.errors[0] at :4:24',
-    'result.errors[1] at :5:19',
+    'result.errors[0] at :3:17',
+    'result.errors[1] at :4:12',
   ]);
 });
 
 test('SIGINT after pause at end should still run teardown', async ({ runInlineTest }) => {
   test.skip(process.platform === 'win32', 'no SIGINT on windows');
   const result = await runInlineTest({
-    'location-reporter.js': `export default ${LocationReporter}`,
-    'playwright.config.js': `
-      module.exports = { reporter: './location-reporter.js' };
+    'location-reporter.ts': `export default ${LocationReporter}`,
+    'playwright.config.ts': `
+      export default { reporter: './location-reporter.ts' };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', () => {
       });
@@ -171,11 +171,11 @@ test('SIGINT after pause at end should still run teardown', async ({ runInlineTe
 test('SIGINT after pause on error should still run teardown', async ({ runInlineTest }) => {
   test.skip(process.platform === 'win32', 'no SIGINT on windows');
   const result = await runInlineTest({
-    'location-reporter.js': `export default ${LocationReporter}`,
-    'playwright.config.js': `
-      module.exports = { reporter: './location-reporter.js' };
+    'location-reporter.ts': `export default ${LocationReporter}`,
+    'playwright.config.ts': `
+      export default { reporter: './location-reporter.ts' };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', () => {
         expect(2).toBe(3);
@@ -187,8 +187,8 @@ test('SIGINT after pause on error should still run teardown', async ({ runInline
     `
   }, {}, { PWPAUSE: '1', SIGINT_AFTER_PAUSE: '1' });
   expect(result.outputLines).toEqual([
-    'onTestPaused on error at :4:19',
-    'result.errors[0] at :4:19',
+    'onTestPaused on error at :3:12',
+    'result.errors[0] at :3:12',
     'SIGINT',
     'teardown',
     'onTestEnd',

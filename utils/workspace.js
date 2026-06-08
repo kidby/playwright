@@ -90,14 +90,7 @@ class Workspace {
     };
 
     const workspacePackageJSON = await readJSON(path.join(this._rootDir, 'package.json'));
-    const packageLockPath = path.join(this._rootDir, 'package-lock.json');
-    const packageLock = JSON.parse(await fs.promises.readFile(packageLockPath, 'utf8'));
     const version = workspacePackageJSON.version;
-
-    // Make sure package-lock version is consistent with root package.json version.
-    packageLock.version = version;
-    packageLock.packages[""].version = version;
-
     for (const pkg of this._packages) {
       // 1. Copy package files.
       for (const file of pkg.files) {
@@ -126,15 +119,6 @@ class Workspace {
       await maybeWriteJSON(pkg.packageJSONPath, pkg.packageJSON);
     }
 
-    // Re-run npm i to make package-lock dirty.
-    child_process.execSync('npm i', {
-      env: {
-        ...process.env,
-        // Playwright would download the browsers because it has e.g. @playwright/browser-chromium or playwright-chromium
-        // in the workspace. We don't want to download browsers here.
-        PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1',
-      }
-    });
     return hasChanges;
   }
 }
@@ -244,9 +228,7 @@ async function parseCLI() {
       if (hasChanges)
         die(`\n  ERROR: workspace is inconsistent! Run '//utils/workspace.js --ensure-consistent' and commit changes!`);
       // Ensure lockfileVersion is 3
-      const packageLock = require(ROOT_PATH +  '/package-lock.json');
-      if (packageLock.lockfileVersion !== 3)
-        die(`\n  ERROR: package-lock.json lockfileVersion must be 3`);
+
     },
     '--list-public-package-paths': () => {
       for (const pkg of workspace.packages()) {

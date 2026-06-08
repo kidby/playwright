@@ -59,7 +59,7 @@ When the root cause is confirmed:
 3. Explain *why* the change breaks the user's case (don't just point at the diff).
 4. Propose and verify a minimal fix by patching the bad install in place.
 
-Post the writeup as a comment on the original issue with `gh issue comment <number> --repo microsoft/playwright --body "$(cat <<'EOF' ... EOF)"`.
+Post the writeup as a comment on the original issue with `gh issue comment <number> --repo kidby/playwright --body "$(cat <<'EOF' ... EOF)"`.
 
 ## Pitfalls
 

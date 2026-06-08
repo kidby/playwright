@@ -40,8 +40,8 @@ test('should fail to screenshot a page with infinite animation', async ({ runInl
         },
       },
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await page.goto('${infiniteAnimationURL}');
         await expect(page).toHaveScreenshot({ timeout: 2000 });
@@ -56,15 +56,15 @@ test('should fail to screenshot a page with infinite animation', async ({ runInl
   expect(fs.existsSync(testInfo.outputPath('test-results', 'a-is-a-test', 'is-a-test-1-expected.png'))).toBe(false);
   expect(fs.existsSync(testInfo.outputPath('test-results', 'a-is-a-test', 'is-a-test-1-previous.png'))).toBe(true);
   expect(fs.existsSync(testInfo.outputPath('test-results', 'a-is-a-test', 'is-a-test-1-diff.png'))).toBe(true);
-  expect(fs.existsSync(testInfo.outputPath('a.spec.js-snapshots', 'is-a-test-1.png'))).toBe(false);
+  expect(fs.existsSync(testInfo.outputPath('a.spec.ts-snapshots', 'is-a-test-1.png'))).toBe(false);
 });
 
 test('should disable animations by default', async ({ runInlineTest }, testInfo) => {
   const cssTransitionURL = pathToFileURL(path.join(__dirname, '../assets/css-transition.html'));
   const result = await runInlineTest({
     ...playwrightConfig({}),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await page.goto('${cssTransitionURL}');
         await expect(page).toHaveScreenshot({ timeout: 2000 });
@@ -80,8 +80,8 @@ test('should not retry missing expectation errors', async ({ runInlineTest }, te
     ...playwrightConfig({
       retries: 2,
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await page.goto('${cssTransitionURL}');
         await expect(page).toHaveScreenshot('foo.png', { timeout: 1000 });
@@ -101,8 +101,8 @@ test('should not retry serial mode suites with missing expectation errors', asyn
     ...playwrightConfig({
       retries: 2,
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test.describe.serial('outer', () => {
         test('last', async ({ page }) => {
         });
@@ -135,8 +135,8 @@ test('should respect toHaveScreenshot timeout from config', async ({ runInlineTe
         },
       },
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await page.goto('${infiniteAnimationURL}');
         await expect(page).toHaveScreenshot();
@@ -159,8 +159,8 @@ test('should let toHaveScreenshot call options override config timeout', async (
         },
       },
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await page.goto('${infiniteAnimationURL}');
         await expect(page).toHaveScreenshot({ timeout: 2000 });
@@ -179,8 +179,8 @@ test.describe('expect config animations option', () => {
       ...playwrightConfig({
         expect: { toHaveScreenshot: { animations: 'disabled' } },
       }),
-      'a.spec.js': `
-        const { test, expect } = require('@playwright/test');
+      'a.spec.ts': `
+        import { test, expect } from '@playwright/test';
         test('is a test', async ({ page }) => {
           await page.goto('${cssTransitionURL}');
           await expect(page).toHaveScreenshot({ timeout: 2000 });
@@ -196,8 +196,8 @@ test.describe('expect config animations option', () => {
       ...playwrightConfig({
         expect: { toHaveScreenshot: { animations: 'allow' } },
       }),
-      'a.spec.js': `
-        const { test, expect } = require('@playwright/test');
+      'a.spec.ts': `
+        import { test, expect } from '@playwright/test';
         test('is a test', async ({ page }) => {
           await page.goto('${cssTransitionURL}');
           await expect(page).toHaveScreenshot({ timeout: 2000 });
@@ -216,8 +216,8 @@ test('should fail with proper error when unsupported argument is given', async (
   const cssTransitionURL = pathToFileURL(path.join(__dirname, '../assets/css-transition.html'));
   const result = await runInlineTest({
     ...playwrightConfig({}),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await page.goto('${cssTransitionURL}');
         await expect(page).toHaveScreenshot({
@@ -241,8 +241,8 @@ test('should have scale:css by default', async ({ runInlineTest }, testInfo) => 
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ browser }) => {
         const context = await browser.newContext({
           viewport: { width: ${IMG_WIDTH}, height: ${IMG_HEIGHT} },
@@ -256,7 +256,7 @@ test('should have scale:css by default', async ({ runInlineTest }, testInfo) => 
   }, { 'update-snapshots': true });
   expect(result.exitCode).toBe(0);
 
-  const snapshotOutputPath = testInfo.outputPath('__screenshots__', 'a.spec.js', 'snapshot.png');
+  const snapshotOutputPath = testInfo.outputPath('__screenshots__', 'a.spec.ts', 'snapshot.png');
   expect(comparePNGs(fs.readFileSync(snapshotOutputPath), whiteImage)).toBe(null);
 });
 
@@ -270,8 +270,8 @@ test('should ignore non-documented options in toHaveScreenshot config', async ({
         },
       },
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png');
       });
@@ -279,7 +279,7 @@ test('should ignore non-documented options in toHaveScreenshot config', async ({
   }, { 'update-snapshots': true });
   expect(result.exitCode).toBe(0);
 
-  const snapshotOutputPath = testInfo.outputPath('__screenshots__', 'a.spec.js', 'snapshot.png');
+  const snapshotOutputPath = testInfo.outputPath('__screenshots__', 'a.spec.ts', 'snapshot.png');
   expect(comparePNGs(fs.readFileSync(snapshotOutputPath), whiteImage)).toBe(null);
 });
 
@@ -291,11 +291,11 @@ test('should report toHaveScreenshot step with expectation name in title', async
           console.log('%% end [' + step.category + '] ' + step.title);
         }
       }
-      module.exports = Reporter;
+      export default Reporter;
     `,
     ...playwrightConfig({ reporter: './reporter' }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         // Named expectation.
         await expect(page).toHaveScreenshot('foo.png', { timeout: 2000 });
@@ -328,9 +328,9 @@ test('should not fail when racing with navigation', async ({ runInlineTest }, te
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': createImage(10, 10, 255, 0, 0),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': createImage(10, 10, 255, 0, 0),
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await Promise.all([
           page.goto('${infiniteAnimationURL}'),
@@ -352,8 +352,8 @@ test('should successfully screenshot a page with infinite animation with disable
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await page.goto('${infiniteAnimationURL}');
         await expect(page).toHaveScreenshot({
@@ -363,7 +363,7 @@ test('should successfully screenshot a page with infinite animation with disable
     `
   }, { 'update-snapshots': true });
   expect(result.exitCode).toBe(0);
-  expect(fs.existsSync(testInfo.outputPath('__screenshots__', 'a.spec.js', 'is-a-test-1.png'))).toBe(true);
+  expect(fs.existsSync(testInfo.outputPath('__screenshots__', 'a.spec.ts', 'is-a-test-1.png'))).toBe(true);
 });
 
 test('should support clip option for page', async ({ runInlineTest }, testInfo) => {
@@ -371,9 +371,9 @@ test('should support clip option for page', async ({ runInlineTest }, testInfo) 
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': createImage(50, 50, 255, 255, 255),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': createImage(50, 50, 255, 255, 255),
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot({
           name: 'snapshot.png',
@@ -391,8 +391,8 @@ test('should support omitBackground option for locator', async ({ runInlineTest 
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await page.evaluate(() => {
           document.body.style.setProperty('width', '100px');
@@ -406,7 +406,7 @@ test('should support omitBackground option for locator', async ({ runInlineTest 
     `
   }, { 'update-snapshots': true });
   expect(result.exitCode).toBe(0);
-  const snapshotPath = testInfo.outputPath('__screenshots__', 'a.spec.js', 'snapshot.png');
+  const snapshotPath = testInfo.outputPath('__screenshots__', 'a.spec.ts', 'snapshot.png');
   expect(fs.existsSync(snapshotPath)).toBe(true);
   const png = PNG.sync.read(fs.readFileSync(snapshotPath));
   expect.soft(png.width, 'image width must be 100').toBe(100);
@@ -430,8 +430,8 @@ test('should fail to screenshot an element with infinite animation', async ({ ru
         },
       }],
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await page.goto('${infiniteAnimationURL}');
         await expect(page.locator('body')).toHaveScreenshot({ timeout: 2000 });
@@ -445,7 +445,7 @@ test('should fail to screenshot an element with infinite animation', async ({ ru
   expect(fs.existsSync(testInfo.outputPath('test-results', 'a-is-a-test', 'is-a-test-1-actual.png'))).toBe(true);
   expect(fs.existsSync(testInfo.outputPath('test-results', 'a-is-a-test', 'is-a-test-1-expected.png'))).toBe(false);
   expect(fs.existsSync(testInfo.outputPath('test-results', 'a-is-a-test', 'is-a-test-1-diff.png'))).toBe(true);
-  expect(fs.existsSync(testInfo.outputPath('__screenshots__', 'a.spec.js', 'is-a-test-1.png'))).toBe(false);
+  expect(fs.existsSync(testInfo.outputPath('__screenshots__', 'a.spec.ts', 'is-a-test-1.png'))).toBe(false);
 });
 
 test('should fail to screenshot an element that keeps moving', async ({ runInlineTest }, testInfo) => {
@@ -459,8 +459,8 @@ test('should fail to screenshot an element that keeps moving', async ({ runInlin
         },
       },
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await page.goto('${infiniteAnimationURL}');
         await expect(page.locator('div')).toHaveScreenshot({ timeout: 2000 });
@@ -473,7 +473,7 @@ test('should fail to screenshot an element that keeps moving', async ({ runInlin
   expect(fs.existsSync(testInfo.outputPath('test-results', 'a-is-a-test', 'is-a-test-1-actual.png'))).toBe(false);
   expect(fs.existsSync(testInfo.outputPath('test-results', 'a-is-a-test', 'is-a-test-1-expected.png'))).toBe(false);
   expect(fs.existsSync(testInfo.outputPath('test-results', 'a-is-a-test', 'is-a-test-1-diff.png'))).toBe(false);
-  expect(fs.existsSync(testInfo.outputPath('__screenshots__', 'a.spec.js', 'is-a-test-1.png'))).toBe(false);
+  expect(fs.existsSync(testInfo.outputPath('__screenshots__', 'a.spec.ts', 'is-a-test-1.png'))).toBe(false);
 });
 
 test('should generate default name', async ({ runInlineTest }, testInfo) => {
@@ -481,8 +481,8 @@ test('should generate default name', async ({ runInlineTest }, testInfo) => {
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot();
       });
@@ -490,7 +490,7 @@ test('should generate default name', async ({ runInlineTest }, testInfo) => {
   });
   expect(result.exitCode).toBe(1);
   expect(fs.existsSync(testInfo.outputPath('test-results', 'a-is-a-test', 'is-a-test-1-actual.png'))).toBe(true);
-  expect(fs.existsSync(testInfo.outputPath('__screenshots__', 'a.spec.js', 'is-a-test-1.png'))).toBe(true);
+  expect(fs.existsSync(testInfo.outputPath('__screenshots__', 'a.spec.ts', 'is-a-test-1.png'))).toBe(true);
 });
 
 test('should compile with different option combinations', async ({ runTSC }) => {
@@ -540,9 +540,9 @@ test('should fail when screenshot is different size', async ({ runInlineTest }) 
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': createImage(22, 33),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': createImage(22, 33),
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png', { timeout: 2000 });
       });
@@ -559,8 +559,8 @@ test('should fail when given non-png snapshot name', async ({ runInlineTest }) =
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.jpeg');
       });
@@ -573,8 +573,8 @@ test('should fail when given non-png snapshot name', async ({ runInlineTest }) =
 test('should fail when given buffer', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     ...playwrightConfig({}),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(Buffer.from([1])).toHaveScreenshot();
       });
@@ -589,9 +589,9 @@ test('should fail when screenshot is different pixels', async ({ runInlineTest }
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': paintBlackPixels(whiteImage, 12345),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': paintBlackPixels(whiteImage, 12345),
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png', { timeout: 2000 });
       });
@@ -611,9 +611,9 @@ test('doesn\'t create comparison artifacts in an output folder for passed negate
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': blueImage,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': blueImage,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).not.toHaveScreenshot('snapshot.png');
       });
@@ -635,9 +635,9 @@ test('should fail on same snapshots with negate matcher', async ({ runInlineTest
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': whiteImage,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': whiteImage,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).not.toHaveScreenshot('snapshot.png', { timeout: 2000 });
       });
@@ -654,9 +654,9 @@ test('should not fail if --ignore-snapshots is passed', async ({ runInlineTest }
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': redImage,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': redImage,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png', { timeout: 2000 });
       });
@@ -671,8 +671,8 @@ test('should write missing expectations locally twice and attach them', async ({
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png');
         await expect(page).toHaveScreenshot('snapshot2.png');
@@ -687,18 +687,18 @@ test('should write missing expectations locally twice and attach them', async ({
   expect(result.exitCode).toBe(1);
   expect(result.failed).toBe(1);
 
-  const snapshot1OutputPath = testInfo.outputPath('__screenshots__', 'a.spec.js', 'snapshot.png');
+  const snapshot1OutputPath = testInfo.outputPath('__screenshots__', 'a.spec.ts', 'snapshot.png');
   expect(result.output).toContain(`Error: A snapshot doesn't exist at ${snapshot1OutputPath}, writing actual`);
   expect(comparePNGs(fs.readFileSync(snapshot1OutputPath), whiteImage)).toBe(null);
 
-  const snapshot2OutputPath = testInfo.outputPath('__screenshots__', 'a.spec.js', 'snapshot2.png');
+  const snapshot2OutputPath = testInfo.outputPath('__screenshots__', 'a.spec.ts', 'snapshot2.png');
   expect(result.output).toContain(`Error: A snapshot doesn't exist at ${snapshot2OutputPath}, writing actual`);
   expect(comparePNGs(fs.readFileSync(snapshot2OutputPath), whiteImage)).toBe(null);
 
   expect(result.output).toContain('Here we are!');
 
-  const stackLines = result.output.split('\n').filter(line => line.includes('    at ')).filter(line => !line.includes('a.spec.js'));
-  expect(result.output).toContain('a.spec.js:5');
+  const stackLines = result.output.split('\n').filter(line => line.includes('    at ')).filter(line => !line.includes('a.spec.ts'));
+  expect(result.output).toContain('a.spec.ts:4');
   expect(stackLines.length).toBe(0);
 
   const attachments = result.outputLines.map(l => JSON.parse(l))[0];
@@ -708,7 +708,7 @@ test('should write missing expectations locally twice and attach them', async ({
     {
       name: 'snapshot-expected.png',
       contentType: 'image/png',
-      path: '__screenshots__/a.spec.js/snapshot.png'
+      path: '__screenshots__/a.spec.ts/snapshot.png'
     },
     {
       name: 'snapshot-actual.png',
@@ -718,7 +718,7 @@ test('should write missing expectations locally twice and attach them', async ({
     {
       name: 'snapshot2-expected.png',
       contentType: 'image/png',
-      path: '__screenshots__/a.spec.js/snapshot2.png'
+      path: '__screenshots__/a.spec.ts/snapshot2.png'
     },
     {
       name: 'snapshot2-actual.png',
@@ -737,13 +737,13 @@ test('should attach missing expectations to right step', async ({ runInlineTest 
             console.log(\`%%[\${step.category}] \${step.title}: \${step.attachments.map(a => a.name).join(", ")}\`);
         }
       }
-      module.exports = Reporter;
+      export default Reporter;
     `,
     ...playwrightConfig({
       reporter: [['dot'], ['./reporter']],
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png');
       });
@@ -759,8 +759,8 @@ test('shouldn\'t write missing expectations locally for negated matcher', async 
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).not.toHaveScreenshot('snapshot.png');
       });
@@ -768,7 +768,7 @@ test('shouldn\'t write missing expectations locally for negated matcher', async 
   });
 
   expect(result.exitCode).toBe(1);
-  const snapshotOutputPath = testInfo.outputPath('__screenshots__/a.spec.js/snapshot.png');
+  const snapshotOutputPath = testInfo.outputPath('__screenshots__/a.spec.ts/snapshot.png');
   expect(result.output).toContain(`A snapshot doesn't exist at ${snapshotOutputPath}, matchers using ".not" won\'t write them automatically.`);
   expect(fs.existsSync(snapshotOutputPath)).toBe(false);
 });
@@ -778,9 +778,9 @@ test('should update snapshot with the update-snapshots flag', async ({ runInline
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': blueImage,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': blueImage,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png');
       });
@@ -788,7 +788,7 @@ test('should update snapshot with the update-snapshots flag', async ({ runInline
   }, { 'update-snapshots': true });
 
   expect(result.exitCode).toBe(0);
-  const snapshotOutputPath = testInfo.outputPath('__screenshots__/a.spec.js/snapshot.png');
+  const snapshotOutputPath = testInfo.outputPath('__screenshots__/a.spec.ts/snapshot.png');
   expect(result.output).toContain(`${snapshotOutputPath} is re-generated, writing actual.`);
   expect(comparePNGs(fs.readFileSync(snapshotOutputPath), whiteImage)).toBe(null);
 });
@@ -800,33 +800,33 @@ test('should respect config.snapshotPathTemplate and sanitize the name', {
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/my-name.png': whiteImage,
-    '__screenshots__/a.spec.js/my_name/bar.png': whiteImage,
-    '__screenshots__/a.spec.js/is-a-test-1.png': whiteImage,
-    '__screenshots__/a.spec.js/is-a-test-2.png': whiteImage,
-    'a.spec.js': `
-      const path = require('path');
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/my-name.png': whiteImage,
+    '__screenshots__/a.spec.ts/my_name/bar.png': whiteImage,
+    '__screenshots__/a.spec.ts/is-a-test-1.png': whiteImage,
+    '__screenshots__/a.spec.ts/is-a-test-2.png': whiteImage,
+    'a.spec.ts': `
+      import path from 'path';
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         const testDir = test.info().project.testDir;
 
         // A single name is sanitized to a valid file name.
-        const expectedPath1 = path.join(testDir, '__screenshots__/a.spec.js/my-name.png');
+        const expectedPath1 = path.join(testDir, '__screenshots__/a.spec.ts/my-name.png');
         expect(test.info().snapshotPath('my_name.png')).toBe(expectedPath1);
         await expect(page).toHaveScreenshot('my_name.png');
 
         // An array is not sanitized - see https://github.com/microsoft/playwright/pull/9156.
-        const expectedPath2 = path.join(testDir, '__screenshots__/a.spec.js/my_name/bar.png');
+        const expectedPath2 = path.join(testDir, '__screenshots__/a.spec.ts/my_name/bar.png');
         expect(test.info().snapshotPath('my_name', 'bar.png')).toBe(expectedPath2);
         await expect(page).toHaveScreenshot(['my_name', 'bar.png']);
 
         // Auto-generated name is sanitized.
-        const expectedPath3 = path.join(testDir, '__screenshots__/a.spec.js/is-a-test-1.png');
+        const expectedPath3 = path.join(testDir, '__screenshots__/a.spec.ts/is-a-test-1.png');
         expect(test.info().snapshotPath('', { kind: 'screenshot' })).toBe(expectedPath3);
         await expect(page).toHaveScreenshot();
 
         // Auto-generated name is incremented.
-        const expectedPath4 = path.join(testDir, '__screenshots__/a.spec.js/is-a-test-2.png');
+        const expectedPath4 = path.join(testDir, '__screenshots__/a.spec.ts/is-a-test-2.png');
         expect(test.info().snapshotPath('', { kind: 'screenshot' })).toBe(expectedPath4);
         await expect(page).toHaveScreenshot();
       });
@@ -842,18 +842,18 @@ test('should respect config.EXPECT toHaveScreenshot.pathTemplate', async ({ runI
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
       expect: { toHaveScreenshot: { pathTemplate: 'actual-screenshots/{testFilePath}/{arg}{ext}' } },
     }),
-    '__screenshots__/a.spec.js/snapshot.png': blueImage,
-    'actual-screenshots/a.spec.js/snapshot.png': whiteImage,
-    'a.spec.js': `
-      const path = require('path');
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': blueImage,
+    'actual-screenshots/a.spec.ts/snapshot.png': whiteImage,
+    'a.spec.ts': `
+      import path from 'path';
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         const testDir = test.info().project.testDir;
 
-        const screenshotPath = path.join(testDir, 'actual-screenshots/a.spec.js/snapshot.png');
+        const screenshotPath = path.join(testDir, 'actual-screenshots/a.spec.ts/snapshot.png');
         expect(test.info().snapshotPath('snapshot.png', { kind: 'screenshot' })).toBe(screenshotPath);
 
-        const snapshotPath = path.join(testDir, '__screenshots__/a.spec.js/snapshot.png');
+        const snapshotPath = path.join(testDir, '__screenshots__/a.spec.ts/snapshot.png');
         expect(test.info().snapshotPath('snapshot.png', { kind: 'snapshot' })).toBe(snapshotPath);
 
         await expect(page).toHaveScreenshot('snapshot.png');
@@ -870,9 +870,9 @@ test('shouldn\'t update snapshot with the update-snapshots flag for negated matc
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': EXPECTED_SNAPSHOT,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': EXPECTED_SNAPSHOT,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).not.toHaveScreenshot('snapshot.png');
       });
@@ -880,7 +880,7 @@ test('shouldn\'t update snapshot with the update-snapshots flag for negated matc
   }, { 'update-snapshots': true });
 
   expect(result.exitCode).toBe(0);
-  const snapshotOutputPath = testInfo.outputPath('__screenshots__/a.spec.js/snapshot.png');
+  const snapshotOutputPath = testInfo.outputPath('__screenshots__/a.spec.ts/snapshot.png');
   expect(fs.readFileSync(snapshotOutputPath).equals(EXPECTED_SNAPSHOT)).toBe(true);
 });
 
@@ -889,8 +889,8 @@ test('should silently write missing expectations locally with the update-snapsho
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png');
       });
@@ -898,7 +898,7 @@ test('should silently write missing expectations locally with the update-snapsho
   }, { 'update-snapshots': true });
 
   expect(result.exitCode).toBe(0);
-  const snapshotOutputPath = testInfo.outputPath('__screenshots__/a.spec.js/snapshot.png');
+  const snapshotOutputPath = testInfo.outputPath('__screenshots__/a.spec.ts/snapshot.png');
   expect(result.output).toContain(`A snapshot doesn't exist at ${snapshotOutputPath}, writing actual`);
   const data = fs.readFileSync(snapshotOutputPath);
   expect(comparePNGs(data, whiteImage)).toBe(null);
@@ -909,8 +909,8 @@ test('should not write missing expectations locally with the update-snapshots fl
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).not.toHaveScreenshot('snapshot.png');
       });
@@ -918,7 +918,7 @@ test('should not write missing expectations locally with the update-snapshots fl
   }, { 'update-snapshots': true });
 
   expect(result.exitCode).toBe(1);
-  const snapshotOutputPath = testInfo.outputPath('__screenshots__/a.spec.js/snapshot.png');
+  const snapshotOutputPath = testInfo.outputPath('__screenshots__/a.spec.ts/snapshot.png');
   expect(result.output).toContain(`A snapshot doesn't exist at ${snapshotOutputPath}, matchers using ".not" won\'t write them automatically.`);
   expect(fs.existsSync(snapshotOutputPath)).toBe(false);
 });
@@ -928,11 +928,11 @@ test('should match multiple snapshots', async ({ runInlineTest }) => {
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/red.png': redImage,
-    '__screenshots__/a.spec.js/green.png': greenImage,
-    '__screenshots__/a.spec.js/blue.png': blueImage,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/red.png': redImage,
+    '__screenshots__/a.spec.ts/green.png': greenImage,
+    '__screenshots__/a.spec.ts/blue.png': blueImage,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await Promise.all([
           page.evaluate(() => document.documentElement.style.setProperty('background', '#f00')),
@@ -957,9 +957,9 @@ test('should use provided name', async ({ runInlineTest }) => {
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/provided.png': whiteImage,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/provided.png': whiteImage,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('provided.png');
       });
@@ -973,9 +973,9 @@ test('should use provided name via options', async ({ runInlineTest }) => {
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/provided.png': whiteImage,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/provided.png': whiteImage,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot({ name: 'provided.png' });
       });
@@ -992,9 +992,9 @@ test('should respect maxDiffPixels option', async ({ runInlineTest }) => {
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': EXPECTED_SNAPSHOT,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': EXPECTED_SNAPSHOT,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png', { timeout: 2000 });
       });
@@ -1005,9 +1005,9 @@ test('should respect maxDiffPixels option', async ({ runInlineTest }) => {
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': EXPECTED_SNAPSHOT,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': EXPECTED_SNAPSHOT,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png', {
           maxDiffPixels: ${BAD_PIXELS}
@@ -1029,9 +1029,9 @@ test('should respect maxDiffPixels option', async ({ runInlineTest }) => {
         },
       ],
     }),
-    '__screenshots__/a.spec.js/snapshot.png': EXPECTED_SNAPSHOT,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': EXPECTED_SNAPSHOT,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png');
       });
@@ -1047,9 +1047,9 @@ test('should not update screenshot that matches with maxDiffPixels option when -
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': EXPECTED_SNAPSHOT,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': EXPECTED_SNAPSHOT,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png', { maxDiffPixels: ${BAD_PIXELS} });
       });
@@ -1063,7 +1063,7 @@ test('should not update screenshot that matches with maxDiffPixels option when -
   expect(fs.existsSync(testInfo.outputPath('test-results', 'a-is-a-test', 'is-a-test-1-previous.png'))).toBe(false);
   expect(fs.existsSync(testInfo.outputPath('test-results', 'a-is-a-test', 'is-a-test-1-diff.png'))).toBe(false);
 
-  const data = fs.readFileSync(testInfo.outputPath('__screenshots__/a.spec.js/snapshot.png'));
+  const data = fs.readFileSync(testInfo.outputPath('__screenshots__/a.spec.ts/snapshot.png'));
   expect(comparePNGs(data, EXPECTED_SNAPSHOT)).toBe(null);
 });
 
@@ -1076,9 +1076,9 @@ test('should satisfy both maxDiffPixelRatio and maxDiffPixels', async ({ runInli
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': EXPECTED_SNAPSHOT,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': EXPECTED_SNAPSHOT,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png', { timeout: 2000 });
       });
@@ -1089,9 +1089,9 @@ test('should satisfy both maxDiffPixelRatio and maxDiffPixels', async ({ runInli
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': EXPECTED_SNAPSHOT,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': EXPECTED_SNAPSHOT,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png', {
           maxDiffPixels: ${Math.floor(BAD_COUNT / 2)},
@@ -1106,9 +1106,9 @@ test('should satisfy both maxDiffPixelRatio and maxDiffPixels', async ({ runInli
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': EXPECTED_SNAPSHOT,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': EXPECTED_SNAPSHOT,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png', {
           maxDiffPixels: ${BAD_COUNT},
@@ -1123,9 +1123,9 @@ test('should satisfy both maxDiffPixelRatio and maxDiffPixels', async ({ runInli
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': EXPECTED_SNAPSHOT,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': EXPECTED_SNAPSHOT,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png', {
           maxDiffPixels: ${BAD_COUNT},
@@ -1145,9 +1145,9 @@ test('should respect maxDiffPixelRatio option', async ({ runInlineTest }) => {
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': EXPECTED_SNAPSHOT,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': EXPECTED_SNAPSHOT,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png', { timeout: 2000 });
       });
@@ -1158,9 +1158,9 @@ test('should respect maxDiffPixelRatio option', async ({ runInlineTest }) => {
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': EXPECTED_SNAPSHOT,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': EXPECTED_SNAPSHOT,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png', {
           maxDiffPixelRatio: ${BAD_RATIO}
@@ -1180,9 +1180,9 @@ test('should respect maxDiffPixelRatio option', async ({ runInlineTest }) => {
         snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
       }],
     }),
-    '__screenshots__/a.spec.js/snapshot.png': EXPECTED_SNAPSHOT,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': EXPECTED_SNAPSHOT,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png');
       });
@@ -1193,8 +1193,8 @@ test('should respect maxDiffPixelRatio option', async ({ runInlineTest }) => {
 test('should throw for invalid maxDiffPixels values', async ({ runInlineTest }) => {
   expect((await runInlineTest({
     ...playwrightConfig({}),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot({
           maxDiffPixels: -1,
@@ -1207,8 +1207,8 @@ test('should throw for invalid maxDiffPixels values', async ({ runInlineTest }) 
 test('should throw for invalid maxDiffPixelRatio values', async ({ runInlineTest }) => {
   expect((await runInlineTest({
     ...playwrightConfig({}),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot({
           maxDiffPixelRatio: 12,
@@ -1224,9 +1224,9 @@ test('should attach expected/actual/diff when sizes are different', async ({ run
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': createImage(2, 2),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': createImage(2, 2),
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test.afterEach(async ({}, testInfo) => {
         console.log('## ' + JSON.stringify(testInfo.attachments));
       });
@@ -1247,7 +1247,7 @@ test('should attach expected/actual/diff when sizes are different', async ({ run
     {
       name: 'snapshot-expected.png',
       contentType: 'image/png',
-      path: '__screenshots__/a.spec.js/snapshot.png',
+      path: '__screenshots__/a.spec.ts/snapshot.png',
     },
     {
       name: 'snapshot-actual.png',
@@ -1268,8 +1268,8 @@ test('should fail with missing expectations and retries', async ({ runInlineTest
       retries: 1,
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png');
       });
@@ -1278,7 +1278,7 @@ test('should fail with missing expectations and retries', async ({ runInlineTest
 
   expect(result.exitCode).toBe(1);
   expect(result.failed).toBe(1);
-  const snapshotOutputPath = testInfo.outputPath('__screenshots__/a.spec.js/snapshot.png');
+  const snapshotOutputPath = testInfo.outputPath('__screenshots__/a.spec.ts/snapshot.png');
   expect(result.output).toContain(`A snapshot doesn't exist at ${snapshotOutputPath}, writing actual`);
   const data = fs.readFileSync(snapshotOutputPath);
   expect(comparePNGs(data, whiteImage)).toBe(null);
@@ -1290,8 +1290,8 @@ test('should update expectations with retries', async ({ runInlineTest }, testIn
       retries: 1,
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png');
       });
@@ -1300,7 +1300,7 @@ test('should update expectations with retries', async ({ runInlineTest }, testIn
 
   expect(result.exitCode).toBe(0);
   expect(result.passed).toBe(1);
-  const snapshotOutputPath = testInfo.outputPath('__screenshots__/a.spec.js/snapshot.png');
+  const snapshotOutputPath = testInfo.outputPath('__screenshots__/a.spec.ts/snapshot.png');
   expect(result.output).toContain(`A snapshot doesn't exist at ${snapshotOutputPath}, writing actual`);
   const data = fs.readFileSync(snapshotOutputPath);
   expect(comparePNGs(data, whiteImage)).toBe(null);
@@ -1313,9 +1313,9 @@ test('should respect comparator name', async ({ runInlineTest }) => {
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': expected,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': expected,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('should pass', async ({ page }) => {
         await page.goto('${actualURL}');
         await expect(page.locator('img')).toHaveScreenshot('snapshot.png', {
@@ -1364,9 +1364,9 @@ test('should respect comparator in config', async ({ runInlineTest }) => {
         },
       ],
     }),
-    '__screenshots__/a.spec.js/snapshot.png': expected,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': expected,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('test', async ({ page }) => {
         await page.goto('${actualURL}');
         await expect(page.locator('img')).toHaveScreenshot('snapshot.png', { threshold: 0, });
@@ -1385,10 +1385,10 @@ test('should throw pretty error if expected PNG file is not a PNG', async ({ run
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': 'not a png',
-    '__screenshots__/a.spec.js/snapshot.jpg': 'not a jpg',
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': 'not a png',
+    '__screenshots__/a.spec.ts/snapshot.jpg': 'not a jpg',
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('png', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png');
       });
@@ -1407,9 +1407,9 @@ test('should throw pretty error if expected PNG file is not a PNG while rebasing
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': 'not a png',
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': 'not a png',
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('png', async ({ page }) => {
         await expect(page).toHaveScreenshot('snapshot.png');
       });
@@ -1425,9 +1425,9 @@ test('should support maskColor option', async ({ runInlineTest }) => {
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': createImage(IMG_WIDTH, IMG_HEIGHT, 0, 255, 0),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': createImage(IMG_WIDTH, IMG_HEIGHT, 0, 255, 0),
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('png', async ({ page }) => {
         await page.setContent('<style> html,body { padding: 0; margin: 0; }</style>');
         await expect(page).toHaveScreenshot('snapshot.png', {
@@ -1445,11 +1445,11 @@ test('should support stylePath option', async ({ runInlineTest }) => {
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/tests/a.spec.js/snapshot.png': createImage(IMG_WIDTH, IMG_HEIGHT, 0, 255, 0),
-    '__screenshots__/tests/a.spec.js/png-1.png': createImage(IMG_WIDTH, IMG_HEIGHT, 0, 255, 0),
+    '__screenshots__/tests/a.spec.ts/snapshot.png': createImage(IMG_WIDTH, IMG_HEIGHT, 0, 255, 0),
+    '__screenshots__/tests/a.spec.ts/png-1.png': createImage(IMG_WIDTH, IMG_HEIGHT, 0, 255, 0),
     'screenshot.css': 'body { background: #00FF00; }',
-    'tests/a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'tests/a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('png', async ({ page }) => {
         await page.setContent('<style> html,body { padding: 0; margin: 0; }</style>');
         await expect(page).toHaveScreenshot('snapshot.png', {
@@ -1475,9 +1475,9 @@ test('should support stylePath option in config', async ({ runInlineTest }) => {
       },
     }),
     'screenshot.css': 'body { background: #00FF00; }',
-    '__screenshots__/a.spec.js/snapshot.png': createImage(IMG_WIDTH, IMG_HEIGHT, 0, 255, 0),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': createImage(IMG_WIDTH, IMG_HEIGHT, 0, 255, 0),
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('png', async ({ page }) => {
         await page.setContent('<style> html,body { padding: 0; margin: 0; }</style>');
         await expect(page).toHaveScreenshot('snapshot.png');
@@ -1489,8 +1489,8 @@ test('should support stylePath option in config', async ({ runInlineTest }) => {
 
 function playwrightConfig(obj: any) {
   return {
-    'playwright.config.js': `
-      module.exports = ${JSON.stringify(obj, null, 2)}
+    'playwright.config.ts': `
+      export default ${JSON.stringify(obj, null, 2)}
     `,
   };
 }
@@ -1500,8 +1500,8 @@ test('should trim+sanitize attachment names and paths', async ({ runInlineTest }
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test.afterEach(async ({}, testInfo) => {
         console.log('## ' + JSON.stringify(testInfo.attachments));
       });
@@ -1525,7 +1525,7 @@ test('should trim+sanitize attachment names and paths', async ({ runInlineTest }
     {
       name: 'long-long-long-long-long-l-852e1-long-long-long-long-title-1-expected.png',
       contentType: 'image/png',
-      path: '__screenshots__/a.spec.js/long-long-long-long-long-long-long-long-long-l-852e1-long-long-long-long-long-long-long-long-title-1.png',
+      path: '__screenshots__/a.spec.ts/long-long-long-long-long-long-long-long-long-l-852e1-long-long-long-long-long-long-long-long-title-1.png',
     },
     {
       name: 'long-long-long-long-long-l-852e1-long-long-long-long-title-1-actual.png',
@@ -1535,7 +1535,7 @@ test('should trim+sanitize attachment names and paths', async ({ runInlineTest }
     {
       name: 'long-long-long-long-long-l-6bf1e-ong-long-long-long-name-expected.png',
       contentType: 'image/png',
-      path: '__screenshots__/a.spec.js/long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-name.png',
+      path: '__screenshots__/a.spec.ts/long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-name.png',
     },
     {
       name: 'long-long-long-long-long-l-6bf1e-ong-long-long-long-name-actual.png',
@@ -1545,7 +1545,7 @@ test('should trim+sanitize attachment names and paths', async ({ runInlineTest }
     {
       name: 'dir/long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long name-expected.png',
       contentType: 'image/png',
-      path: '__screenshots__/a.spec.js/dir/long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long name.png',
+      path: '__screenshots__/a.spec.ts/dir/long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long name.png',
     },
     {
       name: 'dir/long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long name-actual.png',
@@ -1564,16 +1564,16 @@ test.describe('update-snapshots', () => {
       ...playwrightConfig({
         snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
       }),
-      '__screenshots__/a.spec.js/snapshot.png': EXPECTED_SNAPSHOT,
-      'a.spec.js': `
-        const { test, expect } = require('@playwright/test');
+      '__screenshots__/a.spec.ts/snapshot.png': EXPECTED_SNAPSHOT,
+      'a.spec.ts': `
+        import { test, expect } from '@playwright/test';
         test('is a test', async ({ page }) => {
           await expect(page).toHaveScreenshot('snapshot.png', { timeout: 2000 });
         });
       `
     }, { 'update-snapshots': 'changed' });
     expect(result.exitCode).toBe(0);
-    const newBaseline = fs.readFileSync(test.info().outputPath('__screenshots__/a.spec.js/snapshot.png'));
+    const newBaseline = fs.readFileSync(test.info().outputPath('__screenshots__/a.spec.ts/snapshot.png'));
     expect(comparePNGs(newBaseline, whiteImage)).toBe(null);
     expect(comparePNGs(newBaseline, EXPECTED_SNAPSHOT)).not.toBe(null);
   });
@@ -1591,16 +1591,16 @@ test.describe('update-snapshots', () => {
           }
         }
       }),
-      '__screenshots__/a.spec.js/snapshot.png': EXPECTED_SNAPSHOT,
-      'a.spec.js': `
-        const { test, expect } = require('@playwright/test');
+      '__screenshots__/a.spec.ts/snapshot.png': EXPECTED_SNAPSHOT,
+      'a.spec.ts': `
+        import { test, expect } from '@playwright/test';
         test('is a test', async ({ page }) => {
           await expect(page).toHaveScreenshot('snapshot.png', { timeout: 2000 });
         });
       `
     }, { 'update-snapshots': 'changed' });
     expect(result.exitCode).toBe(0);
-    const newBaseline = fs.readFileSync(test.info().outputPath('__screenshots__/a.spec.js/snapshot.png'));
+    const newBaseline = fs.readFileSync(test.info().outputPath('__screenshots__/a.spec.ts/snapshot.png'));
     expect(comparePNGs(newBaseline, EXPECTED_SNAPSHOT)).toBe(null);
     expect(comparePNGs(newBaseline, whiteImage)).not.toBe(null);
   });
@@ -1618,16 +1618,16 @@ test.describe('update-snapshots', () => {
           }
         }
       }),
-      '__screenshots__/a.spec.js/snapshot.png': EXPECTED_SNAPSHOT,
-      'a.spec.js': `
-        const { test, expect } = require('@playwright/test');
+      '__screenshots__/a.spec.ts/snapshot.png': EXPECTED_SNAPSHOT,
+      'a.spec.ts': `
+        import { test, expect } from '@playwright/test';
         test('is a test', async ({ page }) => {
           await expect(page).toHaveScreenshot('snapshot.png', { timeout: 2000 });
         });
       `
     }, { 'update-snapshots': 'all' });
     expect(result.exitCode).toBe(0);
-    const newBaseline = fs.readFileSync(test.info().outputPath('__screenshots__/a.spec.js/snapshot.png'));
+    const newBaseline = fs.readFileSync(test.info().outputPath('__screenshots__/a.spec.ts/snapshot.png'));
     expect(comparePNGs(newBaseline, whiteImage)).toBe(null);
     expect(comparePNGs(newBaseline, EXPECTED_SNAPSHOT)).not.toBe(null);
   });
@@ -1638,9 +1638,9 @@ test('should hide overlays during toHaveScreenshot', async ({ runInlineTest }, t
     ...playwrightConfig({
       snapshotPathTemplate: '__screenshots__/{testFilePath}/{arg}{ext}',
     }),
-    '__screenshots__/a.spec.js/snapshot.png': whiteImage,
-    'a.spec.js': `
-      const { test, expect } = require('@playwright/test');
+    '__screenshots__/a.spec.ts/snapshot.png': whiteImage,
+    'a.spec.ts': `
+      import { test, expect } from '@playwright/test';
       test('is a test', async ({ page }) => {
         await page.screencast.showOverlay('<div style="position:absolute;inset:0;background:red"></div>');
         await expect(page).toHaveScreenshot('snapshot.png');

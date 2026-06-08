@@ -30,27 +30,27 @@ export class AppLocator extends SdkObject {
   async wait(progress: Progress, params: any): Promise<void> {
     const state = params.state ?? 'visible';
     if (state === 'visible' || state === 'attached') {
-      await this._waitForActionable({ requireEnabled: false, timeoutMs: params.timeout });
+      await progress.race(this._waitForActionable({ requireEnabled: false, timeoutMs: params.timeout }));
     } else {
-      await this._pollUntil(async () => {
+      await progress.race(this._pollUntil(async () => {
         try {
           const isDisp = await this.isDisplayed();
           return { matched: !isDisp };
         } catch {
           return { matched: true };
         }
-      }, { what: 'element to be hidden', timeoutMs: params.timeout });
+      }, { what: 'element to be hidden', timeoutMs: params.timeout }));
     }
   }
 
   async click(progress: Progress, params: any): Promise<void> {
-    await this._actAction(async handle => {
+    await progress.race(this._actAction(async handle => {
       await this._device.client.click(handle);
-    }, params.timeout);
+    }, params.timeout));
   }
 
   async fill(progress: Progress, params: any): Promise<void> {
-    await this._actAction(async handle => {
+    await progress.race(this._actAction(async handle => {
       if (this._device.client.platform === 'Android') {
         await this._device.client.clear(handle);
       } else {
@@ -61,18 +61,18 @@ export class AppLocator extends SdkObject {
         }
       }
       await this._device.client.sendKeys(handle, params.text);
-    }, params.timeout);
+    }, params.timeout));
   }
 
   async clear(progress: Progress, params: any): Promise<void> {
-    await this._actAction(async handle => {
+    await progress.race(this._actAction(async handle => {
       await this._device.client.clear(handle);
-    }, params.timeout);
+    }, params.timeout));
   }
 
   async screenshot(progress: Progress, params: any): Promise<Buffer> {
-    const handle = await this._waitForActionable({ requireEnabled: false, timeoutMs: params.timeout });
-    const buffer = await this._device.client.elementScreenshot(handle);
+    const handle = await progress.race(this._waitForActionable({ requireEnabled: false, timeoutMs: params.timeout }));
+    const buffer = await progress.race(this._device.client.elementScreenshot(handle));
     return buffer;
   }
 

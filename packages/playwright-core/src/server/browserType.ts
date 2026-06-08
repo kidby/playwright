@@ -266,7 +266,7 @@ export abstract class BrowserType extends SdkObject {
     try {
       const { wsEndpoint } = await progress.race([
         this.waitForReadyState(options, browserLogsCollector),
-        exitPromise.then(() => ({ wsEndpoint: undefined })),
+        exitPromise.then((): { wsEndpoint?: string } => ({ wsEndpoint: undefined })),
       ]);
       if (exitPromise.isDone()) {
         const log = helper.formatBrowserLogs(browserLogsCollector.recentLogs());

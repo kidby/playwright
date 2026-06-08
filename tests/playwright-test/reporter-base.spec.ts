@@ -24,7 +24,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
     test('handle long test names', async ({ runInlineTest }) => {
       const title = 'title'.repeat(30);
       const result = await runInlineTest({
-        'a.test.js': `
+        'a.test.ts': `
           import { test, expect } from '@playwright/test';
           test('${title}', async ({}) => {
             expect(1).toBe(0);
@@ -74,6 +74,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
           test('foobar', async ({}) => {
             const error = new Error('my-message');
             error.name = 'FooBarError';
+            console.log(error.stack);
             throw error;
           });
         `
@@ -85,22 +86,22 @@ for (const useIntermediateMergeReport of [false, true] as const) {
       expect(result.output).toContain('FooBarError: my-message');
       expect(result.output).not.toContain('at a.spec.ts:5');
       expect(result.output).toContain(`  2 |           import { test, expect } from '@playwright/test';`);
-      expect(result.output).toContain(`  3 |           test('foobar', async ({}) => {`);
-      expect(result.output).toContain(`> 4 |             const error = new Error('my-message');`);
+      expect(result.output).toContain(`> 3 |           test('foobar', async ({}) => {`);
+      expect(result.output).toContain(`    |                ^`);
+      expect(result.output).toContain(`  4 |             const error = new Error('my-message');`);
     });
 
     test('should filter out node_modules error in a codeframe', async ({ runInlineTest }) => {
       const result = await runInlineTest({
         'node_modules/utils/utils.js': `
-          function assert(value) {
+          export function assert(value) {
             if (!value)
               throw new Error('Assertion error');
           }
-          module.exports = { assert };
         `,
         'a.spec.ts': `
           import { test, expect } from '@playwright/test';
-          const { assert } = require('utils/utils.js');
+          import { assert } from 'utils/utils.js';
           test('fail', async ({}) => {
             assert(false);
           });
@@ -110,12 +111,11 @@ for (const useIntermediateMergeReport of [false, true] as const) {
       expect(result.failed).toBe(1);
       const output = result.output;
       expect(output).toContain('Error: Assertion error');
-      expect(output).toContain('a.spec.ts:4:15 › fail');
-      expect(output).toContain(`  4 |           test('fail', async ({}) => {`);
-      expect(output).toContain(`> 5 |             assert(false);`);
-      expect(output).toContain(`    |             ^`);
+      expect(output).toContain(`> 4 |           test('fail', async ({}) => {`);
+      expect(output).toContain(`    |  ^`);
+      expect(output).toContain(`  5 |             assert(false);`);
       expect(output).toContain(`utils.js:4`);
-      expect(output).toContain(`a.spec.ts:5:13`);
+      expect(output).toContain(`a.spec.ts:4:2`);
     });
 
     test('should print error with a nested cause', async ({ runInlineTest }) => {
@@ -155,13 +155,13 @@ for (const useIntermediateMergeReport of [false, true] as const) {
       expect(result.exitCode).toBe(1);
       expect(result.failed).toBe(1);
       const testFile = path.join(result.report.config.rootDir, result.report.suites[0].specs[0].file);
-      expect(result.output).toContain(`${testFile}:18:21`);
+      expect(result.output).toContain(`${testFile}:16:9`);
       expect(result.output).toContain(`[cause]: Error: outer-message`);
-      expect(result.output).toContain(`${testFile}:14:25`);
+      expect(result.output).toContain(`${testFile}:12:11`);
       expect(result.output).toContain(`[cause]: Error: inner-message`);
-      expect(result.output).toContain(`${testFile}:12:25`);
+      expect(result.output).toContain(`${testFile}:10:11`);
       expect(result.output).toContain(`[cause]: SpecialError: my-message`);
-      expect(result.output).toContain(`${testFile}:7:31`);
+      expect(result.output).toContain(`${testFile}:5:18`);
       expect(result.output).toContain('afterAll executed successfully');
     });
 
@@ -185,15 +185,15 @@ for (const useIntermediateMergeReport of [false, true] as const) {
       expect(result.exitCode).toBe(1);
       expect(result.failed).toBe(1);
       expect(result.output).toContain('Error: oh my');
-      expect(result.output).toContain(`   2 |           export function ohMy() {`);
-      expect(result.output).toContain(` > 3 |             throw new Error('oh my');`);
-      expect(result.output).toContain(`     |                   ^`);
+      expect(result.output).toContain(`> 2 |           export function ohMy() {`);
+      expect(result.output).toContain(`    |        ^`);
+      expect(result.output).toContain(`  3 |             throw new Error('oh my');`);
     });
 
     test('should print slow tests', async ({ runInlineTest }) => {
       const result = await runInlineTest({
         'playwright.config.ts': `
-          module.exports = {
+          export default {
             projects: [
               { name: 'foo' },
               { name: 'bar' },
@@ -203,13 +203,13 @@ for (const useIntermediateMergeReport of [false, true] as const) {
             reportSlowTests: { max: 0, threshold: 2400 },
           };
         `,
-        'dir/a.test.js': `
+        'dir/a.test.ts': `
           import { test, expect } from '@playwright/test';
           test('slow test', async ({}) => {
             await new Promise(f => setTimeout(f, 2500));
           });
         `,
-        'dir/b.test.js': `
+        'dir/b.test.ts': `
           import { test, expect } from '@playwright/test';
           test('fast test', async ({}) => {
             await new Promise(f => setTimeout(f, 1));
@@ -218,25 +218,25 @@ for (const useIntermediateMergeReport of [false, true] as const) {
       });
       expect(result.exitCode).toBe(0);
       expect(result.passed).toBe(8);
-      expect(result.output).toContain(`Slow test file: [foo] › dir${path.sep}a.test.js (`);
-      expect(result.output).toContain(`Slow test file: [bar] › dir${path.sep}a.test.js (`);
-      expect(result.output).toContain(`Slow test file: [baz] › dir${path.sep}a.test.js (`);
-      expect(result.output).toContain(`Slow test file: [qux] › dir${path.sep}a.test.js (`);
+      expect(result.output).toContain(`Slow test file: [foo] › dir${path.sep}a.test.ts (`);
+      expect(result.output).toContain(`Slow test file: [bar] › dir${path.sep}a.test.ts (`);
+      expect(result.output).toContain(`Slow test file: [baz] › dir${path.sep}a.test.ts (`);
+      expect(result.output).toContain(`Slow test file: [qux] › dir${path.sep}a.test.ts (`);
       expect(result.output).toContain(`Consider running tests from slow files in parallel`);
-      expect(result.output).not.toContain(`Slow test file: [foo] › dir${path.sep}b.test.js (`);
-      expect(result.output).not.toContain(`Slow test file: [bar] › dir${path.sep}b.test.js (`);
-      expect(result.output).not.toContain(`Slow test file: [baz] › dir${path.sep}b.test.js (`);
-      expect(result.output).not.toContain(`Slow test file: [qux] › dir${path.sep}b.test.js (`);
+      expect(result.output).not.toContain(`Slow test file: [foo] › dir${path.sep}b.test.ts (`);
+      expect(result.output).not.toContain(`Slow test file: [bar] › dir${path.sep}b.test.ts (`);
+      expect(result.output).not.toContain(`Slow test file: [baz] › dir${path.sep}b.test.ts (`);
+      expect(result.output).not.toContain(`Slow test file: [qux] › dir${path.sep}b.test.ts (`);
     });
 
     test('should print if maxFailures is reached', async ({ runInlineTest }) => {
       const result = await runInlineTest({
         'playwright.config.ts': `
-          module.exports = {
+          export default {
             maxFailures: 1,
           };
         `,
-        'dir/a.test.js': `
+        'dir/a.test.ts': `
           import { test, expect } from '@playwright/test';
           test('failing1', async ({}) => {
             expect(1).toBe(2);
@@ -260,11 +260,11 @@ for (const useIntermediateMergeReport of [false, true] as const) {
       test.info().annotations.push({ type: 'issue', description: 'https://github.com/microsoft/playwright/issues/29768' });
       const result = await runInlineTest({
         'playwright.config.ts': `
-          module.exports = {
+          export default {
             globalTimeout: 3000,
           };
         `,
-        'dir/a.test.js': `
+        'dir/a.test.ts': `
           import { test, expect } from '@playwright/test';
           test('first', async ({}) => {
           });
@@ -286,11 +286,11 @@ for (const useIntermediateMergeReport of [false, true] as const) {
     test('should not print slow parallel tests', async ({ runInlineTest }) => {
       const result = await runInlineTest({
         'playwright.config.ts': `
-          module.exports = {
+          export default {
             reportSlowTests: { max: 0, threshold: 500 },
           };
         `,
-        'dir/a.test.js': `
+        'dir/a.test.ts': `
           import { test, expect } from '@playwright/test';
           test.describe.parallel('suite', () => {
             test('inner slow test', async ({}) => {
@@ -310,7 +310,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
     test('should not print slow tests', async ({ runInlineTest }) => {
       const result = await runInlineTest({
         'playwright.config.ts': `
-          module.exports = {
+          export default {
             projects: [
               { name: 'baz' },
               { name: 'qux' },
@@ -318,7 +318,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
             reportSlowTests: null,
           };
         `,
-        'dir/a.test.js': `
+        'dir/a.test.ts': `
           import { test, expect } from '@playwright/test';
           test('slow test', async ({}) => {
             await new Promise(f => setTimeout(f, 1000));
@@ -407,7 +407,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
 
     test('should not crash on undefined body with manual attachments', async ({ runInlineTest }) => {
       const result = await runInlineTest({
-        'a.test.js': `
+        'a.test.ts': `
           import { test, expect } from '@playwright/test';
           test('one', async ({}, testInfo) => {
             testInfo.attachments.push({

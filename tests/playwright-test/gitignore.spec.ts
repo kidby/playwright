@@ -18,12 +18,12 @@ import { test, expect } from './playwright-test-fixtures.js';
 
 test('should respect .gitignore', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    '.gitignore': `a.spec.js`,
-    'a.spec.js': `
+    '.gitignore': `a.spec.ts`,
+    'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', ({}) => {});
     `,
-    'b.spec.js': `
+    'b.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', ({}) => {});
     `
@@ -34,12 +34,12 @@ test('should respect .gitignore', async ({ runInlineTest }) => {
 
 test('should respect nested .gitignore', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a/.gitignore': `a.spec.js`,
-    'a/a.spec.js': `
+    'a/.gitignore': `a.spec.ts`,
+    'a/a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', ({}) => {});
     `,
-    'a/b.spec.js': `
+    'a/b.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', ({}) => {});
     `
@@ -50,12 +50,12 @@ test('should respect nested .gitignore', async ({ runInlineTest }) => {
 
 test('should respect enclosing .gitignore', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    '.gitignore': `a/a.spec.js`,
-    'a/a.spec.js': `
+    '.gitignore': `a/a.spec.ts`,
+    'a/a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', ({}) => {});
     `,
-    'a/b.spec.js': `
+    'a/b.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', ({}) => {});
     `
@@ -70,43 +70,43 @@ test('should respect negations and comments in .gitignore', async ({ runInlineTe
       # A comment
       dir1/
       /dir2
-      #a.spec.js
-      !dir1/foo/a.spec.js
+      #a.spec.ts
+      !dir1/foo/a.spec.ts
     `,
-    'a.spec.js': `
+    'a.spec.ts': `
       import { test, expect } from '@playwright/test';
-      test('pass', ({}) => console.log('\\n%%a.spec.js'));
+      test('pass', ({}) => console.log('\\n%%a.spec.ts'));
     `,
-    'dir1/a.spec.js': `
+    'dir1/a.spec.ts': `
       import { test, expect } from '@playwright/test';
-      test('pass', ({}) => console.log('\\n%%dir1/a.spec.js'));
+      test('pass', ({}) => console.log('\\n%%dir1/a.spec.ts'));
     `,
-    'dir1/foo/a.spec.js': `
+    'dir1/foo/a.spec.ts': `
       import { test, expect } from '@playwright/test';
-      test('pass', ({}) => console.log('\\n%%dir1/foo/a.spec.js'));
+      test('pass', ({}) => console.log('\\n%%dir1/foo/a.spec.ts'));
     `,
-    'dir2/a.spec.js': `
+    'dir2/a.spec.ts': `
       import { test, expect } from '@playwright/test';
-      test('pass', ({}) => console.log('\\n%%dir2/a.spec.js'));
+      test('pass', ({}) => console.log('\\n%%dir2/a.spec.ts'));
     `,
     'dir3/.gitignore': `
-      b.*.js
+      b.*.ts
     `,
-    'dir3/a.spec.js': `
+    'dir3/a.spec.ts': `
       import { test, expect } from '@playwright/test';
-      test('pass', ({}) => console.log('\\n%%dir3/a.spec.js'));
+      test('pass', ({}) => console.log('\\n%%dir3/a.spec.ts'));
     `,
-    'dir3/b.spec.js': `
+    'dir3/b.spec.ts': `
       import { test, expect } from '@playwright/test';
-      test('pass', ({}) => console.log('\\n%%dir3/b.spec.js'));
+      test('pass', ({}) => console.log('\\n%%dir3/b.spec.ts'));
     `,
   }, { workers: 1 });
   expect(result.exitCode).toBe(0);
   expect(result.passed).toBe(3);
   expect(result.outputLines).toEqual([
-    'a.spec.js',
-    'dir1/foo/a.spec.js',
-    'dir3/a.spec.js',
+    'a.spec.ts',
+    'dir1/foo/a.spec.ts',
+    'dir3/a.spec.ts',
   ]);
 });
 
@@ -115,16 +115,16 @@ test('should ignore .gitignore inside globally configured testDir', async ({ run
     'tests/.gitignore': `
       *.js
     `,
-    'playwright.config.js': `
-      module.exports = {
+    'playwright.config.ts': `
+      export default {
         testDir: './tests',
       };
     `,
-    'tests/a.spec.js': `
+    'tests/a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', ({}) => {});
     `,
-    'tests/foo/b.spec.js': `
+    'tests/foo/b.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', ({}) => {});
     `
@@ -139,16 +139,16 @@ test('should ignore .gitignore inside project testDir', async ({ runInlineTest }
     'tests/.gitignore': `
       *.js
     `,
-    'playwright.config.js': `
-      module.exports = { projects: [
+    'playwright.config.ts': `
+      export default { projects: [
         { testDir: './tests' },
       ] };
     `,
-    'tests/a.spec.js': `
+    'tests/a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', ({}) => {});
     `,
-    'tests/foo/b.spec.js': `
+    'tests/foo/b.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', ({}) => {});
     `
@@ -164,10 +164,10 @@ test('global config respectGitIgnore', {
     'tests/.gitignore': `
       *.js
     `,
-    'playwright.config.js': `
-      module.exports = { respectGitIgnore: false, projects: [{ }] };
+    'playwright.config.ts': `
+      export default { respectGitIgnore: false, projects: [{ }] };
     `,
-    'tests/a.spec.js': `
+    'tests/a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', ({}) => {});
     `,
@@ -183,10 +183,10 @@ test('project config respectGitIgnore', {
     'tests/.gitignore': `
       *.js
     `,
-    'playwright.config.js': `
-      module.exports = { projects: [{ respectGitIgnore: false }] };
+    'playwright.config.ts': `
+      export default { projects: [{ respectGitIgnore: false }] };
     `,
-    'tests/a.spec.js': `
+    'tests/a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', ({}) => {});
     `,

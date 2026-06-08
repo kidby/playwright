@@ -1,6 +1,6 @@
 # CI Health Report
 
-Generate a CI health report for the last commit on the `main` branch of `microsoft/playwright`.
+Generate a CI health report for the last commit on the `main` branch of `kidby/playwright`.
 This is an overall tree health report — not a commit regression analysis. The goal is to show
 the full picture of what's failing, grouping by root cause. If any failures appear to be
 regressions introduced by this specific commit, call that out, but most failures will be

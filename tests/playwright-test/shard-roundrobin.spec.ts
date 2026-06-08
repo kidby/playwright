@@ -30,7 +30,7 @@ function twelveTests() {
     ${Array.from({ length: 4 }, (_, i) => `test('t${start + i}', () => {});`).join('\n    ')}
   `;
   return {
-    'playwright.config.ts': `module.exports = { projects: [{ name: 'p' }] };`,
+    'playwright.config.ts': `export default { projects: [{ name: 'p' }] };`,
     'a.test.ts': mkFile(1),
     'b.test.ts': mkFile(5),
     'c.test.ts': mkFile(9),
@@ -115,7 +115,7 @@ test('shardingMode=duration-round-robin reads .last-run.json', async ({ runInlin
 
 test('shardingMode rejects unknown value', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.ts': `module.exports = { shardingMode: 'bogus' };`,
+    'playwright.config.ts': `export default { shardingMode: 'bogus' };`,
     'a.test.ts': `import { test } from '@playwright/test'; test('x', () => {});`,
   });
   expect(result.exitCode).toBe(1);

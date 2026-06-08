@@ -416,3 +416,31 @@ npm run test tests/library/browser-context-cookies.spec.ts
 ### Configuration
 
 Both directories share a single config at `tests/library/playwright.config.ts`. It creates separate projects (`{browserName}-library` and `{browserName}-page`) pointing to their respective `testDir`.
+
+## Fork-Specific Packages
+
+This fork adds several experimental packages beyond upstream:
+
+| Package | npm name | Purpose |
+|---------|----------|---------|
+| `playwright-mobile` | `@playwright/experimental-mobile` | Native mobile testing via Appium 2 (iOS + Android) |
+| `playwright-storybook` | `@playwright/storybook` | Storybook auto-discovery with iframe and component-testing modes |
+| `playwright-lighthouse` | `@playwright/lighthouse` | Lighthouse audits from within Playwright tests |
+
+These packages follow the same client/server/dispatcher architecture as the core
+packages. Their test suites live in dedicated directories:
+
+- `tests/mobile/` -- Appium integration tests (mock server, no real device needed)
+- `tests/bidi/` -- WebDriver BiDi protocol tests
+
+### Bun as a First-Class Runtime
+
+This fork runs under Bun as a first-class target alongside Node.js. Both
+runtimes pass the full fork test suite. Tests can use `Bun.*` APIs directly
+when needed.
+
+### ESM-Only
+
+The fork uses ESM throughout -- all packages are ESM-only modules. This means
+`import`/`export` syntax everywhere, no CommonJS `require()` in source files.
+

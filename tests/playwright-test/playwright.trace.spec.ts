@@ -23,7 +23,7 @@ test.describe.configure({ mode: 'parallel' });
 test('should stop tracing with trace: on-first-retry, when not retrying', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: 'on-first-retry' } };
+      export default { use: { trace: 'on-first-retry' } };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -59,7 +59,7 @@ test('should stop tracing with trace: on-first-retry, when not retrying', async 
 test('should record api trace', async ({ runInlineTest, server }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: 'on' } };
+      export default { use: { trace: 'on' } };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -152,7 +152,7 @@ test('should not throw with trace: on-first-retry and two retries in the same wo
   const result = await runInlineTest({
     ...files,
     'playwright.config.ts': `
-      module.exports = { use: { trace: 'on-first-retry' } };
+      export default { use: { trace: 'on-first-retry' } };
     `,
     'helper.ts': `
       import { test as base } from '@playwright/test';
@@ -211,7 +211,7 @@ test('should not mixup network files between contexts', async ({ runInlineTest, 
 test('should save sources when requested', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         use: {
           trace: 'on',
         }
@@ -232,7 +232,7 @@ test('should save sources when requested', async ({ runInlineTest }, testInfo) =
 test('should not save sources when not requested', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         use: {
           trace: {
             mode: 'on',
@@ -256,7 +256,7 @@ test('should not save sources when not requested', async ({ runInlineTest }, tes
 test('should work in serial mode', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: 'retain-on-failure' } };
+      export default { use: { trace: 'retain-on-failure' } };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -291,7 +291,7 @@ test('should work in serial mode', async ({ runInlineTest }, testInfo) => {
 test('should not override trace file in afterAll', async ({ runInlineTest, server }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: 'retain-on-failure' } };
+      export default { use: { trace: 'retain-on-failure' } };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -346,7 +346,7 @@ test('should not override trace file in afterAll', async ({ runInlineTest, serve
 test('should retain traces for interrupted tests', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: 'retain-on-failure' }, maxFailures: 1 };
+      export default { use: { trace: 'retain-on-failure' }, maxFailures: 1 };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -437,7 +437,7 @@ for (const mode of ['off', 'retain-on-failure', 'on-first-retry', 'on-all-retrie
 test(`trace:retain-on-failure should create trace if context is closed before failure in the test`, async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: 'retain-on-failure' } };
+      export default { use: { trace: 'retain-on-failure' } };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -457,7 +457,7 @@ test(`trace:retain-on-failure should create trace if context is closed before fa
 test(`trace:retain-on-failure should create trace if context is closed before failure in afterEach`, async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: 'retain-on-failure' } };
+      export default { use: { trace: 'retain-on-failure' } };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -479,7 +479,7 @@ test(`trace:retain-on-failure should create trace if context is closed before fa
 test(`trace:retain-on-failure should create trace if request context is disposed before failure`, async ({ runInlineTest, server }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: 'retain-on-failure' } };
+      export default { use: { trace: 'retain-on-failure' } };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -499,7 +499,7 @@ test(`trace:retain-on-failure should create trace if request context is disposed
 test('should include attachments by default', async ({ runInlineTest, server }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: 'on' } };
+      export default { use: { trace: 'on' } };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -531,7 +531,7 @@ test('should include attachments by default', async ({ runInlineTest, server }, 
 test('should opt out of attachments', async ({ runInlineTest, server }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: { mode: 'on', attachments: false } } };
+      export default { use: { trace: { mode: 'on', attachments: false } } };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -588,7 +588,7 @@ test('should record with custom page fixture', async ({ runInlineTest }, testInf
 test('should expand expect.toPass', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: { mode: 'on' } } };
+      export default { use: { trace: { mode: 'on' } } };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -630,7 +630,7 @@ test('should expand expect.toPass', async ({ runInlineTest }, testInfo) => {
 test('should show non-expect error in trace', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: { mode: 'on' } } };
+      export default { use: { trace: { mode: 'on' } } };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -668,7 +668,7 @@ test('should show non-expect error in trace', async ({ runInlineTest }, testInfo
 test('should show error from beforeAll in trace', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: { mode: 'on' } } };
+      export default { use: { trace: { mode: 'on' } } };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -708,7 +708,7 @@ test('should throw when trace fixture is a function', async ({ runInlineTest }, 
 test('should not throw when attachment is missing', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: 'on' } };
+      export default { use: { trace: 'on' } };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -733,7 +733,7 @@ test('should not throw when screenshot on failure fails', async ({ runInlineTest
 
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: 'on', screenshot: 'on' } };
+      export default { use: { trace: 'on', screenshot: 'on' } };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -759,7 +759,7 @@ test('should not throw when screenshot on failure fails', async ({ runInlineTest
 test('should use custom expect message in trace', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: { mode: 'on' } } };
+      export default { use: { trace: { mode: 'on' } } };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -796,7 +796,7 @@ test('should not throw when merging traces multiple times', async ({ runInlineTe
 
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: 'on' } };
+      export default { use: { trace: 'on' } };
     `,
     'a.spec.ts': `
       import { BrowserContext, expect, Page, test as baseTest } from '@playwright/test';
@@ -840,7 +840,7 @@ test('should not throw when merging traces multiple times', async ({ runInlineTe
 test('should record nested steps, even after timeout', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         use: { trace: { mode: 'on' } },
         timeout: 5000,
       };
@@ -996,7 +996,7 @@ test('should record nested steps, even after timeout', async ({ runInlineTest },
 test('should not produce an action entry for calling a binding', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { use: { trace: 'on' } };
+      export default { use: { trace: 'on' } };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -1038,7 +1038,7 @@ test('should not produce an action entry for calling a binding', async ({ runInl
 test('should attribute worker fixture teardown to the right test', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         use: { trace: { mode: 'on' } },
       };
     `,

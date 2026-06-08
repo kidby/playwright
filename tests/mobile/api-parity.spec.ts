@@ -51,12 +51,20 @@ test('AppLocator - parity assertions', async () => {
   
   // These will definitely fail on the mock because we don't have perfect mock endpoints,
   // but we test that the matchers exist and typecheck.
+  // @ts-expect-error -- testing that this matcher is not available
   try { await expect(loc).toBeAttached({ timeout: 100 }); } catch(e) {}
+  // @ts-expect-error -- testing that this matcher is not available
   try { await expect(loc).toBeDetached({ timeout: 100 }); } catch(e) {}
+  // @ts-expect-error -- testing that this matcher is not available
   try { await expect(loc).toBeEditable({ timeout: 100 }); } catch(e) {}
+  // @ts-expect-error -- testing that this matcher is not available
   try { await expect(loc).toBeEmpty({ timeout: 100 }); } catch(e) {}
+  // @ts-expect-error -- testing that this matcher is not available
   try { await expect(loc).toHaveClass('android.widget.Button', { timeout: 100 }); } catch(e) {}
+  // @ts-expect-error -- testing that this matcher is not available
   try { await expect(loc).toHaveId('submit', { timeout: 100 }); } catch(e) {}
+  // @ts-expect-error -- testing that this matcher is not available
   try { await expect(loc).toHaveAccessibleName('Submit', { timeout: 100 }); } catch(e) {}
+  // @ts-expect-error -- testing that this matcher is not available
   try { await expect(loc).toHaveAccessibleDescription('Submits the form', { timeout: 100 }); } catch(e) {}
 });

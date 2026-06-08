@@ -8,11 +8,11 @@ export function open(path: string, options: any, callback: (err: any, zipFile?: 
     callback = options;
   }
   const zip = new StreamZip.async({ file: path });
-  zip.entries().then(entries => {
+  zip.entries().then((entries: Record<string, any>) => {
     const zipFile = new EventEmitter();
     (zipFile as any).entryCount = Object.keys(entries).length;
     (zipFile as any).openReadStream = (entry: any, cb: any) => {
-      zip.stream(entry.name).then(stream => cb(null, stream)).catch(err => cb(err));
+      zip.stream(entry.name).then((stream: any) => cb(null, stream)).catch((err: any) => cb(err));
     };
     (zipFile as any).close = () => {
       zip.close().catch(() => {});
@@ -20,11 +20,11 @@ export function open(path: string, options: any, callback: (err: any, zipFile?: 
     
     callback(null, zipFile);
     
-    for (const entry of Object.values(entries)) {
+    for (const entry of Object.values(entries) as any[]) {
       zipFile.emit('entry', { fileName: entry.name, ...entry });
     }
     zipFile.emit('end');
-  }).catch(err => callback(err));
+  }).catch((err: any) => callback(err));
 }
 
 export default { open };

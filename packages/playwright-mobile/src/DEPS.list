@@ -1,1 +1,7 @@
 [*]
+../../utils/colors.ts
+../../utils/debugLog.ts
+../../utils/network.ts
+../../utils/processLauncher.ts
+../../isomorphic/time.ts
+../../isomorphic/timeoutRunner.ts

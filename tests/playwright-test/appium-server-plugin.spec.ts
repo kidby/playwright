@@ -33,7 +33,7 @@ test('autoStart spawns stub Appium and probes /status', async ({ runInlineTest }
       });
     `,
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [{
           name: 'mobile-stub',
           use: {
@@ -74,7 +74,7 @@ test('reuseExistingServer skips spawn when server is already up', async ({ runIn
         });
       `,
       'playwright.config.ts': `
-        module.exports = {
+        export default {
           projects: [{
             name: 'mobile-stub-existing',
             use: {
@@ -108,7 +108,7 @@ test('autoStart=false leaves the server alone', async ({ runInlineTest }, { work
       });
     `,
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         projects: [{
           name: 'mobile-noautostart',
           use: {

@@ -12,7 +12,7 @@ and how the dependency checker enforces the contract.
 
 | Output | Entry | Purpose |
 |---|---|---|
-| `lib/utilsBundle.js` | `src/utilsBundle.ts` | Vendored npm packages (`debug`, `mime`, `ws`, `yauzl`, `yazl`, `@modelcontextprotocol/sdk`, `graceful-fs`, …). The single home for third-party runtime code in playwright-core. |
+| `lib/utilsBundle.js` | `src/utilsBundle.ts` | Vendored npm packages (`debug`, `mime`, `ws`, `yauzl`, `yazl`, `graceful-fs`, ...). The single home for third-party runtime code in playwright-core. |
 | `lib/coreBundle.js` | `src/coreBundle.ts` | Re-exports of playwright-core's own modules (`client`, `iso`, `utils`, `cli`, `server`, `registry`, …) as namespaces. Inlines almost all playwright-core source except `utilsBundle`. |
 | `lib/server/electron/loader.js` | `src/server/electron/loader.ts` | Tiny Electron preload shim. |
 
@@ -238,3 +238,28 @@ imports to the sibling bundle at consumer output level:
   `exports` field in `packages/<pkg>/package.json`.
 - To check what's inside a bundle: read the `.js.txt` sidecar next to
   the output.
+
+## Fork-Specific: mcpUtilsBundle
+
+MCP-related dependencies (e.g. `@modelcontextprotocol/sdk`) live in a separate
+bundle at `packages/playwright-core/src/mcpUtilsBundle.ts`, not in `utilsBundle.ts`.
+This keeps the MCP SDK out of the core bundle -- it is only loaded when the MCP
+server is started. The corresponding output is `lib/mcpUtilsBundle.js`.
+
+The same mapping/externalization rules apply: add the package to
+`utilsBundleMapping.js` with a `bundle: 'mcpUtilsBundle'` key, export it from
+`mcpUtilsBundle.ts`, and update DEPS.list.
+
+## Fork-Specific: Bun-Compatible Adapter Files
+
+Upstream bundles `yauzl`, `yazl`, and `yaml` inside `utilsBundle.js` as opaque
+blobs. This fork replaces those with thin adapter files in `packages/utils/`:
+
+| File | Purpose |
+|------|---------|
+| `packages/utils/yauzlAdapter.ts` | Wraps `yauzl` for Bun-compatible ZIP reading |
+| `packages/utils/yazlAdapter.ts` | Wraps `yazl` for Bun-compatible ZIP writing |
+| `packages/utils/yamlAdapter.ts` | Wraps `yaml` for Bun-compatible YAML parsing |
+
+These adapters ensure that native Node.js stream and buffer APIs are handled
+correctly under Bun, where some C++ addon behavior differs from Node.js.

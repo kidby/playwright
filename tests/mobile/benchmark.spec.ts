@@ -8,7 +8,7 @@ test('Mobile Benchmark: Server-side Polling Overhead', async () => {
   test.skip(true, 'Requires a live Android emulator and Appium server');
   // 1. Connect to your local Appium server using the new `playwright-core` backend
   // Note: Appium 2.x server must be running locally via `npx appium`
-  const device = await android.connectToAppium('http://localhost:4723', {
+  const device = await (android as any).connectToAppium('http://localhost:4723', {
     platformName: 'Android',
     'appium:automationName': 'UiAutomator2',
     // 'appium:app': '/path/to/your/app.apk'

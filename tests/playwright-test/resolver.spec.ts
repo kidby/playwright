@@ -440,14 +440,15 @@ test('should respect path resolver for JS files when allowJs', async ({ runInlin
       },
     }`,
     'a.test.js': `
-      const { foo } = require('util/b');
+      import util from 'util/b';
+      const { foo } = util;
       import { test, expect } from '@playwright/test';
       test('test', ({}, testInfo) => {
         expect(testInfo.project.name).toBe(foo);
       });
     `,
     'foo/bar/util/b.ts': `
-      module.exports = { foo: 'foo' };
+      export const foo = 'foo';
     `,
   });
 
@@ -467,14 +468,15 @@ test('should not respect path resolver for JS files w/o allowJS', async ({ runIn
       },
     }`,
     'a.test.js': `
-      const { foo } = require('util/b');
+      import util from 'util/b';
+      const { foo } = util;
       import { test, expect } from '@playwright/test';
       test('test', ({}, testInfo) => {
         expect(testInfo.project.name).toBe(foo);
       });
     `,
     'foo/bar/util/b.ts': `
-      module.exports = { foo: 'foo' };
+      export const foo = 'foo';
     `,
   });
 
@@ -494,7 +496,8 @@ test('should respect path resolver for JS and TS files from jsconfig.json', asyn
       },
     }`,
     'a.test.js': `
-      const { foo } = require('util/b');
+      import util from 'util/b';
+      const { foo } = util;
       import { test, expect } from '@playwright/test';
       test('test', ({}, testInfo) => {
         expect(testInfo.project.name).toBe(foo);
@@ -508,7 +511,7 @@ test('should respect path resolver for JS and TS files from jsconfig.json', asyn
       });
     `,
     'foo/bar/util/b.ts': `
-      module.exports = { foo: 'foo' };
+      export const foo = 'foo';
     `,
   });
 
@@ -549,7 +552,7 @@ test('should support extends in tsconfig.json', async ({ runInlineTest }) => {
       });
     `,
     'dir/foo/bar/util/file.ts': `
-      module.exports = { foo: 'foo' };
+      export const foo = 'foo';
     `,
   });
 
@@ -579,7 +582,7 @@ test('should resolve paths relative to the originating config when extending and
       });
     `,
     'mapped/file.ts': `
-      module.exports = { foo: 'foo' };
+      export const foo = 'foo';
     `,
   });
 
@@ -975,6 +978,7 @@ test.describe('directory imports', () => {
   });
 
   test('should respect package.json#exports without path mapping in CJS', async ({ runInlineTest, runTSC }) => {
+    test.skip(true, 'CJS package.json#exports resolution not supported in ESM-only loader');
     const files = {
       'node_modules/foo-pkg/package.json': `
         { "name": "foo-pkg", "exports": { ".": "./foo.js" } }

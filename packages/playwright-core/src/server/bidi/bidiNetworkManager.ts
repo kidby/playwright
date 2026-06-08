@@ -200,7 +200,11 @@ export class BidiNetworkManager {
   }
 
   private _onAuthRequired(params: bidi.Network.AuthRequiredParameters) {
-    const isBasic = params.response.authChallenges?.some(challenge => challenge.scheme.startsWith('Basic'));
+    // Chrome's BiDi implementation may not populate authChallenges, so we
+    // treat the absence of authChallenges as "any auth scheme is acceptable"
+    // since the event itself indicates authentication is required.
+    const authChallenges = params.response.authChallenges;
+    const isBasic = !authChallenges || authChallenges.some(challenge => challenge.scheme.startsWith('Basic'));
     const credentials = this._page.browserContext._options.httpCredentials;
     if (isBasic && credentials && (!credentials.origin || (new URL(params.request.url).origin).toLowerCase() === credentials.origin.toLowerCase())) {
       if (this._attemptedAuthentications.has(params.request.request)) {

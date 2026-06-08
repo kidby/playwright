@@ -18,7 +18,7 @@ import { test, expect } from './playwright-test-fixtures.js';
 
 test('should repeat from command line', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.spec.js': `
+    'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('test', ({}, testInfo) => {
         console.log('REPEAT ' + testInfo.repeatEachIndex);
@@ -26,7 +26,7 @@ test('should repeat from command line', async ({ runInlineTest }) => {
       });
     `
   }, { 'repeat-each': 3 });
-  expect(result.exitCode).toBe(0);
+  console.log(result.output); expect(result.exitCode).toBe(0);
   expect(result.passed).toBe(3);
   expect(result.output).toContain('REPEAT 0');
   expect(result.output).toContain('REPEAT 1');
@@ -36,18 +36,18 @@ test('should repeat from command line', async ({ runInlineTest }) => {
 
 test('should repeat based on config', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.js': `
-      module.exports = { projects: [
+    'playwright.config.ts': `
+      export default { projects: [
         { name: 'no-repeats' },
         { repeatEach: 2, name: 'two-repeats' },
       ] };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('my test', ({}, testInfo) => {});
     `
   });
-  expect(result.exitCode).toBe(0);
+  console.log(result.output); expect(result.exitCode).toBe(0);
   expect(result.passed).toBe(3);
   const names = result.report.suites[0].specs[0].tests.map(test => test.projectName);
   expect(names).toEqual(['no-repeats', 'two-repeats', 'two-repeats']);

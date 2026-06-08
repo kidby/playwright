@@ -41,13 +41,13 @@ export class AppiumDeviceDispatcher extends Dispatcher<AppiumDevice, channels.Ap
       sessionId: device.client.sessionId,
       capabilities: device.client.capabilities,
     });
-    this.addObjectListener('console', (message: channels.ConsoleMessage) => {
+    this.addObjectListener('console', (message: channels.AppiumDeviceConsoleEvent) => {
       this._dispatchEvent('console', message);
     });
   }
 
   async appLocator(params: channels.AppiumDeviceAppLocatorParams, progress: Progress): Promise<channels.AppiumDeviceAppLocatorResult> {
-    const locator = await this._object.appLocator(params.chain, params.options);
+    const locator = await progress.race(this._object.appLocator(params.chain, params.options));
     return { locator: new AppLocatorDispatcher(this, locator) };
   }
 

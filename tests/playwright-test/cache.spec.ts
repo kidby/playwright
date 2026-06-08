@@ -61,7 +61,8 @@ test('should automatically clean cached versions of a changed file', async ({ ru
     PWTEST_CACHE_DIR: cacheDir
   });
 
-  const cacheDirectories = await fs.promises.readdir(cacheDir);
+  const cacheDirectories = await fs.promises.readdir(cacheDir).catch(() => []);
+  console.log('cacheDirectories:', cacheDirectories);
   expect(cacheDirectories).toHaveLength(1);
   const testCacheDirectory = path.join(cacheDir, cacheDirectories[0]);
 

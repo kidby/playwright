@@ -17,7 +17,8 @@
 import { test } from '../playwright-test/stable-test-runner/index.js';
 import { utils } from '../../packages/playwright-core/lib/coreBundle.js';
 
-import referenceSSIM from 'ssim.js';
+import ssimModule from 'ssim.js';
+const referenceSSIM = (ssimModule as any).default ?? ssimModule;
 import { randomPNG, assertEqual, grayChannel } from './utils.js';
 
 const { ssim, FastStats, ImageChannel, srgb2xyz, xyz2lab, colorDeltaE94 } = utils;

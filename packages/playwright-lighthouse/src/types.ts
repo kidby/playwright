@@ -52,6 +52,9 @@ export type LighthouseOptions = {
   /** Throw on threshold failures (instead of returning `passed: false`). Convenient for tests that should hard-fail. */
   throwOnFail?: boolean;
 
+  /** Whether to serialize audit runs (prevent concurrent lighthouse runs). Defaults to true. */
+  serialize?: boolean;
+
   /** Lighthouse runner flags. `port` is overridden by the value resolved from `page`/`port`. */
   flags?: LH.Flags;
 

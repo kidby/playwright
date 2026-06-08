@@ -22,7 +22,7 @@ test('does nothing unless enabled: true (opt-in default)', async ({ runInlineTes
   // so the reporter is OFF unless the consumer explicitly flips `enabled`.
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { reporter: [['jira', {
+      export default { reporter: [['jira', {
         dryRun: true,
         projectKey: 'QE',
         baseUrl: 'https://x.atlassian.net',
@@ -41,7 +41,7 @@ test('does nothing unless enabled: true (opt-in default)', async ({ runInlineTes
 test('builds a Bug issue with consumer labels + playwright tag', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { reporter: [['jira', {
+      export default { reporter: [['jira', {
         dryRun: true,
         enabled: true,
         projectKey: 'QE',

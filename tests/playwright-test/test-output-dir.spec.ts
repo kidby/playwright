@@ -21,13 +21,13 @@ import { test, expect } from './playwright-test-fixtures.js';
 test('should work and remove non-failures', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         name: 'chromium',
         preserveOutput: 'failures-only',
         testDir: 'dir',
       };
     `,
-    'dir/my-test.spec.js': `
+    'dir/my-test.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('test 1', async ({}, testInfo) => {
         if (testInfo.retry) {
@@ -69,7 +69,7 @@ test('should work and remove non-failures', async ({ runInlineTest }, testInfo) 
 
 test('should include repeat token', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.spec.js': `
+    'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('test', ({}, testInfo) => {
         if (testInfo.repeatEachIndex)
@@ -86,10 +86,10 @@ test('should include repeat token', async ({ runInlineTest }) => {
 test('should default to package.json directory', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'foo/package.json': `{ "name": "foo" }`,
-    'foo/bar/playwright.config.js': `
-      module.exports = { reporters: [], projects: [ {} ] };
+    'foo/bar/playwright.config.ts': `
+      export default { reporters: [], projects: [ {} ] };
     `,
-    'foo/bar/baz/tests/a.spec.js': `
+    'foo/bar/baz/tests/a.spec.ts': `
       import { test, expect } from '@playwright/test';
       const fs = require('fs');
       test('pass', ({}, testInfo) => {
@@ -110,7 +110,7 @@ test('should default to package.json directory', async ({ runInlineTest }, testI
 
 test('should be unique for beforeAll hook from different workers', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
-    'a.spec.js': `
+    'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test.beforeAll(({}, testInfo) => {
         console.log('\\n%%' + testInfo.outputDir);
@@ -150,14 +150,14 @@ test('should include the project name', async ({ runInlineTest }) => {
       });
     `,
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         {},
         { name: 'foo' },
         { name: 'foo' },
         { name: 'Bar space!' },
       ] };
     `,
-    'my-test.spec.js': `
+    'my-test.spec.ts': `
       const { test, test2 } = require('./helper');
       test('test 1', async ({}, testInfo) => {
         console.log(testInfo.outputPath('bar.txt').replace(/\\\\/g, '/'));
@@ -177,43 +177,43 @@ test('should include the project name', async ({ runInlineTest }) => {
 
   // test1, run with empty
   expect(result.output).toContain('test-results/my-test-test-1/bar.txt');
-  expect(result.output).toContain('my-test.spec.js-snapshots/bar.txt');
+  expect(result.output).toContain('my-test.spec.ts-snapshots/bar.txt');
   expect(result.output).toContain('test-results/my-test-test-1-retry1/bar.txt');
-  expect(result.output).toContain('my-test.spec.js-snapshots/bar.txt');
+  expect(result.output).toContain('my-test.spec.ts-snapshots/bar.txt');
 
   // test1, run with foo #1
   expect(result.output).toContain('test-results/my-test-test-1-foo/bar.txt');
-  expect(result.output).toContain('my-test.spec.js-snapshots/bar-foo.txt');
+  expect(result.output).toContain('my-test.spec.ts-snapshots/bar-foo.txt');
   expect(result.output).toContain('test-results/my-test-test-1-foo-retry1/bar.txt');
-  expect(result.output).toContain('my-test.spec.js-snapshots/bar-foo.txt');
+  expect(result.output).toContain('my-test.spec.ts-snapshots/bar-foo.txt');
 
   // test1, run with foo #2
   expect(result.output).toContain('test-results/my-test-test-1-foo1/bar.txt');
-  expect(result.output).toContain('my-test.spec.js-snapshots/bar-foo.txt');
+  expect(result.output).toContain('my-test.spec.ts-snapshots/bar-foo.txt');
   expect(result.output).toContain('test-results/my-test-test-1-foo1-retry1/bar.txt');
-  expect(result.output).toContain('my-test.spec.js-snapshots/bar-foo.txt');
+  expect(result.output).toContain('my-test.spec.ts-snapshots/bar-foo.txt');
 
   // test1, run with bar
   expect(result.output).toContain('test-results/my-test-test-1-Bar-space-/bar.txt');
-  expect(result.output).toContain('my-test.spec.js-snapshots/bar-Bar-space-.txt');
+  expect(result.output).toContain('my-test.spec.ts-snapshots/bar-Bar-space-.txt');
   expect(result.output).toContain('test-results/my-test-test-1-Bar-space--retry1/bar.txt');
-  expect(result.output).toContain('my-test.spec.js-snapshots/bar-Bar-space-.txt');
+  expect(result.output).toContain('my-test.spec.ts-snapshots/bar-Bar-space-.txt');
 
   // test2, run with empty
   expect(result.output).toContain('test-results/my-test-test-2/bar.txt');
-  expect(result.output).toContain('my-test.spec.js-snapshots/bar-suffix.txt');
+  expect(result.output).toContain('my-test.spec.ts-snapshots/bar-suffix.txt');
 
   // test2, run with foo #1
   expect(result.output).toContain('test-results/my-test-test-2-foo/bar.txt');
-  expect(result.output).toContain('my-test.spec.js-snapshots/bar-foo-suffix.txt');
+  expect(result.output).toContain('my-test.spec.ts-snapshots/bar-foo-suffix.txt');
 
   // test2, run with foo #2
   expect(result.output).toContain('test-results/my-test-test-2-foo1/bar.txt');
-  expect(result.output).toContain('my-test.spec.js-snapshots/bar-foo-suffix.txt');
+  expect(result.output).toContain('my-test.spec.ts-snapshots/bar-foo-suffix.txt');
 
   // test2, run with bar
   expect(result.output).toContain('test-results/my-test-test-2-Bar-space-/bar.txt');
-  expect(result.output).toContain('my-test.spec.js-snapshots/bar-Bar-space--suffix.txt');
+  expect(result.output).toContain('my-test.spec.ts-snapshots/bar-Bar-space--suffix.txt');
 });
 
 test('should include path option in snapshot', async ({ runInlineTest }) => {
@@ -228,11 +228,11 @@ test('should include path option in snapshot', async ({ runInlineTest }) => {
       });
     `,
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'foo' },
       ] };
     `,
-    'my-test.spec.js': `
+    'my-test.spec.ts': `
       const { test } = require('./helper');
       test('test with path', async ({}, testInfo) => {
         console.log(testInfo.snapshotPath('test', 'path', 'bar.txt').replace(/\\\\/g, '/'));
@@ -242,7 +242,7 @@ test('should include path option in snapshot', async ({ runInlineTest }) => {
 
   expect(result.exitCode).toBe(0);
   expect(result.results[0].status).toBe('passed');
-  expect(result.output).toContain('my-test.spec.js-snapshots/test/path/bar-foo-suffix.txt');
+  expect(result.output).toContain('my-test.spec.ts-snapshots/test/path/bar-foo-suffix.txt');
 });
 
 test('should error if outputPath is resolved to outside of parent', async ({ runInlineTest }) => {
@@ -257,11 +257,11 @@ test('should error if outputPath is resolved to outside of parent', async ({ run
       });
     `,
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'foo' },
       ] };
     `,
-    'my-test.spec.js': `
+    'my-test.spec.ts': `
       const { test } = require('./helper');
       test('test with parent path', async ({}, testInfo) => {
         console.log(testInfo.outputPath('..', 'test', 'path', 'bar-test').replace(/\\\\/g, '/'));
@@ -290,13 +290,13 @@ test('should remove output dirs for projects run', async ({ runInlineTest }, tes
   }
 
   const result = await runInlineTest({
-    'playwright.config.js': `
-      module.exports = { projects: [
+    'playwright.config.ts': `
+      export default { projects: [
         { outputDir: ${JSON.stringify(paths[0])} },
         { outputDir: ${JSON.stringify(paths[2])} },
       ] };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('my test', ({}, testInfo) => {});
     `
@@ -314,7 +314,7 @@ test('should remove folders with preserveOutput=never', async ({ runInlineTest }
     'playwright.config.ts': `
       export default { preserveOutput: 'never' };
     `,
-    'dir/my-test.spec.js': `
+    'dir/my-test.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('test 1', async ({}, testInfo) => {
         require('fs').writeFileSync(testInfo.outputPath('file.txt'), 'content', 'utf-8');
@@ -333,7 +333,7 @@ test('should remove folders with preserveOutput=never', async ({ runInlineTest }
 
 test('should preserve failed results', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
-    'dir/my-test.spec.js': `
+    'dir/my-test.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('test 1', async ({}, testInfo) => {
         require('fs').writeFileSync(testInfo.outputPath('file.txt'), 'content', 'utf-8');
@@ -352,14 +352,14 @@ test('should preserve failed results', async ({ runInlineTest }, testInfo) => {
 
 test('should accept a relative path for outputDir', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
-    'my-test.spec.js': `
+    'my-test.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('test', async ({}, testInfo) => {
         expect(testInfo.outputDir).toBe(${JSON.stringify(path.join(testInfo.outputDir, './my-output-dir', 'my-test-test'))});
       });
     `,
-    'playwright.config.js': `
-    module.exports = { projects: [
+    'playwright.config.ts': `
+    export default { projects: [
       { outputDir: './my-output-dir' },
     ] };
     `,
@@ -369,13 +369,13 @@ test('should accept a relative path for outputDir', async ({ runInlineTest }, te
 
 test('should have output dir based on rootDir (cwd)', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
-    'playwright.config.js': `
+    'playwright.config.ts': `
       const path = require('path');
-      module.exports = {
+      export default {
         testDir: path.join(__dirname, 'e2e'),
         outputDir: 'test-results/',
       };`,
-    'e2e/example.spec.js': `
+    'e2e/example.spec.ts': `
       import { test, expect } from '@playwright/test';
       const fs = require('fs');
       test('hello world', async ({ }, testInfo) => {
@@ -390,7 +390,7 @@ test('should have output dir based on rootDir (cwd)', async ({ runInlineTest }, 
 
 test('should allow nonAscii characters in the output dir', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
-    'my-test.spec.js': `
+    'my-test.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('こんにちは世界', async ({}, testInfo) => {
         console.log('\\n%%' + testInfo.outputDir);
@@ -403,7 +403,7 @@ test('should allow nonAscii characters in the output dir', async ({ runInlineTes
 
 test('should allow shorten long output dirs characters in the output dir', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
-    'very/deep/and/long/file/name/that/i/want/to/be/trimmed/my-test.spec.js': `
+    'very/deep/and/long/file/name/that/i/want/to/be/trimmed/my-test.spec.ts': `
       import { test, expect } from '@playwright/test';
       test.describe('this is a really long description that would be too long for a file path', () => {
         test('and this is an even longer test name that just keeps going and going and we should shorten it', async ({}, testInfo) => {
@@ -418,7 +418,7 @@ test('should allow shorten long output dirs characters in the output dir', async
 
 test('should not mangle double dashes', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
-    'my--file.spec.js': `
+    'my--file.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('my--test', async ({}, testInfo) => {
         console.log('\\n%%' + testInfo.outputDir);
@@ -431,7 +431,7 @@ test('should not mangle double dashes', async ({ runInlineTest }, testInfo) => {
 
 test('should allow include the describe name the output dir', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
-    'my-test.spec.js': `
+    'my-test.spec.ts': `
       import { test, expect } from '@playwright/test';
       test.describe('hello', () => {
         test('world', async ({}, testInfo) => {

@@ -21,7 +21,7 @@ import { test, expect } from './playwright-test-fixtures.js';
 test('ai reporter writes per-failure markdown + index + jsonl', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { reporter: [['ai', { outputDir: 'ai-out' }]] };
+      export default { reporter: [['ai', { outputDir: 'ai-out' }]] };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -51,7 +51,7 @@ test('ai reporter writes per-failure markdown + index + jsonl', async ({ runInli
 test('ai reporter per-failure markdown teaches CLI investigation steps', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { reporter: [['ai', { outputDir: 'ai-out' }]] };
+      export default { reporter: [['ai', { outputDir: 'ai-out' }]] };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -74,7 +74,7 @@ test('ai reporter per-failure markdown teaches CLI investigation steps', async (
 test('ai reporter inline prompt is prepended', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['ai', { outputDir: 'ai-out', prompt: 'You are a triage bot.\\nAlways suggest a JIRA label.' }]]
       };
     `,
@@ -94,7 +94,7 @@ test('ai reporter inline prompt is prepended', async ({ runInlineTest }, testInf
 test('ai reporter inlines mobile-snapshot attachment as a YAML code block', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { reporter: [['ai', { outputDir: 'ai-out' }]] };
+      export default { reporter: [['ai', { outputDir: 'ai-out' }]] };
     `,
     'a.spec.ts': `
       import { test, expect } from '@playwright/test';
@@ -120,7 +120,7 @@ test('ai reporter inlines mobile-snapshot attachment as a YAML code block', asyn
 test('ai reporter writes empty index when all pass', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { reporter: [['ai', { outputDir: 'ai-out' }]] };
+      export default { reporter: [['ai', { outputDir: 'ai-out' }]] };
     `,
     'a.spec.ts': `
       import { test } from '@playwright/test';

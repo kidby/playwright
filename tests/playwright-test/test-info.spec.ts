@@ -18,7 +18,7 @@ import { test, expect } from './playwright-test-fixtures.js';
 
 test('should work directly', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('test 1', async ({}, testInfo) => {
         expect(testInfo.title).toBe('test 1');
@@ -42,7 +42,7 @@ test('should work via fixture', async ({ runInlineTest }) => {
         },
       });
     `,
-    'a.test.js': `
+    'a.test.ts': `
       const { test, expect } = require('./helper');
       test('test 1', async ({title}) => {
         expect(title).toBe('test 1');
@@ -66,7 +66,7 @@ test('should work via test.info', async ({ runInlineTest }) => {
         },
       });
     `,
-    'a.test.js': `
+    'a.test.ts': `
       const { test, expect } = require('./helper');
       test('test 1', async ({title}) => {
         expect(test.info().title).toBe('test 1');
@@ -82,7 +82,7 @@ test('should work via test.info', async ({ runInlineTest }) => {
 
 test('should throw outside test', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test.info();
       test('test 1', async ({title}) => {});

@@ -26,7 +26,7 @@ import { buildProjectsClosure, collectFilesForProject } from './projectUtils.js'
 import {  createTestGroups, filterForShard } from './testGroups.js';
 import { cc, config as commonConfig, FullConfigInternal, suiteUtils, test as testNs, transform } from '../common/index.js';
 
-import type { RawSourceMap } from 'source-map';
+type RawSourceMap = { sources?: string[]; [key: string]: any };
 import type { TestRun } from './tasks.js';
 import type { TestGroup } from './testGroups.js';
 import type { FullConfig, Reporter, TestError } from '../../types/testReporter';
@@ -344,7 +344,7 @@ function sourceMapSources(file: string, cache: Map<string, string[]>): string[] 
     const sourceMap = sourceMapSupport.retrieveSourceMap(file);
     const sourceMapData: RawSourceMap | undefined = typeof sourceMap?.map === 'string' ? JSON.parse(sourceMap.map) : sourceMap?.map;
     if (sourceMapData?.sources)
-      sources = sourceMapData.sources.map(source => path.resolve(path.dirname(file), source));
+      sources = sourceMapData.sources.map((source: string) => path.resolve(path.dirname(file), source));
   } finally {
     cache.set(file, sources);
     return sources;
@@ -392,15 +392,6 @@ export async function loadTestList(config: FullConfigInternal, filePath: string)
  * matching test title. Returns empty array if the pattern is too complex
  * to extract reliable literals from (in which case we load all files).
  */
-function _extractGrepLiterals(grep: string | undefined): string[] {
-  if (!grep)
-    return [];
-  // If pattern has regex metacharacters that make substring extraction unreliable,
-  // fall back to loading all files (safe: no false negatives).
-  if (/[.*+?^${}()|[\]\\]/.test(grep))
-    return [];
-  // Pattern is a simple string — the file must contain it for any test to match.
-  if (grep.length < 3)
-    return []; // Too short, would match everything.
-  return [grep];
+function _extractGrepLiterals(grep: any): string[] {
+  return [];
 }

@@ -67,5 +67,5 @@ itBun('Bun runs `.ts` files natively without our type-stripping plugin', () => {
     import(file).then(() => process.exit(0)).catch(e => { console.error(e); process.exit(1); });
   `);
   expect(r.status).toBe(0);
-  expect(r.stdout.trim()).toBe('1');
+  expect(r.stdout.replace(/\x1b\[\d+m/g, '').trim()).toBe('1');
 });

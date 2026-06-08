@@ -21,10 +21,10 @@ export const XPathEngine: SelectorEngine = {
     if (selector.startsWith('/') && root.nodeType !== Node.DOCUMENT_NODE)
       selector = '.' + selector;
     const result: Element[] = [];
-    const document = root.ownerDocument || root;
+    const document = root.ownerDocument || root as Document;
     if (!document)
       return result;
-    const it = document.evaluate(selector, root, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE);
+    const it = (document as Document).evaluate(selector, root, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE);
     for (let node = it.iterateNext(); node; node = it.iterateNext()) {
       if (node.nodeType === Node.ELEMENT_NODE)
         result.push(node as Element);

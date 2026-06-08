@@ -46,7 +46,8 @@ it('should handle client-side abort correctly', async ({ page, server }) => {
   expect(isAborted).toBe(true);
 });
 
-it('should handle multiple browser context lifecycles without leaks or crashes', async ({ browser, server }) => {
+it('should handle multiple browser context lifecycles without leaks or crashes', async ({ page, server }) => {
+  const browser = page.context().browser()!;
   const contexts = [];
   for (let i = 0; i < 5; i++) {
     const context = await browser.newContext();
@@ -62,7 +63,8 @@ it('should handle multiple browser context lifecycles without leaks or crashes',
   }
 });
 
-it('should handle concurrent browser context lifecycles', async ({ browser, server }) => {
+it('should handle concurrent browser context lifecycles', async ({ page, server }) => {
+  const browser = page.context().browser()!;
   const contextPromises = Array.from({ length: 5 }, async () => {
     const context = await browser.newContext();
     const page = await context.newPage();

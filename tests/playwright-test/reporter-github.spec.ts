@@ -29,7 +29,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
 
     test('print GitHub annotations for success', async ({ runInlineTest }) => {
       const result = await runInlineTest({
-        'a.test.js': `
+        'a.test.ts': `
           import { test, expect } from '@playwright/test';
           test('example1', async ({}) => {
             expect(1 + 1).toBe(2);
@@ -44,7 +44,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
 
     test('print GitHub annotations for failed tests', async ({ runInlineTest }, testInfo) => {
       const result = await runInlineTest({
-        'a.test.js': `
+        'a.test.ts': `
           const { test, expect } = require('@playwright/test');
           test('example', async ({}) => {
             expect(1 + 1).toBe(3);
@@ -52,21 +52,21 @@ for (const useIntermediateMergeReport of [false, true] as const) {
         `
       }, { retries: 3, reporter: 'github' }, { GITHUB_WORKSPACE: process.cwd() });
       const text = result.output;
-      const testPath = relativeFilePath(testInfo.outputPath('a.test.js'));
-      expect(text).toContain(`::error file=${testPath},title=a.test.js:3:11 › example,line=4,col=27::  1) a.test.js:3:11 › example ──────────────────────────────────────────────────────────────────────%0A%0A    Retry #1`);
-      expect(text).toContain(`::error file=${testPath},title=a.test.js:3:11 › example,line=4,col=27::  1) a.test.js:3:11 › example ──────────────────────────────────────────────────────────────────────%0A%0A    Retry #2`);
-      expect(text).toContain(`::error file=${testPath},title=a.test.js:3:11 › example,line=4,col=27::  1) a.test.js:3:11 › example ──────────────────────────────────────────────────────────────────────%0A%0A    Retry #3`);
+      const testPath = relativeFilePath(testInfo.outputPath('a.test.ts'));
+      expect(text).toContain(`::error file=${testPath},title=a.test.ts:3:11 › example,line=3,col=16::  1) a.test.ts:3:11 › example ──────────────────────────────────────────────────────────────────────%0A%0A    Retry #1`);
+      expect(text).toContain(`::error file=${testPath},title=a.test.ts:3:11 › example,line=3,col=16::  1) a.test.ts:3:11 › example ──────────────────────────────────────────────────────────────────────%0A%0A    Retry #2`);
+      expect(text).toContain(`::error file=${testPath},title=a.test.ts:3:11 › example,line=3,col=16::  1) a.test.ts:3:11 › example ──────────────────────────────────────────────────────────────────────%0A%0A    Retry #3`);
       expect(result.exitCode).toBe(1);
     });
 
     test('print GitHub annotations for slow tests', async ({ runInlineTest }) => {
       const result = await runInlineTest({
         'playwright.config.ts': `
-          module.exports = {
+          export default {
             reportSlowTests: { max: 0, threshold: 100 }
           };
         `,
-        'a.test.js': `
+        'a.test.ts': `
           import { test, expect } from '@playwright/test';
           test('slow test', async ({}) => {
             await new Promise(f => setTimeout(f, 200));
@@ -74,7 +74,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
         `
       }, { retries: 3, reporter: 'github' }, { GITHUB_WORKSPACE: '' });
       const text = result.output;
-      expect(text).toContain('::warning title=Slow Test,file=a.test.js::a.test.js took');
+      expect(text).toContain('::warning title=Slow Test,file=a.test.ts::a.test.ts took');
       expect(text).toContain('::notice title=🎭 Playwright Run Summary::  1 passed');
       expect(result.exitCode).toBe(0);
     });
@@ -100,7 +100,7 @@ for (const useIntermediateMergeReport of [false, true] as const) {
 
     test('emit GitHub failure annotation before run summary', async ({ runInlineTest }) => {
       const result = await runInlineTest({
-        'a.test.js': `
+        'a.test.ts': `
           const { test, expect } = require('@playwright/test');
           test('failing', async ({}) => {
             expect(1 + 1).toBe(3);

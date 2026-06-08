@@ -28,7 +28,8 @@ import { createConfig, frameworkConfig, hasJSComponents, populateComponentsFromT
 import type http from 'http';
 import type { AddressInfo } from 'net';
 import type { FullConfig, Suite } from 'playwright/types/testReporter';
-import type { PluginContext } from 'rollup';
+// @ts-ignore -- rollup types not resolved through Bun's node_modules layout
+type PluginContext = any;
 import type { Plugin, ResolveFn, ResolvedConfig } from 'vite';
 import type { TestRunnerPlugin } from '../../playwright/src/plugins/index.js';
 import type { ImportInfo } from './tsxTransform.js';

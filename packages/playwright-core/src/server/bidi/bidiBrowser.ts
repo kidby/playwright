@@ -325,6 +325,59 @@ export class BidiBrowserContext extends BrowserContext {
         { partition: { type: 'storageKey', userContext: this._browserContextId } });
   }
 
+  override async clearCookies(options: { name?: string | RegExp, domain?: string | RegExp, path?: string | RegExp }): Promise<void> {
+    const hasFilter = options.name !== undefined || options.domain !== undefined || options.path !== undefined;
+    if (!hasFilter) {
+      await this.doClearCookies();
+      return;
+    }
+
+    const hasRegex = options.name instanceof RegExp || options.domain instanceof RegExp || options.path instanceof RegExp;
+    if (!hasRegex) {
+      // Use BiDi's native filter for exact string matches.
+      const filter: bidi.Storage.CookieFilter = {};
+      if (options.name)
+        filter.name = options.name as string;
+      if (options.domain)
+        filter.domain = options.domain as string;
+      if (options.path)
+        filter.path = options.path as string;
+      await this._browser._browserSession.send('storage.deleteCookies', {
+        filter,
+        partition: { type: 'storageKey', userContext: this._browserContextId },
+      });
+      return;
+    }
+
+    // For regex filters, fetch cookies, filter locally, and delete individually.
+    const matches = (cookie: channels.NetworkCookie, prop: 'name' | 'domain' | 'path', value: string | RegExp | undefined) => {
+      if (!value)
+        return true;
+      if (value instanceof RegExp) {
+        value.lastIndex = 0;
+        return value.test(cookie[prop]);
+      }
+      return cookie[prop] === value;
+    };
+
+    const currentCookies = await this._cookies();
+    const cookiesToDelete = currentCookies.filter(cookie => {
+      return matches(cookie, 'name', options.name)
+        && matches(cookie, 'domain', options.domain)
+        && matches(cookie, 'path', options.path);
+    });
+
+    if (!cookiesToDelete.length)
+      return;
+
+    await Promise.all(cookiesToDelete.map(cookie =>
+      this._browser._browserSession.send('storage.deleteCookies', {
+        filter: { name: cookie.name, domain: cookie.domain, path: cookie.path },
+        partition: { type: 'storageKey', userContext: this._browserContextId },
+      })
+    ));
+  }
+
   async doGrantPermissions(origin: string, permissions: string[]) {
     if (origin === 'null')
       return;

@@ -335,7 +335,7 @@ test('should report error and pending operations on timeout', async ({ runInline
   expect(result.passed).toBe(0);
   expect(result.failed).toBe(1);
   expect(result.output).toContain('Error: locator.click: Test timeout of 2000ms exceeded.');
-  expect(result.output).toContain('a.test.ts:5:41');
+  expect(result.output).toContain('a.test.ts:4:34');
 });
 
 test('should report error on timeout with shared page', async ({ runInlineTest }) => {

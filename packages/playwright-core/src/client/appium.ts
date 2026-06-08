@@ -95,7 +95,7 @@ export class Appium extends ChannelOwner<channels.AppiumChannel> {
     // The remote Playwright server (the Cloud Orchestrator) intercepts this,
     // dynamically provisions the physical device or Docker container matching
     // the requested capabilities, and bridges the RPC connection to it.
-    const device = await remotePlaywright.appium.connect('cloud-provisioned', capabilities);
+    const device = await (remotePlaywright as any).appium.connect('cloud-provisioned', capabilities);
 
     log(`Device allocated: ${device.sessionId ?? 'unknown'}`);
 

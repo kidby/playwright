@@ -18,7 +18,7 @@ import { test, expect } from './playwright-test-fixtures.js';
 
 test('should retry failures', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'retry-failures.spec.js': `
+    'retry-failures.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('flake', async ({}, testInfo) => {
         // Passes on the second run.
@@ -39,13 +39,13 @@ test('should retry failures', async ({ runInlineTest }) => {
 
 test('should retry based on config', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.js': `
-      module.exports = { projects: [
+    'playwright.config.ts': `
+      export default { projects: [
         { retries: 0, name: 'no-retries' },
         { retries: 2, name: 'two-retries' },
       ] };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('pass', ({}, testInfo) => {
         // Passes on the third run.
@@ -62,10 +62,10 @@ test('should retry based on config', async ({ runInlineTest }) => {
 
 test('should retry based on test.describe.configure', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.js': `
-      module.exports = { retries: 2 };
+    'playwright.config.ts': `
+      export default { retries: 2 };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test.describe.configure({ retries: 1 });
       test('fail 1', ({}, testInfo) => {
@@ -73,7 +73,7 @@ test('should retry based on test.describe.configure', async ({ runInlineTest }) 
         expect(1).toBe(2);
       });
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('fail 4', ({}, testInfo) => {
         console.log('%%fail4-' + testInfo.retry);
@@ -117,7 +117,7 @@ test('should retry based on test.describe.configure', async ({ runInlineTest }) 
 
 test('should retry timeout', async ({ runInlineTest }) => {
   const { exitCode, passed, failed, output } = await runInlineTest({
-    'one-timeout.spec.js': `
+    'one-timeout.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('timeout', async () => {
         await new Promise(f => setTimeout(f, 10000));
@@ -132,7 +132,7 @@ test('should retry timeout', async ({ runInlineTest }) => {
 
 test('should fail on unexpected pass with retries', async ({ runInlineTest }) => {
   const { exitCode, failed, output } = await runInlineTest({
-    'unexpected-pass.spec.js': `
+    'unexpected-pass.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('succeeds', () => {
         test.fail();
@@ -147,7 +147,7 @@ test('should fail on unexpected pass with retries', async ({ runInlineTest }) =>
 
 test('should retry unexpected pass', async ({ runInlineTest }) => {
   const { exitCode, passed, failed, output } = await runInlineTest({
-    'unexpected-pass.spec.js': `
+    'unexpected-pass.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('succeeds', () => {
         test.fail();
@@ -163,7 +163,7 @@ test('should retry unexpected pass', async ({ runInlineTest }) => {
 
 test('should not retry expected failure', async ({ runInlineTest }) => {
   const { exitCode, passed, failed, output } = await runInlineTest({
-    'expected-failure.spec.js': `
+    'expected-failure.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('fails', () => {
         test.fail();
@@ -183,7 +183,7 @@ test('should not retry expected failure', async ({ runInlineTest }) => {
 
 test('should retry unhandled rejection', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'unhandled-rejection.spec.js': `
+    'unhandled-rejection.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('unhandled rejection', async () => {
         setTimeout(() => {
@@ -202,7 +202,7 @@ test('should retry unhandled rejection', async ({ runInlineTest }) => {
 
 test('should retry beforeAll failure', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.spec.js': `
+    'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test.beforeAll(async () => {
         throw new Error('BeforeAll is bugged!');

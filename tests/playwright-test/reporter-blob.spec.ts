@@ -83,20 +83,20 @@ class EchoReporter {
   onStepEnd(test, result, step) {
   }
 }
-module.exports = EchoReporter;
+export default EchoReporter;
 `;
 
 test('should call methods in right order', async ({ runInlineTest, mergeReports }) => {
   const reportDir = test.info().outputPath('blob-report');
   const files = {
-    'echo-reporter.js': echoReporterJs,
+    'echo-reporter.ts': echoReporterJs,
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 1,
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -109,7 +109,7 @@ test('should call methods in right order', async ({ runInlineTest, mergeReports 
       });
       test.skip('skipped 1', async ({}) => {});
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -119,7 +119,7 @@ test('should call methods in right order', async ({ runInlineTest, mergeReports 
       });
       test.skip('skipped 2', async ({}) => {});
     `,
-    'c.test.js': `
+    'c.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 3', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -135,7 +135,7 @@ test('should call methods in right order', async ({ runInlineTest, mergeReports 
   const reportFiles = await fs.promises.readdir(reportDir);
   reportFiles.sort();
   expect(reportFiles).toEqual([expect.stringMatching(/report-.*.zip/), expect.stringMatching(/report-.*.zip/)]);
-  const { exitCode, output } = await mergeReports(reportDir, {}, { additionalArgs: ['--reporter', test.info().outputPath('echo-reporter.js')] });
+  const { exitCode, output } = await mergeReports(reportDir, {}, { additionalArgs: ['--reporter', test.info().outputPath('echo-reporter.ts')] });
   expect(exitCode).toBe(0);
   const lines = output.split('\n').filter(l => l.trim().length);
   expect(lines[0]).toBe('onBegin');
@@ -154,7 +154,7 @@ test('should merge into html with dependencies', async ({ runInlineTest, mergeRe
   const reportDir = test.info().outputPath('blob-report');
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 1,
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]],
         projects: [
@@ -169,7 +169,7 @@ test('should merge into html with dependencies', async ({ runInlineTest, mergeRe
         await setup.step('login step', async () => {});
       });
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -182,7 +182,7 @@ test('should merge into html with dependencies', async ({ runInlineTest, mergeRe
       });
       test.skip('skipped 1', async ({}) => {});
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -192,7 +192,7 @@ test('should merge into html with dependencies', async ({ runInlineTest, mergeRe
       });
       test.skip('skipped 2', async ({}) => {});
     `,
-    'c.test.js': `
+    'c.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 3', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -240,12 +240,12 @@ test('should merge blob into blob', async ({ runInlineTest, mergeReports, showRe
   const reportDir = test.info().outputPath('blob-report-orig');
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 1,
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -258,7 +258,7 @@ test('should merge blob into blob', async ({ runInlineTest, mergeReports, showRe
       });
       test.skip('skipped 1', async ({}) => {});
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -297,7 +297,7 @@ test('should produce consistent step ids', {
 }, async ({ runInlineTest, mergeReports, showReport, page }) => {
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 1,
         reporter: [
           ['blob', { outputFile: 'blob-report/report-1.zip' }],
@@ -305,7 +305,7 @@ test('should produce consistent step ids', {
         ]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -328,12 +328,12 @@ test('be able to merge incomplete shards', async ({ runInlineTest, mergeReports,
   const reportDir = test.info().outputPath('blob-report');
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 1,
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1', async ({}) => {
       });
@@ -342,7 +342,7 @@ test('be able to merge incomplete shards', async ({ runInlineTest, mergeReports,
       });
       test.skip('skipped 1', async ({}) => {});
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', async ({}) => { });
       test('failing 2', async ({}) => {
@@ -350,7 +350,7 @@ test('be able to merge incomplete shards', async ({ runInlineTest, mergeReports,
       });
       test.skip('skipped 2', async ({}) => {});
     `,
-    'c.test.js': `
+    'c.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 3', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -383,19 +383,19 @@ test('total time is from test run not from merge', async ({ runInlineTest, merge
   const reportDir = test.info().outputPath('blob-report');
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 1,
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('slow 1', async ({}) => {
         await new Promise(f => setTimeout(f, 2000));
         expect(1 + 1).toBe(2);
       });
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('slow 1', async ({}) => {
         await new Promise(f => setTimeout(f, 1000));
@@ -427,12 +427,12 @@ test('merge into list report by default', async ({ runInlineTest, mergeReports }
   const reportDir = test.info().outputPath('blob-report');
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 1,
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -445,7 +445,7 @@ test('merge into list report by default', async ({ runInlineTest, mergeReports }
       });
       test.skip('skipped 1', async ({}) => {});
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -455,7 +455,7 @@ test('merge into list report by default', async ({ runInlineTest, mergeReports }
       });
       test.skip('skipped 2', async ({}) => {});
     `,
-    'c.test.js': `
+    'c.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 3', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -480,34 +480,34 @@ test('merge into list report by default', async ({ runInlineTest, mergeReports }
   expect(text).toContain('Running 10 tests using 3 workers');
   const lines = text.split('\n').filter(l => l.match(/^#.* :/)).map(l => l.replace(/[.\d]+m?s/, 'Xms'));
   expect(lines).toEqual([
-    `#0 :       1 a.test.js:3:11 › math 1`,
-    `#0 :   ${POSITIVE_STATUS_MARK}  1 a.test.js:3:11 › math 1 (Xms)`,
-    `#1 :       2 a.test.js:6:11 › failing 1`,
-    `#1 :   ${NEGATIVE_STATUS_MARK}  2 a.test.js:6:11 › failing 1 (Xms)`,
-    `#2 :       3 a.test.js:6:11 › failing 1 (retry #1)`,
-    `#2 :   ${NEGATIVE_STATUS_MARK}  3 a.test.js:6:11 › failing 1 (retry #1) (Xms)`,
-    `#3 :       4 a.test.js:9:11 › flaky 1`,
-    `#3 :   ${NEGATIVE_STATUS_MARK}  4 a.test.js:9:11 › flaky 1 (Xms)`,
-    `#4 :       5 a.test.js:9:11 › flaky 1 (retry #1)`,
-    `#4 :   ${POSITIVE_STATUS_MARK}  5 a.test.js:9:11 › flaky 1 (retry #1) (Xms)`,
-    `#5 :       6 a.test.js:12:12 › skipped 1`,
-    `#5 :   -   6 a.test.js:12:12 › skipped 1`,
-    `#6 :       7 b.test.js:3:11 › math 2`,
-    `#6 :   ${POSITIVE_STATUS_MARK}  7 b.test.js:3:11 › math 2 (Xms)`,
-    `#7 :       8 b.test.js:6:11 › failing 2`,
-    `#7 :   ${NEGATIVE_STATUS_MARK}  8 b.test.js:6:11 › failing 2 (Xms)`,
-    `#8 :       9 b.test.js:6:11 › failing 2 (retry #1)`,
-    `#8 :   ${NEGATIVE_STATUS_MARK}  9 b.test.js:6:11 › failing 2 (retry #1) (Xms)`,
-    `#9 :      10 b.test.js:9:12 › skipped 2`,
-    `#9 :   -  10 b.test.js:9:12 › skipped 2`,
-    `#10 :      11 c.test.js:3:11 › math 3`,
-    `#10 :   ${POSITIVE_STATUS_MARK} 11 c.test.js:3:11 › math 3 (Xms)`,
-    `#11 :      12 c.test.js:6:11 › flaky 2`,
-    `#11 :   ${NEGATIVE_STATUS_MARK} 12 c.test.js:6:11 › flaky 2 (Xms)`,
-    `#12 :      13 c.test.js:6:11 › flaky 2 (retry #1)`,
-    `#12 :   ${POSITIVE_STATUS_MARK} 13 c.test.js:6:11 › flaky 2 (retry #1) (Xms)`,
-    `#13 :      14 c.test.js:9:12 › skipped 3`,
-    `#13 :   -  14 c.test.js:9:12 › skipped 3`,
+    `#0 :       1 a.test.ts:3:7 › math 1`,
+    `#0 :   ${POSITIVE_STATUS_MARK}  1 a.test.ts:3:7 › math 1 (Xms)`,
+    `#1 :       2 a.test.ts:6:7 › failing 1`,
+    `#1 :   ${NEGATIVE_STATUS_MARK}  2 a.test.ts:6:7 › failing 1 (Xms)`,
+    `#2 :       3 a.test.ts:6:7 › failing 1 (retry #1)`,
+    `#2 :   ${NEGATIVE_STATUS_MARK}  3 a.test.ts:6:7 › failing 1 (retry #1) (Xms)`,
+    `#3 :       4 a.test.ts:9:7 › flaky 1`,
+    `#3 :   ${NEGATIVE_STATUS_MARK}  4 a.test.ts:9:7 › flaky 1 (Xms)`,
+    `#4 :       5 a.test.ts:9:7 › flaky 1 (retry #1)`,
+    `#4 :   ${POSITIVE_STATUS_MARK}  5 a.test.ts:9:7 › flaky 1 (retry #1) (Xms)`,
+    `#5 :       6 a.test.ts:12:12 › skipped 1`,
+    `#5 :   -   6 a.test.ts:12:12 › skipped 1`,
+    `#6 :       7 b.test.ts:3:7 › math 2`,
+    `#6 :   ${POSITIVE_STATUS_MARK}  7 b.test.ts:3:7 › math 2 (Xms)`,
+    `#7 :       8 b.test.ts:6:7 › failing 2`,
+    `#7 :   ${NEGATIVE_STATUS_MARK}  8 b.test.ts:6:7 › failing 2 (Xms)`,
+    `#8 :       9 b.test.ts:6:7 › failing 2 (retry #1)`,
+    `#8 :   ${NEGATIVE_STATUS_MARK}  9 b.test.ts:6:7 › failing 2 (retry #1) (Xms)`,
+    `#9 :      10 b.test.ts:9:12 › skipped 2`,
+    `#9 :   -  10 b.test.ts:9:12 › skipped 2`,
+    `#10 :      11 c.test.ts:3:7 › math 3`,
+    `#10 :   ${POSITIVE_STATUS_MARK} 11 c.test.ts:3:7 › math 3 (Xms)`,
+    `#11 :      12 c.test.ts:6:7 › flaky 2`,
+    `#11 :   ${NEGATIVE_STATUS_MARK} 12 c.test.ts:6:7 › flaky 2 (Xms)`,
+    `#12 :      13 c.test.ts:6:7 › flaky 2 (retry #1)`,
+    `#12 :   ${POSITIVE_STATUS_MARK} 13 c.test.ts:6:7 › flaky 2 (retry #1) (Xms)`,
+    `#13 :      14 c.test.ts:9:12 › skipped 3`,
+    `#13 :   -  14 c.test.ts:9:12 › skipped 3`,
   ]);
 });
 
@@ -515,12 +515,12 @@ test('should print progress', async ({ runInlineTest, mergeReports }) => {
   const reportDir = test.info().outputPath('blob-report');
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 1,
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -533,7 +533,7 @@ test('should print progress', async ({ runInlineTest, mergeReports }) => {
       });
       test.skip('skipped 1', async ({}) => {});
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -543,7 +543,7 @@ test('should print progress', async ({ runInlineTest, mergeReports }) => {
       });
       test.skip('skipped 2', async ({}) => {});
     `,
-    'c.test.js': `
+    'c.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 3', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -574,12 +574,12 @@ test('preserve attachments', async ({ runInlineTest, mergeReports, showReport, p
   const reportDir = test.info().outputPath('blob-report');
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 1,
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       import fs from 'fs';
 
@@ -597,7 +597,7 @@ test('preserve attachments', async ({ runInlineTest, mergeReports, showReport, p
       });
       test.skip('skipped 1', async ({}) => {});
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', async ({}) => { });
       test('failing 2', async ({}) => {
@@ -634,7 +634,7 @@ test('generate html with attachment urls', async ({ runInlineTest, mergeReports,
   const reportDir = test.info().outputPath('blob-report');
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 1,
         use: {
           trace: 'on'
@@ -642,7 +642,7 @@ test('generate html with attachment urls', async ({ runInlineTest, mergeReports,
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       import fs from 'fs';
 
@@ -660,7 +660,7 @@ test('generate html with attachment urls', async ({ runInlineTest, mergeReports,
       });
       test.skip('skipped 1', async ({}) => {});
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', async ({}) => { });
       test('failing 2', async ({}) => {
@@ -718,11 +718,11 @@ test('resource names should not clash between runs', async ({ runInlineTest, sho
   const reportDir = test.info().outputPath('blob-report');
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       import fs from 'fs';
       import path from 'path';
@@ -733,7 +733,7 @@ test('resource names should not clash between runs', async ({ runInlineTest, sho
         test.info().attachments.push({ name: 'file-attachment', path: attachmentPath, contentType: 'text/plain' });
       });
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       import fs from 'fs';
       import path from 'path';
@@ -787,12 +787,12 @@ test('multiple output reports', async ({ runInlineTest, mergeReports, showReport
   const reportDir = test.info().outputPath('blob-report');
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 1,
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       import fs from 'fs';
 
@@ -810,7 +810,7 @@ test('multiple output reports', async ({ runInlineTest, mergeReports, showReport
       });
       test.skip('skipped 1', async ({}) => {});
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', async ({}) => { });
       test('failing 2', async ({}) => {
@@ -830,8 +830,8 @@ test('multiple output reports', async ({ runInlineTest, mergeReports, showReport
   // Check that line reporter was called.
   const text = stripAnsi(output);
   expect(text).toContain('Running 3 tests using 1 worker');
-  expect(text).toContain('[1/3] a.test.js:5:11 › first');
-  expect(text).toContain('a.test.js:13:11 › failing 1 (retry #1)');
+  expect(text).toContain('[1/3] a.test.ts:5:11 › first');
+  expect(text).toContain('a.test.ts:13:11 › failing 1 (retry #1)');
 
   // Check html report presence.
   await showReport();
@@ -842,17 +842,17 @@ test('multiple output reports based on config', async ({ runInlineTest, mergeRep
   const reportDir = test.info().outputPath('blob-report');
   const files = {
     'merged/playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['blob', { outputDir: 'merged-blob' }], ['html', { outputFolder: 'html', open: 'never' }], ['line']]
       };
     `,
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 1,
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       import fs from 'fs';
 
@@ -870,7 +870,7 @@ test('multiple output reports based on config', async ({ runInlineTest, mergeRep
       });
       test.skip('skipped 1', async ({}) => {});
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', async ({}) => { });
       test('failing 2', async ({}) => {
@@ -894,8 +894,8 @@ test('multiple output reports based on config', async ({ runInlineTest, mergeRep
   // Check that line reporter was called.
   const text = stripAnsi(output);
   expect(text).toContain('Running 6 tests using 2 workers');
-  expect(text).toContain('[1/6] a.test.js:5:11 › first');
-  expect(text).toContain('a.test.js:13:11 › failing 1 (retry #1)');
+  expect(text).toContain('[1/6] a.test.ts:5:7 › first');
+  expect(text).toContain('a.test.ts:13:7 › failing 1 (retry #1)');
 
   // Check html report presence.
   expect((await fs.promises.stat(test.info().outputPath('merged/html/index.html'))).isFile).toBeTruthy();
@@ -909,7 +909,7 @@ test('onError in the report', async ({ runInlineTest, mergeReports, showReport, 
   const reportDir = test.info().outputPath('blob-report');
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 1,
         tag: process.env.GLOBAL_TAG,
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]]
@@ -989,7 +989,7 @@ test('preserve config fields', async ({ runInlineTest, mergeReports }) => {
     quiet: true
   };
   const files = {
-    'echo-reporter.js': `
+    'echo-reporter.ts': `
       import fs from 'fs';
 
       class EchoReporter {
@@ -997,24 +997,24 @@ test('preserve config fields', async ({ runInlineTest, mergeReports }) => {
           fs.writeFileSync('config.json', JSON.stringify(config));
         }
       }
-      module.exports = EchoReporter;
+      export default EchoReporter;
     `,
     'playwright.config.ts': `
-      module.exports = ${JSON.stringify(config, null, 2)};
+      export default ${JSON.stringify(config, null, 2)};
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1', async ({}) => {
         expect(1 + 1).toBe(2);
       });
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', async ({}) => {
         expect(1 + 1).toBe(2);
       });
     `,
-    'c.test.js': `
+    'c.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 3', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -1032,12 +1032,12 @@ test('preserve config fields', async ({ runInlineTest, mergeReports }) => {
     },
     quiet: false
   };
-  await fs.promises.writeFile(test.info().outputPath('merge.config.ts'), `module.exports = ${JSON.stringify(mergeConfig, null, 2)};`);
+  await fs.promises.writeFile(test.info().outputPath('merge.config.ts'), `export default ${JSON.stringify(mergeConfig, null, 2)};`);
 
   const reportFiles = await fs.promises.readdir(reportDir);
   reportFiles.sort();
   expect(reportFiles).toEqual(['report-1.zip', 'report-3.zip']);
-  const { exitCode } = await mergeReports(reportDir, {}, { additionalArgs: ['--reporter', test.info().outputPath('echo-reporter.js'), '-c', test.info().outputPath('merge.config.ts')] });
+  const { exitCode } = await mergeReports(reportDir, {}, { additionalArgs: ['--reporter', test.info().outputPath('echo-reporter.ts'), '-c', test.info().outputPath('merge.config.ts')] });
   expect(exitCode).toBe(0);
   const json = JSON.parse(fs.readFileSync(test.info().outputPath('config.json')).toString());
   // Test shard parameters.
@@ -1058,7 +1058,7 @@ test('preserve config fields', async ({ runInlineTest, mergeReports }) => {
 test('preserve stdout and stderr', async ({ runInlineTest, mergeReports }) => {
   const reportDir = test.info().outputPath('blob-report');
   const files = {
-    'echo-reporter.js': `
+    'echo-reporter.ts': `
       import fs from 'fs';
 
       class EchoReporter {
@@ -1080,14 +1080,14 @@ test('preserve stdout and stderr', async ({ runInlineTest, mergeReports }) => {
           fs.writeFileSync('log.txt', this.log.join('\\n'));
         }
       }
-      module.exports = EchoReporter;
+      export default EchoReporter;
     `,
-    'playwright.config.js': `
-      module.exports = {
+    'playwright.config.ts': `
+      export default {
         reporter: [['blob']]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('a test', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -1099,7 +1099,7 @@ test('preserve stdout and stderr', async ({ runInlineTest, mergeReports }) => {
 
   await runInlineTest(files);
 
-  const { exitCode } = await mergeReports(reportDir, {}, { additionalArgs: ['--reporter', test.info().outputPath('echo-reporter.js')] });
+  const { exitCode } = await mergeReports(reportDir, {}, { additionalArgs: ['--reporter', test.info().outputPath('echo-reporter.ts')] });
   expect(exitCode).toBe(0);
   const log = fs.readFileSync(test.info().outputPath('log.txt')).toString();
   expect(log).toBe(`onStdOut: stdout text
@@ -1120,7 +1120,7 @@ result.stderr: stderr text
 test('encode inline attachments', async ({ runInlineTest, mergeReports }) => {
   const reportDir = test.info().outputPath('blob-report');
   const files = {
-    'echo-reporter.js': `
+    'echo-reporter.ts': `
       import fs from 'fs';
 
       class EchoReporter {
@@ -1130,14 +1130,14 @@ test('encode inline attachments', async ({ runInlineTest, mergeReports }) => {
           fs.writeFileSync('log.txt', attachmentBodies.join(','));
         }
       }
-      module.exports = EchoReporter;
+      export default EchoReporter;
     `,
-    'playwright.config.js': `
-      module.exports = {
+    'playwright.config.ts': `
+      export default {
         reporter: [['blob']]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('a test', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -1164,7 +1164,7 @@ test('encode inline attachments', async ({ runInlineTest, mergeReports }) => {
 
   await runInlineTest(files);
 
-  const { exitCode } = await mergeReports(reportDir, {}, { additionalArgs: ['--reporter', test.info().outputPath('echo-reporter.js')] });
+  const { exitCode } = await mergeReports(reportDir, {}, { additionalArgs: ['--reporter', test.info().outputPath('echo-reporter.ts')] });
   expect(exitCode).toBe(0);
   const log = fs.readFileSync(test.info().outputPath('log.txt')).toString();
   expect(log).toBe(`Zm9v,eyJmb28iOjF9,dQB0AGYAMQA2ACAAZQBuAGMAbwBkAGUAZAA=`);
@@ -1174,11 +1174,11 @@ test('preserve steps in html report', async ({ runInlineTest, mergeReports, show
   const reportDir = test.info().outputPath('blob-report');
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['blob']]
       };
     `,
-    'tests/a.test.js': `
+    'tests/a.test.ts': `
       import { test, expect } from '@playwright/test';
       test.beforeAll(() => {
         expect(1).toBe(1);
@@ -1218,7 +1218,7 @@ test('preserve steps in html report', async ({ runInlineTest, mergeReports, show
   await expect(page.getByText('Expect "toBe"')).not.toBeVisible();
 
   // Check that 'my step' location is relative.
-  await expect(page.getByText('— tests/a.test.js:7')).toBeVisible();
+  await expect(page.getByText('— tests/a.test.ts:7')).toBeVisible();
   await page.getByText('my step').click();
   await expect(page.getByText('Expect "toBe"')).toBeVisible();
 });
@@ -1226,14 +1226,14 @@ test('preserve steps in html report', async ({ runInlineTest, mergeReports, show
 test('support fileName option', async ({ runInlineTest, mergeReports }) => {
   const files = (fileSuffix: string) => ({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['blob', { fileName: 'report-${fileSuffix}.zip' }]],
         projects: [
           { name: 'foo' },
         ]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1 @smoke', async ({}) => {});
     `,
@@ -1251,14 +1251,14 @@ test('support PLAYWRIGHT_BLOB_OUTPUT_DIR env variable', async ({ runInlineTest, 
   test.info().annotations.push({ type: 'issue', description: 'https://github.com/microsoft/playwright/issues/30091' });
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['blob']],
         projects: [
           { name: 'foo' },
         ]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1 @smoke', async ({}) => {});
     `,
@@ -1275,14 +1275,14 @@ test('support PLAYWRIGHT_BLOB_OUTPUT_NAME env variable', async ({ runInlineTest,
   test.info().annotations.push({ type: 'issue', description: 'https://github.com/microsoft/playwright/issues/30091' });
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['blob']],
         projects: [
           { name: 'foo' },
         ]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1 @smoke', async ({}) => {});
     `,
@@ -1300,14 +1300,14 @@ test('support outputFile option', async ({ runInlineTest, mergeReports }) => {
   test.info().annotations.push({ type: 'issue', description: 'https://github.com/microsoft/playwright/issues/30091' });
   const files = (fileSuffix: string) => ({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['blob', { outputDir: 'should-be-ignored', outputFile: 'my-reports/report-${fileSuffix}.zip' }]],
         projects: [
           { name: 'foo' },
         ]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1 @smoke', async ({}) => {});
     `,
@@ -1325,18 +1325,18 @@ test('support PLAYWRIGHT_BLOB_OUTPUT_FILE environment variable', async ({ runInl
   test.info().annotations.push({ type: 'issue', description: 'https://github.com/microsoft/playwright/issues/30091' });
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: 'blob',
         projects: [
           { name: 'foo' },
         ]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1 @smoke', async ({}) => {});
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1 @smoke', async ({}) => {});
     `,
@@ -1358,7 +1358,7 @@ test('support PLAYWRIGHT_BLOB_OUTPUT_FILE environment variable', async ({ runInl
 test('keep projects with same name different global tag separate', async ({ runInlineTest, mergeReports, showReport, page }) => {
   const files = (reportName: string) => ({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['blob']],
         tag: process.env.GLOBAL_TAG,
         projects: [
@@ -1366,7 +1366,7 @@ test('keep projects with same name different global tag separate', async ({ runI
         ]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('test 1', async ({}) => { expect('${reportName}').toBe('second'); });
     `,
@@ -1404,10 +1404,10 @@ test('blob-report should be next to package.json', async ({ runInlineTest }, tes
   const result = await runInlineTest({
     'foo/package.json': `{ "name": "foo" }`,
     // unused config along "search path"
-    'foo/bar/playwright.config.js': `
-      module.exports = { projects: [ {} ] };
+    'foo/bar/playwright.config.ts': `
+      export default { projects: [ {} ] };
     `,
-    'foo/bar/baz/tests/a.spec.js': `
+    'foo/bar/baz/tests/a.spec.ts': `
       import { test, expect } from '@playwright/test';
       const fs = require('fs');
       test('pass', ({}, testInfo) => {
@@ -1426,11 +1426,11 @@ test('blob report should include version', async ({ runInlineTest }) => {
   const reportDir = test.info().outputPath('blob-report');
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['blob']]
       };
     `,
-    'tests/a.test.js': `
+    'tests/a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('test 1', async ({}) => {});
     `,
@@ -1474,15 +1474,15 @@ test('merge-reports should throw if report version is from the future', async ({
   const reportDir = test.info().outputPath('blob-report');
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['blob']]
       };
     `,
-    'tests/a.test.js': `
+    'tests/a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('test 1', async ({}) => {});
     `,
-    'tests/b.test.js': `
+    'tests/b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('test 1', async ({}) => {});
     `,
@@ -1516,15 +1516,15 @@ test('merge-reports should merge old attachments (pre-1.53)', async ({ runInline
 
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['blob']]
       };
     `,
-    'tests/a.test.js': `
+    'tests/a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('test 1', async ({}) => {});
     `,
-    'merge.config.ts': `module.exports = {
+    'merge.config.ts': `export default {
       testDir: 'mergeRoot',
      };`,
   };
@@ -1547,12 +1547,12 @@ test('merge-reports should merge old attachments (pre-1.53)', async ({ runInline
 test('should merge blob reports with same name', async ({ runInlineTest, mergeReports, showReport, page }) => {
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 1,
         reporter: 'blob'
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -1565,7 +1565,7 @@ test('should merge blob reports with same name', async ({ runInlineTest, mergeRe
       });
       test.skip('skipped 1', async ({}) => {});
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -1605,7 +1605,7 @@ test('reporter list in the custom config', async ({ runInlineTest, mergeReports 
   const reportDir = test.info().outputPath('blob-report');
   const files = {
     'playwright.config.ts': `
-      module.exports = { reporter: 'blob' };
+      export default { reporter: 'blob' };
     `,
     'a.test.ts': `
       import { test, expect } from '@playwright/test';
@@ -1613,19 +1613,19 @@ test('reporter list in the custom config', async ({ runInlineTest, mergeReports 
       test('first', async ({}) => {
       });
     `,
-    'merged/testReporter.js': `
+    'merged/testReporter.ts': `
       class TestReporter {
         onBegin(fullConfig, suite) {
           console.log('reporter', fullConfig.reporter);
         }
       }
 
-      module.exports = TestReporter;
+      export default TestReporter;
     `,
     'merged/playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 1,
-        reporter: [['./testReporter.js', { myOpt: 1 }]]
+        reporter: [['./testReporter.ts', { myOpt: 1 }]]
       };
     `,
   };
@@ -1635,14 +1635,14 @@ test('reporter list in the custom config', async ({ runInlineTest, mergeReports 
   expect(exitCode).toBe(0);
 
   const text = stripAnsi(output);
-  expect(text).toContain('testReporter.js');
+  expect(text).toContain('testReporter.ts');
   expect(text).toContain('{ myOpt: 1 }');
 });
 
 test('merge reports with different rootDirs', async ({ runInlineTest, mergeReports }) => {
   test.info().annotations.push({ type: 'issue', description: 'https://github.com/microsoft/playwright/issues/27877' });
   const files1 = {
-    'echo-reporter.js': `
+    'echo-reporter.ts': `
       export default class EchoReporter {
         onBegin(config, suite) {
           console.log('rootDir:', config.rootDir);
@@ -1652,15 +1652,15 @@ test('merge reports with different rootDirs', async ({ runInlineTest, mergeRepor
         }
       };
     `,
-    'merge.config.ts': `module.exports = {
+    'merge.config.ts': `export default {
       testDir: 'mergeRoot',
-      reporter: './echo-reporter.js'
+      reporter: './echo-reporter.ts'
      };`,
-    'dir1/playwright.config.ts': `module.exports = {
+    'dir1/playwright.config.ts': `export default {
       testDir: 'tests1',
       reporter: [['blob', { outputDir: 'blob-report' }]]
     };`,
-    'dir1/tests1/a.test.js': `
+    'dir1/tests1/a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1', async ({}) => { });
     `,
@@ -1668,10 +1668,10 @@ test('merge reports with different rootDirs', async ({ runInlineTest, mergeRepor
   await runInlineTest(files1, { workers: 1 }, undefined, { additionalArgs: ['--config', test.info().outputPath('dir1/playwright.config.ts')] });
 
   const files2 = {
-    'dir2/playwright.config.ts': `module.exports = {
+    'dir2/playwright.config.ts': `export default {
       reporter: [['blob', { outputDir: 'blob-report' }]]
     };`,
-    'dir2/tests2/b.test.js': `
+    'dir2/tests2/b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', async ({}) => { });
     `,
@@ -1692,15 +1692,15 @@ test('merge reports with different rootDirs', async ({ runInlineTest, mergeRepor
     const { exitCode, output } = await mergeReports(allReportsDir, undefined, { additionalArgs: ['--config', 'merge.config.ts'] });
     expect(exitCode).toBe(0);
     expect(output).toContain(`rootDir: ${test.info().outputPath('mergeRoot')}`);
-    expect(output).toContain(`test: ${test.info().outputPath('mergeRoot', 'a.test.js')}`);
-    expect(output).toContain(`test: ${test.info().outputPath('mergeRoot', 'tests2', 'b.test.js')}`);
+    expect(output).toContain(`test: ${test.info().outputPath('mergeRoot', 'a.test.ts')}`);
+    expect(output).toContain(`test: ${test.info().outputPath('mergeRoot', 'tests2', 'b.test.ts')}`);
   }
 });
 
 test('merge reports same rootDirs', async ({ runInlineTest, mergeReports }) => {
   test.info().annotations.push({ type: 'issue', description: 'https://github.com/microsoft/playwright/issues/27877' });
   const files = {
-    'echo-reporter.js': `
+    'echo-reporter.ts': `
       export default class EchoReporter {
         onBegin(config, suite) {
           console.log('rootDir:', config.rootDir);
@@ -1710,15 +1710,15 @@ test('merge reports same rootDirs', async ({ runInlineTest, mergeReports }) => {
         }
       };
     `,
-    'playwright.config.ts': `module.exports = {
+    'playwright.config.ts': `export default {
       testDir: 'tests',
       reporter: [['blob', { outputDir: 'blob-report' }]]
     };`,
-    'tests/dir1/a.test.js': `
+    'tests/dir1/a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1', async ({}) => { });
     `,
-    'tests/dir2/b.test.js': `
+    'tests/dir2/b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', async ({}) => { });
     `,
@@ -1728,11 +1728,11 @@ test('merge reports same rootDirs', async ({ runInlineTest, mergeReports }) => {
 
   const allReportsDir = test.info().outputPath('blob-report');
 
-  const { exitCode, output } = await mergeReports(allReportsDir, undefined, { additionalArgs: ['--reporter', './echo-reporter.js'] });
+  const { exitCode, output } = await mergeReports(allReportsDir, undefined, { additionalArgs: ['--reporter', './echo-reporter.ts'] });
   expect(exitCode).toBe(0);
   expect(output).toContain(`rootDir: ${test.info().outputPath('tests')}`);
-  expect(output).toContain(`test: ${test.info().outputPath('tests', 'dir1', 'a.test.js')}`);
-  expect(output).toContain(`test: ${test.info().outputPath('tests', 'dir2', 'b.test.js')}`);
+  expect(output).toContain(`test: ${test.info().outputPath('tests', 'dir1', 'a.test.ts')}`);
+  expect(output).toContain(`test: ${test.info().outputPath('tests', 'dir2', 'b.test.ts')}`);
 });
 
 
@@ -1755,7 +1755,7 @@ function patchPathSeparators(json: any) {
 test('merge reports with different rootDirs and path separators', async ({ runInlineTest, mergeReports }) => {
   test.info().annotations.push({ type: 'issue', description: 'https://github.com/microsoft/playwright/issues/27877' });
   const files1 = {
-    'echo-reporter.js': `
+    'echo-reporter.ts': `
       export default class EchoReporter {
         onBegin(config, suite) {
           console.log('rootDir:', config.rootDir);
@@ -1769,14 +1769,14 @@ test('merge reports with different rootDirs and path separators', async ({ runIn
         }
       };
     `,
-    'merge.config.ts': `module.exports = {
+    'merge.config.ts': `export default {
       testDir: 'mergeRoot',
-      reporter: './echo-reporter.js'
+      reporter: './echo-reporter.ts'
      };`,
-    'dir1/playwright.config.ts': `module.exports = {
+    'dir1/playwright.config.ts': `export default {
       reporter: [['blob', { outputDir: 'blob-report' }]]
     };`,
-    'dir1/tests1/a.test.js': `
+    'dir1/tests1/a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1', { annotation: { type: 'warning', description: 'Some warning' } }, async ({}) => { });
     `,
@@ -1784,10 +1784,10 @@ test('merge reports with different rootDirs and path separators', async ({ runIn
   await runInlineTest(files1, { workers: 1 }, undefined, { additionalArgs: ['--config', test.info().outputPath('dir1/playwright.config.ts')] });
 
   const files2 = {
-    'dir2/playwright.config.ts': `module.exports = {
+    'dir2/playwright.config.ts': `export default {
       reporter: [['blob', { outputDir: 'blob-report' }]]
     };`,
-    'dir2/tests2/b.test.js': `
+    'dir2/tests2/b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', { annotation: { type: 'issue' } }, async ({}) => { });
     `,
@@ -1811,15 +1811,15 @@ test('merge reports with different rootDirs and path separators', async ({ runIn
 
   {
     const { exitCode, output } = await mergeReports(allReportsDir, undefined, { additionalArgs: ['--config', 'merge.config.ts'] });
-    const testPath1 = test.info().outputPath('mergeRoot', 'tests1', 'a.test.js');
-    const testPath2 = test.info().outputPath('mergeRoot', 'tests2', 'b.test.js');
+    const testPath1 = test.info().outputPath('mergeRoot', 'tests1', 'a.test.ts');
+    const testPath2 = test.info().outputPath('mergeRoot', 'tests2', 'b.test.ts');
     expect(exitCode).toBe(0);
     expect(output).toContain(`rootDir: ${test.info().outputPath('mergeRoot')}`);
     expect(output).toContain(`test: ${testPath1}`);
-    expect(output).toContain(`test title: ${'tests1' + path.sep + 'a.test.js'}`);
+    expect(output).toContain(`test title: ${'tests1' + path.sep + 'a.test.ts'}`);
     expect(output).toContain(`annotations: type: warning, description: Some warning, file: ${testPath1}`);
     expect(output).toContain(`test: ${testPath2}`);
-    expect(output).toContain(`test title: ${'tests2' + path.sep + 'b.test.js'}`);
+    expect(output).toContain(`test title: ${'tests2' + path.sep + 'b.test.ts'}`);
     expect(output).toContain(`annotations: type: issue, description: undefined, file: ${testPath2}`);
   }
 });
@@ -1827,7 +1827,7 @@ test('merge reports with different rootDirs and path separators', async ({ runIn
 test('merge reports without --config preserves path separators', async ({ runInlineTest, mergeReports }) => {
   test.info().annotations.push({ type: 'issue', description: 'https://github.com/microsoft/playwright/issues/27877' });
   const files1 = {
-    'echo-reporter.js': `
+    'echo-reporter.ts': `
       export default class EchoReporter {
         onBegin(config, suite) {
           console.log('rootDir:', config.rootDir);
@@ -1841,14 +1841,14 @@ test('merge reports without --config preserves path separators', async ({ runInl
         }
       };
     `,
-    'dir1/playwright.config.ts': `module.exports = {
+    'dir1/playwright.config.ts': `export default {
       reporter: [['blob', { outputDir: 'blob-report' }]]
     };`,
-    'dir1/tests1/a.test.js': `
+    'dir1/tests1/a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1', { annotation: { type: 'warning', description: 'Some warning' } }, async ({}) => { });
     `,
-    'dir1/tests2/b.test.js': `
+    'dir1/tests2/b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', { annotation: { type: 'issue' } }, async ({}) => { });
     `,
@@ -1867,17 +1867,17 @@ test('merge reports without --config preserves path separators', async ({ runInl
   const report1 = path.join(allReportsDir, 'report-1.zip');
   await zipReport(events, report1);
 
-  const { exitCode, output } = await mergeReports(allReportsDir, undefined, { additionalArgs: ['--reporter', './echo-reporter.js'] });
+  const { exitCode, output } = await mergeReports(allReportsDir, undefined, { additionalArgs: ['--reporter', './echo-reporter.ts'] });
   expect(exitCode).toBe(0);
   const otherSeparator = path.sep === '/' ? '\\' : '/';
-  const testPath1 = test.info().outputPath('dir1', 'tests1', 'a.test.js').replaceAll(path.sep, otherSeparator);
-  const testPath2 = test.info().outputPath('dir1', 'tests2', 'b.test.js').replaceAll(path.sep, otherSeparator);
+  const testPath1 = test.info().outputPath('dir1', 'tests1', 'a.test.ts').replaceAll(path.sep, otherSeparator);
+  const testPath2 = test.info().outputPath('dir1', 'tests2', 'b.test.ts').replaceAll(path.sep, otherSeparator);
   expect(output).toContain(`rootDir: ${test.info().outputPath('dir1').replaceAll(path.sep, otherSeparator)}`);
   expect(output).toContain(`test: ${testPath1}`);
-  expect(output).toContain(`test title: ${'tests1' + otherSeparator + 'a.test.js'}`);
+  expect(output).toContain(`test title: ${'tests1' + otherSeparator + 'a.test.ts'}`);
   expect(output).toContain(`annotations: type: warning, description: Some warning, file: ${testPath1}`);
   expect(output).toContain(`test: ${testPath2}`);
-  expect(output).toContain(`test title: ${'tests2' + otherSeparator + 'b.test.js'}`);
+  expect(output).toContain(`test title: ${'tests2' + otherSeparator + 'b.test.ts'}`);
   expect(output).toContain(`annotations: type: issue, description: undefined, file: ${testPath2}`);
 });
 
@@ -1885,12 +1885,12 @@ test('merge reports should preserve attachments', async ({ runInlineTest, mergeR
   const reportDir = test.info().outputPath('blob-report-orig');
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 1,
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       import * as fs from 'fs';
       test('attachment A', async ({}) => {
@@ -1905,7 +1905,7 @@ test('merge reports should preserve attachments', async ({ runInlineTest, mergeR
         await test.info().attach('file-attachment7', { path: attachmentPath });
       });
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       import * as fs from 'fs';
       test('attachment B', async ({}) => {
@@ -1969,40 +1969,40 @@ test('merge reports should preserve attachments', async ({ runInlineTest, mergeR
 
 test('merge reports must not change test ids when there is no need to', async ({ runInlineTest, mergeReports }) => {
   const files = {
-    'echo-test-id-reporter.js': `
+    'echo-test-id-reporter.ts': `
       export default class EchoTestIdReporter {
         onTestBegin(test) {
           console.log('%%' + test.id);
         }
       };
     `,
-    'single-run.config.ts': `module.exports = {
+    'single-run.config.ts': `export default {
       reporter: [
-        ['./echo-test-id-reporter.js'],
+        ['./echo-test-id-reporter.ts'],
       ]
     };`,
-    'shard-1.config.ts': `module.exports = {
+    'shard-1.config.ts': `export default {
       fullyParallel: true,
       shard: { total: 2, current: 1 },
       reporter: [
-        ['./echo-test-id-reporter.js'],
+        ['./echo-test-id-reporter.ts'],
         ['blob', { outputDir: 'blob-report' }],
       ]
     };`,
-    'shard-2.config.ts': `module.exports = {
+    'shard-2.config.ts': `export default {
       fullyParallel: true,
       shard: { total: 2, current: 2 },
       reporter: [
-        ['./echo-test-id-reporter.js'],
+        ['./echo-test-id-reporter.ts'],
         ['blob', { outputDir: 'blob-report' }],
       ]
     };`,
-    'merge.config.ts': `module.exports = {
+    'merge.config.ts': `export default {
       reporter: [
-        ['./echo-test-id-reporter.js'],
+        ['./echo-test-id-reporter.ts'],
       ]
     };`,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('test 1', async ({}) => { });
       test('test 2', async ({}) => { });
@@ -2041,23 +2041,23 @@ test('merge reports must not change test ids when there is no need to', async ({
 test('TestSuite.project() should return owning project', async ({ runInlineTest, mergeReports }) => {
   test.info().annotations.push({ type: 'issue', description: 'https://github.com/microsoft/playwright/issues/29173' });
   const files1 = {
-    'echo-reporter.js': `
+    'echo-reporter.ts': `
       export default class EchoReporter {
         onTestBegin(test) {
           console.log('test project:', test.parent?.project()?.name);
         }
       };
     `,
-    'merge.config.ts': `module.exports = {
+    'merge.config.ts': `export default {
       testDir: 'mergeRoot',
-      reporter: './echo-reporter.js'
+      reporter: './echo-reporter.ts'
      };`,
-    'playwright.config.ts': `module.exports = {
+    'playwright.config.ts': `export default {
       testDir: 'tests',
       reporter: [['blob', { outputDir: 'blob-report' }]],
       projects: [{name: 'my-project'}]
     };`,
-    'tests/a.test.js': `
+    'tests/a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1', async ({}) => { });
     `,
@@ -2072,7 +2072,7 @@ test('TestSuite.project() should return owning project', async ({ runInlineTest,
 test('open blob-1.42', async ({ runInlineTest, mergeReports }) => {
   test.info().annotations.push({ type: 'issue', description: 'https://github.com/microsoft/playwright/issues/29984' });
   await runInlineTest({
-    'echo-reporter.js': `
+    'echo-reporter.ts': `
       export default class EchoReporter {
         lines = [];
         onTestBegin(test) {
@@ -2083,9 +2083,9 @@ test('open blob-1.42', async ({ runInlineTest, mergeReports }) => {
         }
       };
     `,
-    'merge.config.ts': `module.exports = {
+    'merge.config.ts': `export default {
       testDir: 'mergeRoot',
-      reporter: './echo-reporter.js'
+      reporter: './echo-reporter.ts'
      };`,
   });
 
@@ -2123,7 +2123,7 @@ test('preserve static annotations when tests did not run', async ({ runInlineTes
   const reportDir = test.info().outputPath('blob-report');
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: 'blob',
         projects: [
           { name: 'setup', testMatch: 'setup.js' },
@@ -2137,7 +2137,7 @@ test('preserve static annotations when tests did not run', async ({ runInlineTes
         expect(1).toBe(2);
       });
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('first', { annotation: [{ type: "sample", description: "uno" }] }, async ({}) => {});
       test.skip('second', { annotation: [{ type: "sample", description: "dos" }] }, async ({}) => {});
@@ -2168,7 +2168,7 @@ test('preserve static annotations when tests did not run', async ({ runInlineTes
 test('project filter in report name', async ({ runInlineTest }) => {
   const files = {
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: 'blob',
         projects: [
           { name: 'foo' },
@@ -2177,7 +2177,7 @@ test('project filter in report name', async ({ runInlineTest }) => {
         ]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1 @smoke', async ({}) => {});
     `,
@@ -2224,28 +2224,28 @@ test('should report duration across all shards', async ({ runInlineTest, mergeRe
   }
   const files = {
     'playwright.config.ts': `
-      module.exports = ${JSON.stringify(config, null, 2)};
+      export default ${JSON.stringify(config, null, 2)};
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 1', async ({}) => {
         expect(1 + 1).toBe(2);
       });
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math 2', async ({}) => {
         expect(1 + 1).toBe(2);
       });
     `,
-    'reporter.js': `module.exports = ${CustomReporter.toString()};`,
+    'reporter.ts': `export default ${CustomReporter.toString()};`,
   };
 
   await runInlineTest(files, { shard: `1/2`, workers: 1 });
   await new Promise(f => setTimeout(f, 1500)); // Ensure different start times.
   await runInlineTest(files, { shard: `2/2`, workers: 1 }, { PWTEST_BLOB_DO_NOT_REMOVE: '1' });
 
-  const { exitCode, outputLines } = await mergeReports(reportDir, {}, { additionalArgs: ['--reporter', test.info().outputPath('reporter.js'), '-c', test.info().outputPath('playwright.config.ts')] });
+  const { exitCode, outputLines } = await mergeReports(reportDir, {}, { additionalArgs: ['--reporter', test.info().outputPath('reporter.ts'), '-c', test.info().outputPath('playwright.config.ts')] });
   expect(exitCode).toBe(0);
 
   const { duration } = JSON.parse(outputLines[0]) as FullResult;
@@ -2256,13 +2256,13 @@ test('shard chart', async ({ runInlineTest, writeFiles, showReport, page, mergeR
   const reportDir = test.info().outputPath('blob-reports');
   await writeFiles({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         fullyParallel: true,
         tag: process.env.BOT_TAG,
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       import timers from 'timers/promises';
       test('one', async () => {
@@ -2311,9 +2311,9 @@ test('should populate projects in config when merging reports', async ({ runInli
     }
   }
   const files = {
-    'reporter.js': `module.exports = ${CustomReporter.toString()};`,
+    'reporter.ts': `export default ${CustomReporter.toString()};`,
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]],
         projects: [
           { name: 'setup' },
@@ -2322,7 +2322,7 @@ test('should populate projects in config when merging reports', async ({ runInli
         ]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test } from '@playwright/test';
       test('test 1', async ({}) => {});
     `,
@@ -2334,7 +2334,7 @@ test('should populate projects in config when merging reports', async ({ runInli
   const reportFiles = await fs.promises.readdir(reportDir);
   expect(reportFiles).toHaveLength(2);
 
-  const { exitCode, outputLines } = await mergeReports(reportDir, {}, { additionalArgs: ['--reporter', test.info().outputPath('reporter.js')] });
+  const { exitCode, outputLines } = await mergeReports(reportDir, {}, { additionalArgs: ['--reporter', test.info().outputPath('reporter.ts')] });
   expect(exitCode).toBe(0);
 
   const projectNames = JSON.parse(outputLines[0]);
@@ -2345,12 +2345,12 @@ test('workerIndex is rebased', async ({ runInlineTest, writeFiles, showReport, p
   const reportDir = test.info().outputPath('blob-reports');
   await writeFiles({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         fullyParallel: true,
         reporter: [['blob', { outputDir: '${reportDir.replace(/\\/g, '/')}' }]]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('test-one', async () => {});
       test('test-two', async () => {});
@@ -2373,6 +2373,6 @@ test('workerIndex is rebased', async ({ runInlineTest, writeFiles, showReport, p
       - list:
         - listitem:
           - link "test-two"
-          - link "a.test.js:4"
+          - link "a.test.ts:4"
   `);
 });

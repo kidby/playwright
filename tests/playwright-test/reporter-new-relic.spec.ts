@@ -20,7 +20,7 @@ import { lastDryRunPayload } from './dry-run-helpers.js';
 test('emits one event per test with CI metadata and extraAttributes', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { reporter: [['new-relic', {
+      export default { reporter: [['new-relic', {
         dryRun: true,
         eventType: 'CustomEvent',
         extraAttributes: { env: 'staging' },

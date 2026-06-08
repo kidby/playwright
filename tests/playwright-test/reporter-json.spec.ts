@@ -20,7 +20,7 @@ import { test, expect, stripAnsi } from './playwright-test-fixtures.js';
 
 test('should support spec.ok and stats', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math works!', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -44,7 +44,7 @@ test('should support spec.ok and stats', async ({ runInlineTest }) => {
 
 test('should not report skipped due to sharding', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('one', async () => {
       });
@@ -52,7 +52,7 @@ test('should not report skipped due to sharding', async ({ runInlineTest }) => {
         test.skip();
       });
     `,
-    'b.test.js': `
+    'b.test.ts': `
       import { test, expect } from '@playwright/test';
       test('three', async () => {
       });
@@ -73,7 +73,7 @@ test('should not report skipped due to sharding', async ({ runInlineTest }) => {
 test('should report projects and stats', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         retries: 2,
         projects: [
           {
@@ -89,7 +89,7 @@ test('should report projects and stats', async ({ runInlineTest }, testInfo) => 
         ]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math works!', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -121,7 +121,7 @@ test('should report projects and stats', async ({ runInlineTest }, testInfo) => 
 
 test('should show steps', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math works!', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -158,7 +158,7 @@ test('should show steps', async ({ runInlineTest }) => {
 
 test('should display tags separately from title', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math works! @USR-MATH-001 @USR-MATH-002', { tag: '@foo' }, async ({}) => {
         test.info().annotations.push({ type: 'issue', description: 'issue-link' });
@@ -173,7 +173,7 @@ test('should display tags separately from title', async ({ runInlineTest }) => {
 
 test('should have relative always-posix paths', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.test.js': `
+    'a.test.ts': `
       const { test, expect } = require('@playwright/test');
       test('math works!', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -182,7 +182,7 @@ test('should have relative always-posix paths', async ({ runInlineTest }) => {
   });
   expect(result.exitCode).toBe(0);
   expect(result.report.config.rootDir.indexOf(path.win32.sep)).toBe(-1);
-  expect(result.report.suites[0].specs[0].file).toBe('a.test.js');
+  expect(result.report.suites[0].specs[0].file).toBe('a.test.ts');
   expect(result.report.suites[0].specs[0].line).toBe(3);
   expect(result.report.suites[0].specs[0].column).toBe(7);
 });
@@ -191,7 +191,7 @@ test('should have error position in results', async ({
   runInlineTest,
 }) => {
   const result = await runInlineTest({
-    'a.test.js': `
+    'a.test.ts': `
       const { test, expect } = require('@playwright/test');
       test('math works!', async ({}) => {
         expect(1 + 1).toBe(3);
@@ -199,17 +199,17 @@ test('should have error position in results', async ({
     `,
   });
   expect(result.exitCode).toBe(1);
-  expect(result.report.suites[0].specs[0].file).toBe('a.test.js');
-  expect(result.report.suites[0].specs[0].tests[0].results[0].errorLocation!.line).toBe(4);
-  expect(result.report.suites[0].specs[0].tests[0].results[0].errorLocation!.column).toBe(23);
+  expect(result.report.suites[0].specs[0].file).toBe('a.test.ts');
+  expect(result.report.suites[0].specs[0].tests[0].results[0].errorLocation!.line).toBe(3);
+  expect(result.report.suites[0].specs[0].tests[0].results[0].errorLocation!.column).toBe(16);
 });
 
 test('should add dot in addition to file json with CI', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { reporter: [['json', { outputFile: 'a.json' }]] };
+      export default { reporter: [['json', { outputFile: 'a.json' }]] };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('one', async ({}) => {
         expect(1).toBe(1);
@@ -224,9 +224,9 @@ test('should add dot in addition to file json with CI', async ({ runInlineTest }
 test('should add line in addition to file json without CI', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { reporter: [['json', { outputFile: 'a.json' }]] };
+      export default { reporter: [['json', { outputFile: 'a.json' }]] };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       const { test, expect } = require('@playwright/test');
       test('one', async ({}) => {
         expect(1).toBe(1);
@@ -234,12 +234,12 @@ test('should add line in addition to file json without CI', async ({ runInlineTe
     `,
   }, { reporter: '' }, { PW_TEST_DEBUG_REPORTERS: '1' });
   expect(result.exitCode).toBe(0);
-  expect(result.output).toContain('[1/1] a.test.js:3:7 › one');
+  expect(result.output).toContain('[1/1] a.test.ts:3:7 › one');
   expect(fs.existsSync(testInfo.outputPath('a.json'))).toBeTruthy();
 });
 test('should have starting time in results', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('math works!', async ({}) => {
         expect(1 + 1).toBe(2);
@@ -255,9 +255,9 @@ test.describe('report location', () => {
   test('with config should create report relative to config', async ({ runInlineTest }, testInfo) => {
     const result = await runInlineTest({
       'nested/project/playwright.config.ts': `
-        module.exports = { reporter: [['json', { outputFile: '../my-report/a.json' }]] };
+        export default { reporter: [['json', { outputFile: '../my-report/a.json' }]] };
       `,
-      'nested/project/a.test.js': `
+      'nested/project/a.test.ts': `
         import { test, expect } from '@playwright/test';
         test('one', async ({}) => {
           expect(1).toBe(1);
@@ -272,10 +272,10 @@ test.describe('report location', () => {
     const result = await runInlineTest({
       'foo/package.json': `{ "name": "foo" }`,
       // unused config along "search path"
-      'foo/bar/playwright.config.js': `
-        module.exports = { projects: [ {} ] };
+      'foo/bar/playwright.config.ts': `
+        export default { projects: [ {} ] };
       `,
-      'foo/bar/baz/tests/a.spec.js': `
+      'foo/bar/baz/tests/a.spec.ts': `
         import { test, expect } from '@playwright/test';
         const fs = require('fs');
         test('pass', ({}, testInfo) => {
@@ -293,10 +293,10 @@ test.describe('report location', () => {
     const result = await runInlineTest({
       'foo/package.json': `{ "name": "foo" }`,
       // unused config along "search path"
-      'foo/bar/playwright.config.js': `
-        module.exports = { projects: [ {} ] };
+      'foo/bar/playwright.config.ts': `
+        export default { projects: [ {} ] };
       `,
-      'foo/bar/baz/tests/a.spec.js': `
+      'foo/bar/baz/tests/a.spec.ts': `
         import { test, expect } from '@playwright/test';
         const fs = require('fs');
         test('pass', ({}, testInfo) => {
@@ -312,10 +312,10 @@ test.describe('report location', () => {
 
   test('support PLAYWRIGHT_JSON_OUTPUT_DIR and PLAYWRIGHT_JSON_OUTPUT_NAME', async ({ runInlineTest }, testInfo) => {
     const result = await runInlineTest({
-      'playwright.config.js': `
-        module.exports = { projects: [ {} ] };
+      'playwright.config.ts': `
+        export default { projects: [ {} ] };
       `,
-      'tests/a.spec.js': `
+      'tests/a.spec.ts': `
         import { test, expect } from '@playwright/test';
         const fs = require('fs');
         test('pass', ({}, testInfo) => {
@@ -330,7 +330,7 @@ test.describe('report location', () => {
 
 test('should report parallelIndex', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
-    'tests/a.spec.js': `
+    'tests/a.spec.ts': `
       import { test, expect } from '@playwright/test';
       const fs = require('fs');
       test.describe.configure({ mode: 'parallel' });

@@ -21,7 +21,7 @@ import { test, expect } from './playwright-test-fixtures.js';
 test('should be able to define config', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { timeout: 12345 };
+      export default { timeout: 12345 };
     `,
     'a.test.ts': `
       import { test, expect } from '@playwright/test';
@@ -38,7 +38,7 @@ test('should be able to define config', async ({ runInlineTest }) => {
 test('should prioritize project timeout', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { timeout: 500, projects: [{ timeout: 10000}, {}] };
+      export default { timeout: 500, projects: [{ timeout: 10000}, {}] };
     `,
     'a.test.ts': `
       import { test, expect } from '@playwright/test';
@@ -57,7 +57,7 @@ test('should prioritize project timeout', async ({ runInlineTest }) => {
 test('should prioritize command line timeout over project timeout', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [{ timeout: 10000}] };
+      export default { projects: [{ timeout: 10000}] };
     `,
     'a.test.ts': `
       import { test, expect } from '@playwright/test';
@@ -75,20 +75,20 @@ test('should prioritize command line timeout over project timeout', async ({ run
 test('should support failOnFlakyTests config option', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-        module.exports = {
+        export default {
           failOnFlakyTests: true,
           retries: 1,
-          reporter: [['line'], ['./reporter.js']],
+          reporter: [['line'], ['./reporter.ts']],
         };
     `,
-    'reporter.js': `
-      module.exports = class Reporter {
+    'reporter.ts': `
+      export default class Reporter {
         onBegin(config) {
           console.log('reporter.failOnFlakyTests:', config.failOnFlakyTests);
         }
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('flake', async ({}, testInfo) => {
         expect(testInfo.retry).toBe(1);
@@ -104,7 +104,7 @@ test('should read config from --config, resolve relative testDir', async ({ runI
   const result = await runInlineTest({
     'my.config.ts': `
       import * as path from 'path';
-      module.exports = {
+      export default {
         testDir: 'dir',
       };
     `,
@@ -129,7 +129,7 @@ test('should read config from --config, resolve relative testDir', async ({ runI
 test('should default testDir to the config file', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'dir/my.config.ts': `
-      module.exports = {};
+      export default {};
     `,
     'a.test.ts': `
       import { test, expect } from '@playwright/test';
@@ -153,7 +153,7 @@ test('should be able to set reporters', async ({ runInlineTest }, testInfo) => {
   const reportFile = testInfo.outputPath('my-report.json');
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         reporter: [
           ['json', { outputFile: ${JSON.stringify(reportFile)} }],
           ['list'],
@@ -176,7 +176,7 @@ test('should support different testDirs', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
       import * as path from 'path';
-      module.exports = { projects: [
+      export default { projects: [
         { testDir: __dirname },
         { testDir: 'dir' },
       ] };
@@ -208,7 +208,7 @@ test('should allow root testDir and use it for relative paths', async ({ runInli
   const result = await runInlineTest({
     'config/config.ts': `
       import * as path from 'path';
-      module.exports = {
+      export default {
         testDir: path.join(__dirname, '..'),
         projects: [{ testDir: path.join(__dirname, '..', 'dir') }]
       };
@@ -231,7 +231,7 @@ test('should allow root testDir and use it for relative paths', async ({ runInli
   expect(result.passed).toBe(0);
   expect(result.skipped).toBe(0);
   expect(result.failed).toBe(1);
-  expect(result.output).toContain(`1) ${path.join('dir', 'a.test.ts')}:3:11 › fails`);
+  expect(result.output).toContain(`1) ${path.join('dir', 'a.test.ts')}:3:7 › fails`);
 });
 
 test('should throw when test() is called in config file', async ({ runInlineTest }) => {
@@ -239,7 +239,7 @@ test('should throw when test() is called in config file', async ({ runInlineTest
     'playwright.config.ts': `
       import { test, expect } from '@playwright/test';
       test('hey', () => {});
-      module.exports = {};
+      export default {};
     `,
     'a.test.ts': `
       import { test, expect } from '@playwright/test';
@@ -253,7 +253,7 @@ test('should throw when test() is called in config file', async ({ runInlineTest
 test('should filter by project, case-insensitive', async ({ runInlineTest }) => {
   const { passed, failed, outputLines, skipped } = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'suite1' },
         { name: 'suite2' },
       ] };
@@ -275,15 +275,15 @@ test('should filter by project, case-insensitive', async ({ runInlineTest }) => 
 
 test('should filter by project wildcard', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.js': `
-      module.exports = {
+    'playwright.config.ts': `
+      export default {
         projects: [
          { name: 'project-name' },
          { name: 'foobar' }
         ]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       const { test } = require('@playwright/test');
       test('one', async ({}) => {
         console.log('%%' + test.info().project.name);
@@ -299,7 +299,7 @@ test('should filter by project wildcard', async ({ runInlineTest }) => {
 test('should print nice error when the project wildcard does not match anything', async ({ runInlineTest }) => {
   const { output, exitCode } = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'suite1' },
         { name: 'suite2' },
       ] };
@@ -317,8 +317,8 @@ test('should print nice error when the project wildcard does not match anything'
 
 test('should filter by project wildcard and exact name', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.js': `
-      module.exports = {
+    'playwright.config.ts': `
+      export default {
         projects: [
          { name: 'first' },
          { name: 'fooBar' },
@@ -328,7 +328,7 @@ test('should filter by project wildcard and exact name', async ({ runInlineTest 
         ]
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       const { test } = require('@playwright/test');
       test('one', async ({}) => {
         console.log('%%' + test.info().project.name);
@@ -341,7 +341,7 @@ test('should filter by project wildcard and exact name', async ({ runInlineTest 
 test('should print nice error when project is unknown', async ({ runInlineTest }) => {
   const { output, exitCode } = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'suite1' },
         { name: 'suite2' },
       ] };
@@ -360,7 +360,7 @@ test('should print nice error when project is unknown and launching UI mode', as
   test.setTimeout(5000);
   const { output, exitCode } = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'suite1' },
         { name: 'suite2' },
       ] };
@@ -377,7 +377,7 @@ test('should print nice error when project is unknown and launching UI mode', as
 test('should filter by project list, case-insensitive', async ({ runInlineTest }) => {
   const { passed, failed, outputLines, skipped } = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'suite1' },
         { name: 'suite2' },
         { name: 'suite3' },
@@ -400,7 +400,7 @@ test('should filter by project list, case-insensitive', async ({ runInlineTest }
 test('should filter when duplicate project names exist', async ({ runInlineTest }) => {
   const { passed, failed, outputLines, skipped } = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'suite1' },
         { name: 'suite2' },
         { name: 'suite1' },
@@ -423,7 +423,7 @@ test('should filter when duplicate project names exist', async ({ runInlineTest 
 test('should print nice error when some of the projects are unknown', async ({ runInlineTest }) => {
   const { output, exitCode } = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: 'suite1' },
         { name: 'suite2' },
       ] };
@@ -442,7 +442,7 @@ test('should print nice error when some of the projects are unknown', async ({ r
 test('should print nice error when project name is not stable', async ({ runInlineTest }) => {
   const { output, exitCode } = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { projects: [
+      export default { projects: [
         { name: \`calculated \$\{Date.now()\}\` },
       ] };
     `,
@@ -478,7 +478,7 @@ test('should work without config file', async ({ runInlineTest }) => {
 test('should inherit use options in projects', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         use: { foo: 'config' },
         projects: [{
           use: { bar: 'project' },
@@ -502,7 +502,7 @@ test('should inherit use options in projects', async ({ runInlineTest }) => {
 test('should support ignoreSnapshots config option', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         ignoreSnapshots: true,
         projects: [
           { name: 'p1' },
@@ -529,7 +529,7 @@ test('should support ignoreSnapshots config option', async ({ runInlineTest }) =
 test('should validate workers option set to percent', async ({ runInlineTest }, testInfo) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         workers: '50%'
       };
     `,
@@ -546,7 +546,7 @@ test('should validate workers option set to percent', async ({ runInlineTest }, 
 test('should throw when workers option is invalid', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-        module.exports = {
+        export default {
           workers: ''
         };
       `,
@@ -563,7 +563,7 @@ test('should throw when workers option is invalid', async ({ runInlineTest }) =>
 
 test('should throw when workers is negative via CLI (regression for #39938)', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.ts': `module.exports = {};`,
+    'playwright.config.ts': `export default {};`,
     'a.test.ts': `
       import { test } from '@playwright/test';
       test('pass', () => {});
@@ -576,7 +576,7 @@ test('should throw when workers is negative via CLI (regression for #39938)', as
 test('should work with undefined values and base', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         updateSnapshots: undefined,
       };
     `,
@@ -801,7 +801,7 @@ test('should throw on invalid --tsconfig', async ({ runInlineTest }) => {
 test('should expose process.argv as config.argv and not pollute test discovery', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {};
+      export default {};
     `,
     'a.test.ts': `
       import { test, expect } from '@playwright/test';
@@ -821,13 +821,13 @@ test('should expose process.argv as config.argv and not pollute test discovery',
 test('config.argv should be visible in globalSetup and reporter', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         globalSetup: './global-setup.ts',
         reporter: './my-reporter.ts',
       };
     `,
     'global-setup.ts': `
-      module.exports = async (config) => {
+      export default async (config) => {
         console.log('GLOBAL_SETUP_HAS_ARG=' + config.argv.includes('--build-path=/foo'));
       };
     `,
@@ -837,7 +837,7 @@ test('config.argv should be visible in globalSetup and reporter', async ({ runIn
           console.log('REPORTER_HAS_ARG=' + config.argv.includes('--build-path=/foo'));
         }
       }
-      module.exports = MyReporter;
+      export default MyReporter;
     `,
     'a.test.ts': `
       import { test, expect } from '@playwright/test';

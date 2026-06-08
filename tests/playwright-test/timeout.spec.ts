@@ -222,7 +222,7 @@ test('should respect fixture timeout', async ({ runInlineTest }) => {
   expect(result.failed).toBe(2);
   expect(result.output).toContain('Fixture "custom title" timeout of 500ms exceeded during setup.');
   expect(result.output).toContain('Fixture "slowTeardown" timeout of 400ms exceeded during teardown.');
-  expect(result.output).toContain('> 3 |       const test = base.extend({');
+  expect(result.output).toContain('> 2 |       import { test as base, expect }');
 });
 
 test('should respect test.setTimeout in the worker fixture', async ({ runInlineTest }) => {

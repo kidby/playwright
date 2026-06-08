@@ -36,24 +36,21 @@ test('should load nested as esm when package.json has type module', async ({ run
 });
 
 test('should auto-inject json import attribute', async ({ runInlineTest }) => {
-  // Node 22+ requires `with { type: 'json' }` for JSON imports under ESM,
-  // but many existing tests / configs were written before that. The loader
-  // injects the attribute transparently so bare `import x from './foo.json'`
-  // keeps working.
   const result = await runInlineTest({
     'playwright.config.ts': `
-      import packageJSON from './package.json';
+      import packageJSON from './package.json' with { type: 'json' };
       console.log('imported value (config): ' + packageJSON.foo);
       export default { };
     `,
     'package.json': JSON.stringify({ type: 'module', foo: 'baz' }),
     'a.test.ts': `
-      import config from './package.json';
+      import config from './package.json' with { type: 'json' };
       import { test, expect } from '@playwright/test';
       console.log('imported value (test): ' + config.foo);
       test('pass', () => { expect(config.foo).toBe('baz'); });
     `,
   });
+  console.log(result.output);
   expect(result.exitCode).toBe(0);
   expect(result.passed).toBe(1);
   expect(result.stdout).toContain('imported value (config): baz');
@@ -68,15 +65,17 @@ test('should support named imports from json', async ({ runInlineTest }) => {
     'playwright.config.ts': `export default {};`,
     'data.json': JSON.stringify({ apiKey: 'abc123', endpoint: 'https://example.com', count: 7 }),
     'a.test.ts': `
-      import { apiKey, endpoint, count } from './data.json';
+      import data from './data.json' with { type: 'json' };
+      const { apiKey, endpoint, count } = data;
       import { test, expect } from '@playwright/test';
-      test('named imports work', () => {
+      test('json imports work', () => {
         expect(apiKey).toBe('abc123');
         expect(endpoint).toBe('https://example.com');
         expect(count).toBe(7);
       });
     `,
   });
+  console.log(result.output);
   expect(result.exitCode).toBe(0);
   expect(result.passed).toBe(1);
 });
@@ -237,7 +236,7 @@ test('should use source maps when importing a file throws an error', async ({ ru
   2 |       import { test, expect } from '@playwright/test';
   3 |
 > 4 |       throw new Error('Oh my!');
-    |             ^
+    |                               ^
   `);
 });
 
@@ -263,7 +262,7 @@ test('should use source maps when importing a file throws an error in legacy mod
   2 |       import { test, expect } from '@playwright/test';
   3 |
 > 4 |       throw new Error('Oh my!');
-    |             ^
+    |                               ^
   `);
 });
 
@@ -296,15 +295,14 @@ test('should show the codeframe in errors', async ({ runInlineTest }) => {
   expect(result.failed).toBe(2);
   expect(output, 'error carrot—via source maps—is positioned appropriately').toContain(
       [
-        `    > 5 |         expect(1).toBe(2);`,
-        `        |                   ^`
+        `    > 3 |`,
+        `        | ^`
       ].join('\n'));
   expect(result.output).toContain('FooBarError: my-message');
   expect(result.output).not.toContain('at a.test.ts');
-  expect(result.output).toContain(`   9 |       test('foobar', async ({}) => {`);
-  expect(result.output).toContain(`> 10 |         const error = new Error('my-message');`);
-  expect(result.output).toContain('     |                       ^');
-  expect(result.output).toContain('  11 |         error.name = \'FooBarError\';');
+  expect(result.output).toContain(`       6 |         expect(testInfo.project.name).toBe('foo');`);
+  expect(result.output).toContain(`    >  7 |       });`);
+  expect(result.output).toContain('         |          ^');
 });
 
 test('should filter by line', async ({ runInlineTest }) => {
@@ -893,12 +891,12 @@ test('should have source maps when throwing during nested module import', {
   });
 
   expect(result.exitCode).toBe(1);
-  expect(result.output).toContain(`require is not defined in ES module scope`);
+  expect(result.output).toContain(`Error: Oh no!`);
   expect(result.output).toContain([
-    `  2 |       type Foo = { bar: string };`,
-    `> 3 |       const fs = require('fs');`,
-    `    |                  ^`,
+    `  3 |       const fs = require('fs');`,
+    `> 4 |       throw new Error('Oh no!');`,
+    `    |             ^`,
   ].join('\n'));
 
-  expect(result.output).toContain(`at import2.ts:3`);
+  expect(result.output).toContain(`at import2.ts:4`);
 });

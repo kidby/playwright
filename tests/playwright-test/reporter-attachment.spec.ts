@@ -302,7 +302,7 @@ test(`testInfo.attach throw if name is not string`, async ({ runInlineTest }) =>
 
 test('render text attachment with multiple lines', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.test.js': `
+    'a.test.ts': `
       const { test, expect } = require('@playwright/test');
       test('one', async ({}, testInfo) => {
         testInfo.attachments.push({

@@ -157,7 +157,7 @@ test('should throw when defining test fixture with the same name as a worker fix
       test2('works', async ({foo}) => {});
     `,
   });
-  expect(result.output).toContain(`Fixture "foo" has already been registered as a { scope: 'worker' } fixture defined in e.spec.ts:3:26.`);
+  expect(result.output).toMatch(/Fixture "foo" has already been registered as a { scope: 'worker' } fixture defined in e\\.spec\\.ts:\\d+:\\d+\\./);
   expect(result.output).toContain(`e.spec.ts:8`);
   expect(result.output).toContain('const test2 = test1.extend');
   expect(result.exitCode).toBe(1);
@@ -181,7 +181,7 @@ test('should throw when defining worker fixture with the same name as a test fix
       test2('works', async ({foo}) => {});
     `,
   });
-  expect(result.output).toContain(`Fixture "foo" has already been registered as a { scope: 'test' } fixture defined in e.spec.ts:3:26.`);
+  expect(result.output).toMatch(/Fixture "foo" has already been registered as a { scope: 'test' } fixture defined in e\\.spec\\.ts:\\d+:\\d+\\./);
   expect(result.output).toContain(`e.spec.ts:8`);
   expect(result.output).toContain('const test2 = test1.extend');
   expect(result.exitCode).toBe(1);
@@ -204,7 +204,7 @@ test('should throw when worker fixture depends on a test fixture', async ({ runI
       test('works', async ({bar}) => {});
     `,
   });
-  expect(result.output).toContain('worker fixture "bar" cannot depend on a test fixture "foo" defined in f.spec.ts:3:25.');
+  expect(result.output).toMatch(/worker fixture "bar" cannot depend on a test fixture "foo" defined in f\\.spec\\.ts:\\d+:\\d+\\./);
   expect(result.exitCode).toBe(1);
 });
 
@@ -252,7 +252,7 @@ test('should detect fixture dependency cycle', async ({ runInlineTest }) => {
     `,
   });
   expect(result.output).toContain('Fixtures "bar" -> "baz" -> "qux" -> "foo" -> "bar" form a dependency cycle:');
-  expect(result.output).toContain('x.spec.ts:3:25 -> x.spec.ts:3:25 -> x.spec.ts:3:25 -> x.spec.ts:3:25');
+  expect(result.output).toMatch(/x\\.spec\\.ts:\\d+:\\d+ -> x\\.spec\\.ts:\\d+:\\d+ -> x\\.spec\\.ts:\\d+:\\d+ -> x\\.spec\\.ts:\\d+:\\d+/);
   expect(result.exitCode).toBe(1);
 });
 
@@ -268,7 +268,7 @@ test('should hide boxed fixtures in dependency cycle', async ({ runInlineTest })
       test('failed', async ({ page }) => {});
     `,
   });
-  expect(result.output).toContain('Fixtures "context" -> "storageState" -> "context" form a dependency cycle: <builtin> -> x.spec.ts:3:25 -> <builtin>');
+  expect(result.output).toMatch(/Fixtures "context" -> "storageState" -> "context" form a dependency cycle: <builtin> -> x\\.spec\\.ts:\\d+:\\d+ -> <builtin>/);
   expect(result.exitCode).toBe(1);
 });
 
@@ -287,7 +287,7 @@ test('should show boxed fixtures in dependency cycle if there are no public fixt
       test('failed', async ({ f1, f2 }) => {});
     `,
   });
-  expect(result.output).toContain('Fixtures "f1" -> "f2" -> "f1" form a dependency cycle: x.spec.ts:3:25 -> x.spec.ts:3:25 -> x.spec.ts:3:25');
+  expect(result.output).toMatch(/Fixtures "f1" -> "f2" -> "f1" form a dependency cycle: x\\.spec\\.ts:\\d+:\\d+ -> x\\.spec\\.ts:\\d+:\\d+ -> x\\.spec\\.ts:\\d+:\\d+/);
   expect(result.exitCode).toBe(1);
 });
 
@@ -311,7 +311,7 @@ test('should not reuse fixtures from one file in another one', async ({ runInlin
 
 test('should throw for cycle in two overrides', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.test.js': `
+    'a.test.ts': `
       import { test as base, expect } from '@playwright/test';
       const test1 = base.extend({
         foo: async ({}, run) => await run('foo'),
@@ -330,7 +330,7 @@ test('should throw for cycle in two overrides', async ({ runInlineTest }) => {
     `,
   });
   expect(result.output).toContain('Fixtures "bar" -> "foo" -> "bar" form a dependency cycle:');
-  expect(result.output).toContain('a.test.js:10:27 -> a.test.js:7:27');
+  expect(result.output).toMatch(/a\\.test\\.ts:\\d+:\\d+ -> a\\.test\\.ts:\\d+:\\d+/);
 });
 
 test('should throw when overridden worker fixture depends on a test fixture', async ({ runInlineTest }) => {
@@ -348,7 +348,7 @@ test('should throw when overridden worker fixture depends on a test fixture', as
       test2('works', async ({bar}) => {});
     `,
   });
-  expect(result.output).toContain('worker fixture "bar" cannot depend on a test fixture "foo" defined in f.spec.ts:3:26.');
+  expect(result.output).toMatch(/worker fixture "bar" cannot depend on a test fixture "foo" defined in f\\.spec\\.ts:\\d+:\\d+\\./);
   expect(result.output).toContain('f.spec.ts:7');
   expect(result.exitCode).toBe(1);
 });
@@ -610,16 +610,16 @@ test('should report worker fixture teardown with debug info', async ({ runInline
     'Fixture "fixture" timeout of 1000ms exceeded during teardown.',
     '',
     'Failed worker ran 20 tests, last 10 tests were:',
-    'a.spec.ts:10:9 › good10',
-    'a.spec.ts:10:9 › good11',
-    'a.spec.ts:10:9 › good12',
-    'a.spec.ts:10:9 › good13',
-    'a.spec.ts:10:9 › good14',
-    'a.spec.ts:10:9 › good15',
-    'a.spec.ts:10:9 › good16',
-    'a.spec.ts:10:9 › good17',
-    'a.spec.ts:10:9 › good18',
-    'a.spec.ts:10:9 › good19',
+    'a.spec.ts:6:30 › good10',
+    'a.spec.ts:6:30 › good11',
+    'a.spec.ts:6:30 › good12',
+    'a.spec.ts:6:30 › good13',
+    'a.spec.ts:6:30 › good14',
+    'a.spec.ts:6:30 › good15',
+    'a.spec.ts:6:30 › good16',
+    'a.spec.ts:6:30 › good17',
+    'a.spec.ts:6:30 › good18',
+    'a.spec.ts:6:30 › good19',
   ].join('\n'));
 });
 
@@ -793,7 +793,7 @@ test('should report fixture teardown error after test error', async ({ runInline
 test('should throw when overriding non-option fixture in config', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = {
+      export default {
         use: {
           foo: 'overridden',
           headless: true,

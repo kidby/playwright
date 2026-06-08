@@ -18,7 +18,7 @@ import { test, expect } from './playwright-test-fixtures.js';
 
 test('should get top level stdio', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.spec.js': `
+    'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       console.log('\\n%% top level stdout');
       console.error('\\n%% top level stderr');
@@ -51,7 +51,7 @@ test('should get stdio from worker fixture teardown', async ({ runInlineTest }) 
         }, { scope: 'worker' } ]
       });
     `,
-    'a.spec.js': `
+    'a.spec.ts': `
       const { test } = require('./helper');
       test('is a test', async ({fixture}) => {});
     `
@@ -65,9 +65,9 @@ test('should get stdio from worker fixture teardown', async ({ runInlineTest }) 
 test('should ignore stdio when quiet', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { quiet: true };
+      export default { quiet: true };
     `,
-    'a.spec.js': `
+    'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('is a test', () => {
         console.log('\\n%% stdout in a test');
@@ -87,7 +87,7 @@ test('should support console colors but not tty', {
   test.skip(nodeVersion.major < 18, 'Node16 does not respect FORCE_COLOR in onsole');
 
   const result = await runInlineTest({
-    'a.spec.js': `
+    'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('console log', () => {
         console.log('process.stdout.isTTY = ' + process.stdout.isTTY);
@@ -106,7 +106,7 @@ test('should support console colors but not tty', {
 
 test('should not throw type error when using assert', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.spec.js': `
+    'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       const assert = require('assert');
       test('assert no type error', () => {

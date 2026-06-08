@@ -1,3 +1,4 @@
+// @ts-expect-error -- js-yaml types not resolved through Bun's node_modules layout
 import * as jsYaml from 'js-yaml';
 
 export default {

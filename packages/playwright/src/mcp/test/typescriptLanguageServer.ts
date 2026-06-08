@@ -21,6 +21,7 @@ export class TypeScriptLanguageServerClient extends EventEmitter {
     });
 
     this.child.stderr?.on('data', (data) => {
+      // oxlint-disable-next-line eslint/no-console -- intentional stderr logging for LSP server errors
       console.error('[tsserver error]', data.toString());
     });
   }
@@ -40,6 +41,7 @@ export class TypeScriptLanguageServerClient extends EventEmitter {
         const payload = JSON.parse(message);
         this.handleMessage(payload);
       } catch (e) {
+        // oxlint-disable-next-line eslint/no-console -- intentional error logging for failed LSP message parsing
         console.error('Failed to parse LSP message', e);
       }
     }
@@ -49,11 +51,10 @@ export class TypeScriptLanguageServerClient extends EventEmitter {
     if (payload.id !== undefined && this.requests.has(payload.id)) {
       const { resolve, reject } = this.requests.get(payload.id)!;
       this.requests.delete(payload.id);
-      if (payload.error) {
+      if (payload.error)
         reject(payload.error);
-      } else {
+      else
         resolve(payload.result);
-      }
     } else if (payload.method === 'textDocument/publishDiagnostics') {
       const { uri, diagnostics } = payload.params;
       this.diagnostics.set(uri, diagnostics);

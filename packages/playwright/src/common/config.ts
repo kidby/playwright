@@ -55,6 +55,7 @@ export type AppiumConfig = {
   stdout?: 'pipe' | 'ignore';
   stderr?: 'pipe' | 'ignore';
   gracefulShutdown?: { signal: 'SIGINT' | 'SIGTERM'; timeout?: number };
+  drivers?: string[];
 };
 
 export class FullConfigInternal {

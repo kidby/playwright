@@ -4,7 +4,7 @@
   "description": "Playwright mobile testing — slim W3C Appium client and fixtures.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/microsoft/playwright.git"
+    "url": "git+https://github.com/kidby/playwright.git"
   },
   "homepage": "https://playwright.dev",
   "engines": {

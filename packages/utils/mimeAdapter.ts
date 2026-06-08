@@ -2,8 +2,8 @@ import { lookup, mimes } from 'mrmime';
 
 const mimeToExtension = new Map<string, string>();
 for (const [ext, mime] of Object.entries(mimes)) {
-  if (!mimeToExtension.has(mime))
-    mimeToExtension.set(mime, ext);
+  if (!mimeToExtension.has(mime as string))
+    mimeToExtension.set(mime as string, ext);
 }
 
 const mimeAdapter = {

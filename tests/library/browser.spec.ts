@@ -46,7 +46,7 @@ test('should throw upon second create new page', async function({ browser }) {
 test('version should work', async function({ browser, browserName }) {
   const version = browser.version();
   if (browserName === 'chromium')
-    expect(version.match(/^\d+\.\d+\.\d+\.\d+$/)).toBeTruthy();
+    expect(version.match(/^\d+\.\d+\.\d+\.\d+$/) || version.match(/^@[0-9a-f]+$/)).toBeTruthy();
   else
     expect(version.match(/^\d+\.\d+/)).toBeTruthy();
 });
@@ -60,7 +60,7 @@ test('should dispatch page.on(close) upon browser.close and reject evaluate', as
   await browser.close();
   expect(closed).toBe(true);
   const error = await promise;
-  expect(error.message).toContain(kTargetClosedErrorMessage);
+  expect(error.message).toMatch(new RegExp(`${kTargetClosedErrorMessage}|Execution context was destroyed`));
 });
 
 test('should fire context event on newContext', async ({ browser }) => {

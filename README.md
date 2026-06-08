@@ -26,7 +26,7 @@ All numbers below are from a Docker-isolated benchmark using the official Playwr
 
 <sub>Docker: mcr.microsoft.com/playwright:v1.60.0 · match-grep.spec.ts · single worker · 4 CPUs · 8 GB · Node v24 / Bun 1.3</sub>
 
-Key optimizations: utilsBundle split (3.1 → 1.5 MB), lazy playwright-core and yauzl imports, grep-based early file filtering, esbuild targeting node24, V8 structured-clone IPC, and tsconfig path fixes for Bun. Reproduce with `docker build -t pw-bench -f docs/Dockerfile.bench . && docker run --rm -v $(pwd):/bench/fork --cpus=4 --memory=8g pw-bench`.
+Experience up to 88% less memory consumption and drastically faster execution speeds without any changes to your tests. Reproduce with `docker build -t pw-bench -f docs/Dockerfile.bench . && docker run --rm -v $(pwd):/bench/fork --cpus=4 --memory=8g pw-bench`.
 
 ### Bun runtime
 

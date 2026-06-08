@@ -41,7 +41,7 @@ test('should run global setup and teardown', async ({ runUITest }, testInfo) => 
         console.log('%%' + JSON.stringify(config));
       };
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('should work', async ({}) => {});
     `
@@ -79,7 +79,7 @@ test('should teardown on sigint', async ({ runUITest, nodeVersion }) => {
     'globalTeardown.ts': `
       export default () => console.log('\\n%%from-global-teardown');
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('should work', async ({}) => {});
     `
@@ -329,7 +329,7 @@ for (const useWeb of [true, false]) {
             console.log('\\n%%from-global-teardown3000')
           };
         `,
-        'a.test.js': `
+        'a.test.ts': `
           import { test, expect } from '@playwright/test';
           test('should work', async ({}) => {});
         `
@@ -360,7 +360,7 @@ test('should restart webserver on reload', async ({ runUITest }) => {
         },
       });
     `,
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('should work', async ({ page }) => {
         await page.goto('http://localhost:${port}/hello');

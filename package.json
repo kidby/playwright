@@ -5,7 +5,7 @@
   "description": "A high-level API to automate web browsers",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/microsoft/playwright.git"
+    "url": "git+https://github.com/kidby/playwright.git"
   },
   "homepage": "https://playwright.dev",
   "engines": {
@@ -26,8 +26,6 @@
     "stest": "./node_modules/playwright/cli.js test --config=tests/stress/playwright.config.ts",
     "biditest": "./node_modules/playwright/cli.js test --config=tests/bidi/playwright.config.ts",
     "ttest": "./node_modules/playwright/cli.js test --config=tests/playwright-test/playwright.config.ts",
-    "ttest:bun": "bun ./node_modules/playwright/cli.js test --config=tests/playwright-test/playwright.config.ts",
-    "ctest:bun": "bun ./node_modules/playwright/cli.js test --config=tests/library/playwright.config.ts --project=chromium-*",
     "ct": "./node_modules/playwright/cli.js test tests/components/test-all.spec.js --reporter=list",
     "test": "./node_modules/playwright/cli.js test --config=tests/library/playwright.config.ts",
     "test-mcp": "./node_modules/playwright/cli.js test --config=tests/mcp/playwright.config.ts",
@@ -153,5 +151,8 @@
   },
   "allowScripts": {
     "better-sqlite3@12.10.0": true
+  },
+  "dependencies": {
+    "mrmime": "^2.0.1"
   }
 }

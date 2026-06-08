@@ -20,8 +20,8 @@ import fs from 'fs';
 
 test('should work with connectOptions', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.js': `
-      module.exports = {
+    'playwright.config.ts': `
+      export default {
         globalSetup: './global-setup',
         // outputDir is relative to the config file. Customers can have special characters in the path:
         // See: https://github.com/microsoft/playwright/issues/24157
@@ -41,7 +41,7 @@ test('should work with connectOptions', async ({ runInlineTest }) => {
     `,
     'global-setup.ts': `
       import { chromium } from '@playwright/test';
-      module.exports = async () => {
+      export default async () => {
         process.env.DEBUG = 'pw:browser';
         process.env.PWTEST_SERVER_WS_HEADERS =
           'x-playwright-debug-log: a-debug-log-string\\r\\n' +
@@ -83,8 +83,8 @@ test('should work with connectOptions', async ({ runInlineTest }) => {
 
 test('should throw with bad connectOptions', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.js': `
-      module.exports = {
+    'playwright.config.ts': `
+      export default {
         use: {
           connectOptions: {
             wsEndpoint: 'http://does-not-exist-bad-domain.oh-no-should-not-work',
@@ -108,8 +108,8 @@ test('should throw with bad connectOptions', async ({ runInlineTest }) => {
 
 test('should respect connectOptions.timeout', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.js': `
-      module.exports = {
+    'playwright.config.ts': `
+      export default {
         use: {
           connectOptions: {
             wsEndpoint: 'wss://localhost:5678',
@@ -131,8 +131,8 @@ test('should respect connectOptions.timeout', async ({ runInlineTest }) => {
 
 test('should print debug log when failed to connect', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.js': `
-      module.exports = {
+    'playwright.config.ts': `
+      export default {
         globalSetup: './global-setup',
         use: {
           connectOptions: {
@@ -145,7 +145,7 @@ test('should print debug log when failed to connect', async ({ runInlineTest }) 
       import { chromium } from '@playwright/test';
       import ws from 'ws';
       import http from 'http';
-      module.exports = async () => {
+      export default async () => {
         const server = http.createServer(() => {});
         server.on('upgrade', async (request, socket, head) => {
           socket.write('HTTP/1.1 401 Unauthorized\\r\\nx-playwright-debug-log: b-debug-log-string\\r\\n\\r\\nUnauthorized body');
@@ -176,8 +176,8 @@ test('should print debug log when failed to connect', async ({ runInlineTest }) 
 
 test('should record trace', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'playwright.config.js': `
-      module.exports = {
+    'playwright.config.ts': `
+      export default {
         globalSetup: './global-setup',
         use: {
           connectOptions: {
@@ -189,7 +189,7 @@ test('should record trace', async ({ runInlineTest }) => {
     `,
     'global-setup.ts': `
       import { chromium } from '@playwright/test';
-      module.exports = async () => {
+      export default async () => {
         const server = await chromium.launchServer();
         process.env.CONNECT_WS_ENDPOINT = server.wsEndpoint();
         process.env.DEBUG = 'pw:channel';

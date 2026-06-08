@@ -18,7 +18,7 @@ import { test, expect } from './playwright-test-fixtures.js';
 
 test('max-failures should work', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.spec.js': `
+    'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       for (let i = 0; i < 10; ++i) {
         test('fail_' + i, () => {
@@ -26,7 +26,7 @@ test('max-failures should work', async ({ runInlineTest }) => {
         });
       }
     `,
-    'b.spec.js': `
+    'b.spec.ts': `
       import { test, expect } from '@playwright/test';
       for (let i = 0; i < 10; ++i) {
         test('fail_' + i, () => {
@@ -42,7 +42,7 @@ test('max-failures should work', async ({ runInlineTest }) => {
 
 test('-x should work', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.spec.js': `
+    'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       for (let i = 0; i < 10; ++i) {
         test('fail_' + i, () => {
@@ -50,7 +50,7 @@ test('-x should work', async ({ runInlineTest }) => {
         });
       }
     `,
-    'b.spec.js': `
+    'b.spec.ts': `
       import { test, expect } from '@playwright/test';
       for (let i = 0; i < 10; ++i) {
         test('fail_' + i, () => {
@@ -66,7 +66,7 @@ test('-x should work', async ({ runInlineTest }) => {
 
 test('max-failures should work with retries', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.spec.js': `
+    'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       for (let i = 0; i < 10; ++i) {
         test('fail_' + i, () => {
@@ -82,7 +82,7 @@ test('max-failures should work with retries', async ({ runInlineTest }) => {
 
 test('max-failures should stop workers', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.spec.js': `
+    'a.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('passed', async () => {
         await new Promise(f => setTimeout(f, 2000));
@@ -91,7 +91,7 @@ test('max-failures should stop workers', async ({ runInlineTest }) => {
         test.expect(1).toBe(2);
       });
     `,
-    'b.spec.js': `
+    'b.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('passed short', async () => {
         await new Promise(f => setTimeout(f, 1));

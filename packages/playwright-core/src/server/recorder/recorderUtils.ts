@@ -147,8 +147,11 @@ async function generateFrameSelectorInParent(prgoress: Progress, parent: Frame, 
     } catch (e) {
     }
   }, monotonicTime() + 2000);
-  if (!result.timedOut && result.result)
-    return result.result;
+  if (!result.timedOut) {
+    const { result: value } = result as { result: string; timedOut: false };
+    if (value)
+      return value;
+  }
 
   if (frame.name())
     return `iframe[name=${quoteCSSAttributeValue(frame.name())}]`;

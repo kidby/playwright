@@ -24,7 +24,7 @@ import { createRootSdkObject, SdkObject } from '../../packages/playwright-core/s
 
 // Mock subclasses to allow spying and overriding method behaviors
 class MockAppium extends Appium {
-  connect(progress: any, params: any): Promise<AppiumDevice> {
+  override connect(progress: any, params: any): Promise<AppiumDevice> {
     throw new Error('Method not implemented.');
   }
 }
@@ -34,16 +34,16 @@ class MockAppiumDevice extends AppiumDevice {
     // Pass a fake AppiumClient to parent constructor
     super(parent, {} as any);
   }
-  appLocator(chain: any[], options?: any): Promise<any> {
+  override appLocator(chain: any[], options?: any): Promise<any> {
     throw new Error('Method not implemented.');
   }
-  screenshot(progress: any, params: any): Promise<Buffer> {
+  override screenshot(progress: any, params: any): Promise<Buffer> {
     throw new Error('Method not implemented.');
   }
-  request(progress: any, params: any): Promise<{ result?: any }> {
+  override request(progress: any, params: any): Promise<{ result?: any }> {
     throw new Error('Method not implemented.');
   }
-  close(progress: any): Promise<void> {
+  override close(progress: any): Promise<void> {
     throw new Error('Method not implemented.');
   }
 }
@@ -75,7 +75,7 @@ test.describe('AppiumDispatcher and AppiumDeviceDispatcher Unit Tests', () => {
     expect(receivedParams).toBe(connectParams);
     expect(receivedProgress).toBe(dummyProgress);
     expect(result.device).toBeInstanceOf(AppiumDeviceDispatcher);
-    expect(result.device._object).toBe(mockDevice);
+    expect((result.device as any)._object).toBe(mockDevice);
   });
 
   test('AppiumDispatcher.connect propagates connection errors', async () => {
@@ -90,7 +90,7 @@ test.describe('AppiumDispatcher and AppiumDeviceDispatcher Unit Tests', () => {
     const rootDispatcher = new RootDispatcher(connection);
     const appiumDispatcher = new AppiumDispatcher(rootDispatcher, mockAppium);
 
-    await expect(appiumDispatcher.connect({ serverUrl: 'http://127.0.0.1:4723' }, {} as any))
+    await expect(appiumDispatcher.connect({ serverUrl: 'http://127.0.0.1:4723', capabilities: {} }, {} as any))
         .rejects.toThrow('Appium server connection timed out');
   });
 
@@ -120,7 +120,7 @@ test.describe('AppiumDispatcher and AppiumDeviceDispatcher Unit Tests', () => {
     expect(receivedChain).toBe(params.chain);
     expect(receivedOptions).toBe(params.options);
     expect(result.locator).toBeInstanceOf(AppLocatorDispatcher);
-    expect(result.locator._object).toBe(mockLocator);
+    expect((result.locator as any)._object).toBe(mockLocator);
   });
 
   test('AppiumDeviceDispatcher.screenshot returns binary data', async () => {
@@ -144,7 +144,7 @@ test.describe('AppiumDispatcher and AppiumDeviceDispatcher Unit Tests', () => {
     const deviceDispatcher = new AppiumDeviceDispatcher(appiumDispatcher, mockDevice);
 
     const dummyProgress = {} as any;
-    const params = { type: 'png' };
+    const params = { timeout: 5000 };
     const result = await deviceDispatcher.screenshot(params, dummyProgress);
 
     expect(receivedProgress).toBe(dummyProgress);
@@ -166,7 +166,7 @@ test.describe('AppiumDispatcher and AppiumDeviceDispatcher Unit Tests', () => {
     const appiumDispatcher = new AppiumDispatcher(rootDispatcher, mockAppium);
     const deviceDispatcher = new AppiumDeviceDispatcher(appiumDispatcher, mockDevice);
 
-    await expect(deviceDispatcher.screenshot({ type: 'png' }, {} as any))
+    await expect(deviceDispatcher.screenshot({ timeout: 5000 }, {} as any))
         .rejects.toThrow('Screenshot acquisition failed');
   });
 

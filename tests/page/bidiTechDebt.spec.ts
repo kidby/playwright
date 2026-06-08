@@ -40,7 +40,7 @@ const testWithFixture = it.extend<{ customContext: any }>({
 });
 
 const order: string[] = [];
-const testWithNestedOrder = it.extend<{ nestedFixture: string }>({
+const testWithNestedOrder = it.extend<{ nestedFixture: string; parentFixture: string }>({
   parentFixture: async ({}, use) => {
     order.push('parent-setup');
     await use('parent');
@@ -504,8 +504,9 @@ it('should not spawn duplicate screencast loops when restarted rapidly', async (
   expect(bidiPage._screencastTimeout).toBeUndefined();
 });
 
-it('should handle high concurrency of tracing starts with the same option name', async ({ browserType }, testInfo) => {
+it('should handle high concurrency of tracing starts with the same option name', async ({ page, browserName }, testInfo) => {
   const tracesDir = testInfo.outputPath('shared-traces-dir');
+  const browserType = page.context().browser()!.browserType();
   const browser = await browserType.launch({ tracesDir });
   const contexts = await Promise.all([
     browser.newContext(),

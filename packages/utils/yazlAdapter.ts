@@ -4,8 +4,8 @@ const archiver = customRequire('archiver');
 import { EventEmitter } from 'events';
 
 export class ZipFile extends EventEmitter {
-  public outputStream: archiver.Archiver;
-  private archive: archiver.Archiver;
+  public outputStream: any;
+  private archive: any;
 
   constructor() {
     super();
@@ -14,8 +14,8 @@ export class ZipFile extends EventEmitter {
     });
     this.outputStream = this.archive;
 
-    this.archive.on('error', (err) => this.emit('error', err));
-    this.archive.on('warning', (err) => this.emit('error', err));
+    this.archive.on('error', (err: any) => this.emit('error', err));
+    this.archive.on('warning', (err: any) => this.emit('error', err));
   }
 
   addFile(realPath: string, metadataPath: string) {

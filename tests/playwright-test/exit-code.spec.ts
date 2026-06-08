@@ -23,7 +23,7 @@ function monotonicTime(): number {
 
 test('should collect stdio', async ({ runInlineTest }) => {
   const { exitCode, report } = await runInlineTest({
-    'stdio.spec.js': `
+    'stdio.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('stdio', () => {
         process.stdout.write('stdout text');
@@ -42,7 +42,7 @@ test('should collect stdio', async ({ runInlineTest }) => {
 
 test('should collect stdio from forked process', async ({ runInlineTest }) => {
   const { exitCode, report } = await runInlineTest({
-    'stdio.spec.js': `
+    'stdio.spec.ts': `
       import { test } from '@playwright/test';
       import { fork } from 'child_process';
       test('stdio', async () => {
@@ -78,7 +78,7 @@ test('should work with typescript', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'global-foo.js': `
       global.foo = true;
-      module.exports = {
+      export default {
         abc: 123
       };
     `,
@@ -101,7 +101,7 @@ test('should work with typescript', async ({ runInlineTest }) => {
 
 test('should repeat each', async ({ runInlineTest }) => {
   const { exitCode, report, passed } = await runInlineTest({
-    'one-success.spec.js': `
+    'one-success.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('succeeds', () => {
         expect(1 + 1).toBe(2);
@@ -117,7 +117,7 @@ test('should repeat each', async ({ runInlineTest }) => {
 
 test('should allow flaky', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('flake', async ({}, testInfo) => {
         expect(testInfo.retry).toBe(1);
@@ -130,7 +130,7 @@ test('should allow flaky', async ({ runInlineTest }) => {
 
 test('failOnFlakyTests flag disallows flaky', async ({ runInlineTest }) => {
   const result = await runInlineTest({
-    'a.test.js': `
+    'a.test.ts': `
       import { test, expect } from '@playwright/test';
       test('flake', async ({}, testInfo) => {
         expect(testInfo.retry).toBe(1);
@@ -143,7 +143,7 @@ test('failOnFlakyTests flag disallows flaky', async ({ runInlineTest }) => {
 
 test('should fail on unexpected pass', async ({ runInlineTest }) => {
   const { exitCode, failed, output } = await runInlineTest({
-    'unexpected-pass.spec.js': `
+    'unexpected-pass.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('succeeds', () => {
         test.fail();
@@ -159,7 +159,7 @@ test('should fail on unexpected pass', async ({ runInlineTest }) => {
 test('should respect global timeout', async ({ runInlineTest }) => {
   const now = monotonicTime();
   const { exitCode, output } = await runInlineTest({
-    'one-timeout.spec.js': `
+    'one-timeout.spec.ts': `
       import { test, expect } from '@playwright/test';
       test('timeout', async () => {
         await new Promise(f => setTimeout(f, 10000));
@@ -174,7 +174,7 @@ test('should respect global timeout', async ({ runInlineTest }) => {
 test('should exit with code 1 if the specified folder does not exist', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { testDir: '111111111111.js' };
+      export default { testDir: '111111111111.js' };
     `,
   });
   expect(result.exitCode).toBe(1);
@@ -184,9 +184,9 @@ test('should exit with code 1 if the specified folder does not exist', async ({ 
 test('should exit with code 1 if passed a file name', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { testDir: 'test.spec.js' };
+      export default { testDir: 'test.spec.ts' };
     `,
-    'test.spec.js': `
+    'test.spec.ts': `
     `,
   });
   expect(result.exitCode).toBe(1);
@@ -196,7 +196,7 @@ test('should exit with code 1 if passed a file name', async ({ runInlineTest }) 
 test('should exit with code 0 with --pass-with-no-tests', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
-      module.exports = { testDir: 'unknown' };
+      export default { testDir: 'unknown' };
     `,
   }, undefined, undefined, { additionalArgs: ['--pass-with-no-tests'] });
   expect(result.exitCode).toBe(0);

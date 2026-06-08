@@ -4,7 +4,7 @@ set -euo pipefail
 # Usage: fetch-commit-logs.sh [<sha>]
 # Fetches CI failure logs for a commit into ~/tmp/commit-<short-sha>/
 
-REPO="microsoft/playwright"
+REPO="kidby/playwright"
 REF="${1:-main}"
 
 # Resolve commit

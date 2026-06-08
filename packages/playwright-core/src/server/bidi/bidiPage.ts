@@ -634,7 +634,7 @@ export class BidiPage implements PageDelegate {
       ]);
     }, null);
     if (!quads || quads === 'error:notconnected')
-      return quads;
+      return quads as 'error:notconnected';
     // TODO: consider transforming quads to support clicks in iframes.
     const position = await this._framePosition(handle._frame);
     if (!position)

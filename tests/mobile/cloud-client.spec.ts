@@ -36,7 +36,7 @@ test.describe('Cloud Client - Header Construction', () => {
   });
 
   test('Bearer token falls back to PLAYWRIGHT_MOBILE_TOKEN env var', () => {
-    const token = undefined || process.env.PLAYWRIGHT_MOBILE_TOKEN;
+    const token: string | undefined = process.env.PLAYWRIGHT_MOBILE_TOKEN;
     const headers: Record<string, string> = {};
     if (token)
       headers['Authorization'] = `Bearer ${token}`;

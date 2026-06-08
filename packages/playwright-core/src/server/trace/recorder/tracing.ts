@@ -326,9 +326,9 @@ export class Tracing extends SdkObject implements InstrumentationListener, Snaps
       fs.existsSync(path.join(tracesDir, traceName + '.network')) ||
       Tracing._activeTracePaths.has(path.join(tracesDir, traceName + '.trace')) ||
       Tracing._activeTracePaths.has(path.join(tracesDir, traceName + '.network'))
-    ) {
+    )
       traceName = `${name}-${++suffix}`;
-    }
+
     const tracePath = path.join(tracesDir, traceName + '.trace');
     const networkPath = path.join(tracesDir, traceName + '.network');
     Tracing._activeTracePaths.add(tracePath);

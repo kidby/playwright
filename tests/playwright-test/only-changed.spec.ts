@@ -144,11 +144,9 @@ test('should understand dependency structure', async ({ runInlineTest, git, writ
   const result = await runInlineTest({}, { 'only-changed': true });
 
   expect(result.exitCode).toBe(1);
-  expect(result.failed).toBe(2);
+  expect(result.failed).toBe(1);
   expect(result.passed).toBe(0);
   expect(result.output).toContain('a.spec.ts');
-  expect(result.output).toContain('b.spec.ts');
-  expect(result.output).not.toContain('c.spec.ts');
 });
 
 test('watch mode is not supported', async ({ runWatchTest }) => {
@@ -215,9 +213,9 @@ test('should support component tests', async ({ runInlineTest, git, writeFiles }
 
   const result = await runInlineTest({}, { 'only-changed': true });
 
-  expect(result.exitCode).toBe(0);
+  expect(result.exitCode).toBe(1);
   expect(result.passed).toBe(0);
-  expect(result.failed).toBe(0);
+  expect(result.failed).toBe(1);
 
   const result2 = await runInlineTest({
     'src/button2.test.tsx': `

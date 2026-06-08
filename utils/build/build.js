@@ -847,6 +847,7 @@ steps.push(new EsbuildStep({
     filePath('packages/playwright/src/*.ts'),
     filePath('packages/playwright/src/agents/**/*.ts'),
     filePath('packages/playwright/src/cli/**/*.ts'),
+    filePath('packages/playwright/src/isomorphic/**/*.ts'),
     filePath('packages/playwright/src/mcp/**/*.ts'),
     filePath('packages/playwright/src/reporters/*.ts'),
   ],
